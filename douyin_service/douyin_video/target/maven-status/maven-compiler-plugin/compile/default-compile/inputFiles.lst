@@ -1,0 +1,10 @@
+D:\专业\项目\douyin\douyin_backend\douyin_service\douyin_video\src\main\java\com\bruce\controller\VideoController.java
+D:\专业\项目\douyin\douyin_backend\douyin_service\douyin_video\src\main\java\com\bruce\exception\GlobalExceptionHandler.java
+D:\专业\项目\douyin\douyin_backend\douyin_service\douyin_video\src\main\java\com\bruce\utils\ThreadLocalUtil.java
+D:\专业\项目\douyin\douyin_backend\douyin_service\douyin_video\src\main\java\com\bruce\service\impl\VideoServiceImpl.java
+D:\专业\项目\douyin\douyin_backend\douyin_service\douyin_video\src\main\java\com\bruce\service\VideoService.java
+D:\专业\项目\douyin\douyin_backend\douyin_service\douyin_video\src\main\java\com\bruce\config\WebConfig.java
+D:\专业\项目\douyin\douyin_backend\douyin_service\douyin_video\src\main\java\com\bruce\dao\VideoDao.java
+D:\专业\项目\douyin\douyin_backend\douyin_service\douyin_video\src\main\java\com\bruce\interceptors\LoginInterceptor.java
+D:\专业\项目\douyin\douyin_backend\douyin_service\douyin_video\src\main\java\com\bruce\listener\DeadLetterQueueConsumer.java
+D:\专业\项目\douyin\douyin_backend\douyin_service\douyin_video\src\main\java\com\bruce\DouyinVideoApplication.java

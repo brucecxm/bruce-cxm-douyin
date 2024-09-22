@@ -1,0 +1,30 @@
+        <spring.mock.version>2.0.8</spring.mock.version>
+
+JAXB（Java Architecture for XML Binding）是Java平台的一项技术，它提供了一种方法来将XML文档与Java对象之间进行映射（绑定）。
+要用途是在Java应用程序中实现XML数据的序列化（将Java对象转换为XML文档）和反序列化（将XML文档转换为Java对象）操作。
+                <jaxb.version>2.3.0</jaxb.version>
+
+
+<!--    系统模块 能读取cpu内存之类的信息-->
+                     <oshi.version>3.9.1</oshi.version>
+
+
+                          <ip2region.version>1.7.2</ip2region.version>
+                          为什么不把数据库文件存入数据库然后查询  因为麻烦不方便
+                          选择使用 org.lionsoul:ip2region 依赖库的主要优势在于：
+                          性能高效：ip2region 使用了高效的数据结构和算法，能够在极短的时间内完成 IP 地址的查询。
+                          简便易用：通过简单的 API 调用即可实现 IP 地址到地理位置的查询，无需自行实现复杂的数据结构和算法。
+
+
+     <flexmark.version>0.62.2</flexmark.version>
+     Flexmark是一个开源的Java库，用于处理和解析Markdown文本。它提供了一套工具和API，可以将Markdown格式的文本解析成HTML或其他格式，
+     或者从HTML转换成Markdown。Flexmark支持标准的Markdown语法，并且可以通过插件和扩展进行定制和增强功能。
+
+
+Java对象和JSON数据之间进行序列化和反序列化的库
+        <google.code.gson.version>2.7</google.code.gson.version>]
+
+
+JavaMail API 是 Java 平台上用于发送和接收电子邮件的标准API。它提供了一组类和接口，使开发者能够与邮件服务器进行通信，
+并实现电子邮件的发送和接收功能。在Java项目中，如果需要发送或接收电子邮件，通常会使用JavaMail API来完成这些任务。
+  <javax.mail.version>1.4</javax.mail.version>

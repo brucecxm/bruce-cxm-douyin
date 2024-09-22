@@ -1,0 +1,15 @@
+com\bruce\mapper\UserMapper.class
+com\bruce\anno\State.class
+com\bruce\exception\GlobalExceptionHandler.class
+com\bruce\pojo\SysUser.class
+com\bruce\utils\ThreadLocalUtil.class
+com\bruce\DouyinUserApplication.class
+com\bruce\mapper\SysUserMapper.class
+com\bruce\controller\UserController.class
+com\bruce\utils\Md5Util.class
+com\bruce\feign\userFeign.class
+com\bruce\pojo\LoginDto.class
+com\bruce\service\impl\UserServiceImpl.class
+com\bruce\validation\StateValidation.class
+com\bruce\service\UserService.class
+com\bruce\utils\JwtUtil.class

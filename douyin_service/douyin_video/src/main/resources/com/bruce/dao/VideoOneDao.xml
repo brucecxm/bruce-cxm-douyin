@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bruce.dao.VideoOneDao">
+
+
+
+    <resultMap type="com.bruce.video.entity.VideoOne" id="VideoOne">
+        <result property="musicName" column="music_name" jdbcType="VARCHAR"/>
+        <result property="videoUrl" column="video_url" jdbcType="VARCHAR"/>
+        <result property="nickName" column="nickname" jdbcType="VARCHAR"/>
+        <result property="userPic" column="user_pic" jdbcType="VARCHAR"/>
+        <result property="comment" column="comment" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+
+    <select id="queryVideoInfo" resultMap="VideoOne" >
+        select
+            m.music_name, v.video_url, u.nickname, u.user_pic, c.comment
+        from video v
+                 inner join user u on v.auth_id = u.id
+                 inner join music m on v.music_id = m.music_video_id
+                 inner join comment c on v.video_id = c.comment_video_id
+        where v.video_id = #{videoId}
+    </select>
+    
+
+
+</mapper>

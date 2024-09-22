@@ -1,0 +1,9 @@
+com\bruce\music\entity\Music.class
+com\bruce\comment\entity\Comment.class
+com\bruce\video\entity\Result.class
+com\bruce\user\pojo\Result.class
+com\bruce\video\entity\Video.class
+com\bruce\video\entity\VideoWithAvatar.class
+com\bruce\user\pojo\PageBean.class
+com\bruce\video\dto\VideoDTO.class
+com\bruce\user\pojo\User.class

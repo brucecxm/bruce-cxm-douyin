@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          client:
+            client-id: client
+            client-secret: secret
+            authorization-grant-type: authorization_code
+            redirect-uri: http://127.0.0.1:8080/login/oauth2/code/client
+            scope: read
+        provider:
+          client:
+            authorization-uri: http://auth-server:9000/oauth2/authorize
+            token-uri: http://auth-server:9000/oauth2/token
+            jwk-set-uri: http://auth-server:9000/oauth2/jwks

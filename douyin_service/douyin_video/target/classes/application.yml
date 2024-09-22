@@ -1,0 +1,25 @@
+spring:
+  rabbitmq:
+    host: 192.168.200.130
+    port: 5672
+    username: itcast
+    password: 123321
+    virtual-host: /douyin # 虚拟主机
+  application:
+    name: DouyinVideoService
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+
+
+
+
+
+
+server:
+  port: 9522
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:10086/eureka

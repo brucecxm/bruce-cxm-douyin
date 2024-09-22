@@ -1,0 +1,14 @@
+# 使用 OpenJDK 8 作为基础镜像
+FROM registry.cn-hangzhou.aliyuncs.com/brucechenhub/openjdk8
+
+# 复制 JAR 文件到容器的 /app 目录
+COPY douyin_eureka-1.0-SNAPSHOT.jar /app/douyin_eureka-1.0-SNAPSHOT.jar
+
+# 设置工作目录
+WORKDIR /app
+
+# 配置容器启动时执行的命令
+ENTRYPOINT ["java", "-jar", "douyin_eureka-1.0-SNAPSHOT.jar"]
+
+# 暴露容器的端口
+EXPOSE 8080

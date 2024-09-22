@@ -1,0 +1,46 @@
+
+
+server:
+  port: 8988
+
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: DouyinUSerService
+          uri: lb://DouyinUSerService
+          predicates:
+            - Path=/user/**
+        - id: DouyinIntroduceService
+          uri: lb://DouyinIntroduceService
+          predicates:
+            - Path=/introduce/**
+        - id: DouyinVideoService
+          uri: lb://DouyinVideoService
+          predicates:
+            - Path=/video/**
+        - id: DouyinMusicService
+          uri: lb://DouyinMusicService
+          predicates:
+            - Path=/music/**
+        - id: DouyinCommentService
+          uri: lb://DouyinCommentService
+          predicates:
+            - Path=/comment/**
+        - id: DouyinChatService
+          uri: lb://DouyinChatService
+          predicates:
+            - Path=/chat/**
+
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:10086/eureka  # Eureka服务器地址
