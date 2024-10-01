@@ -10,7 +10,7 @@
                 <div class="underline" ref="underline" v-show="underlineVisible"></div>
             </div>
         </div>
-        <div class="search"></div>
+        <div class="search" @click="gosearch"></div>
     </div>
 </template>
 
@@ -34,6 +34,9 @@ export default {
         };
     },
     methods: {
+        gosearch() {
+            this.$router.push("/search")
+        },
         triggerParentEvent() {
             // 调用父组件的方法
             this.onChildEvent();
