@@ -20,10 +20,7 @@ import org.springframework.http.HttpStatus;
 //import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 //import org.springframework.security.web.savedrequest.RequestCache;
 //import org.springframework.security.web.savedrequest.SavedRequest;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
+
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

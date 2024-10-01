@@ -18,6 +18,7 @@
                         <option value="+6">+6</option>
                     </select>
                     <input type="tel" v-model="loginpojo.username" placeholder="请输入手机号" />
+                    <input type="tel" v-model="loginpojo.password" placeholder="请输入密码" />
 
                     <br>
                     <button class="clear-btn" @click="clearPhoneNumber">×</button>
@@ -62,6 +63,7 @@ export default {
         },
         clearPhoneNumber() {
             this.loginpojo.username = ''; // 修改为清空手机号
+            this.loginpojo.password = ''; // 修改为清空手机号
         },
         async verifyPhoneNumber() {
             if (!this.isAgreed) { // 检查用户是否勾选协议
