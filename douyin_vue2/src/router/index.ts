@@ -8,12 +8,12 @@ const router = new VueRouter({
   base: import.meta.env.BASE_URL,
   routes: [
     {
-      path: "/",
+      path: "/homeone",
       name: "home",
       component: () => import("../views/one.vue"),
     },
     {
-      path: "/homeone",
+      path: "/",
       name: "homeone",
       component: () => import("../views/home.vue"),
     },

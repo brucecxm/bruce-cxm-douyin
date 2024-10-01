@@ -44,26 +44,26 @@ import java.util.concurrent.TimeUnit;
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-
-
-    @Autowired
-    private OAuth2AuthorizedClientService authorizedClientService;
-
-    @Autowired
-    private RestTemplate restTemplate;
-
-    @GetMapping("/loginqq")
-    public String login(@RegisteredOAuth2AuthorizedClient("qq") OAuth2AuthorizedClient authorizedClient) {
-        OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
-        String userInfo = getUserInfo(accessToken.getTokenValue());
-        return userInfo;
-    }
-
-    private String getUserInfo(String accessToken) {
-        String url = "https://graph.qq.com/user/get_user_info?access_token=" + accessToken + "&oauth_consumer_key=YOUR_APP_ID";
-        return restTemplate.getForObject(url, String.class);
-    }
-
+//
+//
+//    @Autowired
+//    private OAuth2AuthorizedClientService authorizedClientService;
+//
+//    @Autowired
+//    private RestTemplate restTemplate;
+//
+//    @GetMapping("/loginqq")
+//    public String login(@RegisteredOAuth2AuthorizedClient("qq") OAuth2AuthorizedClient authorizedClient) {
+//        OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
+//        String userInfo = getUserInfo(accessToken.getTokenValue());
+//        return userInfo;
+//    }
+//
+//    private String getUserInfo(String accessToken) {
+//        String url = "https://graph.qq.com/user/get_user_info?access_token=" + accessToken + "&oauth_consumer_key=YOUR_APP_ID";
+//        return restTemplate.getForObject(url, String.class);
+//    }
+//
 
 
 

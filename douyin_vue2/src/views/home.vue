@@ -1,12 +1,13 @@
 <template>
     <div class="homecontain">
-        <caidan :style="caidancss" :onChildEvent="showcaidanone"></caidan>
+        <caidan :style="caidancss"></caidan>
 
         <div class="home" :style="boxvideocss">
             <div class="headercontain">
                 <!-- <button @click="showcaidanone"></button> -->
 
-                <header-vue class="header" :activeIndex="activeIndex" @update:index="updateActiveIndex">
+                <header-vue class="header" :activeIndex="activeIndex" @update:index="updateActiveIndex"
+                    :onChildEvent="showcaidanone">
                 </header-vue>
             </div>
 

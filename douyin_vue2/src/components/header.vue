@@ -36,7 +36,7 @@ export default {
     methods: {
         triggerParentEvent() {
             // 调用父组件的方法
-            this.onChildEvent('Hello from Child');
+            this.onChildEvent();
         },
         changeIndex(index) {
             this.$emit('update:index', index);
