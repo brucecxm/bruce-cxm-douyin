@@ -137,7 +137,6 @@ export default {
     methods: {
 
 
-
         startDrag(event) {
             event.preventDefault();
             this.isDragging = true;
