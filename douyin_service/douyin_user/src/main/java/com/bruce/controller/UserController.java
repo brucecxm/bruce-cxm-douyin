@@ -9,6 +9,7 @@ import com.bruce.utils.ThreadLocalUtil;
 import org.hibernate.validator.constraints.URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -19,9 +20,14 @@ import org.springframework.http.HttpStatus;
 //import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 //import org.springframework.security.web.savedrequest.RequestCache;
 //import org.springframework.security.web.savedrequest.SavedRequest;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +35,7 @@ import javax.validation.constraints.Pattern;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -36,6 +43,28 @@ import java.util.concurrent.TimeUnit;
 @Validated
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+
+
+    @Autowired
+    private OAuth2AuthorizedClientService authorizedClientService;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @GetMapping("/loginqq")
+    public String login(@RegisteredOAuth2AuthorizedClient("qq") OAuth2AuthorizedClient authorizedClient) {
+        OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
+        String userInfo = getUserInfo(accessToken.getTokenValue());
+        return userInfo;
+    }
+
+    private String getUserInfo(String accessToken) {
+        String url = "https://graph.qq.com/user/get_user_info?access_token=" + accessToken + "&oauth_consumer_key=YOUR_APP_ID";
+        return restTemplate.getForObject(url, String.class);
+    }
+
+
 
 
     @Autowired
@@ -61,42 +90,101 @@ public class UserController {
         }
     }
 
+//    \\S: 代表一个非空白字符。它可以是字母、数字或其他符号，但不能是空格、制表符或其他空白字符。
+//    {5,16}:
+//            5 表示至少需要 5 个非空白字符。
+//            16 表示最多只能有 16 个非空白字符。
+
     @PostMapping("/login")
-    public Result<String> login(@Pattern(regexp = "^\\S{5,16}$") String username, @Pattern(regexp = "^\\S{5,16}$") String password) {
-        //根据用户名查询用户
+    public Result<String> login(
+            @Pattern(regexp = "^\\S{5,16}$") @RequestParam(name = "username", defaultValue = "admin", required = true) String username,
+            @Pattern(regexp = "^\\S{5,16}$") String password) {
+
+        // 根据用户名查询用户
         User loginUser = userService.findByUserName(username);
-        //判断该用户是否存在
+        // 判断该用户是否存在
         if (loginUser == null) {
             return Result.error("用户名错误");
         }
 
-        //判断密码是否正确  loginUser对象中的password是密文
-        if (Md5Util.getMD5String(password).equals(loginUser.getPassword())) {
-            //登录成功
-            Map<String, Object> claims = new HashMap<>();
-            claims.put("id", loginUser.getId());
-            claims.put("username", loginUser.getUsername());
-            String token = JwtUtil.genToken(claims);
+        String hashedPassword = Md5Util.getMD5String(password);
+        boolean isEmail = true;  // 假设这里是一个标志，您可以根据实际情况调整
+        String yanzhengma = "5657"; // 验证码
 
-
-            //todo  redis未启动异常 后面加到全局异常捕获器
-            try {
-                //把token存储到redis中
-                ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
-                operations.set(token,token,1, TimeUnit.HOURS);
-            } catch (RedisConnectionFailureException ex) {
-               System.out.println("Redis 连接失败，请检查 Redis 服务器是否运行。");
-            } catch (Exception ex) {
-                System.out.println("Redis 连接失败，请检查 Redis 服务器是否运行。");
+        // 检查密码
+        if (isEmail) {
+            if (hashedPassword.equals(loginUser.getPassword())) {
+                return generateTokenAndStoreInRedis(loginUser);
+            } else {
+                return checkValidationCodeAndLogin(loginUser, yanzhengma);
             }
-
-
-
-
-            return Result.success(token);
         }
+
         return Result.error("密码错误");
     }
+
+    private Result<String> generateTokenAndStoreInRedis(User loginUser) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", loginUser.getId());
+        claims.put("username", loginUser.getUsername());
+        String token = JwtUtil.genToken(claims);
+
+        try {
+            // 把token存储到redis中
+            ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+            operations.set(token, token, 1, TimeUnit.HOURS);
+        } catch (RedisConnectionFailureException ex) {
+            System.out.println("Redis 连接失败，请检查 Redis 服务器是否运行。");
+        } catch (Exception ex) {
+            System.out.println("Redis 连接失败，请检查 Redis 服务器是否运行。");
+        }
+
+        return Result.success(token);
+    }
+
+    //核对验证码
+    //核对验证码
+    private Result<String> checkValidationCodeAndLogin(User loginUser, String yanzhengma) {
+        String operations = stringRedisTemplate.opsForValue().get("yancode");
+        if (operations != null && operations.equals(yanzhengma)) {
+            return generateTokenAndStoreInRedis(loginUser);
+        } else {
+            return Result.error("密码错误");
+        }
+    }
+
+
+
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+
+//生成四位的验证吗
+    @GetMapping("/getYanzheng")
+    public Result<String> getYanzheng() {
+        // 生成四位随机验证码
+        String verificationCode = generateRandomCode(4);
+
+        // 将验证码存储到 Redis 中，设置过期时间为5分钟（可根据需求调整）
+        stringRedisTemplate.opsForValue().set("yancode", verificationCode, 5, TimeUnit.MINUTES);
+        rabbitTemplate.convertAndSend("YanZhengQueue", verificationCode);
+        // 返回验证码
+        return Result.success(verificationCode);
+    }
+
+    private String generateRandomCode(int length) {
+        Random random = new Random();
+        StringBuilder code = new StringBuilder();
+
+        for (int i = 0; i < length; i++) {
+            code.append(random.nextInt(10)); // 生成0-9之间的随机数字
+        }
+
+        return code.toString();
+    }
+
+
 
     @GetMapping("/userInfo")
     public Result<User> userInfo(/*@RequestHeader(name = "Authorization") String token*/) {

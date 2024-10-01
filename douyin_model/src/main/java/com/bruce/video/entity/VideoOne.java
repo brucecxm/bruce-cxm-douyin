@@ -7,14 +7,16 @@ public class VideoOne {
 
 
 private  String musicName;
+private  String musicAvatar;
 
 private  String videoUrl;
+private  String videoArticle;
 
-private  String nickName;
+private  String username;
 
-private  String userPic;
+private  String userAvatar;
 
-private  String comment;
+private  int commentn;
 
 }
 

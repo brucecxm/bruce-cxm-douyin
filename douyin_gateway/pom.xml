@@ -18,7 +18,11 @@
     </properties>
 <dependencies>
 
-
+    <!--redis坐标-->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
 <!--    &lt;!&ndash; Sa-Token 权限认证（Reactor响应式集成）, 在线文档：https://sa-token.cc &ndash;&gt;-->
 <!--    <dependency>-->
 <!--        <groupId>cn.dev33</groupId>-->

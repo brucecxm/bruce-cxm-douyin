@@ -1,29 +1,35 @@
 <template>
-    <div class="home">
+    <div class="homecontain">
+        <caidan :style="caidancss" :onChildEvent="showcaidanone"></caidan>
 
-        <div class="headercontain">
-            <header-vue class="header" :activeIndex="activeIndex" @update:index="updateActiveIndex">
-            </header-vue>
-        </div>
+        <div class="home" :style="boxvideocss">
+            <div class="headercontain">
+                <!-- <button @click="showcaidanone"></button> -->
 
-
-
-        <!-- 容器div，包含鼠标和触摸事件监听 -->
-        <div class="videomain" @mousedown="startDrag" @mouseup="stopDrag" @mousemove="drag" @mouseleave="stopDrag"
-            @touchstart="startDrag" @touchend="stopDrag" @touchmove="drag">
-            <!-- 循环渲染每个box，设置样式 -->
-            <div v-for="( box, index ) in  boxes " :key="index" class="box"
-                :style="{ left: box.left * 0.1 + 'vw', backgroundColor: box.color, width: boxWidth * 0.1 + 'vw', height: boxHeight + 'vh' }">
-                <!-- <div class="videobox"><videobox-vue></videobox-vue></div> -->
-                <div class="videobox"><all-box-vue :boxtype="boxes[index].boxtest"></all-box-vue></div>
+                <header-vue class="header" :activeIndex="activeIndex" @update:index="updateActiveIndex">
+                </header-vue>
             </div>
+
+
+
+            <!-- 容器div，包含鼠标和触摸事件监听 -->
+            <div class="videomain" @mousedown="startDrag" @mouseup="stopDrag" @mousemove="drag" @mouseleave="stopDrag"
+                @touchstart="startDrag" @touchend="stopDrag" @touchmove="drag">
+                <!-- 循环渲染每个box，设置样式 -->
+                <div v-for="( box, index ) in  boxes " :key="index" class="box"
+                    :style="{ left: box.left * 0.1 + 'vw', backgroundColor: box.color, width: boxWidth * 0.1 + 'vw', height: boxHeight + 'vh' }">
+                    <!-- <div class="videobox"><videobox-vue></videobox-vue></div> -->
+                    <div class="videobox"><all-box-vue :boxtype="boxes[index].boxtest"></all-box-vue></div>
+                </div>
+            </div>
+
+
+            <footer-vue></footer-vue>
         </div>
-
-
-        <footer-vue></footer-vue>
     </div>
 </template>
 <script>
+import caidan from '../components/caidan.vue';
 import AllBoxVue from '@/components/AllBox.vue'
 import footerVue from '../components/footer.vue'
 import headerVue from '../components/header.vue'
@@ -38,6 +44,21 @@ export default {
             activeIndex: 0, // 默认高亮推荐项
             boxHeight: 95,
             boxes: [], // box的数据，包括颜色和左边距
+
+            caidancss: {
+                position: 'absolute',
+                right: '100vw',
+                bottom: '0px',
+                transition: 'right 0.5s ease',
+                height: '100vh', /* 控制位置变化的动画 */
+
+
+            },
+            boxvideocss: {
+                transform: 'translateX(0px)',
+                overflow: 'hidden',
+                transition: 'transform 0.5s ease' /* 控制位置变化的动画 */
+            }
         }
     },
 
@@ -45,7 +66,8 @@ export default {
         videoboxVue,
         headerVue,
         footerVue,
-        AllBoxVue
+        AllBoxVue,
+        caidan
     },
     created() {
         // 初始化 boxes 的数据，包括颜色和左边距
@@ -118,11 +140,24 @@ export default {
             // 同时将索引传递给子组件
             this.$emit('update:index', index);
         },
+
+        showcaidanone() {
+            // 更新 caidancss 的位置
+            this.caidancss.right = this.caidancss.right === "100vw" ? "20vw" : "100vw";
+
+            // 使用 Vue 的 $set 方法来触发响应式系统检测到 transform 属性变化
+            this.$set(this.boxvideocss, 'transform', this.boxvideocss.transform === "translateX(0px)" ? "translateX(80vw)" : "translateX(0px)");
+        }
     }
 }
 
 </script>
 <style scoped>
+.homecontain {
+    overflow-x: hidden;
+    /* 禁止水平滚动 */
+}
+
 .home {
     display: flex;
     width: 100%;
@@ -156,13 +191,7 @@ export default {
 
 }
 
-/* 
-.guanzhu {
-    width: 400px;
-    height: 800px;
-    background: red;
 
-} */
 
 .box {
 

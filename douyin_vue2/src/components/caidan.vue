@@ -18,8 +18,8 @@ export default {
 
 <style scoped>
 .caidan {
-    width: 400px;
-    height: 800px;
+    width: 80vw;
+    height: 100vh;
     background-color: red;
 }
 </style>

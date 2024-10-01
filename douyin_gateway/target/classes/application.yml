@@ -7,6 +7,14 @@ server:
 spring:
   application:
     name: api-gateway
+  redis:
+    host: localhost
+    port: 6379
+    password:
+    database: 0
+  cache:
+    redis:
+      time-to-live: 1800000 #设置缓存数据的过期时间
   cloud:
     gateway:
       routes:
@@ -14,6 +22,8 @@ spring:
           uri: lb://DouyinUSerService
           predicates:
             - Path=/user/**
+#          filters:
+#            - RewritePath=/user/(?<segment>.*), /user/${segment}
         - id: DouyinIntroduceService
           uri: lb://DouyinIntroduceService
           predicates:

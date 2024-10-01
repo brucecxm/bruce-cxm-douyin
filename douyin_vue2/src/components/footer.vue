@@ -12,13 +12,14 @@
         <div class="nav message" :class="{ active: selected === 'message' }" @click="select('message')">
             消息
         </div>
-        <div class="nav me" :class="{ active: selected === 'me' }" @click="select('me')">
+        <div class="nav me" :class="{ active: selected === 'me' }" @click="select('me'), goLogin()">
             我
         </div>
     </div>
 </template>
 
 <script>
+import { useTokenStore } from "../stores/token";
 export default {
     data() {
         return {
@@ -29,6 +30,21 @@ export default {
         select(option) {
             this.selected = option;
             this.$emit('selection-changed', option); // 向父组件传递数据
+        },
+        goLogin() {
+            //先判断一下有没有登录  如果没有登录 则跳转到登录界面  如果有登录  则跳转到对应界面
+            //先判断一下有没有登录  如果没有登录 则跳转到登录界面  如果有登录  则跳转到对应界面
+            const tokenStore = useTokenStore();
+            const token = tokenStore.token
+            if (token === null || token === undefined || token === "") {
+                this.$router.push('/login');
+
+            } else {
+                this.$router.push('/me');
+
+            }
+
+            // Navigate to '/free-video' route
         }
     }
 };

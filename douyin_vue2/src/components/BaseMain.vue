@@ -37,7 +37,7 @@
         </div>
     </div>
 </template>
-  
+   
 <script>
 import { homegetVideo, homegetVideomore, homegetVideocontent } from "../api/video.js"
 import { eventBus } from '../main'; // 根据实际的路径导入事件总线
@@ -56,7 +56,16 @@ export default {
             videoarr: {
                 code: "0",
                 data: [
-                    { authId: "101", musicId: "1001", videoId: "1", videoUrl: "https://www.douyin.com/aweme/v1/play/?video_id=v0d00fg10000cj1lq4jc77u0ng6s1gt0&line=0&file_id=bed51c00899b458cbc5d8280147c22a1&sign=7749aec7bd62a3760065f60e40fc1867&is_play_url=1&source=PackSourceEnum_PUBLISH", avatar: "https://p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-avt-0015_c7784af3a0bd2e7c5fc92ece450f12e0~c5_168x168.jpeg?from=2956013662", musicAvatar: "https://p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-avt-0015_c7784af3a0bd2e7c5fc92ece450f12e0~c5_168x168.jpeg?from=2956013662", nickname: "前端实力昵称", videoComment: "不是后端传过来的数据 前端中默认的数据" }
+                    {
+                        authId: "101",
+                        musicId: "1001",
+                        videoId: "1",
+                        videoUrl: "https://www.douyin.com/aweme/v1/play/?video_id=v0d00fg10000cj1lq4jc77u0ng6s1gt0&line=0&file_id=bed51c00899b458cbc5d8280147c22a1&sign=7749aec7bd62a3760065f60e40fc1867&is_play_url=1&source=PackSourceEnum_PUBLISH",
+                        avatar: "https://p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-avt-0015_c7784af3a0bd2e7c5fc92ece450f12e0~c5_168x168.jpeg?from=2956013662",
+                        musicAvatar: "https://p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-avt-0015_c7784af3a0bd2e7c5fc92ece450f12e0~c5_168x168.jpeg?from=2956013662",
+                        nickname: "前端实力昵称",
+                        videoComment: "不是后端传过来的数据 前端中默认的数据"
+                    }
                 ],
                 msg: "执行成功"
             },

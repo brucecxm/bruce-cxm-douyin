@@ -123,6 +123,16 @@ export default {
     mounted() {
 
         this.updateVideoPlayback();
+
+
+        // 自动发送请求给后端
+        homegetVideo().then(videoArr => {
+            console.log(videoArr)
+            this.videoboxdata = videoArr;
+        }).catch(error => {
+            console.error('获取视频出错:', error);
+            // 可以适当处理错误
+        });
     },
     methods: {
 

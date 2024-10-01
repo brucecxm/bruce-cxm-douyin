@@ -51,10 +51,10 @@ public class VideoController extends ApiController {
 
 
     @GetMapping("/test")
-    public void  test() {
+    public String  test() {
        List<VideoOne>  videoOne = videoOneService.queryVideoInfo(1);
-
         System.out.println(videoOne.toString());
+        return videoOne.toString();
     }
 
 
@@ -121,24 +121,6 @@ public class VideoController extends ApiController {
         return success(videosWithAvatar);
     }
 
-
-
-
-public R insertVideo(Video video)
-{
-
-
-
-    int music_id = video.getMusicId();
-    if(music_id==null){
-        videoService.save(video);
-    }else {
-
-        music.save(music_id);
-    }
-
-
-}
 
 
 

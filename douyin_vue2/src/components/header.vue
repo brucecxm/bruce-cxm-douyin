@@ -1,6 +1,6 @@
 <template>
     <div class="header">
-        <div class="menu"></div>
+        <div class="menu" @click="triggerParentEvent"></div>
         <div class="nav" ref="nav">
             <p v-for="(item, index) in navItems" :key="index" :class="{ active: activeIndex === index }"
                 @click="changeIndex(index)" ref="navItem">
@@ -20,8 +20,13 @@ export default {
         activeIndex: {
             type: Number,
             default: 0
-        }
+        },
+        onChildEvent: {
+            type: Function,
+            required: true,
+        },
     },
+
     data() {
         return {
             navItems: ["推荐", "同城", "关注", "直播", "经验", "商城", "团购", "精选", "热点"],
@@ -29,6 +34,10 @@ export default {
         };
     },
     methods: {
+        triggerParentEvent() {
+            // 调用父组件的方法
+            this.onChildEvent('Hello from Child');
+        },
         changeIndex(index) {
             this.$emit('update:index', index);
             this.updateUnderline(); // 更新下划线位置

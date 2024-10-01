@@ -4,7 +4,7 @@ spring:
     port: 5672
     username: itcast
     password: 123321
-    virtual-host: /douyin # 虚拟主机
+    virtual-host: /
   application:
     name: DouyinVideoService
   datasource:
@@ -18,7 +18,7 @@ spring:
 
 
 server:
-  port: 9522
+  port: 9573
 eureka:
   client:
     service-url:

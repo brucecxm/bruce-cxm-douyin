@@ -1,4 +1,4 @@
-//package com.bruce.config;
+package com.bruce.config;//package com.bruce.config;
 //
 //import com.bruce.interceptors.LoginInterceptor;
 //import org.springframework.beans.factory.annotation.Autowired;

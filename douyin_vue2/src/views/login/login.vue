@@ -12,14 +12,20 @@
                 <div class="input-group">
                     <select class="country-code">
                         <option value="+86">+86</option>
+                        <option value="+5">+5</option>
+                        <option value="+1">+1</option>
+                        <option value="+7">+7</option>
+                        <option value="+6">+6</option>
                     </select>
                     <input type="tel" v-model="loginpojo.username" placeholder="请输入手机号" />
+
                     <br>
-                    <input type="tel" v-model="loginpojo.password" placeholder="请输入密码" />
                     <button class="clear-btn" @click="clearPhoneNumber">×</button>
                 </div>
+
                 <p class="terms">
-                    <input type="checkbox" /> 已阅读并同意 <a href="#">用户协议</a> 和 <a href="#">隐私政策</a> 以及 <a href="#">运营商服务协议</a>
+                    <input type="checkbox" v-model="isAgreed" /> 已阅读并同意 <a href="#">用户协议</a> 和 <a href="#">隐私政策</a> 以及 <a
+                        href="#">运营商服务协议</a>
                     ，运营商将对你的手机号进行验证
                 </p>
                 <button class="login-btn" @click="verifyPhoneNumber">验证并登录</button>
@@ -32,10 +38,11 @@
         </div>
     </div>
 </template>
-  
+
 <script>
 import { userLoginService } from "../../api/user"
 import { useTokenStore } from "../../stores/token"
+
 export default {
     name: 'Login',
     data() {
@@ -43,41 +50,32 @@ export default {
             loginpojo: {
                 username: '',
                 password: ""
-
             },
             isPasswordLogin: false,
+            isAgreed: false, // 添加一个变量来跟踪协议是否被勾选
         };
     },
     methods: {
         closeScreen() {
-            //跳转到上一级
             this.$router.go(-1); // 返回上一级
             console.log('关闭界面');
         },
         clearPhoneNumber() {
-            this.phoneNumber = '';
+            this.loginpojo.username = ''; // 修改为清空手机号
         },
         async verifyPhoneNumber() {
+            if (!this.isAgreed) { // 检查用户是否勾选协议
+                alert("请勾选用户协议以继续登录。");
+                return; // 如果未勾选，则退出该方法
+            }
+
             console.log('验证手机号:', this.loginpojo);
             try {
                 const response = await userLoginService(this.loginpojo);
-
-                // 如果cookie中没有token  那么从respond中获取 反之
-                // 如果cookie中没有token  那么从respond中获取 反之
-                // 如果cookie中没有token  那么从respond中获取 反之
-                // 如果cookie中没有token  那么从respond中获取 反之
-                // 如果cookie中没有token  那么从respond中获取 反之
-
                 const token = response.data;
 
-
-
-                //如果前端使用的是sa-token 那么token就会直接存储在cookie中 而不会出现在responde中 所以要判断一下token到底在哪
-                //如果前端使用的是sa-token 那么token就会直接存储在cookie中 而不会出现在responde中 所以要判断一下token到底在哪
-                //如果前端使用的是sa-token 那么token就会直接存储在cookie中 而不会出现在responde中 所以要判断一下token到底在哪
                 const usertoken = useTokenStore();
                 usertoken.setToken(token);
-                // 将token存储在localStorage中
                 localStorage.setItem('token', token);
                 this.$router.push("/");
             } catch (error) {
@@ -90,7 +88,11 @@ export default {
     },
 };
 </script>
-  
+
+<style scoped>
+/* 你的样式保持不变 */
+</style>
+
 <style scoped>
 .login-screen {
     display: flex;
