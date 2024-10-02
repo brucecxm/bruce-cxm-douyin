@@ -1,10 +1,10 @@
+com\bruce\dao\VideoOneDao.class
 com\bruce\exception\GlobalExceptionHandler.class
 com\bruce\utils\ThreadLocalUtil.class
 com\bruce\DouyinVideoApplication.class
-com\bruce\interceptors\LoginInterceptor.class
 com\bruce\controller\VideoController.class
 com\bruce\dao\VideoDao.class
+com\bruce\service\impl\VideoOneServiceImpl.class
 com\bruce\listener\DeadLetterQueueConsumer.class
 com\bruce\service\impl\VideoServiceImpl.class
 com\bruce\service\VideoService.class
-com\bruce\config\WebConfig.class

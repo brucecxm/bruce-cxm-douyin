@@ -16,9 +16,9 @@ import java.util.List;
 public interface VideoOneService {
 
 
- List<VideoOne> queryVideoInfo(@Param("videoId") int videoId);
+// List<VideoOne> queryVideoInfo(@Param("videoId") int videoId);
 
 
-
+ void insertlianjie(@Param("lianjie") String lianjie);
 }
 
