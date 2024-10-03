@@ -29,14 +29,14 @@
 
 
         </div>
-        <base-footer></base-footer>
+        <footer-vue class="footer"></footer-vue>
     </div>
 </template>
 <script>
-import BaseFooter from '@/components/BaseFooter.vue'
+import footerVue from '@/components/footer.vue'
 export default {
     components: {
-        BaseFooter
+        footerVue
     },
     data() {
         return {
@@ -128,5 +128,14 @@ li {
     border-radius: 40px;
     background-color: rgba(0, 0, 0, 0.1);
     overflow: hidden;
+}
+
+.footer {
+    background-color: black;
+    color: black;
+    z-index: 10;
+    position: absolute;
+    bottom: 0px;
+
 }
 </style>

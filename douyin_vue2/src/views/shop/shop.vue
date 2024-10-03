@@ -1,85 +1,101 @@
-<!-- 使用的flex布局 -->
-
 <template>
-    <div class="shop">
-        <div class="header">
-            <div class="didian">西安^</div>
-            <div class="search">
-                <button>搜索</button>
-                <input type="text" placeholder="蜜雪冰城团购">
-            </div>
-        </div>
-        <div class="meum">
-            <div class="box1"></div>
-            <div class="box1"></div>
-            <div class="box1"></div>
-            <div class="box1"></div>
-            <div class="box1"></div>
-            <div class="box1"></div>
-
-        </div>
-        <div class="nav">
-            <div class="box">
-                <img src="../../assets/shop/附近美食.png" alt="">
-                <p>附近美食</p>
-            </div>
-            <div class="box">
-                <img src="../../assets/shop/附近美食.png" alt="">
-                <p>附近美食</p>
-            </div>
-            <div class="box">
-                <img src="../../assets/shop/附近美食.png" alt="">
-                <p>附近美食</p>
-            </div>
-            <div class="box">
-                <img src="../../assets/shop/附近美食.png" alt="">
-                <p>附近美食</p>
-            </div>
-            <div class="box">
-                <img src="../../assets/shop/附近美食.png" alt="">
-                <p>附近美食</p>
-            </div>
-            <div class="box">
-                <img src="../../assets/shop/附近美食.png" alt="">
-                <p>附近美食</p>
-            </div>
-            <div class="box">
-                <img src="../../assets/shop/附近美食.png" alt="">
-                <p>附近美食</p>
-            </div>
-            <div class="box">
-                <img src="../../assets/shop/附近美食.png" alt="">
-                <p>附近美食</p>
-            </div>
-            <div class="box">
-                <img src="../../assets/shop/附近美食.png" alt="">
-                <p>附近美食</p>
-            </div>
-            <div class="box">
-                <img src="../../assets/shop/附近美食.png" alt="">
-                <p>附近美食</p>
+    <div class="temp">
+        <div class="shop">
+            <div class="header">
+                <div class="didian">西安^</div>
+                <div class="search">
+                    <button>搜索</button>
+                    <input type="text" placeholder="蜜雪冰城团购">
+                </div>
             </div>
 
+            <div class="meum">
+                <div class="box1" v-for="(meum, index) in meumbox" :key="index">
+                    <img :src="meum.imgurl" alt="" style="width: 100%; height: auto;">
+
+                    <p>{{ meum.name }}</p>
+                </div>
+            </div>
+
+
+
+
+
+            <div class="nav">
+                <div class="box" v-for="(nav, index) in navbox" :key="index">
+                    <img :src="nav.navimgurl" alt="">
+                    <p>附近美食</p>
+                </div>
+            </div>
+
+            <div class="main">
+                <div class="boxm" v-for="(item, index) in mainbox" :key="index" @click="goshopdetail(index + 1)"
+                    :style="{ backgroundImage: 'url(' + item.imgurl + ')' }">
+                    <p>{{ item.name }}</p>
+                </div>
+            </div>
         </div>
-        <div class="main">
-            <div class="boxm" @click="goshopdetail"></div>
-            <div class="boxm"></div>
-            <div class="boxm"></div>
-            <div class="boxm"></div>
-        </div>
-        <base-footer class=".footer"></base-footer>
+
+        <footer-vue class="footer"></footer-vue>
     </div>
 </template>
+
+<script>
+import footerVue from '@/components/footer.vue'
+export default {
+    components: {
+        footerVue
+    },
+    data() {
+        return {
+            meumbox: [
+                { name: "超市", imgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", hrefurl: "" },
+                { name: "超市", imgurl: "", hrefurl: "" },
+                { name: "超市", imgurl: "", hrefurl: "" },
+                { name: "超市", imgurl: "", hrefurl: "" },
+                { name: "超市", imgurl: "", hrefurl: "" },
+                { name: "超市", imgurl: "", hrefurl: "" },
+            ],
+            navbox: [
+                { navname: "", navimgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", navhrefurl: "" },
+                { navname: "", navimgurl: "", navhrefurl: "" },
+                { navname: "", navimgurl: "", navhrefurl: "" },
+                { navname: "", navimgurl: "", navhrefurl: "" },
+                { navname: "", navimgurl: "", navhrefurl: "" },
+                { navname: "", navimgurl: "", navhrefurl: "" },
+                { navname: "", navimgurl: "", navhrefurl: "" },
+                { navname: "", navimgurl: "", navhrefurl: "" },
+            ],
+            mainbox: [
+                { imgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", name: "商品1", hrefurl: "/shopdetail/1" },
+                { imgurl: "url2.jpg", name: "商品2", hrefurl: "/shopdetail/2" },
+                { imgurl: "url3.jpg", name: "商品3", hrefurl: "/shopdetail/3" },
+                { imgurl: "url4.jpg", name: "商品4", hrefurl: "/shopdetail/4" },
+                { imgurl: "url5.jpg", name: "商品5", hrefurl: "/shopdetail/5" },
+                { imgurl: "url6.jpg", name: "商品6", hrefurl: "/shopdetail/6" },
+            ]
+        }
+    },
+    methods: {
+        goshopdetail(id) {
+            this.$router.push({ path: `/shopdetail/${id}` });
+        }
+    }
+}
+</script>
+
+
+
 <style  scoped>
 .boxm {
-    width: 180px;
-    height: 300px;
+    width: 40vw;
+    height: 30vh;
     background-color: green;
-    margin: 5px;
+    margin: 2vw;
 }
 
 .main {
-    width: 400px;
+    width: 95vw;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -89,10 +105,10 @@
 
 .nav img,
 p {
-    width: 55px;
+    width: 10vw;
     display: block;
-    transform: translateX(10px);
-    font-size: 12px;
+    transform: translateX(3vw);
+    font-size: 3vw;
     color: rgb(47, 47, 47);
     line-height: 0px;
 }
@@ -102,10 +118,10 @@ p {
 }
 
 .search input {
-    width: 250px;
-    height: 50px;
+    width: 70vw;
+    height: 3vh;
     border: none;
-    border-radius: 10px;
+    border-radius: 5vh;
     display: block;
     float: right;
 }
@@ -113,23 +129,23 @@ p {
 .search button {
     display: block;
     float: right;
-    height: 40px;
-    width: 70px;
+    height: 3vh;
+    width: 15vw;
     border: none;
     background-color: red;
     color: white;
-    border-radius: 10px;
-    margin: 5px;
+    border-radius: 4vw;
+    margin: 1vw;
 
 }
 
 
 .didian {
-    width: 66px;
-    line-height: 66px;
-    font-size: 20px;
-    margin-left: 5px;
-    margin-right: 0px;
+    width: 10vw;
+    line-height: 20vw;
+    font-size: 5vw;
+    margin-left: 1vw;
+    margin-right: 0;
     float: left;
 }
 
@@ -137,10 +153,11 @@ p {
     border: solid 2px rgb(233, 111, 111);
     overflow: hidden;
     border-radius: 10px;
-    margin-top: 10px;
+    margin-top: 1vh;
     width: 340px;
     float: right;
     margin-right: 0px;
+    height: 4vh;
 }
 
 .box1 {
@@ -150,13 +167,12 @@ p {
     flex-shrink: 0;
     /* 阻止元素缩小 */
     /* 使溢出部分可见 */
-    background-image: url(../../assets/shop/亲子.png);
     background-size: cover;
 }
 
 .box {
-    width: 80px;
-    height: 80px;
+    width: 20vw;
+    height: 20vw;
     margin: 1px;
 
 }
@@ -193,42 +209,26 @@ p {
 }
 
 .shop {
-    display: flex;
-    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+    display: block;
+    position: relative;
+    overflow: scroll;
 }
 
-::v-deep .footer {
-    background-color: white;
+.footer {
+    background-color: black;
     color: black;
+    z-index: 10;
+    position: absolute;
+    bottom: 0px;
 
 }
 
-::v-deep .jiahao {
+.jiahao {
     background-image: url(../../assets/home/加号黑.png);
 
 }
 </style>
 
 </style>
-<script>
-import { getcai } from "../../api/video.js"
-import BaseFooter from '@/components/BaseFooter.vue'
-export default {
-    components: {
-        BaseFooter
-    },
-    data() {
-        return {
-        }
-    },
-    methods: {
-        goshopdetail() {
-            this.$router.push("/shopdetail")
-        }
-
-    }
-
-
-
-}
-</script>

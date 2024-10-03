@@ -102,12 +102,16 @@ export default {
                 { id: 1, avatar: '../../assets/op.jpg', name: 'Reviewer 1', content: 'Great product!' },
                 { id: 2, avatar: '../../assets/op.jpg', name: 'Reviewer 2', content: 'Loved it!' },
                 // more reviews...
-            ]
+            ],
+            itemId: null // 用于存储传递的 ID
         };
     },
     methods: {
         handleScroll() {
             this.isSticky = window.scrollY > 0;
+        },
+        fetchItemDetails(id) {
+            // 根据 ID 请求商品详情数据的逻辑
         }
     },
     mounted() {
@@ -115,7 +119,13 @@ export default {
     },
     beforeDestroy() {
         window.removeEventListener('scroll', this.handleScroll);
-    }
+    },
+    created() {
+        // 在组件创建时获取传递的 ID
+        this.itemId = this.$route.params.id;
+        // 你可以在这里根据 ID 请求商品详情数据
+        this.fetchItemDetails(this.itemId);
+    },
 }
 </script>
   

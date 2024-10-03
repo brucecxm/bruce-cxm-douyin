@@ -1,55 +1,58 @@
 <template>
-    <div class="me">
-        <memenu v-show="receivedMessage.ismemenushow" class="memenu"></memenu>
-        <div :class="receivedMessage.me">
-            <div class="backimg">
-                <img :src=User.data.backimg alt=" no backimg">
-                <div class="caidan" @click="openmenu"></div>
-            </div>
-            <div class="personinfo">
-                <div class="touxiang"><img :src="User.data.userPic" alt=""></div>
-                <div class="name" style="transform: translateY(-150px);">
-                    <h1>{{ User.data.nickname }}</h1>
+    <div class="metemp">
+        <div class="me">
+            <memenu v-show="receivedMessage.ismemenushow" class="memenu"></memenu>
+            <div :class="receivedMessage.me">
+                <div class="backimg">
+                    <img :src=User.data.backimg alt=" no backimg">
+                    <div class="caidan" @click="openmenu"></div>
                 </div>
-                <div class="info">
-                    <p>点击添加介绍 让大家认识你</p>
-                    <span>21岁</span>
-                    <span>陕西西安</span>
-                    <span>添加学校标签</span>
-                    <div class="infonav">
-                        <div class="xuanxiang" v-for="(image, index) in navvideo" :key="index">
-                            <img :src="image" alt="Image">
-                            <!-- <img :src="image" alt="Image" style="width: 100px;"> -->
-                        </div>
+                <div class="personinfo">
+                    <div class="touxiang"><img :src="User.data.userPic" alt=""></div>
+                    <div class="name" style="transform: translateY(-150px);">
+                        <h1>{{ User.data.nickname }}</h1>
                     </div>
-                    .
+                    <div class="info">
+                        <p>点击添加介绍 让大家认识你</p>
+                        <span>21岁</span>
+                        <span>陕西西安</span>
+                        <span>添加学校标签</span>
+                        <div class="infonav">
+                            <div class="xuanxiang" v-for="(image, index) in navvideo" :key="index">
+                                <img :src="image" alt="Image">
+                                <!-- <img :src="image" alt="Image" style="width: 100px;"> -->
+                            </div>
+                        </div>
+                        .
+                    </div>
+                </div>
+                <div class="nav">
+                    <ul>
+                        <li @click="fetchData('works')">作品</li>
+                        <li @click="fetchData('dynamics')">动态</li>
+                        <li @click="fetchData('likes')">喜欢</li>
+                        <li @click="fetchData('albums')">相册</li>
+                    </ul>
+                </div>
+                <div class="uservideo">
+
+                    <div class="uvideo" v-for="(image, index) in nav" :key="index">
+                        <img :src="image" alt="Image">
+                        <!-- <img :src="image" alt="Image" style="width: 100px;"> -->
+                    </div>
+
+
                 </div>
             </div>
-            <div class="nav">
-                <ul>
-                    <li @click="fetchData('works')">作品</li>
-                    <li @click="fetchData('dynamics')">动态</li>
-                    <li @click="fetchData('likes')">喜欢</li>
-                    <li @click="fetchData('albums')">相册</li>
-                </ul>
-            </div>
-            <div class="uservideo">
 
-                <div class="uvideo" v-for="(image, index) in nav" :key="index">
-                    <img :src="image" alt="Image">
-                    <!-- <img :src="image" alt="Image" style="width: 100px;"> -->
-                </div>
-
-
-            </div>
-            <base-footer></base-footer>
         </div>
+        <footer-vue class="footer"></footer-vue>
 
     </div>
 </template>
 
 <script>
-import BaseFooter from '../../components/BaseFooter.vue'
+import footerVue from '@/components/footer.vue'
 import Memenu from "../../components/memenu.vue"
 import { userInfoService } from '../../api/user';
 import oneImg from '@/assets/me/one.jpg';
@@ -81,7 +84,7 @@ export default {
         }
     },
     components: {
-        BaseFooter, Memenu
+        footerVue, Memenu
     },
     methods: {
         openmenu() {
@@ -247,5 +250,14 @@ span {
     width: 414px;
     background-color: white;
     overflow: hidden;
+}
+
+.footer {
+    background-color: black;
+    color: black;
+    z-index: 10;
+    position: absolute;
+    bottom: 0px;
+
 }
 </style>

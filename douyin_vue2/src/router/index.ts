@@ -73,7 +73,7 @@ const router = new VueRouter({
       component: () => import("../views/xiaoxi/xiaoxitdetail.vue"),
     },
     {
-      path: "/shopdetail",
+      path: "/shopdetail/:id",
       name: "ShopDetailVue",
       component: () => import("../views/shop/shopdetail.vue"),
     },
