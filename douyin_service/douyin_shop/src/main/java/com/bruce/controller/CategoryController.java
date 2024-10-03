@@ -120,7 +120,7 @@ public class CategoryController {
 @Autowired
     private CategoryoneService categoryoneService;
 
-    @GetMapping("/list")
+    @GetMapping("/listoo")
     public List<categoryDto> getcatepe(){
 
         return categoryoneService.getCategoryoneList();

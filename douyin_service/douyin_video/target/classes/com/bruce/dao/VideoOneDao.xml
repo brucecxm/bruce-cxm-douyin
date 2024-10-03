@@ -42,7 +42,7 @@
 <!--        group by m.music_name, v.video_url, u.nickname, u.user_pic ,v.video_id &#45;&#45; 按需分组-->
 <!--    </select>-->
 
-<!--    -->
+
 
     <insert id="insertLianjie" parameterType="string">
         INSERT INTO lianjie (lianjie) VALUES (#{lianjie})
