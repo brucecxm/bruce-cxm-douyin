@@ -2,34 +2,59 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/douyin_basic/douyin_file_starter/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_basic/douyin_file_starter/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_basic/douyin_testSpringfactories/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_basic/douyin_testSpringfactories/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_basic/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_basic/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_eureka/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_eureka/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_feign/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_feign/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_gateway/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_model/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_model/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_service/douyin_admin/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_service/douyin_admin/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_service/douyin_article/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_service/douyin_article/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_service/douyin_behavior/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_service/douyin_behavior/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_service/douyin_chat/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_service/douyin_chat/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_service/douyin_comment/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_service/douyin_comment/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_service/douyin_file/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_service/douyin_file/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_service/douyin_introduce/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_service/douyin_introduce/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_service/douyin_music/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_service/douyin_music/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_service/douyin_schedule/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_service/douyin_schedule/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_service/douyin_search/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_service/douyin_search/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_service/douyin_shop/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_service/douyin_shop/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_service/douyin_user/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_service/douyin_user/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_service/douyin_video/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_service/douyin_video/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_sms/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_sms/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_test/douyin_Designpatterns/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_test/douyin_Designpatterns/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_test/douyin_satoken/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_test/douyin_satoken/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_test/douyin_spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_test/douyin_spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_test/douyin_testall/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_test/douyin_testall/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_test/douyin_websocket/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_test/douyin_websocket/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_test/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_test/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />

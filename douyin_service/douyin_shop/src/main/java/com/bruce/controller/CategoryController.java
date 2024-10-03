@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.common.BaseContext;
 import com.bruce.common.R;
+import com.bruce.dto.categoryDto;
 import com.bruce.entity.Category;
 import com.bruce.entity.ShoppingCart;
 import com.bruce.service.CategoryService;
+import com.bruce.service.CategoryoneService;
 import com.bruce.service.ShoppingCartService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,4 +110,27 @@ public class CategoryController {
         List<Category> list = categoryService.list(queryWrapper);
         return R.success(list);
     }
+
+
+
+
+
+
+
+@Autowired
+    private CategoryoneService categoryoneService;
+
+    @GetMapping("/list")
+    public List<categoryDto> getcatepe(){
+
+        return categoryoneService.getCategoryoneList();
+    }
+
+
+
+
+
+
+
+
 }

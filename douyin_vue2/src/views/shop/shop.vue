@@ -24,7 +24,7 @@
             <div class="nav">
                 <div class="box" v-for="(nav, index) in navbox" :key="index">
                     <img :src="nav.navimgurl" alt="">
-                    <p>附近美食</p>
+                    <p>{{ nav.navname }}</p>
                 </div>
             </div>
 
@@ -49,22 +49,22 @@ export default {
     data() {
         return {
             meumbox: [
-                { name: "超市", imgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", hrefurl: "" },
-                { name: "超市", imgurl: "", hrefurl: "" },
-                { name: "超市", imgurl: "", hrefurl: "" },
+                { name: "超d市", imgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", hrefurl: "" },
+                { name: "超d市", imgurl: "", hrefurl: "" },
+                { name: "超d市", imgurl: "", hrefurl: "" },
                 { name: "超市", imgurl: "", hrefurl: "" },
                 { name: "超市", imgurl: "", hrefurl: "" },
                 { name: "超市", imgurl: "", hrefurl: "" },
             ],
             navbox: [
-                { navname: "", navimgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", navhrefurl: "" },
-                { navname: "", navimgurl: "", navhrefurl: "" },
-                { navname: "", navimgurl: "", navhrefurl: "" },
-                { navname: "", navimgurl: "", navhrefurl: "" },
-                { navname: "", navimgurl: "", navhrefurl: "" },
-                { navname: "", navimgurl: "", navhrefurl: "" },
-                { navname: "", navimgurl: "", navhrefurl: "" },
-                { navname: "", navimgurl: "", navhrefurl: "" },
+                { navname: "ss", navimgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", navhrefurl: "" },
+                { navname: "ss", navimgurl: "", navhrefurl: "" },
+                { navname: "ss", navimgurl: "", navhrefurl: "" },
+                { navname: "ss", navimgurl: "", navhrefurl: "" },
+                { navname: "ss", navimgurl: "", navhrefurl: "" },
+                { navname: "ss", navimgurl: "", navhrefurl: "" },
+                { navname: "ss", navimgurl: "", navhrefurl: "" },
+                { navname: "ss", navimgurl: "", navhrefurl: "" },
             ],
             mainbox: [
                 { imgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", name: "商品1", hrefurl: "/shopdetail/1" },
