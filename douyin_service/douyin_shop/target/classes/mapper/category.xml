@@ -3,13 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-
-
-
-
 <mapper namespace="com.bruce.mapper.categoryone">
-
-
 
     <resultMap type="com.bruce.dto.categoryDto" id="categoryDto">
         <result property="name" column="name" jdbcType="VARCHAR"/>
@@ -17,10 +11,14 @@
         <result property="hrefUrl" column="hrefurl" jdbcType="VARCHAR"/>
     </resultMap>
 
-
-
-    <select id="getcategoryimg" resultMap="categoryDto" resultType="List">
-        select category.name as name,other_store.img_url as imgurl,other_store.href_url as hrefurl
-        from category inner join other_store on category.id = other_store.category_id;
+    <select id="getcategoryimg" resultMap="categoryDto" resultType="com.bruce.dto.categoryDto">
+        SELECT
+            category.name AS name,
+            other_store.img_url AS imgurl,
+            other_store.href_url AS hrefurl
+        FROM
+            category
+                INNER JOIN
+            other_store ON category.id = other_store.category_id;
     </select>
 </mapper>
