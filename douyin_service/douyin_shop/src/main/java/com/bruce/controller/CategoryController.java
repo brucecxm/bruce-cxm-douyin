@@ -46,6 +46,9 @@ public class CategoryController {
     @GetMapping("/page")
     public R<Page> page(int page,int pageSize){
         //分页构造器
+
+
+
         Page<Category> pageInfo = new Page<>(page,pageSize);
         //条件构造器
         LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
