@@ -5,11 +5,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.common.BaseContext;
 import com.bruce.common.R;
 import com.bruce.dto.categoryDto;
+import com.bruce.dto.dishoneDto;
 import com.bruce.entity.Category;
 import com.bruce.entity.ShoppingCart;
-import com.bruce.service.CategoryService;
-import com.bruce.service.CategoryoneService;
-import com.bruce.service.ShoppingCartService;
+import com.bruce.mapper.DishoneMapper;
+import com.bruce.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -129,6 +129,22 @@ public class CategoryController {
 
 
 
+    @Autowired
+    private DishoneMapper dishoneMapper;
+
+@Autowired
+    private dishoneService dishoneService;
+
+    @GetMapping("/listoss")
+    public List<dishoneDto> getcatepee(){
+
+        return    dishoneService.getdishone();
+
+
+
+
+
+    }
 
 
 

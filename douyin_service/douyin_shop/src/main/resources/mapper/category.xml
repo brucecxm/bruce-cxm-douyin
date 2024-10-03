@@ -21,4 +21,5 @@
                 INNER JOIN
             other_store ON category.id = other_store.category_id;
     </select>
+
 </mapper>
