@@ -36,7 +36,7 @@
             </video>
         </div>
     </div>
-</template> 
+</template>
    
 <script>
 import { homegetVideo, homegetVideomore, homegetVideocontent } from "../api/video.js"

@@ -7,7 +7,7 @@
         <div class="aside like" @click="behaviour">
         </div>
         <div class="num">{{ videoData.likeNum }}</div>
-        <div class="aside comment" @click="sendMessageToParent">
+        <div class="aside comment">
         </div>
         <div class="num" @click="behaviour">{{ videoData.commentNum }}</div>
         <div class="aside collect">
@@ -24,15 +24,9 @@
  
 <script>
 import { useTokenStore } from "../stores/token";
-import { homegetVideo, homegetVideomore, homegetVideocontent } from "../api/video.js"
-
 export default {
     props: {
-        videoData: Object,
-        updateMessage: {
-            type: Function,
-            required: true,
-        },
+        videoData: Object
     },
     data() {
         return {
@@ -40,32 +34,8 @@ export default {
         };
     },
     methods: {
-        sendMessageToParent() {
-            this.updateMessage(true);
-            const videoIdStore = VideoIdStore();
-            videoIdStore.setVideoId(this.videoarr.data[this.videonum].videoId);
-
-            console.log("Video ID: ", videoIdStore.getVideoId); // 打印 videoId
-            const params = { videoId: videoIdStore.getVideoId }
-            homegetVideocontent(params).then(videoArr => {
-                this.behavior.pingnum = videoArr.data.length
-
-                this.one = videoArr
-                console.log("ssdsdsd", videoArr)
-                eventBus.$emit('eventName', this.one);
-            }).catch(error => {
-                console.error('获取视频出错:', error);
-                // 可以适当处理错误
-            });
-            //把评论数据传给评论组件
-            // 在需要发送数据的地方触发事件，并传递数据
-
-
-        },
-
-
-
-        behaviour() {
+        behaviour(name) {
+            console.log(name)
             console.log('behaviour called')
         },
         goauth() {
@@ -98,7 +68,7 @@ export default {
 .aside {
     width: 1rem;
     height: 1rem;
-    z-index: 10;
+
 }
 
 /* 父组件的absolute布局影响到了子组件的flex布局 */
