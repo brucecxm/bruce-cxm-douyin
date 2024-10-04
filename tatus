@@ -1,0 +1,86 @@
+warning: in the working copy of '.idea/misc.xml', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/.idea/jarRepositories.xml b/.idea/jarRepositories.xml[m
+[1mindex d46a6c7..a2b6c24 100644[m
+[1m--- a/.idea/jarRepositories.xml[m
+[1m+++ b/.idea/jarRepositories.xml[m
+[36m@@ -11,6 +11,11 @@[m
+       <option name="name" value="Central Repository" />[m
+       <option name="url" value="https://repo.maven.apache.org/maven2" />[m
+     </remote-repository>[m
+[32m+[m[32m    <remote-repository>[m
+[32m+[m[32m      <option name="id" value="central" />[m
+[32m+[m[32m      <option name="name" value="Central Repository" />[m
+[32m+[m[32m      <option name="url" value="http://maven.aliyun.com/nexus/content/repositories/central/" />[m
+[32m+[m[32m    </remote-repository>[m
+     <remote-repository>[m
+       <option name="id" value="central" />[m
+       <option name="name" value="Maven Central repository" />[m
+[1mdiff --git a/.idea/misc.xml b/.idea/misc.xml[m
+[1mindex d5cd614..868906c 100644[m
+[1m--- a/.idea/misc.xml[m
+[1m+++ b/.idea/misc.xml[m
+[36m@@ -8,5 +8,5 @@[m
+       </list>[m
+     </option>[m
+   </component>[m
+[31m-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK" />[m
+[32m+[m[32m  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="corretto-1.8" project-jdk-type="JavaSDK" />[m
+ </project>[m
+\ No newline at end of file[m
+[1mdiff --git a/douyin_service/douyin_service.iml b/douyin_service/douyin_service.iml[m
+[1mdeleted file mode 100644[m
+[1mindex f409c0e..0000000[m
+[1m--- a/douyin_service/douyin_service.iml[m
+[1m+++ /dev/null[m
+[36m@@ -1,12 +0,0 @@[m
+[31m-<?xml version="1.0" encoding="UTF-8"?>[m
+[31m-<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">[m
+[31m-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">[m
+[31m-    <output url="file://$MODULE_DIR$/target/classes" />[m
+[31m-    <output-test url="file://$MODULE_DIR$/target/test-classes" />[m
+[31m-    <content url="file://$MODULE_DIR$">[m
+[31m-      <excludeFolder url="file://$MODULE_DIR$/target" />[m
+[31m-    </content>[m
+[31m-    <orderEntry type="inheritedJdk" />[m
+[31m-    <orderEntry type="sourceFolder" forTests="false" />[m
+[31m-  </component>[m
+[31m-</module>[m
+\ No newline at end of file[m
+[1mdiff --git a/douyin_test/douyin_test.iml b/douyin_test/douyin_test.iml[m
+[1mdeleted file mode 100644[m
+[1mindex f409c0e..0000000[m
+[1m--- a/douyin_test/douyin_test.iml[m
+[1m+++ /dev/null[m
+[36m@@ -1,12 +0,0 @@[m
+[31m-<?xml version="1.0" encoding="UTF-8"?>[m
+[31m-<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">[m
+[31m-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">[m
+[31m-    <output url="file://$MODULE_DIR$/target/classes" />[m
+[31m-    <output-test url="file://$MODULE_DIR$/target/test-classes" />[m
+[31m-    <content url="file://$MODULE_DIR$">[m
+[31m-      <excludeFolder url="file://$MODULE_DIR$/target" />[m
+[31m-    </content>[m
+[31m-    <orderEntry type="inheritedJdk" />[m
+[31m-    <orderEntry type="sourceFolder" forTests="false" />[m
+[31m-  </component>[m
+[31m-</module>[m
+\ No newline at end of file[m
+[1mdiff --git a/pom.xml b/pom.xml[m
+[1mindex 3487b09..3fd198a 100644[m
+[1m--- a/pom.xml[m
+[1m+++ b/pom.xml[m
+[36m@@ -130,12 +130,5 @@[m
+             </dependency>[m
+         </dependencies>[m
+     </dependencyManagement>[m
+[31m-    <build>[m
+[31m-        <plugins>[m
+[31m-            <plugin>[m
+[31m-                <groupId>org.springframework.boot</groupId>[m
+[31m-                <artifactId>spring-boot-maven-plugin</artifactId>[m
+[31m-            </plugin>[m
+[31m-        </plugins>[m
+[31m-    </build>[m
+[32m+[m
+ </project>[m
+\ No newline at end of file[m
