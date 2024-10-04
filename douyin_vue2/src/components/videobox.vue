@@ -22,7 +22,7 @@
             </video>
 
 
-
+            <pinglunqu class="lpinglunqu" v-show="pinglunisvisable"></pinglunqu>
         </div>
 
 
@@ -33,17 +33,21 @@
 <script>
 import videoasideVue from './videoaside.vue';
 import videoarticleVue from './videoarticle.vue';
+import Pinglunqu from '../components/Pinglunqu.vue'
+
 import { homegetVideo, homegetVideomore, homegetVideocontent } from "../api/video"
 export default {
     components: {
         videoasideVue,
-        videoarticleVue
+        videoarticleVue,
+        Pinglunqu
     },
     watch: {
 
     },
     data() {
         return {
+            pinglunisvisable: true,
             // 使用props传递数据 使用props的数据在组件中是单向传输的 但是我可以通过请求异步修改数据库中的数据 就可以了
             videoboxdata: [
                 {
@@ -204,6 +208,14 @@ export default {
 </script>
 
 <style scoped>
+.lpinglunqu {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    z-index: 10;
+}
+
+
 .videoasideone {
     display: block;
     z-index: 5;

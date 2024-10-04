@@ -1,6 +1,6 @@
 <template>
     <div class="pinglunqu">
-        <button @click="sendMessageToParent">关闭评论区</button>
+        <button>关闭评论区</button>
         <div class="comment" v-for="(ping, index) in receivedData.data" :key="index">
             <div class="touxiangqu">
                 <div class="touxiang">
@@ -22,10 +22,7 @@ import { eventBus } from '../main'; // 根据实际的路径导入事件总线
 export default {
     name: "Pinglunqu",
     props: {
-        updateMessage: {
-            type: Function,
-            required: true
-        }
+
     },
     data() {
         return {
@@ -35,10 +32,7 @@ export default {
         }
     },
     methods: {
-        sendMessageToParent() {
-            // 调用父组件传递的方法并传递新的消息
-            this.updateMessage(false);
-        }
+
     },
     created() {
         eventBus.$on('eventName', (one) => {
@@ -64,8 +58,8 @@ export default {
 }
 
 .touxiang {
-    width: 50px;
-    height: 50px;
+    width: 20vw;
+    height: 20vw;
     border-radius: 25px;
     background-color: rgba(255, 44, 44, 0.5);
     z-index: 3;
@@ -73,13 +67,13 @@ export default {
 }
 
 .comment {
-    width: 414px;
+    width: 100vw;
     overflow: hidden;
 }
 
 .pinglunqu {
-    width: 414px;
-    height: 600px;
+    width: 100vw;
+    height: 60vh;
     background-color: white;
     border-radius: 10px 10px 0 0;
 }
