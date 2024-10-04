@@ -34,7 +34,8 @@
 import videoasideVue from './videoaside.vue';
 import videoarticleVue from './videoarticle.vue';
 import Pinglunqu from '../components/Pinglunqu.vue'
-import { eventBus } from '../main.ts';
+import { EventBus } from '../main.ts'; // 导入事件总线
+
 import { homegetVideo, homegetVideomore, homegetVideocontent } from "../api/video"
 export default {
     components: {

@@ -17,7 +17,7 @@
     </div>
 </template>
 <script>
-import { eventBus } from '../main.ts'; // 根据实际的路径导入事件总线
+import { EventBus } from '../main.ts'; // 导入事件总线
 
 export default {
     name: "Pinglunqu",
