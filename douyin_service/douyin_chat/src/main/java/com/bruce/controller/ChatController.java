@@ -29,4 +29,15 @@ public class ChatController {
         // 返回的消息会广播到所有订阅了 /topic/public 频道的客户端
         return chatMessage;
     }
+
+
+
+    @MessageMapping("/chat.sendMessagedan")
+    @SendTo("/topic/public")
+    public ChatMessage sendMessagedan(ChatMessage chatMessage) {
+        // 返回的消息会广播到所有订阅了 /topic/public 频道的客户端
+        return chatMessage;
+    }
+
+
 }
