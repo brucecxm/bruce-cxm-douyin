@@ -17,7 +17,7 @@
     </div>
 </template>
 <script>
-import { EventBus } from '../main.ts'; // 导入事件总线
+import { eventBus } from '../main.ts'; // 导入事件总线
 
 export default {
     name: "Pinglunqu",
@@ -33,7 +33,7 @@ export default {
     },
     methods: {
         sendMessage() {
-            EventBus.$emit('messageSent', false);
+            eventBus.$emit('messageSent', false);
         }
 
     },

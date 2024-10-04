@@ -6,7 +6,8 @@ import router from "./router";
 import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 
-export const EventBus = new Vue();
+// 创建一个新的 Vue 实例作为事件总线
+export const eventBus = new Vue();
 Vue.use(ElementUI);
 Vue.use(PiniaVuePlugin);
 new Vue({

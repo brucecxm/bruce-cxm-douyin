@@ -34,7 +34,7 @@
 import videoasideVue from './videoaside.vue';
 import videoarticleVue from './videoarticle.vue';
 import Pinglunqu from '../components/Pinglunqu.vue'
-import { EventBus } from '../main.ts'; // 导入事件总线
+import { eventBus } from '../main.ts'; // 导入事件总线
 
 import { homegetVideo, homegetVideomore, homegetVideocontent } from "../api/video"
 export default {
@@ -124,12 +124,12 @@ export default {
             { color: "black", top: 2 * this.boxHeight },
             { color: "black", top: 3 * this.boxHeight },
         ];
-        EventBus.$on('messageSent', (msg) => {
+        eventBus.$on('messageSent', (msg) => {
             this.message = msg;
         });
     },
     beforeDestroy() {
-        EventBus.$off('messageSent'); // 组件销毁前移除事件监听
+        eventBus.$off('messageSent'); // 组件销毁前移除事件监听
     }
     ,
     mounted() {
