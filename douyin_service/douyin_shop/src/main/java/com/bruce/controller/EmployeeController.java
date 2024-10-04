@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -58,6 +59,28 @@ public class EmployeeController {
         request.getSession().setAttribute("employee",emp.getId());
         return R.success(emp);
     }
+
+
+    @Autowired
+    private RestTemplate restTemplate;
+    @GetMapping("/logindan")
+    public R<Employee> logindan(){
+
+    String one =    restTemplate.getForObject("http://localhost:8988/sso/auth?redirect=https://www.baidu.com/&mode=ticket", String.class).toString();
+
+System.out.println(one);
+
+        String two =    restTemplate.getForObject("http://localhost:8988/sso/doLogin?name=sa&pwd=123456", String.class).toString();
+
+        String three =    restTemplate.getForObject("http://localhost:8988/sso/auth?redirect=www.baidu.com&mode=ticket", String.class).toString();
+
+        return R.success(null);
+    }
+
+
+
+
+
 
     /**
      * 员工退出

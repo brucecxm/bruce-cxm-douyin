@@ -7,11 +7,16 @@ import com.bruce.common.BaseContext;
 import com.bruce.common.R;
 import com.bruce.entity.AddressBook;
 import com.bruce.service.AddressBookService;
+import com.bruce.service.TicketService;
+import com.bruce.utils.MD5Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 地址簿管理
@@ -20,6 +25,36 @@ import java.util.List;
 @RestController
 @RequestMapping("/addressBook")
 public class AddressBookController {
+
+
+
+
+    @Autowired
+    private TicketService ticketService;
+
+    @GetMapping("/checkTicket")
+    public String checkTicket(
+            @RequestParam String ticket,
+            @RequestParam(required = false) String client,
+            @RequestParam(required = false) String ssoLogoutCall) {
+
+        // 调用服务来校验 ticket
+        String result = ticketService.checkTicket(ticket, client, ssoLogoutCall);
+        return result;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @Autowired
     private AddressBookService addressBookService;

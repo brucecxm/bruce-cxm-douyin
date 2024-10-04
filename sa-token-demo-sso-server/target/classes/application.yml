@@ -1,0 +1,96 @@
+
+
+server:
+  port: 8988
+
+# Sa-Token 配置
+sa-token:
+  # ------- SSO-模式一相关配置  (非模式一不需要配置)
+  # cookie:
+  # 配置 Cookie 作用域
+  # domain: stp.com
+
+  # ------- SSO-模式二相关配置
+  sso-server:
+    # Ticket有效期 (单位: 秒)，默认五分钟
+    ticket-timeout: 300
+    # 所有允许的授权回调地址
+    allow-url: "*"
+
+    # ------- SSO-模式三相关配置 （下面的配置在使用SSO模式三时打开）
+    # 是否打开模式三
+    is-http: true
+  sign:
+    # API 接口调用秘钥
+    secret-key: kQwIOrYvnXmSDkwEiFngrKidMcdrgKor
+    # ---- 除了以上配置项，你还需要为 Sa-Token 配置http请求处理器（文档有步骤说明）
+
+spring:
+  # Redis配置 （SSO模式一和模式二使用Redis来同步会话）
+  redis:
+    # Redis数据库索引（默认为0）
+    database: 1
+    # Redis服务器地址
+    host: 127.0.0.1
+    # Redis服务器连接端口
+    port: 6379
+    # Redis服务器连接密码（默认为空）
+    password:
+
+forest:
+  # 关闭 forest 请求日志打印
+  log-enabled: false
+
+
+
+
+
+  application:
+    name: api-gateway
+  redis:
+    host: localhost
+    port: 6379
+    password:
+    database: 0
+  cache:
+    redis:
+      time-to-live: 1800000 #设置缓存数据的过期时间
+  cloud:
+    gateway:
+      routes:
+        - id: DouyinUSerService
+          uri: lb://DouyinUSerService
+          predicates:
+            - Path=/user/**
+        #          filters:
+        #            - RewritePath=/user/(?<segment>.*), /user/${segment}
+        - id: DouyinIntroduceService
+          uri: lb://DouyinIntroduceService
+          predicates:
+            - Path=/introduce/**
+        - id: DouyinVideoService
+          uri: lb://DouyinVideoService
+          predicates:
+            - Path=/video/**
+        - id: DouyinMusicService
+          uri: lb://DouyinMusicService
+          predicates:
+            - Path=/music/**
+        - id: DouyinCommentService
+          uri: lb://DouyinCommentService
+          predicates:
+            - Path=/comment/**
+        - id: DouyinChatService
+          uri: lb://DouyinChatService
+          predicates:
+            - Path=/chat/**
+
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:10086/eureka  # Eureka服务器地址

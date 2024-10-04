@@ -23,6 +23,7 @@
         <module name="douyin_article" />
         <module name="douyin_user" />
         <module name="douyin_music" />
+        <module name="sa-token-demo-sso-server" />
         <module name="douyin_testall" />
         <module name="douyin_model" />
         <module name="douyin_feign" />
@@ -61,6 +62,7 @@
       <module name="douyin_user" options="-parameters" />
       <module name="douyin_video" options="-parameters" />
       <module name="douyin_websocket" options="-parameters" />
+      <module name="sa-token-demo-sso-server" options="-parameters" />
     </option>
   </component>
 </project>

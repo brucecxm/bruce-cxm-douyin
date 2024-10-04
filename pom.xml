@@ -13,6 +13,7 @@
         <module>douyin_basic</module>
         <module>douyin_test</module>
         <module>douyin_sms</module>
+        <module>sa-token-demo-sso-server</module>
     </modules>
     <groupId>org.example</groupId>
     <artifactId>douyin_backend</artifactId>
