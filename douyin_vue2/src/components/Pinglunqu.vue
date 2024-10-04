@@ -1,6 +1,6 @@
 <template>
     <div class="pinglunqu">
-        <button>关闭评论区</button>
+        <button @click="sendMessage">关闭评论区</button>
         <div class="comment" v-for="(ping, index) in receivedData.data" :key="index">
             <div class="touxiangqu">
                 <div class="touxiang">
@@ -17,7 +17,7 @@
     </div>
 </template>
 <script>
-import { eventBus } from '../main'; // 根据实际的路径导入事件总线
+import { eventBus } from '../main.ts'; // 根据实际的路径导入事件总线
 
 export default {
     name: "Pinglunqu",
@@ -32,6 +32,9 @@ export default {
         }
     },
     methods: {
+        sendMessage() {
+            EventBus.$emit('messageSent', false);
+        }
 
     },
     created() {
