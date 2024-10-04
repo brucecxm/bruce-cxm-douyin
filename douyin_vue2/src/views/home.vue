@@ -24,6 +24,7 @@
                 </div>
             </div>
 
+            <pinglunqu class="lpinglunqu" v-show="pinglunisvisable" :updateMessage="updateMessage"></pinglunqu>
 
             <footer-vue></footer-vue>
         </div>
@@ -35,9 +36,12 @@ import AllBoxVue from '@/components/AllBox.vue'
 import footerVue from '../components/footer.vue'
 import headerVue from '../components/header.vue'
 import videoboxVue from '../components/videobox.vue'
+import Pinglunqu from '../components/Pinglunqu.vue'
+
 export default {
     data() {
         return {
+            pinglunisvisable: false,
             isDragging: false, // 是否正在拖动的标志
             startX: 0, // 拖动的起始X位置
             currentX: 0, // 当前的X位置
@@ -154,6 +158,14 @@ export default {
 
 </script>
 <style scoped>
+.lpinglunqu {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    z-index: 10;
+}
+
+
 .homecontain {
     overflow-x: hidden;
     /* 禁止水平滚动 */

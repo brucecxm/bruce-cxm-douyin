@@ -24,7 +24,7 @@
     </div>
 </template>
  
-<script>
+<script> 
 import BaseFooter from '../components/BaseFooter.vue'
 import BaseHeader from '../components/BaseHeader.vue'
 import BaseMain from '../components/BaseMain.vue'
