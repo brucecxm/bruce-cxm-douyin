@@ -1,4 +1,4 @@
-package com.bruce.websocket.entity;
+package com.bruce.entity;
 
 import lombok.Data;
 

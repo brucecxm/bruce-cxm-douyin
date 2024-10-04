@@ -29,8 +29,35 @@ public class CommentController extends ApiController {
 
 
 
+    @GetMapping("/likeping")
+    public R likeping(@RequestParam boolean like,int comment_id,int user_id) {
+
+        if(like==true)
+        {
+//            insert comment_user into (comment_id,user_id,like_or_dislike) (&{comment_id},&{user_id},&{like})
+        }else {
+//            insert comment_user into (comment_id,user_id,like_or_dislike) (&{comment_id},&{user_id},&{dislike})
+
+        }
+
+        return R.ok(null);
+    }
 
 
+    @GetMapping("/insertpinglun")
+    public R insertpinglun(@RequestParam int lastId) {
+
+        if(lastId==-1)
+        {
+//            分配id  并且将其父字段设置为-1
+            return R.ok(null);
+
+        }else{
+//            分配id  父id设置为lastid
+            return R.ok(null);
+        }
+
+    }
 
 
 

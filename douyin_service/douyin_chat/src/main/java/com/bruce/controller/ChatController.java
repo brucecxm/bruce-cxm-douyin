@@ -1,6 +1,6 @@
-package com.bruce.websocket.controller;
+package com.bruce.controller;
 
-import com.bruce.websocket.entity.ChatMessage;
+import com.bruce.entity.ChatMessage;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
