@@ -8,11 +8,15 @@ import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.comment.entity.Comment;
+import com.bruce.dto.CommentDto;
 import com.bruce.service.CommentService;
+import com.bruce.service.CommentoneService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
+import java.util.IdentityHashMap;
 import java.util.List;
 
 /**
@@ -24,6 +28,33 @@ import java.util.List;
 @RestController
 @RequestMapping("/comment")
 public class CommentController extends ApiController {
+@Autowired
+private CommentoneService commentoneservice;
+
+
+
+@GetMapping("/getfu")
+    //获得所有父评论的接口
+    public R getfu(){
+
+    List<CommentDto>  x=commentoneservice.getcomment();
+
+
+    return R.ok(x);
+
+
+
+    }
+
+
+@GetMapping("/getzi")
+    //获得对应父评论的子评论
+    public  R  getzi(@RequestParam("fu_id") int fu_id){
+    List<CommentDto> m=commentoneservice.getcommenti(fu_id);
+
+    return R.ok(m);
+    }
+
 
 
 

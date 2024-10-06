@@ -7,21 +7,13 @@
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
- SET NAMES utf8 ;
+ SET NAMES utf8mb4 ;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
--- Current Database: `douyintest`
---
-
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `douyintest` /*!40100 DEFAULT CHARACTER SET utf8 */;
-
-USE `douyintest`;
 
 --
 -- Table structure for table `comment`
@@ -35,9 +27,10 @@ CREATE TABLE `comment` (
   `comment` varchar(500) DEFAULT NULL,
   `comment_video_id` int(11) DEFAULT NULL,
   `comment_user_id` int(11) DEFAULT NULL,
-  `last_id` int(11) DEFAULT NULL,
+  `last_id` varchar(5000) DEFAULT NULL,
   `comment_like` int(11) DEFAULT NULL,
   `comment_dislike` int(11) DEFAULT NULL,
+  `createtime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`comment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -48,7 +41,7 @@ CREATE TABLE `comment` (
 
 LOCK TABLES `comment` WRITE;
 /*!40000 ALTER TABLE `comment` DISABLE KEYS */;
-INSERT INTO `comment` VALUES (1,'11',1,102,NULL,NULL,NULL),(2,'22',1,102,NULL,NULL,NULL),(3,'33',1,103,NULL,NULL,NULL),(4,'44',1,104,NULL,NULL,NULL),(5,'55',2,101,NULL,NULL,NULL),(6,'66',2,102,NULL,NULL,NULL);
+INSERT INTO `comment` VALUES (1,'11',1,102,'-1',NULL,NULL,'2024-10-06 09:03:39'),(2,'22',1,102,'-1',NULL,NULL,'2024-10-06 09:03:39'),(3,'33',1,103,'-1',NULL,NULL,'2024-10-06 09:03:39'),(4,'44',1,104,'-1',NULL,NULL,'2024-10-06 09:03:39'),(5,'55',2,101,'-1',NULL,NULL,'2024-10-06 09:03:39'),(6,'66',2,102,'-1',NULL,NULL,'2024-10-06 09:03:39'),(1001,NULL,NULL,NULL,'-1',NULL,NULL,'2024-10-06 09:03:39'),(1002,NULL,NULL,NULL,'1001',NULL,NULL,'2024-10-06 09:03:39'),(1003,NULL,NULL,NULL,'1001_1002',NULL,NULL,'2024-10-06 09:03:39'),(1004,NULL,NULL,NULL,'1001',NULL,NULL,'2024-10-06 09:03:39'),(1005,NULL,NULL,NULL,'1001_1002_1003',NULL,NULL,'2024-10-06 09:03:39'),(1007,NULL,NULL,NULL,NULL,NULL,NULL,'2024-10-06 09:04:15'),(15562,NULL,NULL,NULL,NULL,NULL,NULL,'2024-10-06 09:04:41');
 /*!40000 ALTER TABLE `comment` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -73,6 +66,30 @@ CREATE TABLE `comment_user` (
 LOCK TABLES `comment_user` WRITE;
 /*!40000 ALTER TABLE `comment_user` DISABLE KEYS */;
 /*!40000 ALTER TABLE `comment_user` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `file_img`
+--
+
+DROP TABLE IF EXISTS `file_img`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `file_img` (
+  `user_id` bigint(20) DEFAULT NULL,
+  `img_url` varchar(2550) DEFAULT NULL,
+  `href_url` varchar(2550) DEFAULT NULL,
+  `file_url` varchar(2550) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `file_img`
+--
+
+LOCK TABLES `file_img` WRITE;
+/*!40000 ALTER TABLE `file_img` DISABLE KEYS */;
+/*!40000 ALTER TABLE `file_img` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -272,4 +289,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-05 18:01:00
+-- Dump completed on 2024-10-06 18:39:44

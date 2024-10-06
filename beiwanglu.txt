@@ -28,3 +28,17 @@ Java对象和JSON数据之间进行序列化和反序列化的库
 JavaMail API 是 Java 平台上用于发送和接收电子邮件的标准API。它提供了一组类和接口，使开发者能够与邮件服务器进行通信，
 并实现电子邮件的发送和接收功能。在Java项目中，如果需要发送或接收电子邮件，通常会使用JavaMail API来完成这些任务。
   <javax.mail.version>1.4</javax.mail.version>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
