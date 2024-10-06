@@ -142,8 +142,8 @@ export default {
             console.log(videoArr)
             this.videoboxdata = videoArr;
         }).catch(error => {
-            console.error('获取视频出错:', error);
-            // 可以适当处理错误
+            // console.error('获取视频出错:', error);
+            console.log("获取视频出错  videobox中的")
         });
     },
     methods: {

@@ -6,25 +6,20 @@ import router from "./router";
 import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 
-
-
-
-
-
 /*
 封装请求方法,供全局调用
  */
-import {postKeyValueRequest} from "./utils/api";
-import {postRequest} from "./utils/api";
-import {getRequest} from "./utils/api";
-import {putRequest} from "./utils/api";
-import {deleteRequest} from "./utils/api";
+import { postKeyValueRequest } from "./utils/api";
+import { postRequest } from "./utils/api";
+import { getRequest } from "./utils/api";
+import { putRequest } from "./utils/api";
+import { deleteRequest } from "./utils/api";
 
-Vue.prototype.postKeyValueRequest=postKeyValueRequest;
-Vue.prototype.postRequest=postRequest;
-Vue.prototype.getRequest=getRequest;
-Vue.prototype.putRequest=putRequest;
-Vue.prototype.deleteRequest=deleteRequest;
+Vue.prototype.postKeyValueRequest = postKeyValueRequest;
+Vue.prototype.postRequest = postRequest;
+Vue.prototype.getRequest = getRequest;
+Vue.prototype.putRequest = putRequest;
+Vue.prototype.deleteRequest = deleteRequest;
 
 // /*路由前置守卫
 // to：去哪，from：从哪来，调用next()：通过本次路由请求*/
@@ -46,29 +41,11 @@ Vue.prototype.deleteRequest=deleteRequest;
 //   }
 // })
 
-Vue.config.productionTip = false
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Vue.config.productionTip = false;
 
 // 创建一个新的 Vue 实例作为事件总线
 export const eventBus = new Vue();
+
 Vue.use(ElementUI);
 Vue.use(PiniaVuePlugin);
 new Vue({

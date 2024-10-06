@@ -159,7 +159,7 @@ export default {
                 homegetVideomore().then(videoArr => {
                     this.videoarr = videoArr;
                 }).catch(error => {
-                    console.error('获取视频出错:', error);
+                    console.error('出错:', error);
                     // 可以适当处理错误
                 });
             }
