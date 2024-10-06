@@ -7,21 +7,13 @@
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
- SET NAMES utf8 ;
+ SET NAMES utf8mb4 ;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
--- Current Database: `douyintest`
---
-
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `douyintest` /*!40100 DEFAULT CHARACTER SET utf8 */;
-
-USE `douyintest`;
 
 --
 -- Table structure for table `comment`
@@ -35,11 +27,9 @@ CREATE TABLE `comment` (
   `comment` varchar(500) DEFAULT NULL,
   `comment_video_id` int(11) DEFAULT NULL,
   `comment_user_id` int(11) DEFAULT NULL,
-  `last_id` int(11) DEFAULT NULL,
-  `comment_like` int(11) DEFAULT NULL,
-  `comment_dislike` int(11) DEFAULT NULL,
+  `last_id` int(11) DEFAULT NULL COMMENT '上一层的id',
   PRIMARY KEY (`comment_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -48,31 +38,30 @@ CREATE TABLE `comment` (
 
 LOCK TABLES `comment` WRITE;
 /*!40000 ALTER TABLE `comment` DISABLE KEYS */;
-INSERT INTO `comment` VALUES (1,'11',1,102,NULL,NULL,NULL),(2,'22',1,102,NULL,NULL,NULL),(3,'33',1,103,NULL,NULL,NULL),(4,'44',1,104,NULL,NULL,NULL),(5,'55',2,101,NULL,NULL,NULL),(6,'66',2,102,NULL,NULL,NULL);
+INSERT INTO `comment` VALUES (1,'11',1,102,-1),(2,'22',1,102,-1),(3,'33',1,103,-1),(4,'44',1,104,-1),(5,'55',2,101,-1),(6,'66',2,102,-1);
 /*!40000 ALTER TABLE `comment` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `comment_user`
+-- Table structure for table `lianjie`
 --
 
-DROP TABLE IF EXISTS `comment_user`;
+DROP TABLE IF EXISTS `lianjie`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
  SET character_set_client = utf8mb4 ;
-CREATE TABLE `comment_user` (
-  `user_id` int(11) DEFAULT NULL,
-  `comment_id` int(11) DEFAULT NULL,
-  `like_or_dislike` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `lianjie` (
+  `lianjie` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `comment_user`
+-- Dumping data for table `lianjie`
 --
 
-LOCK TABLES `comment_user` WRITE;
-/*!40000 ALTER TABLE `comment_user` DISABLE KEYS */;
-/*!40000 ALTER TABLE `comment_user` ENABLE KEYS */;
+LOCK TABLES `lianjie` WRITE;
+/*!40000 ALTER TABLE `lianjie` DISABLE KEYS */;
+INSERT INTO `lianjie` VALUES ('sss'),('ss'),('ss'),('ss'),('ss'),('ss'),('ss'),('ss'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2'),('链接1'),('链接2。');
+/*!40000 ALTER TABLE `lianjie` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -90,7 +79,7 @@ CREATE TABLE `likeone` (
   `collect` int(11) DEFAULT NULL,
   `comment` int(11) DEFAULT NULL,
   `follow` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -115,7 +104,7 @@ CREATE TABLE `music` (
   `music_name` varchar(20) DEFAULT NULL,
   `music_video_id` int(11) NOT NULL,
   PRIMARY KEY (`music_video_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -139,7 +128,7 @@ CREATE TABLE `secruy` (
   `id` int(11) DEFAULT NULL,
   `username` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -167,7 +156,7 @@ CREATE TABLE `tb_brand` (
   `description` varchar(100) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -189,7 +178,7 @@ DROP TABLE IF EXISTS `user`;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(255) NOT NULL,
+  `username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `password` varchar(255) DEFAULT NULL,
   `nickname` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
@@ -197,7 +186,7 @@ CREATE TABLE `user` (
   `create_time` datetime NOT NULL,
   `update_time` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=106 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=106 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -224,7 +213,7 @@ CREATE TABLE `video` (
   `video_url` varchar(2000) DEFAULT NULL,
   `video_comment` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`video_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -251,7 +240,7 @@ CREATE TABLE `xiaoxi` (
   `text` varchar(500) DEFAULT NULL,
   `img` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -272,4 +261,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-05 18:01:00
+-- Dump completed on 2024-10-06 16:34:11
