@@ -1,5 +1,7 @@
 package com.bruce.listen;
 
+import com.bruce.dto.Feedback;
+import com.bruce.utils.JsonUtil;
 import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +14,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
-import top.javahai.subtlechat.api.entity.Feedback;
-import top.javahai.subtlechat.api.utils.JsonUtil;
 
 import java.io.IOException;
 import java.util.Date;
