@@ -1,6 +1,6 @@
 <template>
     <div class="pinglunqu">
-        <button @click="sendMessage">关闭评论区</button>
+        <button @click="sendMessage()">关闭评论区</button>
         <div class="comment" v-for="(ping, index) in receivedData.data" :key="index">
             <div class="touxiangqu">
                 <div class="touxiang">
@@ -33,8 +33,10 @@ export default {
     },
     methods: {
         sendMessage() {
-            eventBus.$emit('messageSent', false);
-        }
+            console.log("sssss")
+            // eventBus.$emit('messageSent', false);
+
+        },
 
     },
     created() {
