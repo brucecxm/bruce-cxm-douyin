@@ -1,5 +1,5 @@
 <template>
-    <div class="login-screen" style="width: 414px; height: 896px;">
+    <div class="login-screen">
         <div class="header">
             <button class="close-btn" @click="closeScreen">×</button>
             <div class="help-settings">
@@ -19,8 +19,6 @@
                     </select>
                     <input type="tel" v-model="loginpojo.username" placeholder="请输入手机号" />
                     <input type="tel" v-model="loginpojo.password" placeholder="请输入密码" />
-
-                    <br>
                     <button class="clear-btn" @click="clearPhoneNumber">×</button>
                 </div>
 
@@ -41,6 +39,7 @@
 </template>
 
 <script>
+
 import { userLoginService } from "../../api/user"
 import { useTokenStore } from "../../stores/token"
 
@@ -91,36 +90,44 @@ export default {
 };
 </script>
 
-<style scoped>
-/* 你的样式保持不变 */
-</style>
+
+
 
 <style scoped>
 .login-screen {
     display: flex;
     flex-direction: column;
-    padding: 0 16px;
+    padding: 0 4vw;
+    /* 使用 vw 进行水平内边距 */
     box-sizing: border-box;
     background-color: #fff;
-    height: 100%;
+    height: 100vh;
+    /* 使用 vh 进行高度设置 */
+    width: 100vw;
+    /* 使用 vw 进行宽度设置 */
+    overflow-x: hidden;
+    /* 去掉水平滚动条 */
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 0;
+    padding: 2vh 0;
+    /* 使用 vh 进行上下内边距 */
 }
 
 .close-btn {
-    font-size: 24px;
+    font-size: 3vw;
+    /* 使用 vw 进行字体大小 */
     background: none;
     border: none;
     cursor: pointer;
 }
 
 .help-settings {
-    font-size: 14px;
+    font-size: 2vw;
+    /* 使用 vw 进行字体大小 */
     cursor: pointer;
 }
 
@@ -130,55 +137,72 @@ export default {
     flex-direction: column;
     justify-content: space-between;
     text-align: center;
+    overflow-y: auto;
+    /* 允许纵向滚动 */
 }
 
 .notice {
-    font-size: 18px;
-    margin-bottom: 20px;
+    font-size: 4vw;
+    /* 使用 vw 进行字体大小 */
+    margin-bottom: 2vh;
+    /* 使用 vh 进行下边距 */
 }
 
 .login-form {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
+    /* 确保表单宽度为100% */
 }
 
 .input-group {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 2vh;
+    /* 使用 vh 进行下边距 */
     width: 100%;
+    /* 确保输入组宽度为100% */
     border: 1px solid #ccc;
     border-radius: 5px;
-    padding: 10px;
+    padding: 2vh;
+    /* 使用 vh 进行内边距 */
+    box-sizing: border-box;
+    /* 确保内边距和边框不影响总宽度 */
 }
 
 .country-code {
     border: none;
     background: none;
-    font-size: 16px;
-    margin-right: 10px;
+    font-size: 2.5vw;
+    /* 使用 vw 进行字体大小 */
+    margin-right: 1vw;
+    /* 使用 vw 进行右边距 */
 }
 
 .input-group input {
     border: none;
     outline: none;
     flex-grow: 1;
-    font-size: 16px;
+    font-size: 2.5vw;
+    /* 使用 vw 进行字体大小 */
 }
 
 .clear-btn {
-    font-size: 20px;
+    font-size: 3vw;
+    /* 使用 vw 进行字体大小 */
     background: none;
     border: none;
     cursor: pointer;
 }
 
 .terms {
-    font-size: 12px;
+    font-size: 2vw;
+    /* 使用 vw 进行字体大小 */
     color: #888;
     text-align: left;
-    margin: 10px 0;
+    margin: 2vh 0;
+    /* 使用 vh 进行上下边距 */
 }
 
 .terms a {
@@ -194,18 +218,23 @@ export default {
     background-color: #ff5252;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 2vh 0;
+    /* 使用 vh 进行上下内边距 */
     border-radius: 5px;
     cursor: pointer;
     width: 100%;
-    margin-top: 20px;
+    margin-top: 2vh;
+    /* 使用 vh 进行上边距 */
+    font-size: 3vw;
+    /* 使用 vw 进行字体大小 */
 }
 
 .login-options {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    margin-top: 20px;
+    margin-top: 2vh;
+    /* 使用 vh 进行上边距 */
 }
 
 .login-options button {
@@ -213,18 +242,19 @@ export default {
     border: none;
     color: #007bff;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 2vw;
+    /* 使用 vw 进行字体大小 */
 }
 
 .recovery-text {
-    font-size: 12px;
+    font-size: 2vw;
+    /* 使用 vw 进行字体大小 */
     color: #888;
-    margin-top: 20px;
+    margin-top: 2vh;
+    /* 使用 vh 进行上边距 */
 }
 
 .recovery-text a {
     color: #007bff;
     text-decoration: none;
-}
-</style>
-  ../../shop.js/user
+}</style>

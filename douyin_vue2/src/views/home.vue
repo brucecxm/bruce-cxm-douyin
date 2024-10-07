@@ -104,12 +104,12 @@ export default {
         startDrag(event) {
 
             //会影响到子组件事件的执行
-            // event.preventDefault();
+            // event.preventDefault(); // 阻止默认行为
             this.isDragging = true;
             this.startX = this.getEventClientX(event) - this.currentX;
         },
         stopDrag(event) {
-            // event.preventDefault();
+            // event.preventDefault(); // 阻止默认行为
             this.isDragging = false;
             this.updateBoxPositionBasedOnCurrentX();
 

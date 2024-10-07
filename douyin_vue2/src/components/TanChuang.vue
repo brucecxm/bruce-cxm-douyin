@@ -85,7 +85,10 @@
         </div>
     </div>
 </template>
-  
+
+
+
+
 <script>
 import { eventBus } from '../main'; // 导入全局事件总线
 import '@fortawesome/fontawesome-free/css/all.css';
@@ -112,10 +115,13 @@ export default {
 };
 </script>
   
+
 <style scoped>
 .container {
-    width: 330px;
-    height: 896px;
+    width: 90vw;
+    /* 使用 vw 进行宽度设置 */
+    height: 90vh;
+    /* 使用 vh 进行高度设置 */
     margin: 0 auto;
     background-color: #f0f0f0;
     display: flex;
@@ -129,7 +135,8 @@ export default {
     width: 100%;
     display: flex;
     justify-content: space-between;
-    padding: 10px;
+    padding: 2vh 2vw;
+    /* 使用 vh 和 vw 进行内边距 */
     background-color: white;
     border-bottom: 1px solid #ddd;
 }
@@ -142,57 +149,71 @@ export default {
 .scan {
     display: flex;
     align-items: center;
-    transform: translateX(-20px);
+    transform: translateX(-2vw);
+    /* 使用 vw 进行位移 */
 }
 
 .settings i,
 .scan i {
-    font-size: 24px;
+    font-size: 5vw;
+    /* 使用 vw 进行字体大小 */
 }
 
 .scan span {
-    margin-left: 5px;
+    margin-left: 1vw;
+    /* 使用 vw 进行左边距 */
 }
 
 .section {
     width: 100%;
-    padding: 10px;
+    padding: 2vh 2vw;
+    /* 使用 vh 和 vw 进行内边距 */
     background-color: white;
-    margin-top: 10px;
+    margin-top: 2vh;
+    /* 使用 vh 进行上边距 */
     border-radius: 10px;
 }
 
 .section-title {
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 2vh;
+    /* 使用 vh 进行下边距 */
+    font-size: 4vw;
+    /* 使用 vw 进行字体大小 */
 }
 
 .item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 2vh;
+    /* 使用 vh 进行下边距 */
 }
 
 .icon-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 33.33%;
+    width: 30%;
+    /* 使用百分比设置宽度 */
 }
 
 .icon {
-    width: 50px;
-    height: 50px;
+    width: 10vw;
+    /* 使用 vw 进行宽度设置 */
+    height: 10vw;
+    /* 使用 vw 进行高度设置 */
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 5vw;
+    /* 使用 vw 进行字体大小 */
 }
 
 .icon-wrapper span {
-    margin-top: 5px;
+    margin-top: 1vh;
+    /* 使用 vh 进行上边距 */
     text-align: center;
-}
-</style>
-  
+    font-size: 3vw;
+    /* 使用 vw 进行字体大小 */
+}</style>
