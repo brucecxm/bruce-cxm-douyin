@@ -1,5 +1,6 @@
 <template>
-    <div class="homecontain">
+    <div class="homecontain" @mousedown="startDrag" @mouseup="stopDrag" @mousemove="drag" @mouseleave="stopDrag"
+        @touchstart="startDrag" @touchend="stopDrag" @touchmove="drag">
         <caidan :style="caidancss"></caidan>
 
         <div class="home" :style="boxvideocss">
@@ -14,8 +15,7 @@
 
 
             <!-- 容器div，包含鼠标和触摸事件监听 -->
-            <div class="videomain" @mousedown="startDrag" @mouseup="stopDrag" @mousemove="drag" @mouseleave="stopDrag"
-                @touchstart="startDrag" @touchend="stopDrag" @touchmove="drag">
+            <div class="videomain">
                 <!-- 循环渲染每个box，设置样式 -->
                 <div v-for="( box, index ) in  boxes " :key="index" class="box"
                     :style="{ left: box.left * 0.1 + 'vw', backgroundColor: box.color, width: boxWidth * 0.1 + 'vw', height: boxHeight + 'vh' }">
@@ -91,12 +91,14 @@ export default {
             this.go(index);
         },
         startDrag(event) {
-            event.preventDefault();
+
+            //会影响到子组件事件的执行
+            // event.preventDefault();
             this.isDragging = true;
             this.startX = this.getEventClientX(event) - this.currentX;
         },
         stopDrag(event) {
-            event.preventDefault();
+            // event.preventDefault();
             this.isDragging = false;
             this.updateBoxPositionBasedOnCurrentX();
 

@@ -1,5 +1,6 @@
 <template>
     <div class="allbox">
+        <!-- <div class="test" @click="allboxtest"></div> -->
         <videobox-vue v-if="boxtype === '推荐'"></videobox-vue>
         <shopbox-vue v-if="boxtype === '商城'"></shopbox-vue>
         <samecity-vue v-if="boxtype === '同城'"></samecity-vue>
@@ -36,8 +37,22 @@ export default {
         followboxVue,
         liveboxVue
 
+    },
+    methods: {
+        allboxtest() {
+            console.log("sssssssss")
+        }
     }
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.test {
+    width: 200px;
+    height: 200px;
+    position: absolute;
+    left: 0px;
+    background-color: red;
+    z-index: 10;
+}
+</style>

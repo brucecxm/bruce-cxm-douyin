@@ -25,7 +25,7 @@
             <pinglunqu class="lpinglunqu" v-show="message"></pinglunqu>
         </div>
 
-
+        <!-- <div class="videotesto" @click="videotest"></div> -->
 
     </div>
 </template>
@@ -48,7 +48,7 @@ export default {
     },
     data() {
         return {
-            message: true,
+            message: false,
             // 使用props传递数据 使用props的数据在组件中是单向传输的 但是我可以通过请求异步修改数据库中的数据 就可以了
             videoboxdata: [
                 {
@@ -148,14 +148,16 @@ export default {
     },
     methods: {
 
-
+        videotest() {
+            console.log("cccccccccc")
+        },
         startDrag(event) {
-            event.preventDefault();
+            // event.preventDefault();
             this.isDragging = true;
             this.startY = this.getEventClientY(event) - this.currentY;
         },
         stopDrag(event) {
-            event.preventDefault();
+            // event.preventDefault();
             this.isDragging = false;
             this.updateBoxPositionBasedOnCurrentY();
             this.updateVideoPlayback();
@@ -216,6 +218,15 @@ export default {
 </script>
 
 <style scoped>
+.videotesto {
+    width: 200px;
+    height: 200px;
+    position: absolute;
+    right: 0px;
+    background-color: blue;
+    z-index: 10;
+}
+
 .lpinglunqu {
     position: absolute;
     left: 0px;

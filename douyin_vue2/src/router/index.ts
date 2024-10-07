@@ -8,6 +8,16 @@ const router = new VueRouter({
   base: import.meta.env.BASE_URL,
   routes: [
     {
+      path: "/testmap",
+      name: "testmap",
+      component: () => import("../components/leftmap.vue"),
+    },
+    {
+      path: "/map",
+      name: "map",
+      component: () => import("../views/gaode.vue"),
+    },
+    {
       path: "/homeone",
       name: "home",
       component: () => import("../views/one.vue"),
@@ -104,45 +114,41 @@ const router = new VueRouter({
     //   component: () => import('../views/AboutView.vue')
     // }
 
-
     {
-      path: '/chat',
-      name: 'Login',
-      component: () => import('../views/chat/Login.vue'),
+      path: "/chat",
+      name: "Login",
+      component: () => import("../views/chat/Login.vue"),
     },
     {
-      path: '/chat/chatroom',
-      name: 'ChatRoom',
-      component: () => import('../views/chat/ChatRoom.vue'),
+      path: "/chat/chatroom",
+      name: "ChatRoom",
+      component: () => import("../views/chat/ChatRoom.vue"),
     },
     {
-      path: '/chat/adminlogin',
-      name: 'AdminLogin',
-      component: () => import('../views/admin/AdminLogin.vue'),
+      path: "/chat/adminlogin",
+      name: "AdminLogin",
+      component: () => import("../views/admin/AdminLogin.vue"),
     },
     {
-      path: '/chat/home',
-      name: 'Home',
-      component: () => import('../views/admin/Home.vue'),
+      path: "/chat/home",
+      name: "Home",
+      component: () => import("../views/admin/Home.vue"),
     },
     {
-      path: '/chat/userinfo',
-      name: '用户信息管理',
-      component: () => import('../views/admin/UserInfo.vue'),
+      path: "/chat/userinfo",
+      name: "用户信息管理",
+      component: () => import("../views/admin/UserInfo.vue"),
     },
     {
-      path: '/chat/groupChatRecord',
-      name: '群聊记录管理',
-      component: () => import('../views/admin/GroupChatRecord.vue')
+      path: "/chat/groupChatRecord",
+      name: "群聊记录管理",
+      component: () => import("../views/admin/GroupChatRecord.vue"),
     },
     {
-      path: '/chat/privateChatRecord',
-      name: '私聊记录管理',
-      component: () => import('../views/admin/PrivateChatRecord.vue')
-    }
-
-
-
+      path: "/chat/privateChatRecord",
+      name: "私聊记录管理",
+      component: () => import("../views/admin/PrivateChatRecord.vue"),
+    },
   ],
 });
 

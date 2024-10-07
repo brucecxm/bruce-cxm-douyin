@@ -13,7 +13,7 @@
             </div>
 
             <div class="videoarticle">
-                <div class="position">
+                <div class="position" @click="showPosition">
                     距离你1km
                 </div>
 
@@ -131,7 +131,10 @@ export default {
     },
     methods: {
 
+        showPosition() {
+            this.$router.push("/map")
 
+        },
 
         startDrag(event) {
             event.preventDefault();
@@ -230,7 +233,7 @@ export default {
 .videoone {
 
     display: block;
-    z-index: 10;
+    z-index: 1;
     object-fit: cover;
     margin: 0 auto;
     width: 100%;

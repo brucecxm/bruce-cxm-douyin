@@ -33,8 +33,9 @@ export default {
     },
     methods: {
         sendMessage() {
-            console.log("sssss")
-            // eventBus.$emit('messageSent', false);
+            console.log("sssss");
+            // alert("按钮被点击了！");
+            eventBus.$emit('messageSent', false);
 
         },
 

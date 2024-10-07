@@ -1,5 +1,5 @@
 <template>
-    <div class="videoarticle">
+    <div class="videoarticle" @click="testone">
         <div class="username">{{ username }}</div>
         <div class="article">{{ article }}</div>
     </div>
@@ -14,6 +14,11 @@ export default {
             username: "你好"
         };
     },
+    methods: {
+        testone() {
+            console.log("sssssss")
+        }
+    }
 
 };
 </script>
