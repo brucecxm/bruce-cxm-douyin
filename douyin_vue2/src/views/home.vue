@@ -23,6 +23,7 @@
                     <div class="videobox"><all-box-vue :boxtype="boxes[index].boxtest"></all-box-vue></div>
                 </div>
             </div>
+            <pinglunqu class="lpinglunqu" v-show="message"></pinglunqu>
 
 
             <footer-vue></footer-vue>
@@ -35,9 +36,13 @@ import AllBoxVue from '@/components/AllBox.vue'
 import footerVue from '../components/footer.vue'
 import headerVue from '../components/header.vue'
 import videoboxVue from '../components/videobox.vue'
+import Pinglunqu from '@/components/Pinglunqu.vue'
+import { eventBus } from '../main.ts'; // 导入事件总线
+
 export default {
     data() {
         return {
+            message: false,
             isDragging: false, // 是否正在拖动的标志
             startX: 0, // 拖动的起始X位置
             currentX: 0, // 当前的X位置
@@ -68,7 +73,8 @@ export default {
         headerVue,
         footerVue,
         AllBoxVue,
-        caidan
+        caidan,
+        Pinglunqu
     },
     created() {
         // 初始化 boxes 的数据，包括颜色和左边距
@@ -83,7 +89,12 @@ export default {
             { color: "pink", left: 7 * this.boxWidth, boxtest: "同城" },
             { color: "pink", left: 8 * this.boxWidth, boxtest: "同城" },
         ];
-
+        eventBus.$on('messageSent', (msg) => {
+            this.message = msg;
+        });
+    },
+    beforeDestroy() {
+        eventBus.$off('messageSent'); // 组件销毁前移除事件监听
     },
     methods: {
         updateActiveIndex(index) {
@@ -181,6 +192,12 @@ export default {
 
 
 
+.lpinglunqu {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    z-index: 10;
+}
 
 .videomain {
 

@@ -137,12 +137,12 @@ export default {
         },
 
         startDrag(event) {
-            event.preventDefault();
+            //event.preventDefault();
             this.isDragging = true;
             this.startY = this.getEventClientY(event) - this.currentY;
         },
         stopDrag(event) {
-            event.preventDefault();
+            // event.preventDefault();
             this.isDragging = false;
             this.updateBoxPositionBasedOnCurrentY();
             this.updateVideoPlayback();

@@ -22,7 +22,6 @@
             </video>
 
 
-            <pinglunqu class="lpinglunqu" v-show="message"></pinglunqu>
         </div>
 
         <!-- <div class="videotesto" @click="videotest"></div> -->
@@ -33,7 +32,6 @@
 <script>
 import videoasideVue from './videoaside.vue';
 import videoarticleVue from './videoarticle.vue';
-import Pinglunqu from '../components/Pinglunqu.vue'
 import { eventBus } from '../main.ts'; // 导入事件总线
 
 import { homegetVideo, homegetVideomore, homegetVideocontent } from "../api/video"
@@ -41,14 +39,13 @@ export default {
     components: {
         videoasideVue,
         videoarticleVue,
-        Pinglunqu
     },
     watch: {
 
     },
     data() {
         return {
-            message: false,
+
             // 使用props传递数据 使用props的数据在组件中是单向传输的 但是我可以通过请求异步修改数据库中的数据 就可以了
             videoboxdata: [
                 {
@@ -124,14 +121,9 @@ export default {
             { color: "black", top: 2 * this.boxHeight },
             { color: "black", top: 3 * this.boxHeight },
         ];
-        eventBus.$on('messageSent', (msg) => {
-            this.message = msg;
-        });
+
     },
-    beforeDestroy() {
-        eventBus.$off('messageSent'); // 组件销毁前移除事件监听
-    }
-    ,
+
     mounted() {
 
         this.updateVideoPlayback();
@@ -227,12 +219,6 @@ export default {
     z-index: 10;
 }
 
-.lpinglunqu {
-    position: absolute;
-    left: 0px;
-    bottom: 0px;
-    z-index: 10;
-}
 
 
 .videoasideone {
