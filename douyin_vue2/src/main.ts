@@ -7,19 +7,19 @@ import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 
 /*
-封装请求方法,供全局调用
- */
-import { postKeyValueRequest } from "./utils/api";
-import { postRequest } from "./utils/api";
-import { getRequest } from "./utils/api";
-import { putRequest } from "./utils/api";
-import { deleteRequest } from "./utils/api";
+// 封装请求方法,供全局调用
+//  */
+// import { postKeyValueRequest } from "./utils/api";
+// import { postRequest } from "./utils/api";
+// import { getRequest } from "./utils/api";
+// import { putRequest } from "./utils/api";
+// import { deleteRequest } from "./utils/api";
 
-Vue.prototype.postKeyValueRequest = postKeyValueRequest;
-Vue.prototype.postRequest = postRequest;
-Vue.prototype.getRequest = getRequest;
-Vue.prototype.putRequest = putRequest;
-Vue.prototype.deleteRequest = deleteRequest;
+// Vue.prototype.postKeyValueRequest = postKeyValueRequest;
+// Vue.prototype.postRequest = postRequest;
+// Vue.prototype.getRequest = getRequest;
+// Vue.prototype.putRequest = putRequest;
+// Vue.prototype.deleteRequest = deleteRequest;
 
 // /*路由前置守卫
 // to：去哪，from：从哪来，调用next()：通过本次路由请求*/

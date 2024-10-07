@@ -3,7 +3,7 @@ import request from "@/utils/request.js";
 // params 处理get请求  data处理post请求
 
 export const homegetVideo = () => {
-  return request.get("/video/one");
+  return request.get("/video/test");
 };
 
 export const homegetVideomore = () => {

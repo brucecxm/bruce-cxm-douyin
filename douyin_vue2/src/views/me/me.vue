@@ -1,6 +1,9 @@
 <template>
     <div class="metemp">
+        <footer-vue class="footer"></footer-vue>
+
         <div class="me">
+
             <memenu v-show="receivedMessage.ismemenushow" class="memenu"></memenu>
             <div :class="receivedMessage.me">
                 <div class="backimg">
@@ -46,7 +49,6 @@
             </div>
 
         </div>
-        <footer-vue class="footer"></footer-vue>
 
     </div>
 </template>
@@ -206,6 +208,17 @@ span {
     line-height: 50px;
 }
 
+.metemp {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+    /* 隐藏水平滚动条 */
+}
+
+
+
 
 .personinfo {
     border-radius: 30px 30px 0px 30px;
@@ -246,11 +259,27 @@ span {
     right: 320px;
 }
 
+
+
+
+
 .me {
-    width: 414px;
-    background-color: white;
-    overflow: hidden;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    /* 允许垂直滚动 */
+    overflow-x: hidden;
+    /* 隐藏水平滚动条 */
 }
+
+/* 隐藏滚动条 */
+.me::-webkit-scrollbar {
+    display: none;
+    /* 隐藏滚动条 */
+}
+
+
 
 .footer {
     background-color: black;
@@ -259,5 +288,4 @@ span {
     position: absolute;
     bottom: 0px;
 
-}
-</style>
+}</style>

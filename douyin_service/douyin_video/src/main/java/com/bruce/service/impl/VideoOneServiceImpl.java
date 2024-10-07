@@ -26,16 +26,16 @@ public class VideoOneServiceImpl implements VideoOneService {
     @Autowired
     private VideoOneDao videoOneDao;
 
-//
-//    @Override
-//    public List<VideoOne> queryVideoInfo(int videoId) {
-//
-//        return videoOneDao.queryVideoInfo(videoId);
-//    }
-
     @Override
-    public void insertlianjie(String lianjie) {
-        videoOneDao.insertLianjie(lianjie);
+    public List<VideoOne> getVideoInfo( int page, int size) {
+        int limit = size;
+        int offset = (page - 1) * size;
+        return videoOneDao.queryVideoInfo(limit, offset);
     }
+
+//    @Override
+//    public void insertlianjie(String lianjie) {
+//        videoOneDao.insertLianjie(lianjie);
+//    }
 }
 

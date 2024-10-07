@@ -14,11 +14,6 @@ import java.util.List;
  * @since 2024-06-25 13:03:25
  */
 public interface VideoOneService {
-
-
-// List<VideoOne> queryVideoInfo(@Param("videoId") int videoId);
-
-
- void insertlianjie(@Param("lianjie") String lianjie);
+ List<VideoOne> getVideoInfo(int page, int size);
 }
 

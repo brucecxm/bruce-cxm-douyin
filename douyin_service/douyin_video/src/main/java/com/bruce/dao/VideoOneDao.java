@@ -18,10 +18,6 @@ import java.util.List;
 @Mapper
 public interface VideoOneDao {
 
-//    List<VideoOne> queryVideoInfo(@Param("videoId") int videoId);
-
-
-
-    void insertLianjie(@Param("lianjie") String lianjie);
+    List<VideoOne> queryVideoInfo( @Param("limit") int limit, @Param("offset") int offset);
 }
 

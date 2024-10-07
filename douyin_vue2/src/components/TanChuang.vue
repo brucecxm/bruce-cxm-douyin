@@ -116,6 +116,8 @@ export default {
 </script>
   
 
+
+
 <style scoped>
 .container {
     width: 90vw;
@@ -155,7 +157,7 @@ export default {
 
 .settings i,
 .scan i {
-    font-size: 5vw;
+    font-size: 0.5vw;
     /* 使用 vw 进行字体大小 */
 }
 
@@ -178,7 +180,7 @@ export default {
     font-weight: bold;
     margin-bottom: 2vh;
     /* 使用 vh 进行下边距 */
-    font-size: 4vw;
+    font-size: 0.5vw;
     /* 使用 vw 进行字体大小 */
 }
 
@@ -199,21 +201,56 @@ export default {
 }
 
 .icon {
-    width: 10vw;
+    width: 5vw;
     /* 使用 vw 进行宽度设置 */
-    height: 10vw;
+    height: 5vw;
     /* 使用 vw 进行高度设置 */
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 5vw;
+    font-size: 0.5vw;
     /* 使用 vw 进行字体大小 */
 }
 
 .icon-wrapper span {
-    margin-top: 1vh;
+    margin-top: 0.5vh;
     /* 使用 vh 进行上边距 */
     text-align: center;
-    font-size: 3vw;
+    font-size: 0.5vw;
     /* 使用 vw 进行字体大小 */
-}</style>
+}
+
+/* 媒体查询 */
+@media (max-width: 600px) {
+
+    .settings i,
+    .scan i {
+        font-size: 0.5vw;
+        /* 调整较小屏幕的图标大小 */
+    }
+
+    .scan span {
+        font-size: 0.5vw;
+        /* 调整文本大小 */
+    }
+
+    .section-title {
+        font-size: 0.5vw;
+        /* 调整标题字体大小 */
+    }
+
+    .icon {
+        width: 4vw;
+        /* 调整图标宽度 */
+        height: 4vw;
+        /* 调整图标高度 */
+        font-size: 0.5vw;
+        /* 调整图标字体大小 */
+    }
+
+    .icon-wrapper span {
+        font-size: 0.5vw;
+        /* 调整文本字体大小 */
+    }
+}
+</style>

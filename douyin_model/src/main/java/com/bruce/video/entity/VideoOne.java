@@ -1,27 +1,96 @@
 package com.bruce.video.entity;
 
-import lombok.Data;
-
-@Data
 public class VideoOne {
+    private String videoUrl;
+    private String videoArticle;
+    private String username;
+    private String userAvatar;
+    private int likeNum;
+    private int commentNum;
+    private int shareNum;
+    private int collectNum;
+    private String musicAvatar;
+    private String musicName;
 
+    // Getters and Setters
 
-private  String musicName;
-private  String musicAvatar;
+    public String getVideoUrl() {
+        return videoUrl;
+    }
 
-private  String videoUrl;
-private  String videoArticle;
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
+    }
 
-private  String username;
+    public String getVideoArticle() {
+        return videoArticle;
+    }
 
-private  String userAvatar;
+    public void setVideoArticle(String videoArticle) {
+        this.videoArticle = videoArticle;
+    }
 
-private  int commentn;
+    public String getUsername() {
+        return username;
+    }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getUserAvatar() {
+        return userAvatar;
+    }
+
+    public void setUserAvatar(String userAvatar) {
+        this.userAvatar = userAvatar;
+    }
+
+    public int getLikeNum() {
+        return likeNum;
+    }
+
+    public void setLikeNum(int likeNum) {
+        this.likeNum = likeNum;
+    }
+
+    public int getCommentNum() {
+        return commentNum;
+    }
+
+    public void setCommentNum(int commentNum) {
+        this.commentNum = commentNum;
+    }
+
+    public int getShareNum() {
+        return shareNum;
+    }
+
+    public void setShareNum(int shareNum) {
+        this.shareNum = shareNum;
+    }
+
+    public int getCollectNum() {
+        return collectNum;
+    }
+
+    public void setCollectNum(int collectNum) {
+        this.collectNum = collectNum;
+    }
+
+    public String getMusicAvatar() {
+        return musicAvatar;
+    }
+
+    public void setMusicAvatar(String musicAvatar) {
+        this.musicAvatar = musicAvatar;
+    }
+
+    public String getMusicName() {
+        return musicName;
+    }
+
+    public void setMusicName(String musicName) {
+        this.musicName = musicName;
+    }
 }
-
-//    select m.music_name ,  v.video_url , u.nickname , u.user_pic , c.comment from video v
-//    inner join user u on v.auth_id = u.id
-//    inner join music m on v.music_id = m.music_video_id
-//    inner join comment c on v.video_id = c.comment_video_id
-//    ;

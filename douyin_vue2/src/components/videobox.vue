@@ -27,7 +27,7 @@
         <!-- <div class="videotesto" @click="videotest"></div> -->
 
     </div>
-</template>
+</template> 
 
 <script>
 import videoasideVue from './videoaside.vue';
@@ -132,9 +132,9 @@ export default {
         // 自动发送请求给后端
         homegetVideo().then(videoArr => {
             console.log(videoArr)
-            this.videoboxdata = videoArr;
+            this.videoboxdata = videoArr.data;
         }).catch(error => {
-            // console.error('获取视频出错:', error);
+            console.error('获取视频出错:', error);
             console.log("获取视频出错  videobox中的")
         });
     },
