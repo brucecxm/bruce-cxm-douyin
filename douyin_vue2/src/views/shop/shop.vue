@@ -2,7 +2,7 @@
     <div class="temp">
         <div class="shop">
             <div class="header">
-                <div class="didian">西安^</div>
+                <!-- <div class="didian">西安^</div> -->
                 <div class="search">
                     <button>搜索</button>
                     <input type="text" placeholder="蜜雪冰城团购">
@@ -50,35 +50,54 @@ export default {
         return {
             meumbox: [
                 { name: "超d市", imgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", hrefurl: "" },
-                { name: "超d市", imgurl: "", hrefurl: "" },
-                { name: "超d市", imgurl: "", hrefurl: "" },
-                { name: "超市", imgurl: "", hrefurl: "" },
-                { name: "超市", imgurl: "", hrefurl: "" },
-                { name: "超市", imgurl: "", hrefurl: "" },
+                { name: "超d市", imgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", hrefurl: "" },
+                { name: "超d市", imgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", hrefurl: "" },
+                { name: "超市", imgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", hrefurl: "" },
+                { name: "超市", imgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", hrefurl: "" },
+                { name: "超市", imgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", hrefurl: "" },
             ],
             navbox: [
                 { navname: "ss", navimgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", navhrefurl: "" },
-                { navname: "ss", navimgurl: "", navhrefurl: "" },
-                { navname: "ss", navimgurl: "", navhrefurl: "" },
-                { navname: "ss", navimgurl: "", navhrefurl: "" },
-                { navname: "ss", navimgurl: "", navhrefurl: "" },
-                { navname: "ss", navimgurl: "", navhrefurl: "" },
-                { navname: "ss", navimgurl: "", navhrefurl: "" },
-                { navname: "ss", navimgurl: "", navhrefurl: "" },
+                { navname: "ss", navimgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", navhrefurl: "" },
+                { navname: "ss", navimgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", navhrefurl: "" },
+                { navname: "ss", navimgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", navhrefurl: "" },
+                { navname: "ss", navimgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", navhrefurl: "" },
+                { navname: "ss", navimgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", navhrefurl: "" },
+                { navname: "ss", navimgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", navhrefurl: "" },
+                { navname: "ss", navimgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", navhrefurl: "" },
             ],
             mainbox: [
                 { imgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", name: "商品1", hrefurl: "/shopdetail/1" },
-                { imgurl: "url2.jpg", name: "商品2", hrefurl: "/shopdetail/2" },
-                { imgurl: "url3.jpg", name: "商品3", hrefurl: "/shopdetail/3" },
-                { imgurl: "url4.jpg", name: "商品4", hrefurl: "/shopdetail/4" },
-                { imgurl: "url5.jpg", name: "商品5", hrefurl: "/shopdetail/5" },
-                { imgurl: "url6.jpg", name: "商品6", hrefurl: "/shopdetail/6" },
-            ]
+                { imgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", name: "商品2", hrefurl: "/shopdetail/2" },
+                { imgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", name: "商品3", hrefurl: "/shopdetail/3" },
+                { imgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", name: "商品4", hrefurl: "/shopdetail/4" },
+                { imgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", name: "商品5", hrefurl: "/shopdetail/5" },
+                { imgurl: "https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics4.baidu.com%2Ffeed%2F0df431adcbef7609fa79f5ac9d0714c27dd99ef8.jpeg%40f_auto%3Ftoken%3Dd546ae637a8c6fad135ffc7d40889a7b&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1728061200&t=32343368505ab2dc1a5d4214c5181515", name: "商品6", hrefurl: "/shopdetail/6" },
+            ],
+
         }
     },
     methods: {
         goshopdetail(id) {
             this.$router.push({ path: `/shopdetail/${id}` });
+        },
+        getmenu() {
+
+        },
+        getnav() {
+
+        },
+        getshopinfo() {
+
+        },
+        getinputciyu() {
+            //获得搜索输入框联想词
+        },
+        startsearch() {
+
+        },
+        gettuijian() {
+
         }
     }
 }
@@ -86,7 +105,7 @@ export default {
 
 
 
-<style  scoped>
+<style scoped>
 .boxm {
     width: 40vw;
     height: 30vh;
@@ -121,9 +140,10 @@ p {
     width: 70vw;
     height: 3vh;
     border: none;
-    border-radius: 5vh;
     display: block;
     float: right;
+    outline: none;
+
 }
 
 .search button {
@@ -156,8 +176,8 @@ p {
     margin-top: 1vh;
     width: 340px;
     float: right;
-    margin-right: 0px;
     height: 4vh;
+    margin: 5px;
 }
 
 .box1 {
@@ -188,7 +208,6 @@ p {
 
 .meum {
     width: 100%;
-    height: 80px;
     flex-direction: row;
     display: flex;
     align-content: center;
