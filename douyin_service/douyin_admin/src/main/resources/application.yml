@@ -1,0 +1,22 @@
+server:
+  port: 7422
+spring:
+  application:
+    #????????
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/douyinmenu?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+
+
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+
+mybatis-plus:
+  configuration:
+    #???????????????????????????????????????
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: ASSIGN_ID

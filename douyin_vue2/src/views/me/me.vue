@@ -9,24 +9,30 @@
                 <div class="backimg">
                     <img :src=User.data.backimg alt=" no backimg">
                     <div class="caidan" @click="openmenu"></div>
+                    <div class="userinfo">
+                        <div class="touxiang"><img :src="User.data.userPic" alt=""></div>
+                        <div class="name">
+                            <span>{{ User.data.nickname }}</span>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="frienginfo">
+                    <img src="../../assets/me/2.png" alt="">
                 </div>
                 <div class="personinfo">
-                    <div class="touxiang"><img :src="User.data.userPic" alt=""></div>
-                    <div class="name" style="transform: translateY(-150px);">
-                        <h1>{{ User.data.nickname }}</h1>
-                    </div>
-                    <div class="info">
+
+                    <div class=" info">
                         <p>点击添加介绍 让大家认识你</p>
                         <span>21岁</span>
                         <span>陕西西安</span>
                         <span>添加学校标签</span>
-                        <div class="infonav">
-                            <div class="xuanxiang" v-for="(image, index) in navvideo" :key="index">
-                                <img :src="image" alt="Image">
-                                <!-- <img :src="image" alt="Image" style="width: 100px;"> -->
-                            </div>
-                        </div>
-                        .
+                    </div>
+                </div>
+                <div class="infonav">
+                    <div class="xuanxiang" v-for="(image, index) in navvideo" :key="index">
+                        <img :src="image" alt="Image">
+                        <!-- <img :src="image" alt="Image" style="width: 100px;"> -->
                     </div>
                 </div>
                 <div class="nav">
@@ -35,12 +41,15 @@
                         <li @click="fetchData('dynamics')">动态</li>
                         <li @click="fetchData('likes')">喜欢</li>
                         <li @click="fetchData('albums')">相册</li>
+                        <li @click="fetchData('albums')">相册</li>
+                        <li @click="fetchData('albums')">相册</li>
+                        <li @click="fetchData('albums')">相册</li>
                     </ul>
                 </div>
                 <div class="uservideo">
 
-                    <div class="uvideo" v-for="(image, index) in nav" :key="index">
-                        <img :src="image" alt="Image">
+                    <div class="uvideo" v-for="(image, index) in mianvideoarr" :key="index">
+                        <img :src="image" alt="Image" style="width: 100%;height: 100%;">
                         <!-- <img :src="image" alt="Image" style="width: 100px;"> -->
                     </div>
 
@@ -55,6 +64,7 @@
 
 <script>
 import footerVue from '@/components/footer.vue'
+import mainvideo from '@/assets/me/1.png'
 import Memenu from "../../components/memenu.vue"
 import { userInfoService } from '../../api/user';
 import oneImg from '@/assets/me/one.jpg';
@@ -81,6 +91,7 @@ export default {
                 message: ""
             },
             nav: [oneImg, twoImg, threeImg, fourImg],
+            mianvideoarr: [mainvideo, mainvideo, mainvideo, mainvideo],
             navvideo: [oneImg, twoImg, threeImg, fourImg]
 
         }
@@ -109,6 +120,22 @@ export default {
 
 
 <style scoped>
+.userinfo {
+    position: absolute;
+    top: 50px;
+    width: 60%;
+}
+
+.touxiang {
+    width: 130px;
+    height: 130px;
+    border-radius: 800px;
+    overflow: hidden;
+    border: 3px solid white;
+    display: inline-block;
+}
+
+
 .xuanxiang {
     min-width: 80px;
     /* 设置最小宽度 */
@@ -148,18 +175,15 @@ span {
 }
 
 .uvideo {
-    width: 200px;
-    height: 350px;
+    width: 48%;
+    height: 40vh;
     background-color: rgba(0, 0, 0, 0.1);
     margin: 2px;
     float: left;
 }
 
 .info {
-    width: 414px;
-    height: 150px;
-    position: absolute;
-    top: 150px;
+    width: 100%;
 }
 
 .asidebutton {
@@ -171,45 +195,56 @@ span {
     top: 20px;
 }
 
-.touxiang {
-    width: 130px;
-    height: 130px;
-    border-radius: 800px;
-    background-color: rgb(217, 25, 25);
-    overflow: hidden;
-    transform: translateY(-150px);
-    border: 3px solid white;
-}
-
-.uservideo {
-    width: 414px;
-}
-
 .nav {
     width: 414px;
     height: 50px;
     background-color: rgba(255, 255, 255, 0.1);
     color: black;
-    font-size: 25px;
+    font-size: 0.6rem;
     user-select: none;
     /* 禁用文本选择 */
+    overflow-x: hidden;
+    /* 隐藏水平滚动条 */
+    position: relative;
+    /* 使其相对定位 */
 }
 
 .nav ul {
     list-style: none;
     margin: 0px;
     margin-left: 0px;
+    display: flex;
+    /* 使用 flexbox 布局 */
+    overflow-x: auto;
+    /* 允许水平滚动 */
+    padding: 0;
+    /* 去掉默认内边距 */
+    white-space: nowrap;
+    /* 不换行 */
 }
 
 .nav li {
-    float: left;
+    flex: 0 0 auto;
+    /* 不允许缩小和增长 */
     margin-right: 43px;
-    transform: translateX(-4px);
     line-height: 50px;
 }
 
+/* 隐藏滚动条的样式 */
+.nav ul::-webkit-scrollbar {
+    display: none;
+    /* 隐藏 Chrome 和 Safari 的滚动条 */
+}
+
+.nav ul {
+    -ms-overflow-style: none;
+    /* IE 和 Edge 隐藏滚动条 */
+    scrollbar-width: none;
+    /* Firefox 隐藏滚动条 */
+}
+
+
 .metemp {
-    position: absolute;
     width: 100%;
     height: 100%;
 
@@ -221,11 +256,10 @@ span {
 
 
 .personinfo {
+    font-size: 0.5rem;
     border-radius: 30px 30px 0px 30px;
-    width: 414px;
-    height: 350px;
+    width: 100%;
     background-color: white;
-    position: relative;
 }
 
 .backimg {
@@ -264,7 +298,6 @@ span {
 
 
 .me {
-    position: absolute;
     width: 100%;
     height: 100%;
     overflow-y: auto;
@@ -273,19 +306,13 @@ span {
     /* 隐藏水平滚动条 */
 }
 
-/* 隐藏滚动条 */
-.me::-webkit-scrollbar {
-    display: none;
-    /* 隐藏滚动条 */
-}
-
-
 
 .footer {
     background-color: black;
     color: black;
     z-index: 10;
-    position: absolute;
+    position: fixed;
     bottom: 0px;
 
-}</style>
+}
+</style>

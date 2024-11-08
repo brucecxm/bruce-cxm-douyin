@@ -10,6 +10,7 @@ import com.bruce.entity.DishFlavor;
 import com.bruce.service.CategoryService;
 import com.bruce.service.DishFlavorService;
 import com.bruce.service.DishService;
+import com.bruce.service.dishoneService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ import java.util.stream.Collectors;
 public class DishController {
     @Autowired
     private DishService dishService;
+    @Autowired
+    private dishoneService dishoneeService;
+
 
     @Autowired
     private DishFlavorService dishFlavorService;
@@ -110,6 +114,29 @@ public class DishController {
 
         return R.success(dishDto);
     }
+
+
+    /**
+     * 根据name查询菜品信息和对应的口味信息
+     * @return
+     */
+    @GetMapping("/sear/{name}")
+    public R<DishDto> searchdishbyname(@PathVariable("name") String name){
+        DishDto dishDto = dishoneeService.searchdish(name);
+        return R.success(dishDto);
+    }
+
+
+    /**
+     * 根据name查询菜品信息和对应的口味信息
+     * @return
+     */
+    @GetMapping("/liansear/{name}")
+    public R<List<DishDto>> liansearchdishbyname(@PathVariable("name") String name){
+        List<DishDto> dishDto = dishoneeService.liansearchdish(name);
+        return R.success(dishDto);
+    }
+
 
     /**
      * 修改菜品

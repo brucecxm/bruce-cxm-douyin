@@ -16,7 +16,7 @@
         </div>
     </div>
 </template>
-  
+
 <script>
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
@@ -24,11 +24,19 @@ import Stomp from 'stompjs';
 export default {
     data() {
         return {
+            itemId: null,
             stompClient: null,
             username: '',
             message: '',
             messages: []
         };
+    },
+    created() {
+        // 在组件创建时获取传递的 ID
+        this.itemId = this.$route.params.id;
+        console.log(this.itemId)
+        // 你可以在这里根据 ID 请求商品详情数据
+        this.fetchItemDetails(this.itemId);
     },
     mounted() {
         // 自动连接到 WebSocket，当组件挂载时调用
@@ -86,7 +94,7 @@ export default {
     }
 };
 </script>
-  
+
 <style scoped>
 #chat {
     list-style: none;
@@ -110,4 +118,3 @@ export default {
     /* 列表项之间的间距 */
 }
 </style>
-  

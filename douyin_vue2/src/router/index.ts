@@ -78,7 +78,7 @@ const router = new VueRouter({
       component: () => import("../views/auth/auth.vue"),
     },
     {
-      path: "/xiaodetail",
+      path: "/xiaodetail/:id",
       name: "XiaoDetailVue",
       component: () => import("../views/xiaoxi/xiaoxitdetail.vue"),
     },

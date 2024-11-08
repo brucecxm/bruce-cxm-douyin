@@ -19,4 +19,24 @@ select d.name,d.price,d.description,c.img_url,c.href_url
     from dish d inner join dish_store c on d.id = c.dish_id;
     </select>
 
+    <select id="searchdish"  resultType="com.bruce.dto.DishDto">
+
+        select *
+        from dish  where name = #{name};
+    </select>
+
+    <select id="liansearchdish" resultType="com.bruce.dto.DishDto">
+        SELECT *
+        FROM dish
+        WHERE name LIKE CONCAT('%', #{name}, '%')
+    </select>
+
+
+    <select id="listdish" resultType="com.bruce.dto.DishDto">
+        SELECT *
+        FROM dish
+        WHERE name LIKE CONCAT('%', #{name}, '%')
+    </select>
+
+
 </mapper>
