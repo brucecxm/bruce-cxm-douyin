@@ -19,6 +19,10 @@
                 </div>
                 <div class="frienginfo">
                     <img src="../../assets/me/2.png" alt="">
+                    <!-- <span>like</span>
+                    <span>friend</span>
+                    <span>follow</span>
+                    <span>fan</span> -->
                 </div>
                 <div class="personinfo">
 
@@ -120,6 +124,11 @@ export default {
 
 
 <style scoped>
+/* .frienginfo {
+    width: 100%;
+    height: 4vh;
+} */
+
 .userinfo {
     position: absolute;
     top: 50px;

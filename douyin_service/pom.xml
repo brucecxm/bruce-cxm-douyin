@@ -23,6 +23,7 @@
         <module>douyin_schedule</module>
         <module>douyin_admin</module>
         <module>douyin_behavior</module>
+        <module>minio-file-demo</module>
     </modules>
     <artifactId>douyin_service</artifactId>
 

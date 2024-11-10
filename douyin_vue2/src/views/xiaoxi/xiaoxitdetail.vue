@@ -20,11 +20,11 @@
 <script>
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
-
+import { useTokenStore } from "../../stores/token"
 export default {
     data() {
         return {
-            itemId: null,
+            friendId: null,
             stompClient: null,
             username: '',
             message: '',
@@ -33,10 +33,8 @@ export default {
     },
     created() {
         // 在组件创建时获取传递的 ID
-        this.itemId = this.$route.params.id;
-        console.log(this.itemId)
+        this.friendId = this.$route.params.id;
         // 你可以在这里根据 ID 请求商品详情数据
-        this.fetchItemDetails(this.itemId);
     },
     mounted() {
         // 自动连接到 WebSocket，当组件挂载时调用
@@ -46,21 +44,31 @@ export default {
         connect() {
             const socket = new SockJS('http://localhost:9998/chat'); // 创建 SockJS 对象
             this.stompClient = Stomp.over(socket); // 用 STOMP 包装 SockJS 对象
+            const usertoken = useTokenStore();
 
             // 连接到 WebSocket
             this.stompClient.connect({}, (frame) => {
                 console.log('Connected: ' + frame);
 
-                // 订阅 /topic/public 频道，接收消息并显示
-                this.stompClient.subscribe('/topic/public', (messageOutput) => {
+                // 假设 userId 和 friendId 是当前用户和好友的 ID
+                // const userId = usertoken.token.data;
+                const userId = 11;
+                const friendId = this.friendId; // 替换为好友的实际 ID
+                // 订阅两个频道
+                this.stompClient.subscribe(`/topic/chat/${userId}/${friendId}`, (messageOutput) => {
                     this.showMessage(JSON.parse(messageOutput.body));
                 });
 
+                this.stompClient.subscribe(`/topic/chat/${friendId}/${userId}`, (messageOutput) => {
+                    this.showMessage(JSON.parse(messageOutput.body));
+                });
                 // 发送用户加入消息到 /app/chat.addUser 频道
-                this.stompClient.send('/app/chat.addUser',
+                this.stompClient.send(`/app/chat.addUser/${userId}/${friendId}`,
                     {},
-                    JSON.stringify({ sender: this.username, type: 'JOIN' })
+                    JSON.stringify({ sender: userId, type: 'JOIN', friendId: friendId })
                 );
+
+
             }, (error) => {
                 console.error('Error connecting to WebSocket:', error);
             });
@@ -76,7 +84,7 @@ export default {
                 };
 
                 // 发送聊天消息到 /app/chat.sendMessage 频道
-                this.stompClient.send('/app/chat.sendMessage', {}, JSON.stringify(chatMessage));
+                this.stompClient.send(`/app/chat.sendMessage/${userId}/${friendId}`, {}, JSON.stringify(chatMessage));
                 this.message = ''; // 清空输入框
             }
         },

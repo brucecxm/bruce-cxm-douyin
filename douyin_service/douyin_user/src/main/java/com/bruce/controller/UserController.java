@@ -135,7 +135,7 @@ public class UserController {
         } catch (Exception ex) {
             System.out.println("Redis 连接失败，请检查 Redis 服务器是否运行。");
         }
-
+token=loginUser.getUsername();
         return Result.success(token);
     }
 

@@ -12,17 +12,20 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 @Data
-public class Video  {
-    
+public class Video implements Serializable {
+
     private Integer videoId;
-    
+
     private Integer authId;
-    
+
     private Integer musicId;
-    
+
     private String videoUrl;
 
-private  String videoComment;
+    private String videoComment;
+
+    // 新增的属性
+    private String videoTitle; // 视频标题
 
     public Integer getVideoId() {
         return videoId;
@@ -56,6 +59,20 @@ private  String videoComment;
         this.videoUrl = videoUrl;
     }
 
-
+    public String getVideoComment() {
+        return videoComment;
     }
 
+    public void setVideoComment(String videoComment) {
+        this.videoComment = videoComment;
+    }
+
+    // 新增的 getter 和 setter 方法
+    public String getVideoTitle() {
+        return videoTitle;
+    }
+
+    public void setVideoTitle(String videoTitle) {
+        this.videoTitle = videoTitle;
+    }
+}

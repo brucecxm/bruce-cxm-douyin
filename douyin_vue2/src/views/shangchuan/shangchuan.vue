@@ -2,18 +2,22 @@
 <template>
     <div>
         <input type="file" @change="handleFileUpload" />
-        <button @click="submitFile">上传文件</button>
-        <button @click="gohome">gohome</button>
+        <input type="text" placeholder="视频标题" v-model="videoTitle" />
+        <input type="text" placeholder="视频文案" v-model="videoContext" />
+        <button @click="upload">上传文件</button>
+        <!-- <button @click="gohome">gohome</button> -->
     </div>
 </template>
-  
+
 <script>
 import axios from 'axios';
-
+import { uploadFile } from "@/api/video"
 export default {
     data() {
         return {
             selectedFile: null,
+            videoTitle: "",
+            videoContext: ""
         };
     },
     methods: {
@@ -23,31 +27,17 @@ export default {
         handleFileUpload(event) {
             this.selectedFile = event.target.files[0];
         },
-        async submitFile() {
-            if (!this.selectedFile) {
-                alert('请选择一个文件');
-                return;
-            }
+        upload() {
+            const myMap = new Map();
+            myMap.set('videoContext', this.videoContext);
+            myMap.set('videoTitle', this.videoTitle);
+            uploadFile(this.selectedFile, myMap)
+        }
 
-            const formData = new FormData();
-            formData.append('file', this.selectedFile);
-
-            try {
-                const response = await axios.post('localhost:8080/upload', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-                console.log('上传成功', response.data);
-            } catch (error) {
-                console.error('上传失败', error);
-            }
-        },
     },
 };
 </script>
-  
+
 <style scoped>
 /* 添加你的样式 */
 </style>
-  

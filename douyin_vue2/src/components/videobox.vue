@@ -27,7 +27,7 @@
         <!-- <div class="videotesto" @click="videotest"></div> -->
 
     </div>
-</template> 
+</template>
 
 <script>
 import videoasideVue from './videoaside.vue';
@@ -49,7 +49,7 @@ export default {
             // 使用props传递数据 使用props的数据在组件中是单向传输的 但是我可以通过请求异步修改数据库中的数据 就可以了
             videoboxdata: [
                 {
-                    videoUrl: "//www.douyin.com/aweme/v1/play/?file_id=370f33fcdaa74c9d97632b243e80adb0&is_play_url=1&line=0&sign=167396a9fbd6e693dd934fe73a0e7073&source=PackSourceEnum_SEARCH&uifid=c4683e1a43ffa6bc6852097c712d14b81f04bc9b5ca6d30214b0e66b4e385280917b1ee2dd6c8cf98d22bdbe31e765a617637cb5e3f8c7ea32ab2f6d6adf62d8c038b3a0718002d3d6e612782bc8e4790de3023e098e48eb6e37ef2259ee15803ce304237e3fdbf46a88caae910c209bb4614fbde6a15491bac590af176e8420b5d932e88ca503b38bbe056da33ab0de509ffbf6f2f2a34daa880354b8e41e82&video_id=v0200fg10000cm15vg3c77ua07n478h0&aid=6383",
+                    videoUrl: "http://192.168.200.130:9000/mybucket/20230811_192018.mp4",
                     videoArticle: "",
                     username: "",
                     userAvatar: "",
@@ -61,7 +61,7 @@ export default {
                     musicName: ""
                 },
                 {
-                    videoUrl: "//www.douyin.com/aweme/v1/play/?file_id=370f33fcdaa74c9d97632b243e80adb0&is_play_url=1&line=0&sign=167396a9fbd6e693dd934fe73a0e7073&source=PackSourceEnum_SEARCH&uifid=c4683e1a43ffa6bc6852097c712d14b81f04bc9b5ca6d30214b0e66b4e385280917b1ee2dd6c8cf98d22bdbe31e765a617637cb5e3f8c7ea32ab2f6d6adf62d8c038b3a0718002d3d6e612782bc8e4790de3023e098e48eb6e37ef2259ee15803ce304237e3fdbf46a88caae910c209bb4614fbde6a15491bac590af176e8420b5d932e88ca503b38bbe056da33ab0de509ffbf6f2f2a34daa880354b8e41e82&video_id=v0200fg10000cm15vg3c77ua07n478h0&aid=6383",
+                    videoUrl: "http://192.168.200.130:9000/mybucket/20230811_192018.mp4",
 
                     videoArticle: "",
                     username: "",

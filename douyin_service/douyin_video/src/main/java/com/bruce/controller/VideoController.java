@@ -16,6 +16,7 @@ import com.bruce.utils.ThreadLocalUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.*;
@@ -49,6 +50,29 @@ public class VideoController extends ApiController {
 
 
 
+
+    @PostMapping("/upvideo")
+    public void upvideo(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("params")    Map params) {
+
+        String videoTitle= String.valueOf(params.get("videoTitle"));
+        String videoContext= String.valueOf(params.get("videoContext"));
+        String authId="100112";
+        String VideoId="100112";
+        String MusicId="100112";
+        String fileName=file.getName();
+        StringBuilder videoUrl= new StringBuilder("http://192.168.200.130:9000/mybucket/");
+         videoUrl.append(fileName);
+       Video video=new Video();
+       video.setVideoId(Integer.valueOf(VideoId));
+       video.setVideoComment(videoContext);
+       video.setVideoUrl(videoUrl.toString());
+       video.setAuthId(Integer.valueOf(authId));
+       video.setMusicId(Integer.valueOf(MusicId));
+       video.setVideoTitle(videoTitle);
+       this.videoService.save(video);
+    }
 
 
     @GetMapping("/{videoId}")

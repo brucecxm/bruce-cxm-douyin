@@ -1,0 +1,26 @@
+server:
+  port: 8015
+spring:
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+
+
+minio:
+  url: http://192.168.200.130:9000
+  access-key: minio
+  secret-key: minio123
+  bucket-name: mybucket
+
+mybatis:
+  type-aliases-package: com.ztesoft.easyexcel.mapper
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+

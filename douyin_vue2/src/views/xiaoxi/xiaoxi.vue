@@ -32,8 +32,8 @@
                 </div>
             </div> -->
 
-            <img src="../../assets/xiaoxi/main/1.png" alt="" style="width: 100%;" @click="goxiaodetail(55)">
-            <img src="../../assets/xiaoxi/main/2.png" alt="" style="width: 100%;">
+            <img src="../../assets/xiaoxi/main/1.png" alt="" style="width: 100%;" @click="goxiaodetail('brucebbb')">
+            <img src="../../assets/xiaoxi/main/2.png" alt="" style="width: 100%; " @click="goxiaodetail('bruceccc')">
             <img src="../../assets/xiaoxi/main/2.png" alt="" style="width: 100%;">
             <img src="../../assets/xiaoxi/main/3.png" alt="" style="width: 100%;">
             <img src="../../assets/xiaoxi/main/3.png" alt="" style="width: 100%;">

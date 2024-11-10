@@ -19,6 +19,7 @@
         <module name="douyin_behavior" />
         <module name="douyin_satoken" />
         <module name="douyin_video" />
+        <module name="minio-file-demo" />
         <module name="douyin_search" />
         <module name="douyin_article" />
         <module name="douyin_user" />
@@ -62,6 +63,7 @@
       <module name="douyin_user" options="-parameters" />
       <module name="douyin_video" options="-parameters" />
       <module name="douyin_websocket" options="-parameters" />
+      <module name="minio-file-demo" options="-parameters" />
       <module name="sa-token-demo-sso-server" options="-parameters" />
     </option>
   </component>
