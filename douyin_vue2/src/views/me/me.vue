@@ -4,9 +4,9 @@
 
         <div class="me">
             <memenu v-show="receivedMessage.ismemenushow" class="memenu"></memenu>
-            <div :class="receivedMessage.me">
+            <div :class="['me-content', receivedMessage.me]">
                 <div class="backimg">
-                    <img :src="User.data.backimg" alt=" no backimg" />
+                    <img :src="User.data.backimg" alt="no backimg" />
                     <div class="caidan" @click="openmenu"></div>
                     <div class="userinfo">
                         <div class="touxiang">
@@ -63,80 +63,99 @@ import threeImg from '@/assets/me/three.jpg';
 import fourImg from '@/assets/me/four.jpg';
 import { getmeinfo } from '../../api/me';
 import { useTokenStore } from '@/stores/token'
+
 export default {
     data() {
         return {
-            videos: [],
             receivedMessage: {
                 me: "me",
                 ismemenushow: false,
-
-
             },
             User: {
-                code: "",
                 data: {
                     nickname: "默认名字",
-                    userPic: "//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813c001_oYCBO7DFFAYxR4jFA7gwAEqBTmfEIGAfANeokE.jpeg?from=2956013662"
-                    , backimg: "//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813c001_ooSy9lAm2G5DAfrLAAQAjO0bp7lg4eInAaCCGX.jpeg?from=2956013662"
-                    , friendnum: "4"
-                    , likenumL: "3"
-                    , follow: "2"
-                    , fan: "1"
-                    , jieshao: "自我介绍"
-                    , age: "年龄"
-                    , location: "城市"
-                    , collegt: "学校"
-
+                    userPic: "//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813c001_oYCBO7DFFAYxR4jFA7gwAEqBTmfEIGAfANeokE.jpeg?from=2956013662",
+                    backimg: "//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813c001_ooSy9lAm2G5DAfrLAAQAjO0bp7lg4eInAaCCGX.jpeg?from=2956013662",
+                    jieshao: "自我介绍",
+                    age: "年龄",
+                    location: "城市",
+                    collegt: "学校"
                 },
-                message: ""
             },
-            nav: [oneImg, twoImg, threeImg, fourImg, fourImg],
-            mianvideoarr: [mainvideo, mainvideo, mainvideo, mainvideo],
-            navvideo: [oneImg, twoImg, threeImg, fourImg, fourImg]
-
-        }
+            navvideo: [oneImg, twoImg, threeImg, fourImg],
+            mianvideoarr: [mainvideo, mainvideo, mainvideo, mainvideo]
+        };
     },
-    components: {
-        footerVue, Memenu
-    },
+    components: { footerVue, Memenu },
     methods: {
         openmenu() {
-            this.receivedMessage.ismemenushow = true
-            this.receivedMessage.me = "metransform"
+            this.receivedMessage.ismemenushow = true;
+            this.receivedMessage.me = "metransform";
+            this.$nextTick(() => {
+                this.$el.querySelector('.memenu').classList.add('active');
+            });
         },
-        gofriend() {
-            this.$router.push("/friend")
+        closemenu() {
+            this.receivedMessage.ismemenushow = false;
+            this.receivedMessage.me = "";
+            this.$nextTick(() => {
+                this.$el.querySelector('.memenu').classList.remove('active');
+            });
         },
         fetchData(type) {
-            console.log(type)
-            //在这里调用实际的 API 请求或处理逻辑
+            console.log(type);
         },
-
     },
     mounted() {
-        // 获取用户令牌存储
         const usertoken = useTokenStore();
-
-
-        // 获取用户信息的方法
-        // 调用获取用户信息的函数
         getmeinfo(usertoken.data.message);
-
-        // 调用获取用户信息的方法
     }
-
-
-}
+};
 </script>
 
-
 <style scoped>
-/* .frienginfo {
+/* General Styles */
+.metemp {
     width: 100%;
-    height: 4vh;
-} */
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
 
+/* Main content area */
+.me {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    position: relative;
+    transition: transform 0.5s ease-in-out;
+}
+
+/* Sidebar menu (memenu) */
+.memenu {
+    position: absolute;
+    top: 0;
+    right: -80%;
+    width: 80%;
+    height: 100%;
+    transition: right 0.5s ease-in-out;
+    z-index: 10;
+}
+
+.memenu.active {
+    right: 0;
+}
+
+/* Content area when menu is active */
+.me-content {
+    transition: transform 0.5s ease-in-out;
+}
+
+.me-content.metransform {
+    transform: translateX(80%);
+}
+
+/* User info */
 .userinfo {
     position: absolute;
     top: 50px;
@@ -152,45 +171,31 @@ export default {
     display: inline-block;
 }
 
-
-.xuanxiang {
-    min-width: 80px;
-    /* 设置最小宽度 */
-    height: 80px;
-    margin-right: 10px;
-    margin-top: 10px;
-}
-
-.infonav {
+/* Nav bar */
+.nav ul {
+    list-style: none;
     display: flex;
-    flex-shrink: 0;
-    /* 禁止缩小 */
     overflow-x: auto;
-    /* 允许水平滚动 */
+    padding: 0;
     white-space: nowrap;
-    /* 不换行 */
-
-    overflow-x: hidden;
-    /* 隐藏水平滚动条 */
-    overflow-y: hidden;
-    /* 隐藏水平滚动条 */
-    overflow-y: hidden;
-    /* 禁止垂直滚动 */
 }
 
-
-span {
-    background-color: rgba(137, 8, 211, 0.1);
-    margin-left: 10px;
+.nav li {
+    margin-right: 43px;
+    line-height: 50px;
 }
 
-.memenu {
-    position: relative;
-    top: 0px;
-    right: 0px;
-    z-index: 6;
+/* Remove scrollbars */
+.nav ul::-webkit-scrollbar {
+    display: none;
 }
 
+.nav ul {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Video thumbnails */
 .uvideo {
     width: 48%;
     height: 40vh;
@@ -199,92 +204,12 @@ span {
     float: left;
 }
 
-.info {
-    width: 100%;
-}
-
-.asidebutton {
-    position: absolute;
-    right: 0px;
-    background-color: rgb(11, 11, 11);
-    width: 200px;
-    height: 50px;
-    top: 20px;
-}
-
-.nav {
-    width: 414px;
-    height: 50px;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: black;
-    font-size: 0.6rem;
-    user-select: none;
-    /* 禁用文本选择 */
-    overflow-x: hidden;
-    /* 隐藏水平滚动条 */
-    position: relative;
-    /* 使其相对定位 */
-}
-
-.nav ul {
-    list-style: none;
-    margin: 0px;
-    margin-left: 0px;
-    display: flex;
-    /* 使用 flexbox 布局 */
-    overflow-x: auto;
-    /* 允许水平滚动 */
-    padding: 0;
-    /* 去掉默认内边距 */
-    white-space: nowrap;
-    /* 不换行 */
-}
-
-.nav li {
-    flex: 0 0 auto;
-    /* 不允许缩小和增长 */
-    margin-right: 43px;
-    line-height: 50px;
-}
-
-/* 隐藏滚动条的样式 */
-.nav ul::-webkit-scrollbar {
-    display: none;
-    /* 隐藏 Chrome 和 Safari 的滚动条 */
-}
-
-.nav ul {
-    -ms-overflow-style: none;
-    /* IE 和 Edge 隐藏滚动条 */
-    scrollbar-width: none;
-    /* Firefox 隐藏滚动条 */
-}
-
-
-.metemp {
-    width: 100%;
-    height: 100%;
-
-    overflow: hidden;
-    /* 隐藏水平滚动条 */
-}
-
-
-
-
-.personinfo {
-    font-size: 0.5rem;
-    border-radius: 30px 30px 0px 30px;
-    width: 100%;
-    background-color: white;
-}
-
+/* Background image */
 .backimg {
     width: 414px;
     height: 300px;
     background-color: rgba(255, 255, 255, 0.5);
     position: relative;
-
 }
 
 .backimg img {
@@ -302,34 +227,43 @@ span {
     z-index: 5;
 }
 
-.metransform {
-    width: 414px;
-    background-color: rgb(0, 0, 0);
-    overflow: hidden;
-    position: relative;
-    right: 320px;
-}
-
-
-
-
-
-.me {
+/* User info text */
+.personinfo {
+    font-size: 0.5rem;
+    border-radius: 30px 30px 0px 30px;
     width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    /* 允许垂直滚动 */
-    overflow-x: hidden;
-    /* 隐藏水平滚动条 */
+    background-color: white;
 }
 
-
+/* Footer */
 .footer {
     background-color: black;
     color: black;
-    z-index: 10;
     position: fixed;
-    bottom: 0px;
+    bottom: 0;
+    width: 100%;
+    z-index: 10;
+}
 
+/* Other utility styles */
+.xuanxiang {
+    min-width: 80px;
+    height: 80px;
+    margin-right: 10px;
+    margin-top: 10px;
+}
+
+.infonav {
+    display: flex;
+    flex-shrink: 0;
+    overflow-x: auto;
+    white-space: nowrap;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+span {
+    background-color: rgba(137, 8, 211, 0.1);
+    margin-left: 10px;
 }
 </style>
