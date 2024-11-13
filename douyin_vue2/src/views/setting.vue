@@ -32,7 +32,7 @@
         </div>
     </div>
 </template>
-  
+
 <script>
 export default {
     name: 'Settings',
@@ -70,12 +70,12 @@ export default {
     },
     methods: {
         goBack() {
-            console.log('返回上一页');
+            this.$router.push("/")
         },
     },
 };
 </script>
-  
+
 <style scoped>
 .settings {
     display: flex;
@@ -143,4 +143,3 @@ export default {
     font-size: 16px;
 }
 </style>
-  

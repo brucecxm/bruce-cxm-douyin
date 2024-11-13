@@ -22,27 +22,19 @@
             </ul>
         </div> -->
         <div class="commentbody">
-            <!-- <div class="comment" @click="goxiaodetail">
+            <div class="comment" @click="goxiaodetail" v-for="(userinfo, index ) in userinfos" :key="index">
                 <div class="touxiang">
                     <img :src=userinfo.avatar alt="" style="width: 100px;height: 100px;">
                 </div>
                 <div class="neirong">
-                    <h4>{{ userinfo.username }}</h4>
-                    <h6>{{ userinfo.latermessage }}</h6>
+                    <span>{{ userinfo.username }}</span>
+                    <span>{{ userinfo.latermessage }}</span>
                 </div>
-            </div> -->
+            </div>
 
-            <img src="../../assets/xiaoxi/main/1.png" alt="" style="width: 100%;" @click="goxiaodetail('brucebbb')">
-            <img src="../../assets/xiaoxi/main/2.png" alt="" style="width: 100%; " @click="goxiaodetail('bruceccc')">
-            <img src="../../assets/xiaoxi/main/2.png" alt="" style="width: 100%;">
-            <img src="../../assets/xiaoxi/main/3.png" alt="" style="width: 100%;">
-            <img src="../../assets/xiaoxi/main/3.png" alt="" style="width: 100%;">
-            <img src="../../assets/xiaoxi/main/3.png" alt="" style="width: 100%;">
-            <img src="../../assets/xiaoxi/main/4.png" alt="" style="width: 100%;">
-            <img src="../../assets/xiaoxi/main/5.png" alt="" style="width: 100%;">
-            <img src="../../assets/xiaoxi/main/5.png" alt="" style="width: 100%;">
-            <img src="../../assets/xiaoxi/main/5.png" alt="" style="width: 100%;">
-            <img src="../../assets/xiaoxi/main/5.png" alt="" style="width: 100%;">
+            <!-- <img src="../../assets/xiaoxi/main/1.png" alt="" style="width: 100%;" @click="goxiaodetail('brucebbb')"> -->
+            <!-- <img src="../../assets/xiaoxi/main/2.png" alt="" style="width: 100%; " @click="goxiaodetail('bruceccc')"> -->
+
         </div>
 
         <footer-vue class="footer"></footer-vue>
@@ -58,11 +50,21 @@ export default {
     },
     data() {
         return {
-            userinfo: {
-                username: "前端默认的数据 用户名",
+
+
+            userinfos: [{
+                username: "互动消息",
                 avatar: "//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813_fdbb0995a81d4bccaac82bbf3d3a6470.jpeg?from=2956013662",
                 latermessage: "前端默认的数据 最新一条聊天记录"
-            }, caidancss: {
+            }, {
+                username: "张三",
+                avatar: "//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813_fdbb0995a81d4bccaac82bbf3d3a6470.jpeg?from=2956013662",
+                latermessage: "前端默认的数据 最新一条聊天记录"
+            },
+
+            ],
+
+            caidancss: {
                 position: 'absolute',
                 right: '100vw',
                 bottom: '0px',
@@ -144,6 +146,11 @@ export default {
 
 .comment {
     margin-top: 10px;
+    height: 6vh;
+    width: 100%;
+    font-size: 20px;
+    display: flex;
+
 }
 
 ul {

@@ -85,7 +85,7 @@
         </div>
     </div>
 </template>
-  
+
 <script>
 import { eventBus } from '../main'; // 导入全局事件总线
 import '@fortawesome/fontawesome-free/css/all.css';
@@ -111,13 +111,11 @@ export default {
     }
 };
 </script>
-  
+
 <style scoped>
 .container {
     width: 80vw;
-    /* 修改为 80vw */
     height: 100vh;
-    /* 修改为 100vh */
     margin: 0 auto;
     background-color: #f0f0f0;
     display: flex;
@@ -125,6 +123,8 @@ export default {
     justify-content: flex-start;
     border-radius: 10px;
     overflow: hidden;
+    font-size: 0.5rem;
+    /* 设置字体大小为0.5rem */
 }
 
 .header {
@@ -132,7 +132,6 @@ export default {
     display: flex;
     justify-content: space-between;
     padding: 2vw;
-    /* 调整为相对单位 */
     background-color: white;
     border-bottom: 1px solid #ddd;
 }
@@ -145,35 +144,34 @@ export default {
 .scan {
     display: flex;
     align-items: center;
-    transform: translateX(-2vw);
-    /* 调整为相对单位 */
+    transform: translateX(-3vw);
 }
 
 .settings i,
 .scan i {
-    font-size: 4vw;
-    /* 调整为相对单位 */
+    font-size: 0.5rem;
+    /* 设置字体大小为0.5rem */
 }
 
 .scan span {
     margin-left: 1vw;
-    /* 调整为相对单位 */
+    font-size: 0.5rem;
+    /* 设置字体大小为0.5rem */
 }
 
 .section {
     width: 100%;
     padding: 2vw;
-    /* 调整为相对单位 */
     background-color: white;
     margin-top: 2vw;
-    /* 调整为相对单位 */
     border-radius: 10px;
 }
 
 .section-title {
     font-weight: bold;
     margin-bottom: 1vw;
-    /* 调整为相对单位 */
+    font-size: 0.5rem;
+    /* 设置字体大小为0.5rem */
 }
 
 .item {
@@ -181,7 +179,6 @@ export default {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1vw;
-    /* 调整为相对单位 */
 }
 
 .icon-wrapper {
@@ -193,19 +190,18 @@ export default {
 
 .icon {
     width: 10vw;
-    /* 调整为相对单位 */
     height: 10vw;
-    /* 调整为相对单位 */
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 4vw;
-    /* 调整为相对单位 */
+    font-size: 0.5rem;
+    /* 设置字体大小为0.5rem */
 }
 
 .icon-wrapper span {
     margin-top: 1vw;
-    /* 调整为相对单位 */
     text-align: center;
-}</style>
-  
+    font-size: 0.5rem;
+    /* 设置字体大小为0.5rem */
+}
+</style>

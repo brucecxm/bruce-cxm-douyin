@@ -64,32 +64,36 @@
         </div>
     </div>
 </template>
+
 <script>
 export default {
     name: 'MenuComponent',
     data() {
-        return {
-
-        };
+        return {};
     },
     methods: {
-        fanhui() {
-            // 要传一个参数给home主界面
-            eventBus.$emit('memenu', this.tanchuang); // 发送事件和数据
+        toggleMenu() {
+            this.$el.classList.toggle('open');
         },
-
-    }
+    },
 };
-
 </script>
+
 <style scoped>
 .menu {
-    width: 320px;
+    width: 100%;
+    max-width: 320px;
     margin: 0 auto;
     background-color: #fff;
-    height: 896px;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    right: -100%;
+    /* Initially hidden off-screen */
+    transition: transform 0.3s ease-in-out;
 }
 
+/* Menu Items Styling */
 .menu ul {
     list-style-type: none;
     padding: 0;
@@ -116,6 +120,7 @@ export default {
     border-radius: 10px;
 }
 
+/* More Function Styling */
 .more-functions {
     text-align: center;
     padding: 10px;
@@ -123,5 +128,53 @@ export default {
     color: #007bff;
     cursor: pointer;
 }
+
+/* Responsive Design */
+
+/* For Mobile and Tablet (Max-width 768px) */
+@media (max-width: 768px) {
+    .menu {
+        width: 80%;
+        /* Take up 80% of screen width on small devices */
+        right: -80%;
+        /* Initially hidden off-screen */
+    }
+
+    .menu.open {
+        right: 0;
+        /* Slide in when 'open' class is added */
+    }
+
+    .menu li {
+        font-size: 14px;
+        /* Smaller font size for smaller screens */
+        padding: 12px;
+        /* Add padding for better tap targets */
+    }
+
+    .more-functions {
+        font-size: 14px;
+    }
+}
+
+/* For Desktop and Larger Screens (Min-width 769px) */
+@media (min-width: 769px) {
+    .menu {
+        position: relative;
+        max-width: 320px;
+        margin-left: 0;
+        right: 0;
+        /* Always visible on larger screens */
+    }
+
+    .menu li {
+        font-size: 18px;
+        /* Larger font size for desktop */
+        padding: 15px 30px;
+    }
+
+    .more-functions {
+        font-size: 18px;
+    }
+}
 </style>
-  

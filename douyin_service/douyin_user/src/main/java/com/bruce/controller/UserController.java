@@ -1,5 +1,6 @@
 package com.bruce.controller;
 
+import com.bruce.dao.chatInfoDao;
 import com.bruce.user.pojo.User;
 import com.bruce.user.pojo.Result;
 import com.bruce.service.UserService;
@@ -64,6 +65,24 @@ public class UserController {
 
 
 
+
+
+@Autowired
+private chatInfoDao chatInfoDaoone;
+
+    @GetMapping("/getuserinfo")
+    public Result<User> getuserinfo(String user_id) {
+
+     User user=   chatInfoDaoone.queryUserInfoone(user_id);
+
+        return Result.success(user);
+    }
+
+
+
+
+
+
     @Autowired
     private UserService userService;
     @Autowired
@@ -110,11 +129,13 @@ public class UserController {
 
         // 检查密码
         if (isEmail) {
-            if (hashedPassword.equals(loginUser.getPassword())) {
-                return generateTokenAndStoreInRedis(loginUser);
-            } else {
-                return checkValidationCodeAndLogin(loginUser, yanzhengma);
-            }
+//            if (hashedPassword.equals(loginUser.getPassword())) {
+//                return generateTokenAndStoreInRedis(loginUser);
+//            } else {
+//                return checkValidationCodeAndLogin(loginUser, yanzhengma);
+//            }
+            return Result.error(String.valueOf(loginUser.getId()));
+
         }
 
         return Result.error("密码错误");

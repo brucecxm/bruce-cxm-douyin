@@ -3,40 +3,35 @@
         <footer-vue class="footer"></footer-vue>
 
         <div class="me">
-
             <memenu v-show="receivedMessage.ismemenushow" class="memenu"></memenu>
             <div :class="receivedMessage.me">
                 <div class="backimg">
-                    <img :src=User.data.backimg alt=" no backimg">
+                    <img :src="User.data.backimg" alt=" no backimg" />
                     <div class="caidan" @click="openmenu"></div>
                     <div class="userinfo">
-                        <div class="touxiang"><img :src="User.data.userPic" alt=""></div>
+                        <div class="touxiang">
+                            <img :src="User.data.userPic" alt="" />
+                        </div>
                         <div class="name">
                             <span>{{ User.data.nickname }}</span>
                         </div>
                     </div>
-
                 </div>
+
                 <div class="frienginfo">
-                    <img src="../../assets/me/2.png" alt="">
-                    <!-- <span>like</span>
-                    <span>friend</span>
-                    <span>follow</span>
-                    <span>fan</span> -->
+                    <img src="../../assets/me/2.png" alt="" />
                 </div>
                 <div class="personinfo">
-
-                    <div class=" info">
-                        <p>点击添加介绍 让大家认识你</p>
-                        <span>21岁</span>
-                        <span>陕西西安</span>
-                        <span>添加学校标签</span>
+                    <div class="info">
+                        <p>{{ User.data.jieshao }}</p>
+                        <span>{{ User.data.age }}</span>
+                        <span>{{ User.data.location }}</span>
+                        <span>{{ User.data.collegt }}</span>
                     </div>
                 </div>
                 <div class="infonav">
                     <div class="xuanxiang" v-for="(image, index) in navvideo" :key="index">
-                        <img :src="image" alt="Image">
-                        <!-- <img :src="image" alt="Image" style="width: 100px;"> -->
+                        <img :src="image" alt="Image" />
                     </div>
                 </div>
                 <div class="nav">
@@ -45,24 +40,15 @@
                         <li @click="fetchData('dynamics')">动态</li>
                         <li @click="fetchData('likes')">喜欢</li>
                         <li @click="fetchData('albums')">相册</li>
-                        <li @click="fetchData('albums')">相册</li>
-                        <li @click="fetchData('albums')">相册</li>
-                        <li @click="fetchData('albums')">相册</li>
                     </ul>
                 </div>
                 <div class="uservideo">
-
                     <div class="uvideo" v-for="(image, index) in mianvideoarr" :key="index">
-                        <img :src="image" alt="Image" style="width: 100%;height: 100%;">
-                        <!-- <img :src="image" alt="Image" style="width: 100px;"> -->
+                        <img :src="image" alt="Image" style="width: 100%; height: 100%;" />
                     </div>
-
-
                 </div>
             </div>
-
         </div>
-
     </div>
 </template>
 
@@ -75,6 +61,8 @@ import oneImg from '@/assets/me/one.jpg';
 import twoImg from '@/assets/me/two.jpg';
 import threeImg from '@/assets/me/three.jpg';
 import fourImg from '@/assets/me/four.jpg';
+import { getmeinfo } from '../../api/me';
+import { useTokenStore } from '@/stores/token'
 export default {
     data() {
         return {
@@ -91,12 +79,21 @@ export default {
                     nickname: "默认名字",
                     userPic: "//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813c001_oYCBO7DFFAYxR4jFA7gwAEqBTmfEIGAfANeokE.jpeg?from=2956013662"
                     , backimg: "//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813c001_ooSy9lAm2G5DAfrLAAQAjO0bp7lg4eInAaCCGX.jpeg?from=2956013662"
+                    , friendnum: "4"
+                    , likenumL: "3"
+                    , follow: "2"
+                    , fan: "1"
+                    , jieshao: "自我介绍"
+                    , age: "年龄"
+                    , location: "城市"
+                    , collegt: "学校"
+
                 },
                 message: ""
             },
-            nav: [oneImg, twoImg, threeImg, fourImg],
+            nav: [oneImg, twoImg, threeImg, fourImg, fourImg],
             mianvideoarr: [mainvideo, mainvideo, mainvideo, mainvideo],
-            navvideo: [oneImg, twoImg, threeImg, fourImg]
+            navvideo: [oneImg, twoImg, threeImg, fourImg, fourImg]
 
         }
     },
@@ -116,8 +113,19 @@ export default {
             //在这里调用实际的 API 请求或处理逻辑
         },
 
-
     },
+    mounted() {
+        // 获取用户令牌存储
+        const usertoken = useTokenStore();
+
+
+        // 获取用户信息的方法
+        // 调用获取用户信息的函数
+        getmeinfo(usertoken.data.message);
+
+        // 调用获取用户信息的方法
+    }
+
 
 }
 </script>

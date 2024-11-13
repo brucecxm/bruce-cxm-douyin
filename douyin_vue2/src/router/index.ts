@@ -8,6 +8,11 @@ const router = new VueRouter({
   base: import.meta.env.BASE_URL,
   routes: [
     {
+      path: "/videobox",
+      name: "videobox",
+      component: () => import("../components/videobox.vue"),
+    },
+    {
       path: "/testmap",
       name: "testmap",
       component: () => import("../components/leftmap.vue"),
