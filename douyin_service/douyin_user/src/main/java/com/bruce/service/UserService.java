@@ -1,24 +1,15 @@
 package com.bruce.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.bruce.entity.User;
 
-import com.bruce.user.pojo.User;
-
-public interface UserService {
-    //根据用户名查询用户
-    User findByUserName(String username);
-
-    //注册
-    void register(String username, String password);
-
-    //更新
-    void update(User user);
-
-    //更新头像
-    void updateAvatar(String avatarUrl);
-
-    //更新密码
-    void updatePwd(String newPwd);
-
-    User findById(int id);
+/**
+ * (User)表服务接口
+ *
+ * @author makejava
+ * @since 2024-11-19 11:42:31
+ */
+public interface UserService extends IService<User> {
 
 }
+

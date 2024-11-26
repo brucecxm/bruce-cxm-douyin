@@ -13,9 +13,5 @@ public class DouyinUserApplication {
     public static void main(String[] args) {
         SpringApplication.run(DouyinUserApplication.class);
     }
-    @Bean
-    @LoadBalanced
-    public RestTemplate restTemplate(){
-        return new RestTemplate();
-    }
+
 }

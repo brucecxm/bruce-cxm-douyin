@@ -25,12 +25,12 @@ public class userFeign  {
     @Resource
     private UserService userService;
 
-    @GetMapping("/avatar")
-    public User avatar(@RequestParam int authId) {
-
-        User user=  this.userService.findById(authId);
-        return user;
-    }
+//    @GetMapping("/avatar")
+//    public User avatar(@RequestParam int authId) {
+//
+//        User user=  this.userService.findById(authId);
+//        return user;
+//    }
 
 }
 

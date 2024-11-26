@@ -17,12 +17,12 @@ export const userLoginService = (loginData) => {
   for (let key in loginData) {
     params.append(key, loginData[key]);
   }
-  return request.post("/user/login", params);
+  return request.post("/user/doLogin", params);
 };
 
-//获取用户详细信息
+//获取用户登录状态
 export const userInfoService = () => {
-  return request.get("/user/userInfo");
+  return request.get("/user/isLogin");
 };
 
 //修改个人信息

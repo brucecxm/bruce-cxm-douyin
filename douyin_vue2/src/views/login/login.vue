@@ -23,11 +23,12 @@
                 </div>
 
                 <p class="terms">
-                    <input type="checkbox" v-model="isAgreed" /> 已阅读并同意 <a href="#">用户协议</a> 和 <a href="#">隐私政策</a> 以及 <a
-                        href="#">运营商服务协议</a>
+                    <input type="checkbox" v-model="isAgreed" /> 已阅读并同意 <a href="#">用户协议</a> 和 <a href="#">隐私政策</a> 以及
+                    <a href="#">运营商服务协议</a>
                     ，运营商将对你的手机号进行验证
                 </p>
                 <button class="login-btn" @click="verifyPhoneNumber">验证并登录</button>
+                <button class="login-btn" @click="getinfo" v-show="false">验证并登录</button>
                 <div class="login-options">
                     <button @click="switchToPasswordLogin">密码登录</button>
                     <button>其他方式登录</button>
@@ -40,7 +41,7 @@
 
 <script>
 
-import { userLoginService } from "../../api/user"
+import { userLoginService, userInfoService } from "../../api/user"
 import { useTokenStore } from "../../stores/token"
 
 export default {
@@ -73,12 +74,18 @@ export default {
             console.log('验证手机号:', this.loginpojo);
             try {
                 const response = await userLoginService(this.loginpojo);
-                const token = response.data;
+                if (response.data.code === 1) {
+                    console.error("登录失败：", error);
 
-                const usertoken = useTokenStore();
-                usertoken.setToken(token);
-                localStorage.setItem('token', token);
-                this.$router.push("/");
+                } else {
+                    const token = response.data.data;
+
+                    const usertoken = useTokenStore();
+                    usertoken.setToken(token);
+                    localStorage.setItem('token', token);
+                    this.$router.push("/");
+                }
+
             } catch (error) {
                 console.error("登录失败：", error);
             }
@@ -86,6 +93,10 @@ export default {
         switchToPasswordLogin() {
             this.isPasswordLogin = true;
         },
+        async getinfo() {
+            const response = await userInfoService();
+            const info = response.data
+        }
     },
 };
 </script>
@@ -257,4 +268,5 @@ export default {
 .recovery-text a {
     color: #007bff;
     text-decoration: none;
-}</style>
+}
+</style>

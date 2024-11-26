@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { shoplist, searchForDish, liansearchForDish, shoplistpage } from "@/api/shop"
+import { shoplist, searchForDish, liansearchForDish, shoplistpage, getnav } from "@/api/shop"
 import { shopmenulist } from "@/api/menu"
 import { shopnavlist } from "@/api/menu"
 
@@ -128,7 +128,20 @@ export default {
 
 
 
-
+        // // 自动发送请求给后端
+        getnav().then(shopArr => {
+            console.log(shopArr);
+            if (shopArr && shopArr.data && shopArr.data.data) {
+                // 检查数据是否有效
+                this.navbox = shopArr.data.data;
+                console.log(this.navbox);
+            } else {
+                console.error('获取 shoplist 数据失败: 数据无效');
+            }
+        }).catch(error => {
+            console.error('获取 shoplist 数据出错:', error);
+            console.log("获取 shoplist 数据出错");
+        });
         // shoplistpage(this.pagenum, 10).then(shopArr => {
         //     console.log(shopArr);
         //     if (shopArr && shopArr.data && shopArr.data.data) {
@@ -212,8 +225,8 @@ export default {
         getmenu() {
 
         },
-        getnav() {
-
+        getnavone() {
+            const respond = getnav()
         },
         getshopinfo() {
 
