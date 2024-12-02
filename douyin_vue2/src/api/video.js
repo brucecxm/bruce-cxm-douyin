@@ -44,3 +44,7 @@ export const uploadFile = (file, additionalParams) => {
     },
   });
 };
+// 前端代码
+export const getauthinfo = (params) => {
+  return request.get("/user/friend/getauth", { params }); // 将参数放入 { params } 中
+};

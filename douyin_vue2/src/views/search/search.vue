@@ -1,7 +1,7 @@
 <template>
     <div class="search-page">
         <header class="header">
-            <i class="fas fa-chevron-left"></i>
+            <i class="fas fa-chevron-left" @click="gohome"></i>
             <input type="text" placeholder="人体捐献要求给钱" v-model="searchQuery" />
             <i class="fas fa-search" @click="gosearchdetail"></i>
         </header>
@@ -77,6 +77,9 @@ export default {
         }
     },
     methods: {
+        gohome() {
+            this.$router.push("/")
+        },
         gosearchdetail() {
             this.$router.push("/searchdetail")
         },

@@ -54,4 +54,16 @@
                id = #{user_id}
     </select>
 
+
+    <select id="getAuthinfo"  >
+
+
+        SELECT a.nickname,a.user_pic,b.video_url,b.video_img,a.*
+        from user a  left join video b  on a.id=b.auth_id where   a.id = #{user_id}
+
+    </select>
+
+
+
+
 </mapper>

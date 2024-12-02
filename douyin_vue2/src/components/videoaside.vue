@@ -1,6 +1,6 @@
 <template>
     <div class="videoaside">
-        <div class="touxiang avatar" @click="goauth">
+        <div class="touxiang avatar" @click="goauth(101)">
             <img src="//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_8fd03d785381b8f1dabc166e71f16626.jpeg?from=2956013662"
                 alt="avatar" style="width: 1.4rem;height: 1.4rem;">
         </div>
@@ -29,6 +29,7 @@ export default {
     },
     data() {
         return {
+            userId: "1",
             isLiked: false, // 用于控制是否已点赞
             isCollected: false, // 用于控制是否已收藏
             isCommentClicked: false, // 用于控制评论图标点击状态
@@ -68,9 +69,10 @@ export default {
             console.log(name);
             console.log('behaviour called');
         },
-        goauth() {
-            this.$router.push('/auth');
+        goauth(userId) {
+            this.$router.push({ path: `/auth/${userId}` });
         },
+
         gomusic() {
             this.$router.push('/music');
         },

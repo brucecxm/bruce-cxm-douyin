@@ -18,8 +18,8 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: DouyinUSerService
-          uri: lb://DouyinUSerService
+        - id: DouyinUserService
+          uri: lb://DouyinUserService
           predicates:
             - Path=/user/**
 #          filters:

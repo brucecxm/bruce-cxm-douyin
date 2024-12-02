@@ -8,6 +8,21 @@ const router = new VueRouter({
   base: import.meta.env.BASE_URL,
   routes: [
     {
+      path: "/wallet",
+      name: "wallet",
+      component: () => import("../views/shop/wallet.vue"),
+    },
+    {
+      path: "/shopcat",
+      name: "shopcat",
+      component: () => import("../views/shop/shopcat.vue"),
+    },
+    {
+      path: "/coupon",
+      name: "coupon",
+      component: () => import("../views/shop/coupon.vue"),
+    },
+    {
       path: "/videobox",
       name: "videobox",
       component: () => import("../components/videobox.vue"),
@@ -77,11 +92,13 @@ const router = new VueRouter({
       name: "MusicVue",
       component: () => import("../views/music/music.vue"),
     },
+
     {
-      path: "/auth",
+      path: "/auth/:userId",
       name: "AuthVue",
       component: () => import("../views/auth/auth.vue"),
     },
+
     {
       path: "/xiaodetail/:id",
       name: "XiaoDetailVue",

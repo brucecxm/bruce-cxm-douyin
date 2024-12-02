@@ -12,11 +12,11 @@
         <div class="section">
             <div class="section-title">常用功能</div>
             <div class="item">
-                <div class="icon-wrapper">
+                <div class="icon-wrapper" @click="gowallet">
                     <div class="icon"><i class="fas fa-wallet"></i></div>
                     <span>我的钱包</span>
                 </div>
-                <div class="icon-wrapper">
+                <div class="icon-wrapper" @click="gocoupon">
                     <div class="icon"><i class="fas fa-ticket-alt"></i></div>
                     <span>优惠券</span>
                 </div>
@@ -107,6 +107,12 @@ export default {
         },
         gosetting() {
             this.$router.push("/setting")
+        },
+        gocoupon() {
+            this.$router.push("/coupon")
+        },
+        gowallet() {
+            this.$router.push("/wallet")
         }
     }
 };

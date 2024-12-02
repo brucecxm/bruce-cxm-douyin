@@ -29,9 +29,18 @@
 </template>
 
 <script>
+import { homegetVideo, homegetVideomore, homegetVideocontent, getauthinfo } from "@/api/video"
 export default {
+    created() {
+        // 在组件创建时获取传递的 ID
+        this.userId = this.$route.params.userId;
+        console.log(this.userId)
+        // 你可以在这里根据 ID 请求商品详情数据
+        this.fetchItemDetails(this.userId);
+    },
     data() {
         return {
+            userId: "",
             videonunm: "10000",
             auth: {
                 like: "1",
@@ -63,7 +72,25 @@ export default {
     methods: {
         gohome() {
             this.$router.push('/');
+        },
+        fetchItemDetails(id) {
+            console.log(id + "sssssss");
+            if (id !== null && id !== undefined) {
+                getauthinfo({ userId: id }) // 确保传递的参数是对象，并且属性名与后端相匹配
+                    .then(videoArr => {
+                        console.log('返回的数据:', videoArr); // 调试输出
+                        this.auth = videoArr.authinfo; // 确保这些属性存在
+                        this.videobox = videoArr.videobox; // 确保这些属性存在
+                    })
+                    .catch(error => {
+                        console.error('获取视频出错:', error);
+                        console.log("获取视频出错  videobox中的");
+                    });
+            } else {
+                console.error('用户 ID 无效');
+            }
         }
+
     }
 };
 </script>

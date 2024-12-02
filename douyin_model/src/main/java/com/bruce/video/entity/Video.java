@@ -24,6 +24,8 @@ public class Video implements Serializable {
 
     private String videoComment;
 
+    private String videoImg;
+
     // 新增的属性
     private String videoTitle; // 视频标题
 

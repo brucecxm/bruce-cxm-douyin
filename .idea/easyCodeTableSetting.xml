@@ -214,6 +214,41 @@
             </TableInfoDTO>
           </value>
         </entry>
+        <entry key="douyintest.coupon">
+          <value>
+            <TableInfoDTO>
+              <option name="comment" value="优惠券" />
+              <option name="fullColumn">
+                <list>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="id" />
+                    <option name="type" value="java.lang.Integer" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="num" />
+                    <option name="type" value="java.lang.Integer" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="name" />
+                    <option name="type" value="java.lang.String" />
+                  </ColumnInfoDTO>
+                </list>
+              </option>
+              <option name="name" value="Coupon" />
+              <option name="preName" value="" />
+              <option name="saveModelName" value="douyin_shop" />
+              <option name="savePackageName" value="com.bruce" />
+              <option name="savePath" value="./douyin_service/douyin_shop/src/main/java/com/bruce" />
+              <option name="templateGroupName" value="MybatisPlus" />
+            </TableInfoDTO>
+          </value>
+        </entry>
         <entry key="douyintest.file_img">
           <value>
             <TableInfoDTO>
