@@ -2,8 +2,9 @@
     <div class="auth">
         <div class="backimg">
             <img :src="auth.backimg" alt="no backimg">
-            <div class="caidan"></div>
-            <div class="fanhui" @click="gohome"></div>
+            <div class="fanhui" @click="gohome">
+                <label style="font-size: 1rem;">{{ '<' }}</label>
+            </div>
             <div class="touxiang">
                 <img :src="auth.touimg" alt="头像">
             </div>
@@ -22,7 +23,8 @@
         </div>
         <div class="uservideo">
             <div class="vbox" v-for="(videoboxtemp, index) in videobox" :key="index"
-                :style="{ backgroundImage: 'url(' + videoboxtemp.videoimgurl + ')' }">
+                :style="{ backgroundImage: 'url(' + videoboxtemp.videoimgurl + ')' }"
+                @click="govideodetail(videoboxtemp.videoimgurl)">
             </div>
         </div>
     </div>
@@ -65,11 +67,44 @@ export default {
                     videoimgurl: "http://gips3.baidu.com/it/u=1821127123,1149655687&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280",
                     videohref: "",
                     videolike: ""
+                }, {
+                    videoimgurl: "http://gips3.baidu.com/it/u=1821127123,1149655687&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280",
+                    videohref: "",
+                    videolike: ""
+                }, {
+                    videoimgurl: "http://gips3.baidu.com/it/u=1821127123,1149655687&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280",
+                    videohref: "",
+                    videolike: ""
+                }, {
+                    videoimgurl: "http://gips3.baidu.com/it/u=1821127123,1149655687&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280",
+                    videohref: "",
+                    videolike: ""
+                }, {
+                    videoimgurl: "http://gips3.baidu.com/it/u=1821127123,1149655687&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280",
+                    videohref: "",
+                    videolike: ""
+                }, {
+                    videoimgurl: "http://gips3.baidu.com/it/u=1821127123,1149655687&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280",
+                    videohref: "",
+                    videolike: ""
+                }, {
+                    videoimgurl: "http://gips3.baidu.com/it/u=1821127123,1149655687&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280",
+                    videohref: "",
+                    videolike: ""
+                }, {
+                    videoimgurl: "http://gips3.baidu.com/it/u=1821127123,1149655687&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280",
+                    videohref: "",
+                    videolike: ""
                 }
             ]
         };
     },
     methods: {
+        govideodetail(videoid) {
+            //点击盒子 要导航到视频播放界面 就是要把视频的参数传上过去 就是linkurl
+            //也许要写一个界面  还是前端没设计好  哪些用组件 哪些是页面
+            this.$router.push(`/videodetail?type=auth&videoid=${videoid}`);
+        },
         gohome() {
             this.$router.push('/');
         },
@@ -123,13 +158,27 @@ export default {
 }
 
 .fanhui {
-    width: 50px;
-    height: 50px;
+    left: 5vw;
+    top: 5vh;
+    width: 36px;
+    height: 36px;
     position: absolute;
     left: 20px;
     top: 50px;
-    background-color: red;
+    border-radius: 18px;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    /* 使用 flexbox */
+    justify-content: center;
+    /* 水平居中 */
+    align-items: center;
+    /* 垂直居中 */
+    font-size: 1.5rem;
+    /* 调整字体大小 */
+    color: white;
+    /* 字体颜色 */
 }
+
 
 .touxiang {
     width: 30vw;
@@ -176,7 +225,7 @@ export default {
 }
 
 .followbutt {
-    width: 80vw;
+    width: 90vw;
     height: 5vh;
     background-color: red;
     margin: 0 auto;
@@ -186,7 +235,7 @@ export default {
     position: absolute;
     bottom: 0;
     left: 0;
-    padding: 0.5rem;
+    font-size: 0.7rem;
 }
 
 .uservideo {

@@ -49,7 +49,7 @@ export default {
             // 使用props传递数据 使用props的数据在组件中是单向传输的 但是我可以通过请求异步修改数据库中的数据 就可以了
             videoboxdata: [
                 {
-                    videoUrl: "https://v26-web-prime.douyinvod.com/video/tos/cn/tos-cn-ve-15/ooRPEIAtasBw4j9iWbBZOQAGQXa7BFiwPoIWs/?a=6383&ch=0&cr=0&dr=0&er=0&cd=0%7C0%7C0%7C0&cv=1&br=1376&bt=1376&cs=0&ds=4&ft=AQHeBxbkRR0s~1C62Dv2Nc.xBiGNbLeFc2sU_4OjdCeJNv7TGW&mime_type=video_mp4&qs=0&rc=Nmk0ODo6NjtoNjM4Ozc4ZkBpM3c3OGo5cnRwdTMzNGkzM0AzNmMyLy4xNl8xNS4zNmIzYSM0MGRwMmQ0MzVgLS1kLTBzcw%3D%3D&btag=80000e00030000&cquery=100b&dy_q=1726993944&expire=1726997786&feature_id=46a7bb47b4fd1280f3d3825bf2b29388&l=2024092216322471F0DEB02CE76903FBF4&ply_type=4&policy=4&signature=63a0e466f23de0df6ceeb7132cf81be2&tk=webid&webid=c4683e1a43ffa6bc6852097c712d14b81f04bc9b5ca6d30214b0e66b4e385280917b1ee2dd6c8cf98d22bdbe31e765a617637cb5e3f8c7ea32ab2f6d6adf62d8c038b3a0718002d3d6e612782bc8e4790de3023e098e48eb6e37ef2259ee15803ce304237e3fdbf46a88caae910c209bb4614fbde6a15491bac590af176e8420b5d932e88ca503b38bbe056da33ab0de509ffbf6f2f2a34daa880354b8e41e82-d2d651a1efc95dd260bf0cc906e1ce4c",
+                    videoUrl: "https://vdept3.bdstatic.com/mda-qkhekcm1quetqsm3/360p/h264/1731925121198299454/mda-qkhekcm1quetqsm3.mp4?v_from_s=hkapp-haokan-nanjing&auth_key=1734113109-0-0-c8ebeb78681daafa698ec0145326c037&bcevod_channel=searchbox_feed&cr=0&cd=0&pd=1&pt=3&logid=0309796217&vid=11209263194208596039&klogid=0309796217&abtest=122021_2",
 
                     videoArticle: "",
                     username: "",
@@ -62,43 +62,39 @@ export default {
                     musicName: ""
                 },
                 {
-                    videoUrl: "https://v26-web-prime.douyinvod.com/video/tos/cn/tos-cn-ve-15/ooRPEIAtasBw4j9iWbBZOQAGQXa7BFiwPoIWs/?a=6383&ch=0&cr=0&dr=0&er=0&cd=0%7C0%7C0%7C0&cv=1&br=1376&bt=1376&cs=0&ds=4&ft=AQHeBxbkRR0s~1C62Dv2Nc.xBiGNbLeFc2sU_4OjdCeJNv7TGW&mime_type=video_mp4&qs=0&rc=Nmk0ODo6NjtoNjM4Ozc4ZkBpM3c3OGo5cnRwdTMzNGkzM0AzNmMyLy4xNl8xNS4zNmIzYSM0MGRwMmQ0MzVgLS1kLTBzcw%3D%3D&btag=80000e00030000&cquery=100b&dy_q=1726993944&expire=1726997786&feature_id=46a7bb47b4fd1280f3d3825bf2b29388&l=2024092216322471F0DEB02CE76903FBF4&ply_type=4&policy=4&signature=63a0e466f23de0df6ceeb7132cf81be2&tk=webid&webid=c4683e1a43ffa6bc6852097c712d14b81f04bc9b5ca6d30214b0e66b4e385280917b1ee2dd6c8cf98d22bdbe31e765a617637cb5e3f8c7ea32ab2f6d6adf62d8c038b3a0718002d3d6e612782bc8e4790de3023e098e48eb6e37ef2259ee15803ce304237e3fdbf46a88caae910c209bb4614fbde6a15491bac590af176e8420b5d932e88ca503b38bbe056da33ab0de509ffbf6f2f2a34daa880354b8e41e82-d2d651a1efc95dd260bf0cc906e1ce4c",
+                    videoUrl: "https://vdept3.bdstatic.com/mda-qkhekcm1quetqsm3/360p/h264/1731925121198299454/mda-qkhekcm1quetqsm3.mp4?v_from_s=hkapp-haokan-nanjing&auth_key=1734113109-0-0-c8ebeb78681daafa698ec0145326c037&bcevod_channel=searchbox_feed&cr=0&cd=0&pd=1&pt=3&logid=0309796217&vid=11209263194208596039&klogid=0309796217&abtest=122021_2",
 
                     videoArticle: "",
                     username: "",
                     userAvatar: "",
-                    likeNum: "2",
-                    commentNum: "20",
-                    shareNum: "200",
-                    collectNum: "2000",
+                    likeNum: "1",
+                    commentNum: "10",
+                    shareNum: "100",
+                    collectNum: "1000",
                     musicAvatar: "",
                     musicName: ""
-                },
-                {
-                    videoUrl: "https://v26-web-prime.douyinvod.com/video/tos/cn/tos-cn-ve-15/ooRPEIAtasBw4j9iWbBZOQAGQXa7BFiwPoIWs/?a=6383&ch=0&cr=0&dr=0&er=0&cd=0%7C0%7C0%7C0&cv=1&br=1376&bt=1376&cs=0&ds=4&ft=AQHeBxbkRR0s~1C62Dv2Nc.xBiGNbLeFc2sU_4OjdCeJNv7TGW&mime_type=video_mp4&qs=0&rc=Nmk0ODo6NjtoNjM4Ozc4ZkBpM3c3OGo5cnRwdTMzNGkzM0AzNmMyLy4xNl8xNS4zNmIzYSM0MGRwMmQ0MzVgLS1kLTBzcw%3D%3D&btag=80000e00030000&cquery=100b&dy_q=1726993944&expire=1726997786&feature_id=46a7bb47b4fd1280f3d3825bf2b29388&l=2024092216322471F0DEB02CE76903FBF4&ply_type=4&policy=4&signature=63a0e466f23de0df6ceeb7132cf81be2&tk=webid&webid=c4683e1a43ffa6bc6852097c712d14b81f04bc9b5ca6d30214b0e66b4e385280917b1ee2dd6c8cf98d22bdbe31e765a617637cb5e3f8c7ea32ab2f6d6adf62d8c038b3a0718002d3d6e612782bc8e4790de3023e098e48eb6e37ef2259ee15803ce304237e3fdbf46a88caae910c209bb4614fbde6a15491bac590af176e8420b5d932e88ca503b38bbe056da33ab0de509ffbf6f2f2a34daa880354b8e41e82-d2d651a1efc95dd260bf0cc906e1ce4c",
-
+                }, {
+                    videoUrl: "https://vdept3.bdstatic.com/mda-qkhekcm1quetqsm3/360p/h264/1731925121198299454/mda-qkhekcm1quetqsm3.mp4?v_from_s=hkapp-haokan-nanjing&auth_key=1734113109-0-0-c8ebeb78681daafa698ec0145326c037&bcevod_channel=searchbox_feed&cr=0&cd=0&pd=1&pt=3&logid=0309796217&vid=11209263194208596039&klogid=0309796217&abtest=122021_2",
 
                     videoArticle: "",
                     username: "",
                     userAvatar: "",
-                    likeNum: "3",
-                    commentNum: "30",
-                    shareNum: "300",
-                    collectNum: "3000",
+                    likeNum: "1",
+                    commentNum: "10",
+                    shareNum: "100",
+                    collectNum: "1000",
                     musicAvatar: "",
                     musicName: ""
-                },
-                {
-                    videoUrl: "https://v26-web-prime.douyinvod.com/video/tos/cn/tos-cn-ve-15/ooRPEIAtasBw4j9iWbBZOQAGQXa7BFiwPoIWs/?a=6383&ch=0&cr=0&dr=0&er=0&cd=0%7C0%7C0%7C0&cv=1&br=1376&bt=1376&cs=0&ds=4&ft=AQHeBxbkRR0s~1C62Dv2Nc.xBiGNbLeFc2sU_4OjdCeJNv7TGW&mime_type=video_mp4&qs=0&rc=Nmk0ODo6NjtoNjM4Ozc4ZkBpM3c3OGo5cnRwdTMzNGkzM0AzNmMyLy4xNl8xNS4zNmIzYSM0MGRwMmQ0MzVgLS1kLTBzcw%3D%3D&btag=80000e00030000&cquery=100b&dy_q=1726993944&expire=1726997786&feature_id=46a7bb47b4fd1280f3d3825bf2b29388&l=2024092216322471F0DEB02CE76903FBF4&ply_type=4&policy=4&signature=63a0e466f23de0df6ceeb7132cf81be2&tk=webid&webid=c4683e1a43ffa6bc6852097c712d14b81f04bc9b5ca6d30214b0e66b4e385280917b1ee2dd6c8cf98d22bdbe31e765a617637cb5e3f8c7ea32ab2f6d6adf62d8c038b3a0718002d3d6e612782bc8e4790de3023e098e48eb6e37ef2259ee15803ce304237e3fdbf46a88caae910c209bb4614fbde6a15491bac590af176e8420b5d932e88ca503b38bbe056da33ab0de509ffbf6f2f2a34daa880354b8e41e82-d2d651a1efc95dd260bf0cc906e1ce4c",
-
+                }, {
+                    videoUrl: "https://vdept3.bdstatic.com/mda-qkhekcm1quetqsm3/360p/h264/1731925121198299454/mda-qkhekcm1quetqsm3.mp4?v_from_s=hkapp-haokan-nanjing&auth_key=1734113109-0-0-c8ebeb78681daafa698ec0145326c037&bcevod_channel=searchbox_feed&cr=0&cd=0&pd=1&pt=3&logid=0309796217&vid=11209263194208596039&klogid=0309796217&abtest=122021_2",
 
                     videoArticle: "",
                     username: "",
                     userAvatar: "",
-                    likeNum: "4",
-                    commentNum: "40",
-                    shareNum: "400",
-                    collectNum: "4000",
+                    likeNum: "1",
+                    commentNum: "10",
+                    shareNum: "100",
+                    collectNum: "1000",
                     musicAvatar: "",
                     musicName: ""
                 },
@@ -129,14 +125,20 @@ export default {
 
         this.updateVideoPlayback();
 
-
         // 自动发送请求给后端
         homegetVideo().then(videoArr => {
-            console.log(videoArr)
-            this.videoboxdata = videoArr.data;
+            console.log(videoArr);
+
+            // 校验 videoArr.data 是否存在且为非空数组
+            if (Array.isArray(videoArr.data) && videoArr.data.length > 0) {
+                this.videoboxdata = videoArr.data;
+            } else {
+                console.warn('获取到的视频数据为空或格式不正确:', videoArr.data);
+                // 你可以在这里进行其他处理，比如给用户提示
+            }
         }).catch(error => {
             console.error('获取视频出错:', error);
-            console.log("获取视频出错  videobox中的")
+            console.log("获取视频出错  videobox中的");
         });
     },
     methods: {

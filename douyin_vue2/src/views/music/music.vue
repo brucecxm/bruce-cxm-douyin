@@ -1,9 +1,9 @@
 <template>
     <div class="music">
         <div class="header">
-            <label @click="gohome">返回</label>
-            <label>--------------------------</label>
-            <label>zhuanfa</label>
+            <label @click="gohome" style="font-size: 1rem;">{{ '<' }}</label>
+
+                    <!-- <label>zhuanfa</label> -->
         </div>
         <div class="musicbody">
             <div class="imgbox"><img src="https://tencentcdn.production.link3.cc/profile_images/1722150064686" alt=""
@@ -14,11 +14,20 @@
             <div class="qu"></div>
             <div class="shoucang"></div>
         </div>
-        <div class="wanfa">
+        <div class="wanfa" v-if="false">
 
         </div>
         <div class="videobody">
-            <div class="box"><img :src="videobox.imgurl" alt="" height="100%" @click="govideodetail"></div>
+            <div class="box"><img :src="videobox.imgurl" alt="" height="100%" @click="govideodetail(11)"></div>
+            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
+            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
+            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
+            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
+            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
+            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
+            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
+            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
+            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
             <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
             <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
 
@@ -30,6 +39,7 @@
 export default {
     data() {
         return {
+            is_wanfa: false,
             name: "歌曲作者名字",
             videobox: {
                 imgurl: "https://tencentcdn.production.link3.cc/profile_images/1722150064686",
@@ -44,11 +54,10 @@ export default {
             // 这里可以是跳转回主页的逻辑
             this.$router.push('/');
         },
-        govideodetail() {
+        govideodetail(videoid) {
             //点击盒子 要导航到视频播放界面 就是要把视频的参数传上过去 就是linkurl
             //也许要写一个界面  还是前端没设计好  哪些用组件 哪些是页面
-            this.$router.push('/videodetail');
-
+            this.$router.push(`/videodetail?type=music&videoid=${videoid}`);
         }
     }
 };
@@ -56,11 +65,11 @@ export default {
 
 <style scoped>
 .box {
-    width: 100px;
+    width: 31.2vw;
     height: 160px;
     background-color: rgba(190, 40, 40, 0.1);
     float: left;
-    margin: 10px;
+    margin: 0.2vw;
     transform: translateX(10px);
     overflow: hidden;
 }
@@ -80,6 +89,10 @@ export default {
 
 .header {
     height: 40px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.5rem;
+    margin-left: 0px;
 }
 
 .geming {
@@ -102,8 +115,8 @@ export default {
 }
 
 .qu {
-    width: 180px;
-    height: 50px;
+    width: 40vw;
+    height: 6vh;
     border-radius: 20px;
     background-color: rgba(0, 0, 0, 0.1);
     float: left;
@@ -111,12 +124,12 @@ export default {
     bottom: 10px;
     left: 10px;
     background-image: url(../../assets/music/qu.jpg);
-
+    background-size: cover;
 }
 
 .shoucang {
-    width: 180px;
-    height: 50px;
+    width: 40vw;
+    height: 6vh;
     border-radius: 20px;
     background-color: rgba(0, 0, 0, 0.1);
     float: left;
@@ -124,11 +137,13 @@ export default {
     bottom: 10px;
     right: 10px;
     background-image: url(../../assets/music/share.jpg);
+    background-size: cover;
 
 }
 
 .musicbody {
     height: 200px;
     position: relative;
+    font-size: 0.65rem;
 }
 </style>

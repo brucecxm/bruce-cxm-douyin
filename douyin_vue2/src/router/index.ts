@@ -23,6 +23,11 @@ const router = new VueRouter({
       component: () => import("../views/shop/coupon.vue"),
     },
     {
+      path: "/videodetail",
+      name: "videodetail",
+      component: () => import("@/views/video/videodetail.vue"),
+    },
+    {
       path: "/videobox",
       name: "videobox",
       component: () => import("../components/videobox.vue"),
