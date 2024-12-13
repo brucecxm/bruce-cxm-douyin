@@ -18,7 +18,7 @@
             <div class="city" style="font-size: 0.6rem;background-color: rgba(0,0,0,0.1); width: 10vw;">
                 <span>{{ auth.city }}</span>
             </div>
-            <div class="followbutt" style="border-radius: 2vw;"></div>
+            <div class="followbutt" style="border-radius: 2vw;">+ 关注</div>
             <div class="videonum">{{ videonunm }}</div>
         </div>
         <div class="uservideo">
@@ -229,6 +229,16 @@ export default {
     height: 5vh;
     background-color: red;
     margin: 0 auto;
+    display: flex;
+    /* 使用 flexbox */
+    justify-content: center;
+    /* 水平居中 */
+    align-items: center;
+    /* 垂直居中 */
+    border-radius: 2vw;
+    /* 保持圆角 */
+    color: white;
+    font-size: 0.7rem;
 }
 
 .videonum {
