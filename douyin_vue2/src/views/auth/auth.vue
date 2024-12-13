@@ -15,9 +15,10 @@
                 <span>{{ auth.follow }}关注</span>
                 <span>{{ auth.fan }}粉丝</span>
             </div>
-            <div class="city" style="font-size: 0.6rem;background-color: rgba(0,0,0,0.1); width: 10vw;">
+            <div class="city" style="font-size: 0.4rem;background-color: rgba(0,0,0,0.1); width: 10vw;">
                 <span>{{ auth.city }}</span>
             </div>
+            <div class="authinfo" style=" font-size: 0.5rem;">信息介绍</div>
             <div class="followbutt" style="border-radius: 2vw;">+ 关注</div>
             <div class="videonum">{{ videonunm }}</div>
         </div>
@@ -211,7 +212,7 @@ export default {
 }
 
 .authnum {
-    font-size: 0.8rem;
+    font-size: 0.6rem;
 }
 
 .authnum span {
@@ -219,7 +220,6 @@ export default {
 }
 
 .city {
-    font-size: 0.6rem;
     background-color: rgba(0, 0, 0, 0.1);
     width: 10vw;
 }
