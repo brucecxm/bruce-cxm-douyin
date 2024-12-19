@@ -1,7 +1,5 @@
 <template>
     <div class="xiaoxi">
-
-
         <caidan :style="caidancss"></caidan>
 
         <div class="forposition">
@@ -9,191 +7,177 @@
                 <img src="../../assets/xiaoxi/header/1.png" alt="" @click="showcaidanone">
                 <img src="../../assets/xiaoxi/header/2.png" alt="">
                 <img src="../../assets/xiaoxi/header/3.png" alt="">
-
             </div>
         </div>
 
-        <!-- <div class="navbody">
-            <ul class="nav">
-                <li><img :src=userinfo.avatar alt="" style="width: 200px;height: 100px; "></li>
-
-
-
-            </ul>
-        </div> -->
         <div class="commentbody">
             <div class="comment" @click="goxiaodetail" v-for="(userinfo, index ) in userinfos" :key="index">
                 <div class="touxiang">
-                    <img :src=userinfo.avatar alt="" style="width: 100px;height: 100px;">
+                    <img :src=userinfo.avatar alt="" />
                 </div>
                 <div class="neirong">
-                    <span>{{ userinfo.username }}</span>
-                    <span>{{ userinfo.latermessage }}</span>
+                    <span class="username">{{ userinfo.username }}</span>
+                    <span class="message">{{ userinfo.latermessage }}</span>
                 </div>
             </div>
-
-            <!-- <img src="../../assets/xiaoxi/main/1.png" alt="" style="width: 100%;" @click="goxiaodetail('brucebbb')"> -->
-            <!-- <img src="../../assets/xiaoxi/main/2.png" alt="" style="width: 100%; " @click="goxiaodetail('bruceccc')"> -->
-
         </div>
 
         <footer-vue class="footer"></footer-vue>
     </div>
 </template>
+
 <script>
 import caidan from '@/components/caidan.vue';
+import footerVue from '@/components/footer.vue';
 
-import footerVue from '@/components/footer.vue'
 export default {
     components: {
         footerVue, caidan
     },
     data() {
         return {
-
-
-            userinfos: [{
-                username: "互动消息",
-                avatar: "//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813_fdbb0995a81d4bccaac82bbf3d3a6470.jpeg?from=2956013662",
-                latermessage: "前端默认的数据 最新一条聊天记录"
-            }, {
-                username: "张三",
-                avatar: "//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813_fdbb0995a81d4bccaac82bbf3d3a6470.jpeg?from=2956013662",
-                latermessage: "前端默认的数据 最新一条聊天记录"
-            },
-
+            userinfos: [
+                {
+                    username: "互动消息",
+                    avatar: "//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813_fdbb0995a81d4bccaac82bbf3d3a6470.jpeg?from=2956013662",
+                    latermessage: "前端默认的数据 最新一条聊天记录"
+                },
+                {
+                    username: "张三",
+                    avatar: "//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813_fdbb0995a81d4bccaac82bbf3d3a6470.jpeg?from=2956013662",
+                    latermessage: "前端默认的数据 最新一条聊天记录"
+                },
             ],
-
             caidancss: {
                 position: 'absolute',
                 right: '100vw',
                 bottom: '0px',
                 transition: 'right 0.5s ease',
-                height: '100vh', /* 控制位置变化的动画 */
-
-
+                height: '100vh',
             },
-        }
-
+        };
     },
     methods: {
         goxiaodetail(id) {
-            this.$router.push({ path: `/xiaodetail/${id}` })
+            this.$router.push({ path: `/xiaodetail/${id}` });
         },
-
         showcaidanone() {
-            // 更新 caidancss 的位置
             this.caidancss.right = this.caidancss.right === "100vw" ? "20vw" : "100vw";
-
-            // 使用 Vue 的 $set 方法来触发响应式系统检测到 transform 属性变化
             this.$set(this.boxvideocss, 'transform', this.boxvideocss.transform === "translateX(0px)" ? "translateX(80vw)" : "translateX(0px)");
         }
     }
-
 }
 </script>
 
 <style scoped>
-.commentbody {
-    margin-top: 5vh;
-    overflow-y: auto;
-    /* 允许垂直滚动 */
-    height: calc(100vh - 5vh - 50px);
-    /* 根据 header 和 footer 的高度调整 */
-}
-
 .xiaoxi {
     overflow: hidden;
-
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+    min-height: 100vh;
 }
 
-/* 隐藏所有滚动条 */
-.commentbody::-webkit-scrollbar {
-    display: none;
-    /* 隐藏滚动条 */
+.header {
+    background-color: #fff;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.header img {
+    height: 30px;
+    cursor: pointer;
+}
+
+.commentbody {
+    margin-top: 60px;
+    overflow-y: auto;
+    height: calc(100vh - 60px - 50px);
+    /* Adjust based on header and footer height */
+    padding: 10px;
+}
+
+.comment {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.comment:hover {
+    background-color: #f9f9f9;
+}
+
+.touxiang img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.neirong {
+    margin-left: 15px;
+    flex: 1;
+}
+
+.username {
+    font-weight: bold;
+    color: #333;
+    font-size: 16px;
+}
+
+.message {
+    display: block;
+    color: #777;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.footer {
+    background-color: #222;
+    color: #fff;
+    z-index: 10;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.footer-vue {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+footer-vue img {
+    height: 20px;
+    margin: 0 10px;
 }
 
 ::v-deep .jiahao {
     background-image: url(../../assets/home/加号黑.png);
 }
 
-.header {
-    background-color: white;
-    width: 100%;
-    height: 5vh;
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    z-index: 10;
-    position: fixed;
-    top: 0;
-}
-
-.fas {
-    flex-direction: row;
-    align-content: center;
-}
-
-.touxiang {
-    width: 50px;
-    height: 50px;
-    border-radius: 25px;
-    background-color: rgba(213, 17, 17, 0.1);
-    float: left;
-    margin-right: 20px;
-    overflow: hidden;
-}
-
-.comment {
-    margin-top: 10px;
-    height: 6vh;
-    width: 100%;
-    font-size: 20px;
-    display: flex;
-
-}
-
-ul {
-    list-style: none;
-    overflow: scroll;
-    white-space: nowrap;
-    /* 不换行 */
-    overflow-x: auto;
-    /* 横向滚动 */
-    width: 414px;
-    margin-left: 0px;
-    transform: translateX(-50px);
-}
-
-.navbody {
-    width: 414px;
-}
-
-.nav::-webkit-scrollbar {
+/* Hide scrollbar */
+.commentbody::-webkit-scrollbar {
     display: none;
-    /* 隐藏滚动条 */
-}
-
-li {
-    display: inline-block;
-    margin-left: 20px;
-    width: 80px;
-    height: 80px;
-    border-radius: 40px;
-    background-color: rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-}
-
-.footer {
-    background-color: black;
-    color: black;
-    z-index: 10;
-    position: fixed;
-    bottom: 0px;
-}
-
-::v-deep .footer {
-    background-color: black;
-    color: black;
 }
 </style>

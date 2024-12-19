@@ -21,7 +21,7 @@
                 <span class="discounted-price">¥26</span>
             </div>
             <div class="product-name">
-                时尚复古碎花连衣裙...
+                时尚复古碎花连衣裙
             </div>
             <div class="additional-info">
                 <span>包邮</span>
@@ -44,7 +44,7 @@
         <div class="recommendations">
             <h3>店铺推荐</h3>
             <div class="recommendation-item" v-for="item in recommendations" :key="item.id">
-                <img src="../../assets/op.jpg" :alt="item.name" style="width: 100px;height: 100px;">
+                <img src="../../assets/op.jpg" :alt="item.name" class="recommendation-img">
                 <div class="item-info">
                     <span class="item-price">{{ item.price }}</span>
                     <span class="item-name">{{ item.name }}</span>
@@ -57,7 +57,7 @@
             <h3>商品评价</h3>
             <div class="review" v-for="review in reviews" :key="review.id">
                 <div class="reviewer-info">
-                    <img src="../../assets/op.jpg" alt="Reviewer Avatar" style="width: 100px;height: 100px;">
+                    <img src="../../assets/op.jpg" alt="Reviewer Avatar" class="reviewer-avatar">
                     <span>{{ review.name }}</span>
                 </div>
                 <div class="review-content">
@@ -69,8 +69,8 @@
         <!-- Product Details -->
         <div class="product-details">
             <p>------商品详情页--------</p>
-            <img src="../../assets/op.jpg" alt="Detail Image 1">
-            <img src="../../assets/op.jpg" alt="Detail Image 2">
+            <img src="../../assets/op.jpg" alt="Detail Image 1" class="detail-img">
+            <img src="../../assets/op.jpg" alt="Detail Image 2" class="detail-img">
         </div>
 
         <!-- Footer -->
@@ -81,8 +81,8 @@
                 <i class="fas fa-user"></i>
             </div>
             <div class="footer-buttons">
-                <button>加入购物车</button>
-                <button>立即购买</button>
+                <button class="add-cart">加入购物车</button>
+                <button class="buy-now">立即购买</button>
             </div>
         </footer>
     </div>
@@ -94,13 +94,13 @@ export default {
         return {
             isSticky: false,
             recommendations: [
-                { id: 1, image: '../../assets/op.jpg', price: '¥47.83', name: 'Recommendation 1' },
-                { id: 2, image: '../../assets/op.jpg', price: '¥49.99', name: 'Recommendation 2' },
+                { id: 1, price: '¥47.83', name: 'Recommendation 1' },
+                { id: 2, price: '¥49.99', name: 'Recommendation 2' },
                 // more recommendation items...
             ],
             reviews: [
-                { id: 1, avatar: '../../assets/op.jpg', name: 'Reviewer 1', content: 'Great product!' },
-                { id: 2, avatar: '../../assets/op.jpg', name: 'Reviewer 2', content: 'Loved it!' },
+                { id: 1, name: 'Reviewer 1', content: 'Great product!' },
+                { id: 2, name: 'Reviewer 2', content: 'Loved it!' },
                 // more reviews...
             ],
             itemId: null // 用于存储传递的 ID
@@ -121,129 +121,242 @@ export default {
         window.removeEventListener('scroll', this.handleScroll);
     },
     created() {
-        // 在组件创建时获取传递的 ID
         this.itemId = this.$route.params.id;
-        console.log(this.itemId)
-        // 你可以在这里根据 ID 请求商品详情数据
+        console.log(this.itemId);
         this.fetchItemDetails(this.itemId);
-    },
+    }
 }
 </script>
 
 <style scoped>
-.touxiang {
-    width: 100px;
-    height: 100px;
-    border-radius: 50px;
+/* Reset some default styles for full screen */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
+/* 使页面高度达到100% */
+html,
+body,
 .product-page {
-    width: 414px;
+    height: 100%;
+    width: 100%;
+}
+
+/* Global Styles */
+body {
+    font-family: 'PingFang SC', sans-serif;
+    background-color: #f5f5f5;
+    overflow-x: hidden;
+    /* 禁止水平滚动条 */
+}
+
+/* Product Page */
+.product-page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 /* Header */
 header {
     position: absolute;
     top: 0;
-    width: 100%;
+    left: 0;
+    right: 0;
     background-color: transparent;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease;
+    z-index: 10;
 }
 
 header.sticky {
     position: fixed;
-    background-color: white;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .header-content {
     display: flex;
     justify-content: space-between;
-    padding: 10px;
+    padding: 15px 20px;
+}
+
+.header-content i {
+    font-size: 20px;
+    color: #333;
 }
 
 /* Carousel */
-.carousel {
-    width: 100%;
-}
-
 .carousel img {
     width: 100%;
+    height: 300px;
+    /* 定高 */
+    object-fit: cover;
+    border-radius: 10px;
 }
 
 /* Product Info */
 .product-info {
-    padding: 10px;
+    padding: 15px;
 }
 
 .price {
     display: flex;
-    align-items: baseline;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
 .original-price {
     text-decoration: line-through;
+    color: #888;
     margin-right: 10px;
 }
 
 .discounted-price {
-    color: red;
+    color: #e64a19;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.product-name {
+    font-size: 16px;
+    margin-bottom: 10px;
 }
 
 .additional-info {
-    margin-top: 10px;
+    font-size: 14px;
+    color: #999;
+}
+
+.additional-info span {
+    margin-right: 15px;
 }
 
 /* Shop Info */
 .shop-info {
     display: flex;
     align-items: center;
-    padding: 10px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 10px;
+    margin: 10px 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.touxiang {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 10px;
 }
 
 .shop-details {
-    margin-left: 10px;
+    flex: 1;
+}
+
+.shop-name {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.shop-description {
+    font-size: 14px;
+    color: #888;
+}
+
+button {
+    padding: 8px 16px;
+    background-color: #ff6a00;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #e65c00;
 }
 
 /* Recommendations */
 .recommendations {
-    padding: 10px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 10px;
+    margin-top: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .recommendation-item {
     display: flex;
     align-items: center;
-    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.recommendation-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    object-fit: cover;
 }
 
 .item-info {
-    margin-left: 10px;
+    margin-left: 15px;
+}
+
+.item-price {
+    color: #e64a19;
+    font-size: 16px;
+}
+
+.item-name {
+    font-size: 14px;
+    color: #555;
 }
 
 /* Reviews */
 .reviews {
-    padding: 10px;
+    padding: 15px;
 }
 
 .review {
-    margin-top: 10px;
+    margin-bottom: 15px;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .reviewer-info {
     display: flex;
     align-items: center;
+    margin-bottom: 10px;
+}
+
+.reviewer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
 }
 
 .review-content {
-    margin-top: 5px;
+    font-size: 14px;
+    color: #555;
 }
 
 /* Product Details */
 .product-details {
-    padding: 10px;
+    padding: 15px;
 }
 
-.product-details img {
+.detail-img {
     width: 100%;
+    border-radius: 10px;
     margin-top: 10px;
 }
 
@@ -251,11 +364,13 @@ header.sticky {
 footer {
     position: fixed;
     bottom: 0;
-    width: 100%;
-    background-color: white;
+    left: 0;
+    right: 0;
+    background-color: #fff;
     display: flex;
     justify-content: space-between;
-    padding: 10px;
+    padding: 15px 20px;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .footer-icons {
@@ -264,14 +379,29 @@ footer {
 }
 
 .fas {
-    font-size: 30px;
+    font-size: 28px;
     margin-left: 20px;
+    color: #333;
 }
 
-.footer-buttons button {
+.footer-buttons {
+    display: flex;
+    align-items: center;
+}
+
+.add-cart,
+.buy-now {
+    padding: 10px 20px;
+    background-color: #ff6a00;
+    color: white;
+    border-radius: 30px;
+    font-size: 16px;
     margin-left: 10px;
-    width: 100px;
-    height: 50px;
-    margin-right: 10px;
+    transition: background-color 0.3s;
+}
+
+.add-cart:hover,
+.buy-now:hover {
+    background-color: #e65c00;
 }
 </style>

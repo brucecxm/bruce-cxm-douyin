@@ -21,7 +21,7 @@
             <div class="allowscoll">
                 <div class="meum">
                     <div class="box1" v-for="(meum, index) in meumbox" :key="index">
-                        <img :src="meum.menuImg" alt="" style="width: 100%; height: 100%;">
+                        <img :src="meum.menuImg" alt="" style="width: 100%; height: 100%;" @click="go(meum.hrefurl)">
                         <!--  <p>{{ meum.name }}</p> -->
 
                     </div>
@@ -53,7 +53,7 @@
 import { shoplist, searchForDish, liansearchForDish, shoplistpage, getnav } from "@/api/shop"
 import { shopmenulist } from "@/api/menu"
 import { shopnavlist } from "@/api/menu"
-
+import { useTokenStore } from "../../stores/token"
 import footerVue from '@/components/footer.vue'
 import img1 from '@/assets/shop/menunav/1.png';
 import img2 from '@/assets/shop/menunav/2.png';
@@ -77,19 +77,19 @@ export default {
         return {
             search: "",
             meumbox: [
-                { name: "超d市", menuImg: img1, hrefurl: "" },
-                { name: "超d市", menuImg: img2, hrefurl: "" },
-                { name: "超d市", menuImg: img3, hrefurl: "" },
+                { name: "超d市", menuImg: img1, hrefurl: "order" },
+                { name: "超d市", menuImg: img2, hrefurl: "chongzhi" },
+                { name: "超d市", menuImg: img3, hrefurl: "shopmessage" },
                 { name: "超d市", menuImg: img4, hrefurl: "" },
                 { name: "超d市", menuImg: img5, hrefurl: "" },
                 { name: "超d市", menuImg: img5, hrefurl: "" },
                 { name: "超d市", menuImg: img5, hrefurl: "" },
             ],
             navbox: [
-                { navname: "ss", navImg: imgn6, navhrefurl: "" },
-                { navname: "ss", navImg: imgn7, navhrefurl: "" },
-                { navname: "ss", navImg: imgn8, navhrefurl: "" },
-                { navname: "ss", navImg: imgn9, navhrefurl: "" },
+                { navname: "ss", navImg: imgn6, navhrefurl: "order" },
+                { navname: "ss", navImg: imgn7, navhrefurl: "chongzhi" },
+                { navname: "ss", navImg: imgn8, navhrefurl: "shopmessage" },
+                { navname: "ss", navImg: imgn9, navhrefurl: "order" },
                 { navname: "ss", navImg: imgn10, navhrefurl: "" },
                 { navname: "ss", navImg: imgn10, navhrefurl: "" },
                 { navname: "ss", navImg: imgn10, navhrefurl: "" },
@@ -203,6 +203,12 @@ export default {
         },
     },
     methods: {
+        go(hrefurl) {
+
+            const usertoken = useTokenStore();
+            const id = usertoken.getToken
+            this.$router.push({ path: `/${hrefurl}/${id}` });
+        },
         handleFocus() {
             this.isFocused = true;  // 输入框获得焦点
         },

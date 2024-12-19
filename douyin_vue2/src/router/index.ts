@@ -48,6 +48,21 @@ const router = new VueRouter({
       component: () => import("../views/one.vue"),
     },
     {
+      path: "/order/:userid", // 动态路由参数 :id
+      name: "order",
+      component: () => import("../views/shop/order.vue"),
+    },
+    {
+      path: "/chongzhi/:userid", // 动态路由参数 :id
+      name: "chongzhi",
+      component: () => import("../views/shop/chongzhi.vue"),
+    },
+    {
+      path: "/shopmessage/:userid", // 动态路由参数 :id
+      name: "shopmessage",
+      component: () => import("../views/shop/shopmessage.vue"),
+    },
+    {
       path: "/",
       name: "homeone",
       component: () => import("../views/home.vue"),
