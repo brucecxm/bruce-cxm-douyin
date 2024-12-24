@@ -21,7 +21,7 @@ import java.util.List;
  * @since 2024-11-19 17:34:00
  */
 @RestController
-@RequestMapping("fileImg")
+@RequestMapping("/shop/fileImg")
 public class FileImgController extends ApiController {
     /**
      * 服务对象

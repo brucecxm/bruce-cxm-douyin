@@ -20,7 +20,7 @@ import java.util.UUID;
  * 文件上传和下载
  */
 @RestController
-@RequestMapping("/coupon")
+@RequestMapping("/shop/coupon")
 @Slf4j
 public class couponController {
 

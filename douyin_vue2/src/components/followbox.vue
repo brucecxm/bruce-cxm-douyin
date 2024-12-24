@@ -128,6 +128,22 @@ export default {
     mounted() {
 
         this.updateVideoPlayback();
+
+        // 自动发送请求给后端
+        homegetVideo().then(videoArr => {
+            console.log(videoArr);
+
+            // 校验 videoArr.data 是否存在且为非空数组
+            if (Array.isArray(videoArr.data) && videoArr.data.length > 0) {
+                this.videoboxdata = videoArr.data;
+            } else {
+                console.log('获取到的视频数据为空或格式不正确:', videoArr.data);
+                // 你可以在这里进行其他处理，比如给用户提示
+            }
+        }).catch(error => {
+            console.error('获取视频出错:', error);
+            console.log("获取视频出错  videobox中的");
+        });
     },
     methods: {
 

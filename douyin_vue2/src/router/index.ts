@@ -108,7 +108,7 @@ const router = new VueRouter({
       component: () => import("../views/shangchuan/shangchuan.vue"),
     },
     {
-      path: "/music",
+      path: "/music/:musicid",
       name: "MusicVue",
       component: () => import("../views/music/music.vue"),
     },

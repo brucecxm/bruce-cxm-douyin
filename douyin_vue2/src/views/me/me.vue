@@ -10,9 +10,9 @@
                     <div class="caidan" @click="openmenu"></div>
                     <div class="userinfo">
                         <div class="touxiang">
-                            <img :src="User.data.userPic" alt="" />
+                            <img :src="User.data.userPic" alt="" style="width: 26vw;height: 36vw;" />
                         </div>
-                        <div class="name">
+                        <div class="name" style="color: white;">
                             <span>{{ User.data.nickname }}</span>
                         </div>
                     </div>
@@ -114,6 +114,10 @@ export default {
 </script>
 
 <style scoped>
+.name {
+    transform: translateY(2vh);
+}
+
 /* General Styles */
 .metemp {
     width: 100%;
@@ -163,12 +167,14 @@ export default {
 }
 
 .touxiang {
-    width: 130px;
-    height: 130px;
-    border-radius: 800px;
+    width: 26vw;
+    height: 26vw;
+    border-radius: 13vw;
     overflow: hidden;
     border: 3px solid white;
     display: inline-block;
+    transform: translateX(10vw);
+    transform: translateY(3vh);
 }
 
 /* Nav bar */
@@ -178,6 +184,7 @@ export default {
     overflow-x: auto;
     padding: 0;
     white-space: nowrap;
+    font-size: 0.6rem;
 }
 
 .nav li {
@@ -206,10 +213,12 @@ export default {
 
 /* Background image */
 .backimg {
-    width: 414px;
-    height: 300px;
+    width: 100%;
+    height: 35vh;
     background-color: rgba(255, 255, 255, 0.5);
     position: relative;
+    overflow: hidden;
+
 }
 
 .backimg img {

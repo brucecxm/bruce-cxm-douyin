@@ -18,7 +18,10 @@
     </properties>
     <dependencies>
 
-
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
 
         <!-- Sa-Token 权限认证, 在线文档：https://sa-token.cc -->
         <dependency>

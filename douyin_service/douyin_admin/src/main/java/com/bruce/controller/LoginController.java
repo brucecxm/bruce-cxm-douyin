@@ -36,7 +36,7 @@ public class LoginController extends ApiController {
      * @param user 查询实体
      * @return 所有数据
      */
-    @PostMapping("/login")
+    @PostMapping("/admin/login")
     public Result login(@RequestBody UserVo user, HttpServletResponse response, HttpSession session) {
         Assert.notNull(user.getUsername(), "用户名不能为空");
         Assert.notNull(user.getPassword(), "密码不能为空");

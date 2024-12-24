@@ -130,6 +130,22 @@ export default {
     mounted() {
 
         this.updateVideoPlayback();
+
+        // 自动发送请求给后端
+        homegetVideo().then(videoArr => {
+            console.log(videoArr);
+
+            // 校验 videoArr.data 是否存在且为非空数组
+            if (Array.isArray(videoArr.data) && videoArr.data.length > 0) {
+                this.videoboxdata = videoArr.data;
+            } else {
+                console.log('获取到的视频数据为空或格式不正确:', videoArr.data);
+                // 你可以在这里进行其他处理，比如给用户提示
+            }
+        }).catch(error => {
+            console.error('获取视频出错:', error);
+            console.log("获取视频出错  videobox中的");
+        });
     },
     methods: {
 
@@ -219,16 +235,31 @@ export default {
     line-height: 1rem;
 }
 
-
 .position {
-    /* color: white; */
     color: rgba(255, 255, 255, 0.7);
+    /* 文字颜色为半透明白色 */
     font-size: 0.4rem;
+    /* 字体大小 */
     width: 5rem;
+    /* 宽度 */
     height: 1rem;
+    /* 高度 */
     background-color: red;
+    /* 背景颜色 */
     transform: translateY(-3rem) translateX(0.5rem);
+    /* 位移 */
+
+    display: flex;
+    /* 使用flex布局 */
+    justify-content: center;
+    /* 水平居中 */
+    align-items: center;
+    /* 垂直居中 */
+
+    border-radius: 0.5rem;
+    /* 圆角 */
 }
+
 
 
 

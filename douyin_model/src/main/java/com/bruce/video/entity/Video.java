@@ -1,5 +1,7 @@
 package com.bruce.video.entity;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,8 +14,9 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 @Data
+@ApiModel(description = "视频实体类")
 public class Video implements Serializable {
-
+    @ApiModelProperty(value = "视频ID", example = "1")
     private Integer videoId;
 
     private Integer authId;

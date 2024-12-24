@@ -1,8 +1,9 @@
 <template>
     <div class="header">
-        <div class="menu" @click="triggerParentEvent"></div>
+        <div class="menu" :style="menuStyle" @click="triggerParentEvent"></div>
         <div class="nav" ref="nav">
-            <p v-for="(item, index) in navItems" :key="index" :class="{ active: activeIndex === index }"
+            <p v-for="(item, index) in navItems" :key="index"
+                :class="{ 'active': activeIndex === index, 'black-text': isBlack, 'white-text': !isBlack }"
                 @click="changeIndex(index)" ref="navItem">
                 {{ item }}
             </p>
@@ -10,7 +11,7 @@
                 <div class="underline" ref="underline" v-show="underlineVisible"></div>
             </div>
         </div>
-        <div class="search" @click="gosearch"></div>
+        <div class="search" :style="searchStyle" @click="gosearch"></div>
     </div>
 </template>
 
@@ -31,6 +32,13 @@ export default {
         return {
             navItems: ["推荐", "同城", "关注", "直播", "经验", "商城", "团购", "精选", "热点"],
             underlineVisible: true, // 控制下划线的可见性
+            isBlack: false, // 控制是否将所有文字变成黑色
+            menuStyle: { // 默认的菜单图标样式
+                backgroundImage: 'url(src/assets/home/菜单.png)',
+            },
+            searchStyle: { // 默认的搜索图标样式
+                backgroundImage: 'url(src/assets/home/放大镜.png)',
+            }
         };
     },
     methods: {
@@ -44,6 +52,27 @@ export default {
         changeIndex(index) {
             this.$emit('update:index', index);
             this.updateUnderline(); // 更新下划线位置
+
+            // 如果选择了商城、团购或经验，将所有文字变成黑色，并修改图标
+            if (this.navItems[index] === "商城" || this.navItems[index] === "团购" || this.navItems[index] === "经验"
+                || this.navItems[index] === "团购" || this.navItems[index] === "精选" || this.navItems[index] === "热点"
+            ) {
+                this.isBlack = true;
+                this.menuStyle = {
+                    backgroundImage: 'url(src/assets/home/黑菜单.png)',
+                };
+                this.searchStyle = {
+                    backgroundImage: 'url(src/assets/home/黑放大镜.png)',
+                };
+            } else {
+                this.isBlack = false;
+                this.menuStyle = {
+                    backgroundImage: 'url(src/assets/home/菜单.png)',
+                };
+                this.searchStyle = {
+                    backgroundImage: 'url(src/assets/home/放大镜.png)',
+                };
+            }
         },
         updateUnderline() {
             const underline = this.$refs.underline;
@@ -174,10 +203,17 @@ p {
     font-weight: bold;
 }
 
+.white-text {
+    color: white !important;
+}
+
+.black-text {
+    color: black !important;
+}
+
 .search {
     width: 1rem;
     height: 1rem;
-    background-image: url(../assets/home/放大镜.png);
     background-size: 0.8rem 0.8rem;
     background-repeat: no-repeat;
     margin-right: 0.5rem;
@@ -187,7 +223,6 @@ p {
 .menu {
     width: 1rem;
     height: 1rem;
-    background-image: url(../assets/home/菜单.png);
     background-size: 0.8rem 0.7rem;
     background-repeat: no-repeat;
     margin-left: 0.5rem;

@@ -8,8 +8,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @SpringBootApplication
 @EnableConfigurationProperties({JwtProperties.class})
 
-public class ProductServiceApplication {
+public class DouyinAdminService {
     public static void main(String[] args) {
-        SpringApplication.run(ProductServiceApplication.class, args);
+        SpringApplication.run(DouyinAdminService.class, args);
     }
 }

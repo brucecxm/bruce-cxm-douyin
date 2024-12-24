@@ -3,6 +3,7 @@
         <div class="order-header">
             <div class="back-button" @click="goBack">
                 <i class="icon-back"></i>
+                <i class="fas fa-arrow-left"></i>
             </div>
             <div class="order-title">全部订单</div>
             <div class="manage-auth">授权管理</div>

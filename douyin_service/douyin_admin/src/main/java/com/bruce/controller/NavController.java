@@ -21,7 +21,7 @@ import java.util.List;
  * @since 2024-11-06 00:40:08
  */
 @RestController
-@RequestMapping("nav")
+@RequestMapping("/admin/nav")
 public class NavController extends ApiController {
     /**
      * 服务对象

@@ -47,6 +47,26 @@ export default {
     watch: {
 
     },
+    mounted() {
+
+        this.updateVideoPlayback();
+
+        // 自动发送请求给后端
+        homegetVideo().then(videoArr => {
+            console.log(videoArr);
+
+            // 校验 videoArr.data 是否存在且为非空数组
+            if (Array.isArray(videoArr.data) && videoArr.data.length > 0) {
+                this.videoboxdata = videoArr.data;
+            } else {
+                console.log('获取到的视频数据为空或格式不正确:', videoArr.data);
+                // 你可以在这里进行其他处理，比如给用户提示
+            }
+        }).catch(error => {
+            console.error('获取视频出错:', error);
+            console.log("获取视频出错  videobox中的");
+        });
+    },
     data() {
         return {
             // 使用props传递数据 使用props的数据在组件中是单向传输的 但是我可以通过请求异步修改数据库中的数据 就可以了
@@ -125,10 +145,7 @@ export default {
             { color: "black", top: 3 * this.boxHeight },
         ];
     },
-    mounted() {
 
-        this.updateVideoPlayback();
-    },
     methods: {
 
         showPosition() {
@@ -208,8 +225,19 @@ export default {
     width: 5rem;
     height: 1rem;
     background-color: green;
+    color: white;
+    /* 文字颜色设置为白色 */
+    display: flex;
+    /* 使用flex布局来居中文本 */
+    justify-content: center;
+    /* 水平居中 */
+    align-items: center;
+    /* 垂直居中 */
+    border-radius: 0.5rem;
+    /* 为盒子加上圆角 */
     transform: translateY(-3rem) translateX(0.5rem);
 }
+
 
 .videoasideone {
     display: block;

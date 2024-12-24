@@ -13,6 +13,17 @@ export const homegetVideocontent = (params) => {
   return request.get("/comment/getcomment", { params });
 };
 
+// 修改 getauthzzz 函数
+export const getauthzzz = (userid) => {
+  return request.get("/video/auth", {
+    params: { userid }, // 将 userid 包装在 params 对象中
+  });
+};
+
+export const like = (params) => {
+  return request.post("/video/like", { params });
+};
+
 export const getcai = (params) => {
   return request.get("/dish/list", { params });
 };

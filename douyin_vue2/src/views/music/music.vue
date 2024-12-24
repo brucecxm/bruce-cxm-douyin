@@ -1,13 +1,14 @@
 <template>
     <div class="music">
         <div class="header">
-            <label @click="gohome" style="font-size: 1rem;">{{ '<' }}</label>
+            <i class="fas fa-arrow-left" @click="goBack"></i>
 
-                    <!-- <label>zhuanfa</label> -->
+            <!-- <label>zhuanfa</label> -->
         </div>
         <div class="musicbody">
-            <div class="imgbox"><img src="https://tencentcdn.production.link3.cc/profile_images/1722150064686" alt=""
-                    width="100%"></div>
+            <div class="imgbox"><img
+                    src="https://gips2.baidu.com/it/u=1651586290,17201034&fm=3028&app=3028&f=JPEG&fmt=auto&q=100&size=f600_800"
+                    alt="" width="100%"></div>
             <div class="geming">{{ name }}创作的原神</div>
             <div class="zuozhe">
             </div>
@@ -37,12 +38,18 @@
 </template>
 <script>
 export default {
+    created() {
+        this.musicid = this.$route.params.musicid;
+        console.log(this.musicid);
+        this.fetchItemDetails(this.musicid);
+    },
     data() {
         return {
+            musicid: "1",
             is_wanfa: false,
             name: "歌曲作者名字",
             videobox: {
-                imgurl: "https://tencentcdn.production.link3.cc/profile_images/1722150064686",
+                imgurl: "https://gips2.baidu.com/it/u=1651586290,17201034&fm=3028&app=3028&f=JPEG&fmt=auto&q=100&size=f600_800",
                 linkurl: ""
             }
 
@@ -50,6 +57,9 @@ export default {
     },
 
     methods: {
+        goBack() {
+            this.$router.go(-1); // 返回上一页
+        },
         gohome() {
             // 这里可以是跳转回主页的逻辑
             this.$router.push('/');
@@ -58,6 +68,21 @@ export default {
             //点击盒子 要导航到视频播放界面 就是要把视频的参数传上过去 就是linkurl
             //也许要写一个界面  还是前端没设计好  哪些用组件 哪些是页面
             this.$router.push(`/videodetail?type=music&videoid=${videoid}`);
+        },
+        fetchItemDetails(id) {
+            if (id) {
+                getauthzzz(id)
+                    .then(result => {
+                        console.log(result)
+                        this.auth = result.data.auth
+                        this.videobox = result.data.videobox
+                    })
+                    .catch(error => {
+                        console.error('获取认证信息出错:', error);
+                    });
+            } else {
+                console.error('用户 ID 无效');
+            }
         }
     }
 };
@@ -75,9 +100,10 @@ export default {
 }
 
 .videobody {
-    width: 380px;
+    width: 100%;
     margin: 0 auto;
     overflow: hidden;
+    padding: 0px;
 }
 
 .wanfa {
@@ -88,6 +114,7 @@ export default {
 }
 
 .header {
+    padding: 10px;
     height: 40px;
     display: flex;
     justify-content: space-between;
@@ -98,7 +125,6 @@ export default {
 .geming {
     width: 200px;
     height: 50px;
-    background-color: rgba(0, 0, 0, 0.1);
     position: absolute;
     top: 10px;
     left: 150px;
@@ -112,6 +138,7 @@ export default {
     position: absolute;
     left: 10px;
     top: 10px;
+    overflow: hidden;
 }
 
 .qu {

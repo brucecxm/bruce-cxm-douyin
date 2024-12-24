@@ -1,8 +1,7 @@
 <template>
     <div class="videoaside">
-        <div class="touxiang avatar" @click="goauth(101)">
-            <img src="//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_8fd03d785381b8f1dabc166e71f16626.jpeg?from=2956013662"
-                alt="avatar" style="width: 1.4rem;height: 1.4rem;">
+        <div class="touxiang avatar" @click="goauth(videoData.userid)">
+            <img :src="videoData.userAvatar" alt="avatar" style="width: 1.4rem;height: 1.4rem;">
         </div>
         <div class="aside like" @click="toggleLike" :class="{ 'liked': isLiked }"></div>
         <div class="num">{{ videoData.likeNum }}</div>
@@ -12,9 +11,8 @@
         <div class="num">{{ videoData.collectNum }}</div>
         <div class="aside share" @click="toggleShare" :class="{ 'clicked': isShareClicked }"></div>
         <div class="num">{{ videoData.shareNum }}</div>
-        <div class="touxiang music" @click="gomusic">
-            <img src="//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_8fd03d785381b8f1dabc166e71f16626.jpeg?from=2956013662"
-                alt="music" style="width: 1.4rem;height: 1.4rem;">
+        <div class="touxiang music" @click="gomusic(videoData.music_id)">
+            <img :src="videoData.musicAvatar" alt="music" style="width: 1.4rem;height: 1.4rem;">
         </div>
     </div>
 </template>
@@ -22,7 +20,8 @@
 <script>
 import { useTokenStore } from "../stores/token";
 import { eventBus } from '../main.ts'; // 导入事件总线
-
+import { like } from '@/api/video'
+import { Result } from "element-ui";
 export default {
     props: {
         videoData: Object
@@ -33,12 +32,15 @@ export default {
             isLiked: false, // 用于控制是否已点赞
             isCollected: false, // 用于控制是否已收藏
             isCommentClicked: false, // 用于控制评论图标点击状态
-            isShareClicked: false // 用于控制分享图标点击状态
+            isShareClicked: false,// 用于控制分享图标点击状态
+            videoDateOne: {}
         };
     },
     methods: {
         showcomment() {
             eventBus.$emit('messageSent', true);
+            eventBus.$emit('messageSent_videoid', this.videoData);
+            console.log(this.videoData)
         },
         toggleComment() {
             this.isCommentClicked = true; // 设置评论图标点击状态
@@ -53,10 +55,25 @@ export default {
         toggleLike() {
             this.isLiked = !this.isLiked; // 切换点赞状态
             this.behaviour('like');
+            var params = {};
+
+            like(this.videoData.videoId).then(
+                Result => {
+                    console.error('点赞成功:', error);
+
+                }
+            ).catch(
+                error => {
+                    console.error('点赞出错:', error);
+                }
+            )
+
         },
         toggleCollect() {
             this.isCollected = !this.isCollected; // 切换收藏状态
             this.behaviour('collect');
+
+
         },
         toggleShare() {
             this.isShareClicked = true; // 设置分享图标点击状态
@@ -73,9 +90,12 @@ export default {
             this.$router.push({ path: `/auth/${userId}` });
         },
 
-        gomusic() {
-            this.$router.push('/music');
+        gomusic(musicid) {
+            this.$router.push({ path: `/music/${musicid}` });
         },
+    },
+    mounted() {
+        this.videoDateOne = this.videoData
     }
 };
 </script>

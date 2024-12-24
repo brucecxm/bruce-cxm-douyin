@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * 菜品管理
  */
 @RestController
-@RequestMapping("/dish")
+@RequestMapping("/shop/dish")
 @Slf4j
 public class DishController {
     @Autowired

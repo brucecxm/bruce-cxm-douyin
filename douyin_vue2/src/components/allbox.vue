@@ -6,6 +6,10 @@
         <samecity-vue v-if="boxtype === '同城'"></samecity-vue>
         <followbox-vue v-if="boxtype === '关注'"></followbox-vue>
         <livebox-vue v-if="boxtype === '直播'"></livebox-vue>
+        <experiencebox v-if="boxtype === '经验'"></experiencebox>
+        <experiencebox v-if="boxtype === '团购'"></experiencebox>
+        <experiencebox v-if="boxtype === '精选'"></experiencebox>
+        <experiencebox v-if="boxtype === '热点'"></experiencebox>
 
     </div>
 </template>
@@ -16,6 +20,7 @@ import liveboxVue from './livebox.vue';
 import samecityVue from './samecity.vue';
 import shopboxVue from './shopbox.vue';
 import videoboxVue from './videobox.vue';
+import experiencebox from './experiencebox.vue';
 
 export default {
     props: {
@@ -35,7 +40,9 @@ export default {
         shopboxVue,
         samecityVue,
         followboxVue,
-        liveboxVue
+        liveboxVue,
+        shopboxVue,
+        experiencebox
 
     },
     methods: {

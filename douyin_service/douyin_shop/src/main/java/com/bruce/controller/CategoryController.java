@@ -21,7 +21,7 @@ import java.util.List;
  * 分类管理
  */
 @RestController
-@RequestMapping("/category")
+@RequestMapping("/shop/category")
 @Slf4j
 public class CategoryController {
     @Autowired

@@ -3,7 +3,7 @@ server:
 spring:
   application:
     #应用的名称，可选
-    name: reggie_take_out
+    name: DouyinShopService
   datasource:
     username: root
     password: root
@@ -45,3 +45,10 @@ sa-token:
     password:
     # 连接超时时间
     timeout: 10s
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:10086/eureka  # Eureka服务器地址
+

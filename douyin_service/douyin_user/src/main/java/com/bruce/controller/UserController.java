@@ -111,11 +111,11 @@ private  UserService userService;
         // 此处仅作模拟示例，真实项目需要从数据库中查询数据进行比对
         // 获取当前会话的 token 值
        String token= StpUtil.getTokenValue();
-        if(user.getNickname().equals(username) && user.getPassword().equals(password)) {
+        if(user.getUsername().equals(username) && user.getPassword().equals(password)) {
             StpUtil.login(user.getId(),"PC");
             StpUtil.getSession().set("user", user);
-
-            return Result.success(token);
+            System.out.println("sss");
+            return Result.success("sssssssssssssssssssssssssssssss");
         }
         return  Result.error("登录失败");
     }

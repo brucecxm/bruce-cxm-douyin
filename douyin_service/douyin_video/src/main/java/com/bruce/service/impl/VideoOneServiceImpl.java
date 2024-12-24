@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * (Video)表服务实现类
@@ -27,10 +28,11 @@ public class VideoOneServiceImpl implements VideoOneService {
     private VideoOneDao videoOneDao;
 
     @Override
-    public List<VideoOne> getVideoInfo( int page, int size) {
+    public List<Map> getVideoInfo(int page, int size) {
         int limit = size;
         int offset = (page - 1) * size;
-        return videoOneDao.queryVideoInfo(limit, offset);
+        List<Map> one =videoOneDao.queryVideoInfo(limit, offset);
+        return one ;
     }
 
 //    @Override

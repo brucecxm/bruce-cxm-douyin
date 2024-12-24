@@ -11,7 +11,7 @@
 
             </div>
             <div class="videoarticle">
-                <videoarticle-vue></videoarticle-vue>
+                <videoarticle-vue :video-data="videoboxdata[index]"></videoarticle-vue>
 
             </div>
 
@@ -49,6 +49,7 @@ export default {
             // 使用props传递数据 使用props的数据在组件中是单向传输的 但是我可以通过请求异步修改数据库中的数据 就可以了
             videoboxdata: [
                 {
+                    videoid: "1",
                     videoUrl: "https://vdept3.bdstatic.com/mda-qkhekcm1quetqsm3/360p/h264/1731925121198299454/mda-qkhekcm1quetqsm3.mp4?v_from_s=hkapp-haokan-nanjing&auth_key=1734113109-0-0-c8ebeb78681daafa698ec0145326c037&bcevod_channel=searchbox_feed&cr=0&cd=0&pd=1&pt=3&logid=0309796217&vid=11209263194208596039&klogid=0309796217&abtest=122021_2",
 
                     videoArticle: "",
@@ -62,6 +63,7 @@ export default {
                     musicName: ""
                 },
                 {
+                    videoid: "2",
                     videoUrl: "https://vdept3.bdstatic.com/mda-qkhekcm1quetqsm3/360p/h264/1731925121198299454/mda-qkhekcm1quetqsm3.mp4?v_from_s=hkapp-haokan-nanjing&auth_key=1734113109-0-0-c8ebeb78681daafa698ec0145326c037&bcevod_channel=searchbox_feed&cr=0&cd=0&pd=1&pt=3&logid=0309796217&vid=11209263194208596039&klogid=0309796217&abtest=122021_2",
 
                     videoArticle: "",
@@ -74,6 +76,7 @@ export default {
                     musicAvatar: "",
                     musicName: ""
                 }, {
+                    videoid: "3",
                     videoUrl: "https://vdept3.bdstatic.com/mda-qkhekcm1quetqsm3/360p/h264/1731925121198299454/mda-qkhekcm1quetqsm3.mp4?v_from_s=hkapp-haokan-nanjing&auth_key=1734113109-0-0-c8ebeb78681daafa698ec0145326c037&bcevod_channel=searchbox_feed&cr=0&cd=0&pd=1&pt=3&logid=0309796217&vid=11209263194208596039&klogid=0309796217&abtest=122021_2",
 
                     videoArticle: "",
@@ -86,6 +89,7 @@ export default {
                     musicAvatar: "",
                     musicName: ""
                 }, {
+                    videoid: "4",
                     videoUrl: "https://vdept3.bdstatic.com/mda-qkhekcm1quetqsm3/360p/h264/1731925121198299454/mda-qkhekcm1quetqsm3.mp4?v_from_s=hkapp-haokan-nanjing&auth_key=1734113109-0-0-c8ebeb78681daafa698ec0145326c037&bcevod_channel=searchbox_feed&cr=0&cd=0&pd=1&pt=3&logid=0309796217&vid=11209263194208596039&klogid=0309796217&abtest=122021_2",
 
                     videoArticle: "",
@@ -133,7 +137,7 @@ export default {
             if (Array.isArray(videoArr.data) && videoArr.data.length > 0) {
                 this.videoboxdata = videoArr.data;
             } else {
-                console.warn('获取到的视频数据为空或格式不正确:', videoArr.data);
+                console.log('获取到的视频数据为空或格式不正确:', videoArr.data);
                 // 你可以在这里进行其他处理，比如给用户提示
             }
         }).catch(error => {

@@ -3,6 +3,7 @@
         <div class="recharge-header">
             <div class="back-button" @click="goBack">
                 <i class="icon-back"></i>
+                <i class="fas fa-arrow-left"></i>
             </div>
             <div class="recharge-title">充值中心</div>
             <div class="help-center">帮助中心</div>

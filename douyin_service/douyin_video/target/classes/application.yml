@@ -12,9 +12,24 @@ spring:
     password: root
     url: jdbc:mysql://localhost:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
 
+
 server:
   port: 9573
 eureka:
   client:
     service-url:
       defaultZone: http://127.0.0.1:10086/eureka
+
+
+logging:
+  level:
+    org.mybatis: DEBUG     # 打印 MyBatis 执行的 SQL
+    java.sql: DEBUG        # 打印 JDBC 执行的 SQL（包括参数）
+    jdbc.sqlonly: DEBUG    # 打印 SQL 查询语句
+    jdbc.resultset: DEBUG  # 打印 JDBC 查询结果集
+    jdbc.statement: DEBUG  # 打印 JDBC 执行的语句
+
+
+mybatis:
+  configuration:
+    log-impl: SLF4J   # 使用 SLF4J 作为 MyBatis 日志实现

@@ -23,7 +23,7 @@ import java.util.Map;
  */
 @Slf4j
 @RestController
-@RequestMapping("/addressBook")
+@RequestMapping("/shop/addressBook")
 public class AddressBookController {
 
 

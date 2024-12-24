@@ -21,7 +21,7 @@ import java.util.List;
  * @since 2024-11-26 17:41:36
  */
 @RestController
-@RequestMapping("user")
+@RequestMapping("/admin/user")
 public class UserController extends ApiController {
     /**
      * 服务对象

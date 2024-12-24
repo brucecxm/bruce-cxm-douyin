@@ -3,17 +3,17 @@ import request from "@/utils/request.js";
 // params 处理get请求  data处理post请求
 
 export const shoplist = () => {
-  return request.get("/dish/list");
+  return request.get("/shop/dish/list");
 };
 export const searchForDish = (name) => {
-  return request.get(`/dish/sear/${name}`);
+  return request.get(`/shop/dish/sear/${name}`);
 };
 export const liansearchForDish = (name) => {
-  return request.get(`/dish/liansear/${name}`);
+  return request.get(`/shop/dish/liansear/${name}`);
 };
 
 export const shoplistpage = (page = 1, pageSize = 10) => {
-  return request.get("/dish/page", {
+  return request.get("/shop/dish/page", {
     params: {
       page: page, // 当前页码
       pageSize: pageSize, // 每页条数
@@ -22,7 +22,7 @@ export const shoplistpage = (page = 1, pageSize = 10) => {
   });
 };
 export const getnav = (page = 1, pageSize = 10) => {
-  return request.get("/fileImg", {
+  return request.get("/shop/fileImg", {
     params: {
       page: page, // 当前页码
       pageSize: pageSize, // 每页条数

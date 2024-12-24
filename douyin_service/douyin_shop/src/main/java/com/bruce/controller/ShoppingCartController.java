@@ -18,7 +18,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/shoppingCart")
+@RequestMapping("/shop/shoppingCart")
 public class ShoppingCartController {
 
     @Autowired

@@ -21,7 +21,7 @@ import java.util.List;
  * @since 2024-11-05 23:56:50
  */
 @RestController
-@RequestMapping("/menu")
+@RequestMapping("/admin/menu")
 public class MenuController extends ApiController {
     /**
      * 服务对象

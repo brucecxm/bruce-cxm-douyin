@@ -13,6 +13,10 @@
                             {{ lian.name }}
                         </li>
                         <li>ssss</li>
+                        <li>ssss</li>
+                        <li>ssss</li>
+                        <li>ssss</li>
+                        <li>ssss</li>
                     </ul>
                 </div>
             </div>
@@ -53,7 +57,7 @@
 import { shoplist, searchForDish, liansearchForDish, shoplistpage, getnav } from "@/api/shop"
 import { shopmenulist } from "@/api/menu"
 import { shopnavlist } from "@/api/menu"
-import { useTokenStore } from "../../stores/token"
+import { useTokenStore } from "@/stores/token"
 import footerVue from '@/components/footer.vue'
 import img1 from '@/assets/shop/menunav/1.png';
 import img2 from '@/assets/shop/menunav/2.png';
@@ -254,8 +258,52 @@ export default {
 
 <style scoped>
 .lian {
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa;
+    /* 背景色 */
+    border-radius: 8px;
+    /* 圆角 */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    /* 阴影效果 */
+    padding: 10px 15px;
+    /* 内边距 */
+    max-width: 300px;
+    /* 最大宽度 */
+    width: 100%;
+    /* 宽度自适应 */
+    font-family: 'Arial', sans-serif;
+    /* 字体 */
+    text-align: left;
 }
+
+.lian ul {
+    list-style-type: none;
+    /* 去除默认的列表样式 */
+    padding: 0;
+    margin: 0;
+}
+
+.lian li {
+    padding: 8px;
+    /* 每个列表项的内边距 */
+    font-size: 14px;
+    /* 字体大小 */
+    color: #333;
+    /* 字体颜色 */
+    cursor: pointer;
+    /* 鼠标指针效果 */
+    transition: background-color 0.3s, color 0.3s;
+    /* 平滑过渡 */
+}
+
+.lian li:hover {
+    background-color: #f0f0f0;
+    /* 悬停背景色 */
+    color: #007bff;
+    /* 悬停字体颜色 */
+}
+
+
+
 
 html,
 body {
@@ -271,6 +319,7 @@ body {
     display: block;
     position: relative;
     overflow: hidden;
+    background-color: white;
     /* 确保 shop 不会滚动 */
 }
 

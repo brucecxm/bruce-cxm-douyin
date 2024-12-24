@@ -2,7 +2,7 @@
     <div class="message-page">
         <div class="message-header">
             <div class="back-button" @click="goBack">
-                <i class="icon-back"></i>
+                <i class="fas fa-arrow-left"></i>
             </div>
             <div class="message-title">购物消息</div>
             <div class="settings" @click="goToSettings">

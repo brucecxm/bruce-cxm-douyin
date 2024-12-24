@@ -2,10 +2,10 @@
     <div class="product-page">
         <!-- Header -->
         <header :class="{ 'sticky': isSticky }">
-            <div class="header-content">
-                <i class="fas fa-arrow-left"></i>
-                <i class="fas fa-heart"></i>
-                <i class="fas fa-share-alt"></i>
+            <div class="icons">
+                <div class="icon arrow" @click="goBack"></div>
+                <div class="icon heart"></div>
+                <div class="icon share"></div>
             </div>
         </header>
 
@@ -89,6 +89,7 @@
 </template>
 
 <script>
+
 export default {
     data() {
         return {
@@ -107,6 +108,9 @@ export default {
         };
     },
     methods: {
+        goBack() {
+            this.$router.go(-1); // 返回上一页
+        },
         handleScroll() {
             this.isSticky = window.scrollY > 0;
         },
@@ -180,6 +184,8 @@ header.sticky {
 }
 
 .header-content {
+    color: #333;
+    /* 确保图标的颜色 */
     display: flex;
     justify-content: space-between;
     padding: 15px 20px;
@@ -403,5 +409,58 @@ footer {
 .add-cart:hover,
 .buy-now:hover {
     background-color: #e65c00;
+}
+
+
+
+
+
+.header-content {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    font-family: Arial, sans-serif;
+}
+
+.icons {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.icon {
+    width: 30px;
+    height: 30px;
+    position: relative;
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Arrow Icon */
+.icon.arrow::before {
+    content: '<';
+    font-size: 30px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Heart Icon */
+.icon.heart::before {
+    content: '\2665';
+    /* Unicode for heart */
+    font-size: 30px;
+    color: #ff6a00;
+}
+
+/* Share Icon */
+.icon.share::before {
+    content: '\2194';
+    /* Unicode for left-right arrow (share icon) */
+    font-size: 30px;
+    color: #4caf50;
 }
 </style>

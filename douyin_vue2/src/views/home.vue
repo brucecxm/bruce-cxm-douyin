@@ -17,13 +17,13 @@
             <!-- 容器div，包含鼠标和触摸事件监听 -->
             <div class="videomain">
                 <!-- 循环渲染每个box，设置样式 -->
-                <div v-for="( box, index ) in  boxes " :key="index" class="box"
+                <div v-for="( box, index ) in boxes " :key="index" class="box"
                     :style="{ left: box.left * 0.1 + 'vw', backgroundColor: box.color, width: boxWidth * 0.1 + 'vw', height: boxHeight + 'vh' }">
                     <!-- <div class="videobox"><videobox-vue></videobox-vue></div> -->
                     <div class="videobox"><all-box-vue :boxtype="boxes[index].boxtest"></all-box-vue></div>
                 </div>
             </div>
-            <pinglunqu class="lpinglunqu" v-show="message"></pinglunqu>
+            <pinglunqu class="lpinglunqu" v-if="message"></pinglunqu>
 
 
             <footer-vue></footer-vue>
@@ -83,11 +83,11 @@ export default {
             { color: "blue", left: this.boxWidth, boxtest: "同城" },
             { color: "yellow", left: 2 * this.boxWidth, boxtest: "关注" },
             { color: "pink", left: 3 * this.boxWidth, boxtest: "直播" },
-            { color: "pink", left: 4 * this.boxWidth, boxtest: "同城" },
-            { color: "pink", left: 5 * this.boxWidth, boxtest: "同城" },
-            { color: "pink", left: 6 * this.boxWidth, boxtest: "同城" },
-            { color: "pink", left: 7 * this.boxWidth, boxtest: "同城" },
-            { color: "pink", left: 8 * this.boxWidth, boxtest: "同城" },
+            { color: "pink", left: 4 * this.boxWidth, boxtest: "经验" },
+            { color: "white", left: 5 * this.boxWidth, boxtest: "商城" },
+            { color: "pink", left: 6 * this.boxWidth, boxtest: "团购" },
+            { color: "pink", left: 7 * this.boxWidth, boxtest: "精选" },
+            { color: "pink", left: 8 * this.boxWidth, boxtest: "热点" },
         ];
         eventBus.$on('messageSent', (msg) => {
             this.message = msg;

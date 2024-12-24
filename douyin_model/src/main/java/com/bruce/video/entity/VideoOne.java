@@ -1,5 +1,8 @@
 package com.bruce.video.entity;
 
+import lombok.Data;
+
+@Data
 public class VideoOne {
     private String videoUrl;
     private String videoArticle;
@@ -12,6 +15,25 @@ public class VideoOne {
     private String musicAvatar;
     private String musicName;
 
+    public String getUserid() {
+        return userid;
+    }
+
+    public void setUserid(String userid) {
+        this.userid = userid;
+    }
+
+    private String userid;
+
+    public String getVideoid() {
+        return videoid;
+    }
+
+    public void setVideoid(String videoid) {
+        this.videoid = videoid;
+    }
+
+    private String videoid;
     // Getters and Setters
 
     public String getVideoUrl() {

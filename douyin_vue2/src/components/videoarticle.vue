@@ -1,13 +1,16 @@
 <template>
     <div class="videoarticle" @click="testone">
-        <div class="username">{{ username }}</div>
-        <div class="article">{{ article }}</div>
+        <div class="username" @click="goauth(videoData.userid)"> {{ videoData.username }}</div>
+        <div div class=" article">{{ videoData.video_comment }}</div>
     </div>
 </template>
 
 <script>
 
 export default {
+    props: {
+        videoData: Object
+    },
     data() {
         return {
             article: "感谢穿越火线感谢穿越火线感谢穿越火线",
@@ -17,7 +20,10 @@ export default {
     methods: {
         testone() {
             console.log("sssssss")
-        }
+        },
+        goauth(userId) {
+            this.$router.push({ path: `/auth/${userId}` });
+        },
     }
 
 };
