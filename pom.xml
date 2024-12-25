@@ -141,6 +141,15 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 指定当前模块的主类 -->
+                    <mainClass>com.bruce.eruka.EurekaApplication</mainClass>
+                    <mainClass>com.bruce.DouyinGatewayApplication</mainClass>
+                    <mainClass>com.bruce.DouyinAdminService</mainClass>
+                    <mainClass>com.bruce.DouyinArticleApplication</mainClass>
+                    <mainClass>com.bruce.DouyinUserApplication</mainClass>
+                    <mainClass>com.bruce.DouyinVideoApplication</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>
