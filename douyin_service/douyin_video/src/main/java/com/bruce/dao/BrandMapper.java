@@ -1,6 +1,7 @@
 package com.bruce.dao;
 
-import com.bruce.video.entity.Brand;
+
+import com.bruce.entity.Brand;
 
 import java.util.List;
 

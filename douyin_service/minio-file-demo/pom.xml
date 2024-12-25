@@ -13,11 +13,12 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-<dependencies>
+
+    <dependencies>
     <dependency>
         <!--引入了它就可以不用引入mybatis了，因为mybatis-plus帮我们引入了mybatis相关依赖，引入了之后也可以正常使用mybatis -->
         <groupId>com.baomidou</groupId>

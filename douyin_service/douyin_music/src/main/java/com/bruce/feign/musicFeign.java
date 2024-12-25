@@ -3,7 +3,7 @@ package com.bruce.feign;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.api.ApiController;
-import com.bruce.music.entity.Music;
+import com.bruce.entity.Music;
 import com.bruce.service.MusicService;
 import org.springframework.web.bind.annotation.*;
 

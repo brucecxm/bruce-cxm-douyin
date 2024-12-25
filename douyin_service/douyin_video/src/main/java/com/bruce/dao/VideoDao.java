@@ -1,11 +1,8 @@
 package com.bruce.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.bruce.video.entity.Video;
-import com.bruce.video.entity.VideoOne;
-import com.bruce.video.entity.test;
+import com.bruce.entity.Video;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 /**
  * (Video)表数据库访问层

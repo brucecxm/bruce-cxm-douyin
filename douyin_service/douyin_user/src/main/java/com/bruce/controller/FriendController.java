@@ -9,8 +9,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.dao.chatInfoDao;
 import com.bruce.entity.Friend;
 import com.bruce.pojo.UserVideoDTO;
+import com.bruce.pojo.Video;
 import com.bruce.service.FriendService;
-import com.bruce.video.entity.Video;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,9 +1,8 @@
 package com.bruce.service;
 
+
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.bruce.video.entity.Video;
-import com.bruce.video.entity.VideoOne;
-import org.apache.ibatis.annotations.Param;
+import com.bruce.entity.Video;
 
 /**
  * (Video)表服务接口

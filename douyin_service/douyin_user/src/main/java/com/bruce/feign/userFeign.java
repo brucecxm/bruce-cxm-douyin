@@ -3,7 +3,6 @@ package com.bruce.feign;
 
 
 
-import com.bruce.user.pojo.User;
 import com.bruce.service.UserService;
 import org.springframework.web.bind.annotation.*;
 

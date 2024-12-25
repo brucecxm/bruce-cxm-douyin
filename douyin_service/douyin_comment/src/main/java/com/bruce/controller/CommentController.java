@@ -7,9 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.bruce.comment.entity.Comment;
 import com.bruce.dto.CommentDto;
-import com.bruce.service.CommentService;
 import com.bruce.service.CommentoneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -97,17 +95,17 @@ private CommentoneService commentoneservice;
 
     /**
      * 服务对象
-     */
-    @Resource
-    private CommentService commentService;
-
-    @GetMapping("/getcomment")
-    public R getData(@RequestParam int videoId) {
-      System.out.println(videoId);
-        LambdaQueryWrapper<Comment> queryWrapper=new LambdaQueryWrapper();
-        queryWrapper.eq(Comment::getCommentVideoId,videoId);
-        return success(this.commentService.list(queryWrapper));
-    }
+//     */
+//    @Resource
+//    private CommentService commentService;
+//
+//    @GetMapping("/getcomment")
+//    public R getData(@RequestParam int videoId) {
+//      System.out.println(videoId);
+//        LambdaQueryWrapper<Comment> queryWrapper=new LambdaQueryWrapper();
+//        queryWrapper.eq(Comment::getCommentVideoId,videoId);
+//        return success(this.commentService.list(queryWrapper));
+//    }
 
 }
 

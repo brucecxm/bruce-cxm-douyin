@@ -5,8 +5,6 @@ import com.bruce.dao.VideoDao;
 import com.bruce.dao.VideoOneDao;
 import com.bruce.service.VideoOneService;
 import com.bruce.service.VideoService;
-import com.bruce.video.entity.Video;
-import com.bruce.video.entity.VideoOne;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

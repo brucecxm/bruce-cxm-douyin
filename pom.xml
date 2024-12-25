@@ -20,8 +20,8 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.cloud.version>Hoxton.SR10</spring.cloud.version>
         <mybatisplus.version>3.4.2</mybatisplus.version>
@@ -91,7 +91,14 @@
         </dependency>
     </dependencies>
     <dependencyManagement>
+
+
         <dependencies>
+            <dependency>
+                <groupId>org.example</groupId>
+                <artifactId>douyin_feign</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>

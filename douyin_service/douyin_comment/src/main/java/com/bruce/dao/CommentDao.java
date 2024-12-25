@@ -1,7 +1,7 @@
 package com.bruce.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.bruce.comment.entity.Comment;
+import com.bruce.entity.Comment;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

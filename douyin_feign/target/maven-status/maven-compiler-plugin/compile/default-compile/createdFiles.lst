@@ -1,2 +1,2 @@
-com\bruce\user\UserClient.class
-com\bruce\music\MusicClient.class
+com\bruce\entity\Friend.class
+com\bruce\entity\User.class

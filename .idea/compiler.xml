@@ -17,7 +17,6 @@
         <module name="douyin_sms" />
         <module name="douyin_gateway" />
         <module name="douyin_behavior" />
-        <module name="douyin_satoken" />
         <module name="douyin_video" />
         <module name="minio-file-demo" />
         <module name="douyin_search" />
@@ -35,6 +34,9 @@
         <module name="douyin_Designpatterns" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="douyin_satoken" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">

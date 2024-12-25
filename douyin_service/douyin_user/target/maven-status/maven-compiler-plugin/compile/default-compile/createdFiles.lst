@@ -1,0 +1,14 @@
+com\bruce\pojo\UserInfo.class
+com\bruce\mapper\UserMapper.class
+com\bruce\pojo\Result.class
+com\bruce\controller\FriendController.class
+com\bruce\service\impl\FriendServiceImpl.class
+com\bruce\pojo\Video.class
+com\bruce\pojo\PageBean.class
+com\bruce\dao\FriendDao.class
+com\bruce\service\FriendService.class
+com\bruce\dao\chatInfoDao.class
+com\bruce\pojo\UserVideoDTO.class
+com\bruce\controller\UserController.class
+com\bruce\feign\userFeign.class
+com\bruce\pojo\User.class

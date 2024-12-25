@@ -1,7 +1,6 @@
 package com.bruce.pojo;
 
 import com.bruce.entity.User;
-import com.bruce.video.entity.Video;
 
 import java.util.List;
 

@@ -3,7 +3,6 @@ package com.bruce.feign;
 
 
 import com.baomidou.mybatisplus.extension.api.ApiController;
-import com.bruce.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,10 +16,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/feigncomment")
 public class commentFeign extends ApiController {
     /**
-     * 服务对象
-     */
-    @Autowired
-    private CommentService commentService;
+//     * 服务对象
+//     */
+//    @Autowired
+//    private CommentService commentService;
 
 
 }

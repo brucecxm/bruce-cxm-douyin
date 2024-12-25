@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.bruce.music.entity.Music;
+import com.bruce.entity.Music;
 import com.bruce.service.MusicService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,11 +51,6 @@ public class MusicController extends ApiController {
      * @param music 查询实体
      * @return 所有数据
      */
-    @GetMapping
-
-    public R selectAll( Page<Music> page, Music music) {
-        return success(this.musicService.page(page, new QueryWrapper<>(music)));
-    }
 
     /**
      * 通过主键查询单条数据
@@ -74,10 +69,10 @@ public class MusicController extends ApiController {
      * @param music 实体对象
      * @return 新增结果
      */
-    @PostMapping
-    public R insert(@RequestBody Music music) {
-        return success(this.musicService.save(music));
-    }
+//    @PostMapping
+//    public R insert(@RequestBody Music music) {
+//        return success(this.musicService.save(music));
+//    }
 
     /**
      * 修改数据
@@ -85,10 +80,10 @@ public class MusicController extends ApiController {
      * @param music 实体对象
      * @return 修改结果
      */
-    @PutMapping
-    public R update(@RequestBody Music music) {
-        return success(this.musicService.updateById(music));
-    }
+//    @PutMapping
+//    public R update(@RequestBody Music music) {
+//        return success(this.musicService.updateById(music));
+//    }
 
     /**
      * 删除数据

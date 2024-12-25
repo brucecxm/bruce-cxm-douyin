@@ -1,9 +1,8 @@
 package com.bruce.dao;
 
+import com.bruce.entity.User;
 import com.bruce.pojo.ChatInfo;
 import com.bruce.pojo.UserVideoDTO;
-import com.bruce.user.pojo.User;
-import com.bruce.video.entity.Video;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

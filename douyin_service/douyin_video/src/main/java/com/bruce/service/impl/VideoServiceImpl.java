@@ -2,9 +2,8 @@ package com.bruce.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bruce.dao.VideoDao;
-import com.bruce.video.entity.Video;
+import com.bruce.entity.Video;
 import com.bruce.service.VideoService;
-import com.bruce.video.entity.VideoOne;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

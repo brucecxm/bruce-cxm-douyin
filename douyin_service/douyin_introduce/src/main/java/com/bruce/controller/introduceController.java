@@ -3,7 +3,6 @@ package com.bruce.controller;
 
 import com.bruce.annotation.RateLimit;
 import com.bruce.config.RabbitMQConfig;
-import com.bruce.filter.GlobalFilterooo;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,15 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/introduce")
 public class introduceController {
 
-    @Autowired
-private GlobalFilterooo globalFilterooo;
-
-    @GetMapping("/limited")
-    @RateLimit(value = 10, period = 60)
-    public String limitedApi() {
-        globalFilterooo.testFilter();
-        return "API 访问成功";
-    }
 
 
 

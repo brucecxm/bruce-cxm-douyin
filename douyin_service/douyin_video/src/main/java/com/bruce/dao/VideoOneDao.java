@@ -1,10 +1,6 @@
 package com.bruce.dao;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.bruce.video.entity.Result;
-import com.bruce.video.entity.Video;
-import com.bruce.video.entity.VideoOne;
-import com.bruce.video.entity.test;
+import com.bruce.entity.VideoOne;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

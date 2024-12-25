@@ -1,6 +1,6 @@
 package com.bruce.exception;
 
-import com.bruce.video.entity.Result;
+import com.bruce.entity.Result;
 import org.springframework.amqp.AmqpConnectException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

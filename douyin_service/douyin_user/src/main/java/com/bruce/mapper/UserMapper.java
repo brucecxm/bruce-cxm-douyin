@@ -1,6 +1,6 @@
 package com.bruce.mapper;
 
-import com.bruce.user.pojo.User;
+import com.bruce.entity.User;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;

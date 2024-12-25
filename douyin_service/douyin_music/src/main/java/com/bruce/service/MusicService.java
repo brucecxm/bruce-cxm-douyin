@@ -1,7 +1,7 @@
 package com.bruce.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.bruce.music.entity.Music;
+import com.bruce.entity.Music;
 
 /**
  * (Music)表服务接口
