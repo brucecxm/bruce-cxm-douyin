@@ -9,7 +9,7 @@ spring:
 
 
 server:
-  port: 9003
+  port: 9059
 eureka:
   client:
     service-url:
