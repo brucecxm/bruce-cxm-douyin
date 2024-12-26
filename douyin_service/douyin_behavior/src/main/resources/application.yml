@@ -2,7 +2,7 @@
 spring:
   application:
     # 应用的名称，可选
-    name: DouyinChatService  # 设置应用名称为 DouyinUserService
+    name: DouyinBehaviorService  # 设置应用名称为 DouyinUserService
   datasource:
     url: jdbc:mysql://localhost:3306/douyinComment?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
     type: com.alibaba.druid.pool.DruidDataSource

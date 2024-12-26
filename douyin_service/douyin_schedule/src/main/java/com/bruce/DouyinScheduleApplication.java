@@ -14,16 +14,6 @@ public class DouyinScheduleApplication {
         SpringApplication.run(DouyinScheduleApplication.class);
     }
 
-    /**
-     * mybatis-plus乐观锁支持
-     * @return
-     */
-    @Bean
-    public MybatisPlusInterceptor optimisticLockerInterceptor(){
-        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-        interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
-        return interceptor;
-    }
 
 
 

@@ -5,7 +5,7 @@
 
 
 
-    <bean id="testbean" class="com.spring.testbean"></bean>
+    <bean id="testbean" class="com.bruce.testbean"></bean>
 
 
 

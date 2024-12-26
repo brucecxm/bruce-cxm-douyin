@@ -87,7 +87,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.20</version>
+            <version>1.18.30</version>
         </dependency>
     </dependencies>
     <dependencyManagement>
@@ -150,12 +150,25 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <!-- 指定当前模块的主类 -->
-                    <mainClass>com.bruce.eruka.EurekaApplication</mainClass>
+                    <mainClass>com.bruce.EurekaApplication</mainClass>
                     <mainClass>com.bruce.DouyinGatewayApplication</mainClass>
                     <mainClass>com.bruce.DouyinAdminService</mainClass>
                     <mainClass>com.bruce.DouyinArticleApplication</mainClass>
+                    <mainClass>com.bruce.DouyinBehaviorService</mainClass>
+                    <mainClass>com.bruce.DouyinChatService</mainClass>
+                    <mainClass>com.bruce.DouyinCommentApplication</mainClass>
+                    <mainClass>com.bruce.DouyinFileService</mainClass>
+                    <mainClass>com.bruce.DouyinIntroduceApplication</mainClass>
+                    <mainClass>com.bruce.DouyinMusicApplication</mainClass>
+                    <mainClass>com.bruce.DouyinScheduleApplication</mainClass>
+                    <mainClass>com.bruce.DouyinSearchApplication</mainClass>
+                    <mainClass>com.bruce.DouyinShopApplication</mainClass>
                     <mainClass>com.bruce.DouyinUserApplication</mainClass>
                     <mainClass>com.bruce.DouyinVideoApplication</mainClass>
+                    <mainClass>com.bruce.minioApplication</mainClass>
+                    <mainClass>com.bruce.smsApplication</mainClass>
+                    <mainClass>com.bruce.DouyinSpringApplication</mainClass>
+                    <mainClass>com.bruce.SaSsoServerApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>

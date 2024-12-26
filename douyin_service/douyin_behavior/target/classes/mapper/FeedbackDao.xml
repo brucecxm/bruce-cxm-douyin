@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.two.douyinComment.dao.FeedbackDao">
+<mapper namespace="com.bruce.dao.FeedbackDao">
 
-    <resultMap type="com.two.douyinComment.entity.Feedback" id="FeedbackMap">
+    <resultMap type="com.bruce.entity.Feedback" id="FeedbackMap">
         <result property="id" column="id" jdbcType="VARCHAR"/>
         <result property="userId" column="user_id" jdbcType="VARCHAR"/>
         <result property="username" column="username" jdbcType="VARCHAR"/>
