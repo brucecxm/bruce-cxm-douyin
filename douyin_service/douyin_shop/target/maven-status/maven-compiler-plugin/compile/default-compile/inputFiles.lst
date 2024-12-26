@@ -23,6 +23,7 @@ F:\GitHub\bruce-cxm-douyin\douyin_service\douyin_shop\src\main\java\com\bruce\co
 F:\GitHub\bruce-cxm-douyin\douyin_service\douyin_shop\src\main\java\com\bruce\entity\Category.java
 F:\GitHub\bruce-cxm-douyin\douyin_service\douyin_shop\src\main\java\com\bruce\controller\OrderDetailController.java
 F:\GitHub\bruce-cxm-douyin\douyin_service\douyin_shop\src\main\java\com\bruce\service\FileImgService.java
+F:\GitHub\bruce-cxm-douyin\douyin_service\douyin_shop\src\main\java\com\bruce\DouyinShopApplication.java
 F:\GitHub\bruce-cxm-douyin\douyin_service\douyin_shop\src\main\java\com\bruce\config\WebMvcConfig.java
 F:\GitHub\bruce-cxm-douyin\douyin_service\douyin_shop\src\main\java\com\bruce\controller\SetmealController.java
 F:\GitHub\bruce-cxm-douyin\douyin_service\douyin_shop\src\main\java\com\bruce\service\CouponService.java
@@ -84,6 +85,5 @@ F:\GitHub\bruce-cxm-douyin\douyin_service\douyin_shop\src\main\java\com\bruce\co
 F:\GitHub\bruce-cxm-douyin\douyin_service\douyin_shop\src\main\java\com\bruce\controller\DishController.java
 F:\GitHub\bruce-cxm-douyin\douyin_service\douyin_shop\src\main\java\com\bruce\service\impl\DishServiceImpl.java
 F:\GitHub\bruce-cxm-douyin\douyin_service\douyin_shop\src\main\java\com\bruce\service\impl\SetmealDishServiceImpl.java
-F:\GitHub\bruce-cxm-douyin\douyin_service\douyin_shop\src\main\java\com\bruce\DouyinShopService.java
 F:\GitHub\bruce-cxm-douyin\douyin_service\douyin_shop\src\main\java\com\bruce\mapper\ShoppingCartMapper.java
 F:\GitHub\bruce-cxm-douyin\douyin_service\douyin_shop\src\main\java\com\bruce\service\impl\SetmealServiceImpl.java
