@@ -78,10 +78,7 @@
         <artifactId>spring-boot-starter-web</artifactId>
         <scope>compile</scope>
     </dependency>
-    <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-    </dependency>
+
 
 </dependencies>
 </project>
