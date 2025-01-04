@@ -14,22 +14,10 @@ spring:
           uri: lb://DouyinUserService
           predicates:
             - Path=/user/**
-        - id: DouyinVideoService
-          uri: lb://DouyinVideoService
-          predicates:
-            - Path=/video/**
         - id: DouyinAdminService
           uri: lb://DouyinAdminService
           predicates:
             - Path=/admin/**
-        - id: DouyinVideoService
-          uri: lb://DouyinVideoService
-          predicates:
-            - Path=/music/**
-        - id: DouyinCommentService
-          uri: lb://DouyinCommentService
-          predicates:
-            - Path=/comment/**
         - id: DouyinChatService
           uri: lb://DouyinChatService
           predicates:
@@ -38,6 +26,10 @@ spring:
           uri: lb://DouyinShopService
           predicates:
             - Path=/shop/**
+        - id: DouyinVideoService
+          uri: lb://DouyinVideoService
+          predicates:
+            - Path=/video/**,/music/**,/comment/**
 
       discovery:
         locator:

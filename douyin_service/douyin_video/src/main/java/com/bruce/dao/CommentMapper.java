@@ -1,4 +1,4 @@
-package com.bruce.mapper;
+package com.bruce.dao;
 
 import com.bruce.dto.CommentDto;
 import org.apache.ibatis.annotations.Mapper;

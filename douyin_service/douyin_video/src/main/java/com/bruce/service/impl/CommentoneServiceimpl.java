@@ -1,7 +1,7 @@
 package com.bruce.service.impl;
 
 import com.bruce.dto.CommentDto;
-import com.bruce.mapper.CommentMapper;
+import com.bruce.dao.CommentMapper;
 import com.bruce.service.CommentoneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
