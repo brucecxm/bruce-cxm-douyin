@@ -6,36 +6,37 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="douyin_testSpringfactories" />
-        <module name="douyin_websocket" />
         <module name="douyin_schedule" />
         <module name="douyin_admin" />
-        <module name="douyin_spring" />
         <module name="douyin_chat" />
-        <module name="douyin_comment" />
         <module name="douyin_file_starter" />
         <module name="douyin_sms" />
         <module name="douyin_gateway" />
         <module name="douyin_behavior" />
         <module name="douyin_video" />
-        <module name="minio-file-demo" />
         <module name="douyin_search" />
         <module name="douyin_article" />
         <module name="douyin_user" />
-        <module name="douyin_music" />
-        <module name="sa-token-demo-sso-server" />
-        <module name="douyin_testall" />
-        <module name="douyin_model" />
         <module name="douyin_feign" />
-        <module name="douyin_introduce" />
         <module name="douyin_eureka" />
-        <module name="douyin_file" />
         <module name="douyin_shop" />
-        <module name="douyin_Designpatterns" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="douyin_comment" target="1.8" />
+      <module name="douyin_Designpatterns" target="1.8" />
+      <module name="douyin_file" target="1.8" />
+      <module name="douyin_introduce" target="1.8" />
+      <module name="douyin_model" target="1.8" />
+      <module name="douyin_music" target="1.8" />
       <module name="douyin_satoken" target="1.8" />
+      <module name="douyin_spring" target="1.8" />
+      <module name="douyin_test" target="1.8" />
+      <module name="douyin_testall" target="1.8" />
+      <module name="douyin_testSpringfactories" target="1.8" />
+      <module name="douyin_websocket" target="1.8" />
+      <module name="minio-file-demo" target="1.8" />
+      <module name="sa-token-demo-sso-server" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

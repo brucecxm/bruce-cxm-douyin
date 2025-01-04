@@ -7,14 +7,6 @@ server:
 spring:
   application:
     name: api-gateway
-  redis:
-    host: localhost
-    port: 6379
-    password:
-    database: 0
-  cache:
-    redis:
-      time-to-live: 1800000 #设置缓存数据的过期时间
   cloud:
     gateway:
       routes:
@@ -22,14 +14,6 @@ spring:
           uri: lb://DouyinUserService
           predicates:
             - Path=/user/**
-          filters:
-            - name: CustomResponseFilter
-#          filters:
-#            - RewritePath=/user/(?<segment>.*), /user/${segment}
-        - id: DouyinIntroduceService
-          uri: lb://DouyinIntroduceService
-          predicates:
-            - Path=/introduce/**
         - id: DouyinVideoService
           uri: lb://DouyinVideoService
           predicates:
@@ -38,8 +22,8 @@ spring:
           uri: lb://DouyinAdminService
           predicates:
             - Path=/admin/**
-        - id: DouyinMusicService
-          uri: lb://DouyinMusicService
+        - id: DouyinVideoService
+          uri: lb://DouyinVideoService
           predicates:
             - Path=/music/**
         - id: DouyinCommentService
@@ -50,7 +34,7 @@ spring:
           uri: lb://DouyinChatService
           predicates:
             - Path=/chat/**
-        - id: DouyinChatService
+        - id: DouyinShopService
           uri: lb://DouyinShopService
           predicates:
             - Path=/shop/**
@@ -64,22 +48,3 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:10086/eureka  # Eureka服务器地址
-
-
-
-############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
-sa-token:
-  # token 名称（同时也是 cookie 名称）
-  token-name: satoken
-  # token 有效期（单位：秒） 默认30天，-1 代表永久有效
-  timeout: 2592000
-  # token 最低活跃频率（单位：秒），如果 token 超过此时间没有访问系统就会被冻结，默认-1 代表不限制，永不冻结
-  active-timeout: -1
-  # 是否允许同一账号多地同时登录 （为 true 时允许一起登录, 为 false 时新登录挤掉旧登录）
-  is-concurrent: true
-  # 在多人登录同一账号时，是否共用一个 token （为 true 时所有登录共用一个 token, 为 false 时每次登录新建一个 token）
-  is-share: true
-  # token 风格（默认可取值：uuid、simple-uuid、random-32、random-64、random-128、tik）
-  token-style: uuid
-  # 是否输出操作日志
-  is-log: true

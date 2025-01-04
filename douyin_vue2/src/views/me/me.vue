@@ -1,278 +1,347 @@
 <template>
-    <div class="metemp">
-        <footer-vue class="footer"></footer-vue>
+    <div class="container">
 
-        <div class="me">
-            <memenu v-show="receivedMessage.ismemenushow" class="memenu"></memenu>
-            <div :class="['me-content', receivedMessage.me]">
-                <div class="backimg">
-                    <img :src="User.data.backimg" alt="no backimg" />
-                    <div class="caidan" @click="openmenu"></div>
-                    <div class="userinfo">
-                        <div class="touxiang">
-                            <img :src="User.data.userPic" alt="" style="width: 26vw;height: 36vw;" />
-                        </div>
-                        <div class="name" style="color: white;">
-                            <span>{{ User.data.nickname }}</span>
-                        </div>
+
+
+        <!-- 顶部背景图 -->
+        <div class="profile-header">
+            <img class="cover-image" :src="userInfo.coverImg" alt="背景图" />
+
+            <!-- 用户基本信息区 -->
+            <div class="user-info">
+                <img class="avatar" :src="userInfo.avatar" alt="头像" />
+                <div class="user-name">{{ userInfo.nickname }}</div>
+                <div class="user-id">抖音号：{{ userInfo.userId }}</div>
+
+                <!-- 用户统计信息 -->
+                <div class="user-stats">
+                    <div class="stat-item">
+                        <div class="num">{{ userInfo.followers }}</div>
+                        <div class="label">粉丝</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="num">{{ userInfo.following }}</div>
+                        <div class="label">关注</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="num">{{ userInfo.likes }}</div>
+                        <div class="label">获赞</div>
                     </div>
                 </div>
 
-                <div class="frienginfo">
-                    <img src="../../assets/me/2.png" alt="" />
+                <div class="edit-profile-btn">编辑主页</div>
+
+                <!-- 个人简介 -->
+                <div class="bio">
+                    <div>{{ userInfo.bio }}</div>
+                    <div class="location">{{ userInfo.location }}</div>
+                    <div class="school">{{ userInfo.school }}</div>
                 </div>
-                <div class="personinfo">
-                    <div class="info">
-                        <p>{{ User.data.jieshao }}</p>
-                        <span>{{ User.data.age }}</span>
-                        <span>{{ User.data.location }}</span>
-                        <span>{{ User.data.collegt }}</span>
-                    </div>
-                </div>
-                <div class="infonav">
-                    <div class="xuanxiang" v-for="(image, index) in navvideo" :key="index">
-                        <img :src="image" alt="Image" />
-                    </div>
-                </div>
-                <div class="nav">
-                    <ul>
-                        <li @click="fetchData('works')">作品</li>
-                        <li @click="fetchData('dynamics')">动态</li>
-                        <li @click="fetchData('likes')">喜欢</li>
-                        <li @click="fetchData('albums')">相册</li>
-                    </ul>
-                </div>
-                <div class="uservideo">
-                    <div class="uvideo" v-for="(image, index) in mianvideoarr" :key="index">
-                        <img :src="image" alt="Image" style="width: 100%; height: 100%;" />
+            </div>
+        </div>
+
+        <!-- 功能按钮区 -->
+        <div class="function-bar">
+            <div class="function-item">
+                <i class="iconfont icon-gouwuche"></i>
+                <span>我的购物</span>
+            </div>
+            <div class="function-item">
+                <i class="iconfont icon-lishijilu"></i>
+                <span>浏览历史</span>
+            </div>
+            <div class="function-item">
+                <i class="iconfont icon-youxi"></i>
+                <span>我的游戏</span>
+            </div>
+            <div class="function-item">
+                <i class="iconfont icon-shoucang"></i>
+                <span>我的收藏</span>
+            </div>
+            <div class="function-item">
+                <i class="iconfont icon-gengduo"></i>
+                <span>全部动态</span>
+            </div>
+        </div>
+
+        <!-- 内容标签页 -->
+        <div class="content-tabs">
+            <div class="tab-header">
+                <div class="tab-item active">作品</div>
+                <div class="tab-item">时刻</div>
+                <div class="tab-item">私密</div>
+                <div class="tab-item">推荐</div>
+                <div class="tab-item">收藏</div>
+                <div class="tab-item">音乐</div>
+            </div>
+
+            <!-- 视频列表 -->
+            <div class="video-grid">
+                <div class="video-item" v-for="(video, index) in videos" :key="index">
+                    <img :src="video.cover" alt="视频封面" />
+                    <div class="play-count">
+                        <i class="iconfont icon-bofang1"></i>
+                        <span>{{ video.playCount }}</span>
                     </div>
                 </div>
             </div>
         </div>
+
+        <footer-vue class="footer"></footer-vue>
     </div>
 </template>
 
 <script>
 import footerVue from '@/components/footer.vue'
-import mainvideo from '@/assets/me/1.png'
-import Memenu from "../../components/memenu.vue"
-import { userInfoService } from '../../api/user';
-import oneImg from '@/assets/me/one.jpg';
-import twoImg from '@/assets/me/two.jpg';
-import threeImg from '@/assets/me/three.jpg';
-import fourImg from '@/assets/me/four.jpg';
-import { getmeinfo } from '../../api/me';
-import { useTokenStore } from '@/stores/token'
-
 export default {
+    components: {
+        footerVue
+    },
     data() {
         return {
-            receivedMessage: {
-                me: "me",
-                ismemenushow: false,
+            userInfo: {
+                nickname: "单曲循环",
+                userId: "dy123456",
+                avatar: "http://gips3.baidu.com/it/u=1821127123,1149655687&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280",
+                coverImg: "http://gips3.baidu.com/it/u=1821127123,1149655687&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280",
+                followers: "1.47万",
+                following: "189",
+                likes: "754",
+                bio: "点击关注内容，让大家认识你",
+                location: "南京",
+                school: "南京信息科技大学"
             },
-            User: {
-                data: {
-                    nickname: "默认名字",
-                    userPic: "//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813c001_oYCBO7DFFAYxR4jFA7gwAEqBTmfEIGAfANeokE.jpeg?from=2956013662",
-                    backimg: "//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813c001_ooSy9lAm2G5DAfrLAAQAjO0bp7lg4eInAaCCGX.jpeg?from=2956013662",
-                    jieshao: "自我介绍",
-                    age: "年龄",
-                    location: "城市",
-                    collegt: "学校"
-                },
-            },
-            navvideo: [oneImg, twoImg, threeImg, fourImg],
-            mianvideoarr: [mainvideo, mainvideo, mainvideo, mainvideo]
-        };
-    },
-    components: { footerVue, Memenu },
-    methods: {
-        openmenu() {
-            this.receivedMessage.ismemenushow = true;
-            this.receivedMessage.me = "metransform";
-            this.$nextTick(() => {
-                this.$el.querySelector('.memenu').classList.add('active');
-            });
-        },
-        closemenu() {
-            this.receivedMessage.ismemenushow = false;
-            this.receivedMessage.me = "";
-            this.$nextTick(() => {
-                this.$el.querySelector('.memenu').classList.remove('active');
-            });
-        },
-        fetchData(type) {
-            console.log(type);
-        },
-    },
-    mounted() {
-        const usertoken = useTokenStore();
-        getmeinfo(usertoken.data.message);
+            videos: [
+                { cover: "http://gips0.baidu.com/it/u=1690853528,2506870245&fm=3028&app=3028&f=JPEG&fmt=auto?w=1024&h=1024", playCount: "512" },
+                { cover: "http://gips0.baidu.com/it/u=1690853528,2506870245&fm=3028&app=3028&f=JPEG&fmt=auto?w=1024&h=1024", playCount: "1693" },
+                { cover: "http://gips0.baidu.com/it/u=1690853528,2506870245&fm=3028&app=3028&f=JPEG&fmt=auto?w=1024&h=1024", playCount: "137" },
+                { cover: "http://gips0.baidu.com/it/u=1690853528,2506870245&fm=3028&app=3028&f=JPEG&fmt=auto?w=1024&h=1024", playCount: "137" },
+                { cover: "http://gips0.baidu.com/it/u=1690853528,2506870245&fm=3028&app=3028&f=JPEG&fmt=auto?w=1024&h=1024", playCount: "137" },
+                { cover: "http://gips0.baidu.com/it/u=1690853528,2506870245&fm=3028&app=3028&f=JPEG&fmt=auto?w=1024&h=1024", playCount: "137" },
+                { cover: "http://gips0.baidu.com/it/u=1690853528,2506870245&fm=3028&app=3028&f=JPEG&fmt=auto?w=1024&h=1024", playCount: "137" },
+                { cover: "http://gips0.baidu.com/it/u=1690853528,2506870245&fm=3028&app=3028&f=JPEG&fmt=auto?w=1024&h=1024", playCount: "137" },
+                { cover: "http://gips0.baidu.com/it/u=1690853528,2506870245&fm=3028&app=3028&f=JPEG&fmt=auto?w=1024&h=1024", playCount: "137" },
+            ]
+        }
     }
-};
+}
 </script>
 
 <style scoped>
-.name {
-    transform: translateY(2vh);
+.container {
+    min-height: 100vh;
+    background: #f8f8f8;
 }
 
-/* General Styles */
-.metemp {
+.profile-header {
+    position: relative;
+    height: 45vh;
+}
+
+.cover-image {
     width: 100%;
     height: 100%;
-    overflow: hidden;
-    position: relative;
+    object-fit: cover;
 }
 
-/* Main content area */
-.me {
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    position: relative;
-    transition: transform 0.5s ease-in-out;
-}
-
-/* Sidebar menu (memenu) */
-.memenu {
+.user-info {
     position: absolute;
-    top: 0;
-    right: -80%;
-    width: 80%;
-    height: 100%;
-    transition: right 0.5s ease-in-out;
-    z-index: 10;
-}
-
-.memenu.active {
+    bottom: 20px;
+    left: 0;
     right: 0;
+    padding: 0 16px;
+    color: #fff;
 }
 
-/* Content area when menu is active */
-.me-content {
-    transition: transform 0.5s ease-in-out;
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid #fff;
 }
 
-.me-content.metransform {
-    transform: translateX(80%);
-}
-
-/* User info */
-.userinfo {
-    position: absolute;
-    top: 50px;
-    width: 60%;
-}
-
-.touxiang {
-    width: 26vw;
-    height: 26vw;
-    border-radius: 13vw;
-    overflow: hidden;
-    border: 3px solid white;
-    display: inline-block;
-    transform: translateX(10vw);
-    transform: translateY(3vh);
-}
-
-/* Nav bar */
-.nav ul {
-    list-style: none;
-    display: flex;
-    overflow-x: auto;
-    padding: 0;
-    white-space: nowrap;
-    font-size: 0.6rem;
-}
-
-.nav li {
-    margin-right: 43px;
-    line-height: 50px;
-}
-
-/* Remove scrollbars */
-.nav ul::-webkit-scrollbar {
-    display: none;
-}
-
-.nav ul {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-/* Video thumbnails */
-.uvideo {
-    width: 48%;
-    height: 40vh;
-    background-color: rgba(0, 0, 0, 0.1);
-    margin: 2px;
-    float: left;
-}
-
-/* Background image */
-.backimg {
-    width: 100%;
-    height: 35vh;
-    background-color: rgba(255, 255, 255, 0.5);
-    position: relative;
-    overflow: hidden;
-
-}
-
-.backimg img {
-    width: 414px;
-    height: 300px;
-}
-
-.backimg .caidan {
-    width: 150px;
-    height: 50px;
-    background-color: rgba(222, 56, 128, 0.5);
-    position: absolute;
-    right: 20px;
-    top: 50px;
-    z-index: 5;
-}
-
-/* User info text */
-.personinfo {
-    font-size: 0.5rem;
-    border-radius: 30px 30px 0px 30px;
-    width: 100%;
-    background-color: white;
-}
-
-/* Footer */
 .footer {
     background-color: black;
     color: black;
+    z-index: 10;
+    position: fixed;
+    bottom: 0px;
+}
+
+.user-name {
+    margin-top: 8px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.user-id {
+    margin-top: 4px;
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.user-stats {
+    display: flex;
+    margin-top: 15px;
+}
+
+.stat-item {
+    flex: 1;
+    text-align: center;
+}
+
+.num {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.label {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.edit-profile-btn {
+    margin-top: 15px;
+    padding: 5px 20px;
+    border: 1px solid #fff;
+    border-radius: 20px;
+    display: inline-block;
+    font-size: 14px;
+}
+
+.bio {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.location,
+.school {
+    margin-top: 4px;
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.function-bar {
+    display: flex;
+    padding: 15px 0;
+    background: #fff;
+}
+
+.function-item {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.function-item .iconfont {
+    font-size: 24px;
+    margin-bottom: 4px;
+    color: #333;
+}
+
+.content-tabs {
+    margin-top: 10px;
+    background: #fff;
+}
+
+.tab-header {
+    display: flex;
+    border-bottom: 1px solid #eee;
+}
+
+.tab-item {
+    flex: 1;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 14px;
+}
+
+.tab-item.active {
+    color: #000;
+    font-weight: bold;
+    position: relative;
+}
+
+.tab-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 2px;
+    background: #fe2c55;
+}
+
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: #eee;
+    padding-bottom: 50px;
+    /* 为底部导航留出空间 */
+}
+
+.video-item {
+    position: relative;
+    padding-bottom: 100%;
+}
+
+.video-item img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.play-count {
+    position: absolute;
+    left: 5px;
+    bottom: 5px;
+    color: #fff;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.play-count .iconfont {
+    font-size: 12px;
+    margin-right: 2px;
+}
+
+.bottom-nav {
     position: fixed;
     bottom: 0;
-    width: 100%;
-    z-index: 10;
-}
-
-/* Other utility styles */
-.xuanxiang {
-    min-width: 80px;
-    height: 80px;
-    margin-right: 10px;
-    margin-top: 10px;
-}
-
-.infonav {
+    left: 0;
+    right: 0;
     display: flex;
-    flex-shrink: 0;
-    overflow-x: auto;
-    white-space: nowrap;
-    overflow-x: hidden;
-    overflow-y: hidden;
+    background: #fff;
+    padding: 5px 0;
+    border-top: 1px solid #eee;
 }
 
-span {
-    background-color: rgba(137, 8, 211, 0.1);
-    margin-left: 10px;
+.nav-item {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.nav-item .iconfont {
+    font-size: 20px;
+    margin-bottom: 2px;
+}
+
+.nav-item.active {
+    color: #fe2c55;
+}
+
+.nav-item.active .iconfont {
+    color: #fe2c55;
 }
 </style>

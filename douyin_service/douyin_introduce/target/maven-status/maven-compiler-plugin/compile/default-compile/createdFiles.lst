@@ -1,5 +1,0 @@
-com\bruce\aop\RateLimitAspect.class
-com\bruce\annotation\RateLimit.class
-com\bruce\controller\introduceController.class
-com\bruce\DouyinIntroduceApplication.class
-com\bruce\config\RabbitMQConfig.class

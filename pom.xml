@@ -9,19 +9,15 @@
         <module>douyin_feign</module>
         <module>douyin_eureka</module>
         <module>douyin_gateway</module>
-        <module>douyin_model</module>
         <module>douyin_basic</module>
-        <module>douyin_test</module>
-        <module>douyin_sms</module>
-        <module>sa-token-demo-sso-server</module>
     </modules>
     <groupId>org.example</groupId>
     <artifactId>douyin_backend</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.cloud.version>Hoxton.SR10</spring.cloud.version>
         <mybatisplus.version>3.4.2</mybatisplus.version>
