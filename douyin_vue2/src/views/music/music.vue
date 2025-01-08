@@ -37,6 +37,7 @@
     </div>
 </template>
 <script>
+
 export default {
     created() {
         this.musicid = this.$route.params.musicid;

@@ -32,7 +32,7 @@
                 </div>
 
                 <div class="nav">
-                    <div class="box2" v-for="(nav, index) in navbox.records" :key="index">
+                    <div class="box2" v-for="(nav, index) in navbox" :key="index">
                         <img :src="nav.navImg" alt="" style="width: 100%; height: 100%;">
                         <!-- <p>{{ nav.navname }}</p> -->
                     </div>

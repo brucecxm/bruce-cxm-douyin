@@ -50,8 +50,7 @@ export default {
             videoboxdata: [
                 {
                     videoid: "1",
-                    videoUrl: "https://vdept3.bdstatic.com/mda-qkhekcm1quetqsm3/360p/h264/1731925121198299454/mda-qkhekcm1quetqsm3.mp4?v_from_s=hkapp-haokan-nanjing&auth_key=1734113109-0-0-c8ebeb78681daafa698ec0145326c037&bcevod_channel=searchbox_feed&cr=0&cd=0&pd=1&pt=3&logid=0309796217&vid=11209263194208596039&klogid=0309796217&abtest=122021_2",
-
+                    videoUrl: "",
                     videoArticle: "",
                     username: "",
                     userAvatar: "",
@@ -64,8 +63,7 @@ export default {
                 },
                 {
                     videoid: "2",
-                    videoUrl: "https://vdept3.bdstatic.com/mda-qkhekcm1quetqsm3/360p/h264/1731925121198299454/mda-qkhekcm1quetqsm3.mp4?v_from_s=hkapp-haokan-nanjing&auth_key=1734113109-0-0-c8ebeb78681daafa698ec0145326c037&bcevod_channel=searchbox_feed&cr=0&cd=0&pd=1&pt=3&logid=0309796217&vid=11209263194208596039&klogid=0309796217&abtest=122021_2",
-
+                    videoUrl: "",
                     videoArticle: "",
                     username: "",
                     userAvatar: "",
@@ -77,8 +75,7 @@ export default {
                     musicName: ""
                 }, {
                     videoid: "3",
-                    videoUrl: "https://vdept3.bdstatic.com/mda-qkhekcm1quetqsm3/360p/h264/1731925121198299454/mda-qkhekcm1quetqsm3.mp4?v_from_s=hkapp-haokan-nanjing&auth_key=1734113109-0-0-c8ebeb78681daafa698ec0145326c037&bcevod_channel=searchbox_feed&cr=0&cd=0&pd=1&pt=3&logid=0309796217&vid=11209263194208596039&klogid=0309796217&abtest=122021_2",
-
+                    videoUrl: "",
                     videoArticle: "",
                     username: "",
                     userAvatar: "",
@@ -90,8 +87,7 @@ export default {
                     musicName: ""
                 }, {
                     videoid: "4",
-                    videoUrl: "https://vdept3.bdstatic.com/mda-qkhekcm1quetqsm3/360p/h264/1731925121198299454/mda-qkhekcm1quetqsm3.mp4?v_from_s=hkapp-haokan-nanjing&auth_key=1734113109-0-0-c8ebeb78681daafa698ec0145326c037&bcevod_channel=searchbox_feed&cr=0&cd=0&pd=1&pt=3&logid=0309796217&vid=11209263194208596039&klogid=0309796217&abtest=122021_2",
-
+                    videoUrl: "",
                     videoArticle: "",
                     username: "",
                     userAvatar: "",

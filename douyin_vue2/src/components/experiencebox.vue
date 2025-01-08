@@ -45,11 +45,7 @@ import { shopmenulist } from "@/api/menu"
 import { shopnavlist } from "@/api/menu"
 import { useTokenStore } from "@/stores/token"
 import footerVue from '@/components/footer.vue'
-import img1 from '@/assets/shop/menunav/1.png';
-import img2 from '@/assets/shop/menunav/2.png';
-import img3 from '@/assets/shop/menunav/3.png';
-import img4 from '@/assets/shop/menunav/4.png';
-import img5 from '@/assets/shop/menunav/5.png';
+
 import imgn6 from '@/assets/shop/nav/2.png';
 import imgn7 from '@/assets/shop/nav/3.png';
 import imgn8 from '@/assets/shop/nav/4.png';
