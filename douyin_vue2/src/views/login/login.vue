@@ -8,7 +8,7 @@
         </div>
         <div class="content">
             <p class="notice">登录后即可点赞喜欢的内容</p>
-            <div class="login-form">
+            <div v-if="!isRegistering" class="login-form">
                 <div class="input-group">
                     <select class="country-code">
                         <option value="+86">+86</option>
@@ -18,7 +18,7 @@
                         <option value="+6">+6</option>
                     </select>
                     <input type="tel" v-model="loginpojo.username" placeholder="请输入手机号" />
-                    <input type="tel" v-model="loginpojo.password" placeholder="请输入密码" />
+                    <input type="password" v-model="loginpojo.password" placeholder="请输入密码" />
                     <button class="clear-btn" @click="clearPhoneNumber">×</button>
                 </div>
 
@@ -28,20 +28,44 @@
                     ，运营商将对你的手机号进行验证
                 </p>
                 <button class="login-btn" @click="verifyPhoneNumber">验证并登录</button>
-                <button class="login-btn" @click="getinfo" v-show="false">验证并登录</button>
                 <div class="login-options">
                     <button @click="switchToPasswordLogin">密码登录</button>
-                    <button>其他方式登录</button>
+                    <button @click="switchToRegister">切换到注册</button>
                 </div>
             </div>
+
+            <div v-if="isRegistering" class="login-form">
+                <div class="input-group">
+                    <select class="country-code">
+                        <option value="+86">+86</option>
+                        <option value="+5">+5</option>
+                        <option value="+1">+1</option>
+                        <option value="+7">+7</option>
+                        <option value="+6">+6</option>
+                    </select>
+                    <input type="tel" v-model="loginpojo.username" placeholder="请输入手机号" />
+                    <input type="password" v-model="loginpojo.password" placeholder="请输入密码" />
+                    <input type="password" v-model="loginpojo.confirmPassword" placeholder="确认密码" />
+                    <button class="clear-btn" @click="clearPhoneNumber">×</button>
+                </div>
+                <p class="terms">
+                    <input type="checkbox" v-model="isAgreed" /> 已阅读并同意 <a href="#">用户协议</a> 和 <a href="#">隐私政策</a> 以及
+                    <a href="#">运营商服务协议</a>
+                    ，运营商将对你的手机号进行验证
+                </p>
+                <button class="login-btn" @click="register">注册并登录</button>
+                <div class="login-options">
+                    <button @click="switchToLogin">切换到登录</button>
+                </div>
+            </div>
+
             <p class="recovery-text">手机号不用了？ <a href="#">找回账号</a></p>
         </div>
     </div>
 </template>
 
 <script>
-
-import { userLoginService, userInfoService } from "../../api/user"
+import { userLoginService, userInfoService, userRegisterService } from "../../api/user"
 import { useTokenStore } from "../../stores/token"
 
 export default {
@@ -50,10 +74,12 @@ export default {
         return {
             loginpojo: {
                 username: '',
-                password: ""
+                password: "",
+                confirmPassword: ""  // for registration
             },
             isPasswordLogin: false,
-            isAgreed: false, // 添加一个变量来跟踪协议是否被勾选
+            isAgreed: false, // 协议同意状态
+            isRegistering: false, // 是否处于注册页面
         };
     },
     methods: {
@@ -62,13 +88,14 @@ export default {
             console.log('关闭界面');
         },
         clearPhoneNumber() {
-            this.loginpojo.username = ''; // 修改为清空手机号
-            this.loginpojo.password = ''; // 修改为清空手机号
+            this.loginpojo.username = ''; // 清空手机号
+            this.loginpojo.password = ''; // 清空密码
+            this.loginpojo.confirmPassword = ''; // 清空确认密码
         },
         async verifyPhoneNumber() {
             if (!this.isAgreed) { // 检查用户是否勾选协议
                 alert("请勾选用户协议以继续登录。");
-                return; // 如果未勾选，则退出该方法
+                return;
             }
 
             console.log('验证手机号:', this.loginpojo);
@@ -76,16 +103,13 @@ export default {
                 const response = await userLoginService(this.loginpojo);
                 if (response.data.code === 1) {
                     console.error("登录失败：", error);
-
                 } else {
                     const token = response.data.data;
-
                     const usertoken = useTokenStore();
                     usertoken.setToken(token);
                     localStorage.setItem('token', token);
                     this.$router.push("/");
                 }
-
             } catch (error) {
                 console.error("登录失败：", error);
             }
@@ -93,16 +117,42 @@ export default {
         switchToPasswordLogin() {
             this.isPasswordLogin = true;
         },
+        switchToRegister() {
+            this.isRegistering = true;
+        },
+        switchToLogin() {
+            this.isRegistering = false;
+        },
+        async register() {
+            if (!this.isAgreed) { // 检查用户是否勾选协议
+                alert("请勾选用户协议以继续注册。");
+                return;
+            }
+
+            if (this.loginpojo.password !== this.loginpojo.confirmPassword) {
+                alert("密码和确认密码不匹配");
+                return;
+            }
+
+            console.log('注册手机号:', this.loginpojo);
+            try {
+                const response = await userRegisterService(this.loginpojo);
+                if (response.data.code === 1) {
+                    alert("注册失败，请稍后再试");
+                } else {
+                    this.verifyPhoneNumber(); // 注册成功后自动登录
+                }
+            } catch (error) {
+                console.error("注册失败：", error);
+            }
+        },
         async getinfo() {
             const response = await userInfoService();
-            const info = response.data
+            const info = response.data;
         }
     },
 };
 </script>
-
-
-
 
 <style scoped>
 .login-screen {

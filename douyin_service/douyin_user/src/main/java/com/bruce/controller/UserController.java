@@ -2,6 +2,7 @@ package com.bruce.controller;
 
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.bruce.entity.User;
@@ -9,6 +10,7 @@ import com.bruce.pojo.Result;
 import com.bruce.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -33,7 +35,7 @@ public class UserController {
 
     //*******************sa-token***********************
     @Autowired
-private  UserService userService;
+    private UserService userService;
 
     @RequestMapping("logout")
     public void handleLogoutAction(String action, Object param) {
@@ -79,32 +81,19 @@ private  UserService userService;
     }
 
 
-
-
-
-
     @RequestMapping("getall")
     public R getAllUser() {
 
-     List<User> one=   userService.list();
+        List<User> one = userService.list();
 
         return R.ok(one);
 
     }
 
 
-
-
-
-
-
-
-
-
-
-
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
     // 测试登录，浏览器访问： http://localhost:8081/user/doLogin?username=zhang&password=123456
     @RequestMapping("doLogin")
     public Result<String> doLogin(String username, String password) {
@@ -118,14 +107,14 @@ private  UserService userService;
 
         // 此处仅作模拟示例，真实项目需要从数据库中查询数据进行比对
         // 获取当前会话的 token 值
-       String token= StpUtil.getTokenValue();
-        if(user.getUsername().equals(username) && user.getPassword().equals(password)) {
-            StpUtil.login(user.getId(),"PC");
+        String token = StpUtil.getTokenValue();
+        if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+            StpUtil.login(user.getId(), "PC");
             StpUtil.getSession().set("user", user);
             System.out.println("sss");
             return Result.success("sssssssssssssssssssssssssssssss");
         }
-        return  Result.error("登录失败");
+        return Result.error("登录失败");
     }
 
     // 查询登录状态，浏览器访问： http://localhost:8081/user/isLogin
@@ -133,18 +122,16 @@ private  UserService userService;
     public Result isLogin() {
 
         // 获取：当前账号所拥有的权限集合
-      List<String> permission=  StpUtil.getPermissionList();
+        List<String> permission = StpUtil.getPermissionList();
 
         for (String permissiontemp : permission
-        ){
+        ) {
             if (permissiontemp.equals("user.get")
             ) {
 
 
-
 // 判断：当前账号是否拥有指定角色, 返回 true 或 false
-                if( StpUtil.hasRole("super-admin"))
-                {
+                if (StpUtil.hasRole("super-admin")) {
 // 在登录时缓存 user 对象
                     Object user1 = StpUtil.getSession().get("user");
                     // 然后我们就可以在任意处使用这个 user 对象
@@ -159,7 +146,7 @@ private  UserService userService;
                     StpUtil.kickout(10001);
                     StpUtil.disable(10001, 86400);
 
-                    return   Result.success("当前会话是否登录：" + StpUtil.isLogin())            ;
+                    return Result.success("当前会话是否登录：" + StpUtil.isLogin());
                 }
 
             }
@@ -170,25 +157,7 @@ private  UserService userService;
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
     //*******************sa-token***********************
-
-
-
-
-
-
-
 
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -215,7 +184,6 @@ private  UserService userService;
 //
 
 
-
 //
 //
 //@Autowired
@@ -230,27 +198,32 @@ private  UserService userService;
 //    }
 
 
+    @Autowired
+    private AmqpTemplate amqpTemplate;
 
 
+    @PostMapping("/register")
+    public Result register(String username, String password) {
 
-
-//
-//
-//    @PostMapping("/register")
-//    public Result register(@Pattern(regexp = "^\\S{5,16}$") String username, @Pattern(regexp = "^\\S{5,16}$") String password) {
-//
-//        //查询用户
-//        User u = userService.findByUserName(username);
-//        if (u == null) {
-//            //没有占用
-//            //注册
-//            userService.register(username, password);
-//            return Result.success();
-//        } else {
-//            //占用
-//            return Result.error("用户名已被占用");
-//        }
-//    }
+        // 查询用户
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getUsername, username);
+        User u = userService.getOne(queryWrapper); // 获取用户名对应的用户
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);
+        if (u == null) {
+            //没有占用
+            //注册
+            userService.save(user);
+            amqpTemplate.convertAndSend("create_wallet_exampleExchange", "create_wallet_RoutingKey", user.getId());
+            //这里用mq创建钱包 并且每天都会用定时任务  查询钱包表的用户是否和用户表的一致  如果不一致的话 就解决问题
+            return Result.success();
+        } else {
+            //占用
+            return Result.error("用户名已被占用");
+        }
+    }
 
 //    \\S: 代表一个非空白字符。它可以是字母、数字或其他符号，但不能是空格、制表符或其他空白字符。
 //    {5,16}:
@@ -318,13 +291,11 @@ private  UserService userService;
 //    }
 
 
-
-
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
 
-//生成四位的验证吗
+    //生成四位的验证吗
     @GetMapping("/getYanzheng")
     public Result<String> getYanzheng() {
         // 生成四位随机验证码
