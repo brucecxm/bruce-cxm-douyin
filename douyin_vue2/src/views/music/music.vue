@@ -6,10 +6,8 @@
             <!-- <label>zhuanfa</label> -->
         </div>
         <div class="musicbody">
-            <div class="imgbox"><img
-                    src="https://gips2.baidu.com/it/u=1651586290,17201034&fm=3028&app=3028&f=JPEG&fmt=auto&q=100&size=f600_800"
-                    alt="" width="100%"></div>
-            <div class="geming">{{ name }}创作的原神</div>
+            <div class="imgbox"><img :src="musicinfo.music_avatar" alt="" width="100%"></div>
+            <div class="geming">{{ musicinfo.music_name }}创作的原神</div>
             <div class="zuozhe">
             </div>
             <div class="qu"></div>
@@ -19,25 +17,15 @@
 
         </div>
         <div class="videobody">
-            <div class="box"><img :src="videobox.imgurl" alt="" height="100%" @click="govideodetail(11)"></div>
-            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
-            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
-            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
-            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
-            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
-            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
-            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
-            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
-            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
-            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
-            <div class="box"><img :src="videobox.imgurl" alt="" height="100%"></div>
-
-
+            <div class="box" v-for="(video, index) in videobox" :key="index">
+                <img :src="video.video_img" alt="" height="100%" @click="govideodetail(11)">
+            </div>
         </div>
+
     </div>
 </template>
 <script>
-
+import { getmumsic } from '@/api/video'
 export default {
     created() {
         this.musicid = this.$route.params.musicid;
@@ -46,14 +34,19 @@ export default {
     },
     data() {
         return {
+            musicinfo: {},
             musicid: "1",
             is_wanfa: false,
             name: "歌曲作者名字",
-            videobox: {
+            videobox: [{
                 imgurl: "https://gips2.baidu.com/it/u=1651586290,17201034&fm=3028&app=3028&f=JPEG&fmt=auto&q=100&size=f600_800",
                 linkurl: ""
-            }
-
+            },
+            {
+                imgurl: "https://gips2.baidu.com/it/u=1651586290,17201034&fm=3028&app=3028&f=JPEG&fmt=auto&q=100&size=f600_800",
+                linkurl: ""
+            },
+            ]
         }
     },
 
@@ -71,19 +64,14 @@ export default {
             this.$router.push(`/videodetail?type=music&videoid=${videoid}`);
         },
         fetchItemDetails(id) {
-            if (id) {
-                getauthzzz(id)
-                    .then(result => {
-                        console.log(result)
-                        this.auth = result.data.auth
-                        this.videobox = result.data.videobox
-                    })
-                    .catch(error => {
-                        console.error('获取认证信息出错:', error);
-                    });
-            } else {
-                console.error('用户 ID 无效');
-            }
+            getmumsic(id).then(videoArr => {
+
+                console.log(videoArr)
+                this.videobox = videoArr.data.videoimg
+                this.musicinfo = videoArr.data.music_info
+            }).catch(error => {
+                console.error('获取视频出错:', error);
+            });
         }
     }
 };
