@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CommentoneServiceimpl implements CommentoneService {
@@ -14,8 +15,10 @@ public class CommentoneServiceimpl implements CommentoneService {
 private CommentMapper commentMapper;
 
     @Override
-    public List<CommentDto> getcomment() {
-        return commentMapper.getCommentid();
+    public List<Map> getcomment() {
+        int video_id=1;
+        List<Map> one =commentMapper.getCommentid(1);
+        return one;
     }
 
     @Override

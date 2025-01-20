@@ -54,8 +54,8 @@ public interface VideoOneDao {
             "    (SELECT COUNT(ll.collect) FROM likeone ll WHERE ll.like_videoid = v.video_id and collect = 1 ) AS collectNum",
 
             "FROM video v",
-            "    INNER JOIN user u ON v.auth_id = u.id",
-            "    INNER JOIN music m ON v.music_id = m.music_video_id",
+            "    left JOIN user u ON v.auth_id = u.id",
+            "    left JOIN music m ON v.music_id = m.music_video_id",
             "    LEFT JOIN comment c ON v.video_id = c.comment_video_id",
             "    LEFT JOIN likeone l ON v.video_id = l.like_videoid",
             "GROUP BY m.music_name, v.video_url, u.nickname, u.user_pic, v.video_id",

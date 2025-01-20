@@ -158,7 +158,7 @@
                     <mainClass>com.bruce.DouyinMusicApplication</mainClass>
                     <mainClass>com.bruce.DouyinScheduleApplication</mainClass>
                     <mainClass>com.bruce.DouyinSearchApplication</mainClass>
-                    <mainClass>com.bruce.DouyinShopApplication</mainClass>
+                    <mainClass>com.com.bruce.DouyinShopApplication</mainClass>
                     <mainClass>com.bruce.DouyinUserApplication</mainClass>
                     <mainClass>com.bruce.DouyinVideoApplication</mainClass>
                     <mainClass>com.bruce.minioApplication</mainClass>

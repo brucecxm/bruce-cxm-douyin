@@ -1,56 +1,56 @@
 <template>
-    <div class="temp">
-        <div class="shop">
-            <div class="header">
-                <!-- <div class="didian">西安^</div> -->
-                <div class="search">
-                    <button @click="searchmeth">搜索</button>
-                    <input type="text" placeholder="蜜雪冰城团购" v-model="search" @focus="handleFocus" @blur="handleBlur">
-                </div>
-                <div class="lian" v-if="isFocused">
-                    <ul>
-                        <li v-for="(lian, index) in searchlian" :key="index">
-                            {{ lian.name }}
-                        </li>
-                        <li>ssss</li>
-                        <li>ssss</li>
-                        <li>ssss</li>
-                        <li>ssss</li>
-                        <li>ssss</li>
-                    </ul>
-                </div>
+    <div class="ssss">
+        <div class="header">
+            <!-- 搜索输入框 -->
+            <div class="search" ref="searchBox">
+                <button @click="searchmeth">搜索</button>
+                <input v-model="searchText" @focus="showSuggestions = true" @blur="hideSuggestions" type="text"
+                    placeholder="输入搜索内容" />
             </div>
 
-
-            <div class="allowscoll">
-                <div class="meum">
-                    <div class="box1" v-for="(meum, index) in meumbox" :key="index">
-                        <img :src="meum.menuImg" alt="" style="width: 100%; height: 100%;" @click="go(meum.hrefurl)">
-                        <!--  <p>{{ meum.name }}</p> -->
-
-                    </div>
-                </div>
-
-                <div class="nav">
-                    <div class="box2" v-for="(nav, index) in navbox" :key="index">
-                        <img :src="nav.navImg" alt="" style="width: 100%; height: 100%;">
-                        <!-- <p>{{ nav.navname }}</p> -->
-                    </div>
-                </div>
-
-                <div class="main">
-                    <!-- 给这里的页面传入商品的唯一id  然后对应商品的详情页 -->
-                    <div class="boxm" v-for="(item, index) in mainbox" :key="index" @click="goshopdetail(item.shopId)"
-                        :style="{ backgroundImage: 'url(' + item.image + ')' }">
-                        <!-- <p>{{ item.name }}</p> -->
-                    </div>
-                </div>
+            <!-- 显示联想框 -->
+            <div class="lian" ref="suggestionBox">
+                <ul v-if="showSuggestions && filteredSuggestions.length > 0">
+                    <li v-for="(suggestion, index) in filteredSuggestions" :key="index"
+                        @click="selectSuggestion(suggestion)">
+                        {{ suggestion }}
+                    </li>
+                </ul>
             </div>
         </div>
 
+        <div class="box-containeraaa" @scroll="handleScroll">
+            <!-- <div v-for="(box, index) in boxes" :key="index" class="boxaaa">
+                {{ box }}
+            </div> -->
+            <div class="meum">
+                <div class="box1" v-for="(meum, index) in meumbox" :key="index">
+                    <img :src="meum.menuImg" alt="" style="width: 100%; height: 100%;" @click="go(meum.hrefurl)">
+                    <!--  <p>{{ meum.name }}</p> -->
+
+                </div>
+            </div>
+
+            <div class="nav">
+                <div class="box2" v-for="(nav, index) in navbox" :key="index">
+                    <img :src="nav.navImg" alt="" style="width: 100%; height: 100%;">
+                    <!-- <p>{{ nav.navname }}</p> -->
+                </div>
+            </div>
+
+            <div class="main">
+                <!-- 给这里的页面传入商品的唯一id  然后对应商品的详情页 -->
+                <div class="boxm" v-for="(item, index ) in mainbox" :key="index" @click="goshopdetail(item.shopId)"
+                    :style="{ backgroundImage: 'url(' + item.image + ')' }">
+                    <!-- <p>{{ item.name }}</p> -->
+                </div>
+            </div>
+            <div v-if="loading" class="loadingaaa">加载中...</div>
+        </div>
 
         <footer-vue class="footer"></footer-vue>
     </div>
+
 </template>
 
 <script>
@@ -74,12 +74,24 @@ import imgm2 from '@/assets/shop/maininfo/2.png';
 import imgm3 from '@/assets/shop/maininfo/3.png';
 import imgm4 from '@/assets/shop/maininfo/4.png';
 export default {
+    beforeDestroy() {
+        // 移除事件监听
+        document.removeEventListener('click', this.handleOutsideClick);
+    },
     components: {
         footerVue
     },
     data() {
         return {
+            searchText: '',  // 输入框的内容
+            showSuggestions: false,  // 是否显示联想框
+            suggestions: ['苹果', '香蕉', '橙子', '葡萄', '西瓜', '草莓', '芒果'],
+            searchlian: [{ id: 1, name: "ssadsas" }, { id: 2, name: "ssdasss" }, { id: 3, name: "dsadssss" }],
             search: "",
+            isFocused: false,
+            // 初始化更多的数据，使其超出视口
+            boxes: Array.from({ length: 50 }, (_, index) => index + 1),  // 初始数据为 50 个盒子
+            loading: false,  // 加载状态
             meumbox: [
                 { name: "超d市", menuImg: img1, hrefurl: "order" },
                 { name: "超d市", menuImg: img2, hrefurl: "chongzhi" },
@@ -109,24 +121,33 @@ export default {
                 { image: imgm4, name: "商品1", hrefurl: "/shopdetail/1", shopId: "4" },
                 { image: imgm4, name: "商品1", hrefurl: "/shopdetail/1", shopId: "5" },
             ],
-            searchlian: [],
-            isFocused: false,  // 用于表示输入框是否被选中
-            pagenum: 1
-        }
+            pagenum: 1,
+            size: 10,
+        };
+    },
+    computed: {
+        filteredSuggestions() {
+            // 根据输入框内容过滤联想词
+            return this.suggestions.filter((suggestion) =>
+                suggestion.toLowerCase().includes(this.searchText.toLowerCase())
+            );
+        },
     },
     mounted() {
+        // 监听点击外部区域事件
+        document.addEventListener('click', this.handleOutsideClick);
         // // 自动发送请求给后端
-        shoplist().then(shopArr => {
+        shoplist(this.pagenum, this.size).then(shopArr => {
             console.log(shopArr);
             if (shopArr && shopArr.data && shopArr.data.data) {
                 // 检查数据是否有效
-                this.mainbox = shopArr.data.data;
+                this.mainbox = shopArr.data.data.records;
                 console.log(this.mainbox);
             } else {
-                console.error('获取 shoplist 数据失败: 数据无效');
+                console.log('获取 shoplist 数据失败: 数据无效');
             }
         }).catch(error => {
-            console.error('获取 shoplist 数据出错:', error);
+            console.log('获取 shoplist 数据出错:', error);
             console.log("获取 shoplist 数据出错");
         });
 
@@ -140,25 +161,12 @@ export default {
                 this.navbox = shopArr.data.data;
                 console.log(this.navbox);
             } else {
-                console.error('获取 shoplist 数据失败: 数据无效');
+                console.log('获取 shoplist 数据失败: 数据无效');
             }
         }).catch(error => {
-            console.error('获取 shoplist 数据出错:', error);
+            console.log('获取 shoplist 数据出错:', error);
             console.log("获取 shoplist 数据出错");
         });
-        // shoplistpage(this.pagenum, 10).then(shopArr => {
-        //     console.log(shopArr);
-        //     if (shopArr && shopArr.data && shopArr.data.data) {
-        //         // 检查数据是否有效
-        //         this.mainbox = shopArr.data.data;
-        //         console.log(this.mainbox);
-        //     } else {
-        //         console.error('获取 shoplist 数据失败: 数据无效');
-        //     }
-        // }).catch(error => {
-        //     console.error(error);  // Handle any error
-        // });
-
 
 
 
@@ -170,10 +178,10 @@ export default {
                 this.meumbox = shopArr.data.data.records;
                 console.log(this.meumbox);
             } else {
-                console.error('获取 shopmenulist 数据失败: 数据无效');
+                console.log('获取 shopmenulist 数据失败: 数据无效');
             }
         }).catch(error => {
-            console.error('获取 shopmenulist 数据出错:', error);
+            console.log('获取 shopmenulist 数据出错:', error);
             console.log("获取 shopmenulist 数据出错");
         });
 
@@ -185,28 +193,93 @@ export default {
                 this.navbox = shopArr.data.data.records;
                 console.log(this.navbox);
             } else {
-                console.error('获取 shopnavlist 数据失败: 数据无效');
+                console.log('获取 shopnavlist 数据失败: 数据无效');
             }
         }).catch(error => {
-            console.error('获取 shopnavlist 数据出错:', error);
+            console.log('获取 shopnavlist 数据出错:', error);
             console.log("获取 shopnavlist 数据出错");
         });
 
     },
-    watch: {
-        search(newValue, oldValue) {
-            // 自动发送请求给后端
-            liansearchForDish(this.search).then(shopArr => {
-                console.log(shopArr.data.data)
-                this.searchlian = shopArr.data.data
-                this.lianopen = true
-            }).catch(error => {
-                console.error('获取视频出错:', error);
-                console.log("获取视频出错  videobox中的")
-            });
-        },
-    },
     methods: {
+        selectSuggestion(suggestion) {
+            // 点击某个联想词时更新输入框的内容
+            this.searchText = suggestion;
+
+            // 可选：如果需要根据其他逻辑来决定是否关闭联想框，可以去掉此行
+            // 例如：点击搜索后可保留联想框状态
+            this.showSuggestions = false;  // 点击后隐藏联想框
+        },
+        hideSuggestions() {
+            // 失去焦点时隐藏联想框
+            setTimeout(() => {
+                this.showSuggestions = false;
+            }, 100);  // 延迟隐藏，确保点击联想词时不关闭
+        },
+
+        // 点击外部区域时关闭联想框
+        handleOutsideClick(event) {
+            const searchBox = this.$refs.searchBox;
+            const suggestionBox = this.$refs.suggestionBox;
+
+            // 如果点击的地方既不是输入框也不是联想框，则关闭联想框
+            if (!searchBox.contains(event.target) && !suggestionBox.contains(event.target)) {
+                this.showSuggestions = false;
+            }
+        },
+
+        searchmeth() {
+            // 实现搜索操作
+            console.log('搜索内容:', this.searchText);
+        },
+        submitlian(name) {
+            this.search = name
+        },
+        // 滚动事件处理函数
+        handleScroll(event) {
+            const container = event.target;
+            const bottom = container.scrollHeight <= container.scrollTop + container.clientHeight;
+
+            if (bottom && !this.loading) {
+                this.loadMoreBoxes();  // 滚动到底部时加载更多数据
+            }
+        },
+        // 请求加载更多盒子数据
+        loadMoreBoxes() {
+            this.loading = true;  // 开始加载
+            // 模拟异步请求
+            setTimeout(() => {
+                shoplist(this.pagenum, this.size).then(shopArr => {
+                    console.log(shopArr);  // 查看返回的数据结构
+                    if (shopArr && shopArr.data && shopArr.data.data) {
+                        const newData = shopArr.data.data.records;
+                        if (Array.isArray(newData)) {
+                            console.log('New data:', newData);  // 打印新数据
+                            // 确保新数据是有效的，并将其添加到 mainbox
+                            this.mainbox.push(...newData);
+
+                            this.pagenum++;
+                            console.log(this.mainbox);  // 打印更新后的 mainbox
+                        } else {
+                            console.log('新数据不是数组:', newData);
+                        }
+                    } else {
+                        console.log('获取 shoplist 数据失败: 数据无效');
+                    }
+                }).catch(error => {
+                    console.log('获取 shoplist 数据出错:', error);
+                })
+                this.loading = false;  // 加载完成
+            }, 1000);
+        },
+        go(url) {
+            // Navigation logic here
+            console.log(url);
+        },
+        goshopdetail(shopId) {
+            // Redirect to the product details page
+            console.log(shopId);
+        },
         go(hrefurl) {
 
             const usertoken = useTokenStore();
@@ -219,16 +292,16 @@ export default {
         handleBlur() {
             this.isFocused = false;  // 输入框失去焦点
         },
-        searchmeth() {
+        // searchmeth() {
 
-            // 自动发送请求给后端
-            searchForDish(this.search).then(shopArr => {
-                console.log(shopArr.data)
-            }).catch(error => {
-                console.error('获取视频出错:', error);
-                console.log("获取视频出错  videobox中的")
-            });
-        },
+        //     // 自动发送请求给后端
+        //     searchForDish(this.search).then(shopArr => {
+        //         console.log(shopArr.data)
+        //     }).catch(error => {
+        //         console.log('获取视频出错:', error);
+        //         console.log("获取视频出错  videobox中的")
+        //     });
+        // },
         goshopdetail(id) {
             this.$router.push({ path: `/shopdetail/${id}` });
         },
@@ -250,14 +323,33 @@ export default {
         gettuijian() {
 
         }
-    }
-}
+    },
+};
 </script>
 
-
-
 <style scoped>
+.box-containeraaa {
+    height: 100vh;
+    /* 高度可以根据需要调整 */
+    overflow-y: scroll;
+    border: 1px solid #ccc;
+}
+
+.boxaaa {
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin: 5px;
+    background-color: #f9f9f9;
+}
+
+.loadingaaa {
+    text-align: center;
+    padding: 10px;
+    color: #888;
+}
+
 .lian {
+    z-index: 10;
     background-color: #f8f9fa;
     /* 背景色 */
     border-radius: 8px;
@@ -320,14 +412,12 @@ body {
     position: relative;
     overflow: hidden;
     background-color: white;
-    /* 确保 shop 不会滚动 */
 }
 
 .allowscoll {
+    height: 100vh;
     overflow-y: scroll;
     /* 允许垂直滚动 */
-    height: calc(100vh - 50px);
-    /* 设置合适的高度，减去 header 的高度 */
 }
 
 /* 隐藏滚动条 */
@@ -488,6 +578,4 @@ p {
 .jiahao {
     background-image: url(../../assets/home/加号黑.png);
 }
-</style>
-
 </style>

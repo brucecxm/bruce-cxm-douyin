@@ -68,10 +68,12 @@ private musiconeDao musiconedao;
 
         List<Map> one=musiconedao.one(music_id);
 
-List<String> videoArr=new ArrayList<String>();
+List<Map> videoArr=new ArrayList<Map>();
 for(Map a:one) {
-   String ss= String.valueOf(a.get("video_img"));
-   videoArr.add(ss);
+  Map ss=new HashMap<>();
+  ss.put("video_img",a.get("video_img"));
+  ss.put("linkurl",a.get("linkurl"));
+    videoArr.add(ss);
 }
 
 Map oneww =new HashMap();

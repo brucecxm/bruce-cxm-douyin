@@ -1,6 +1,7 @@
 package com.bruce.entity;
 
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import lombok.Data;
 
 /**
  * (Nav)表实体类
@@ -8,18 +9,19 @@ import com.baomidou.mybatisplus.extension.activerecord.Model;
  * @author makejava
  * @since 2024-11-06 00:40:08
  */
+@Data
 @SuppressWarnings("serial")
 public class Nav extends Model<Nav> {
     
     private Integer navId;
     
-    private Integer navName;
+    private String navName;
     
     private String navImg;
     
     private Integer navHref;
     
-    private Integer navType;
+    private String navType;
     
     private Integer navLev;
 
@@ -28,49 +30,7 @@ public class Nav extends Model<Nav> {
         return navId;
     }
 
-    public void setNavId(Integer navId) {
-        this.navId = navId;
-    }
 
-    public Integer getNavName() {
-        return navName;
-    }
-
-    public void setNavName(Integer navName) {
-        this.navName = navName;
-    }
-
-    public String getNavImg() {
-        return navImg;
-    }
-
-    public void setNavImg(String navImg) {
-        this.navImg = navImg;
-    }
-
-    public Integer getNavHref() {
-        return navHref;
-    }
-
-    public void setNavHref(Integer navHref) {
-        this.navHref = navHref;
-    }
-
-    public Integer getNavType() {
-        return navType;
-    }
-
-    public void setNavType(Integer navType) {
-        this.navType = navType;
-    }
-
-    public Integer getNavLev() {
-        return navLev;
-    }
-
-    public void setNavLev(Integer navLev) {
-        this.navLev = navLev;
-    }
 
 }
 

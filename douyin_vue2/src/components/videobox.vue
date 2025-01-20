@@ -3,28 +3,27 @@
         @touchstart="startDrag" @touchend="stopDrag" @touchmove="drag"
         :style="{ width: boxWidth, height: boxHeight * 0.1 + 'vh' }">
 
+        <!-- 视频盒子 -->
         <div v-for="(box, index) in boxes" :key="index" class="box"
             :style="{ top: box.top * 0.1 + 'vh', backgroundColor: box.color, width: boxWidth, height: boxHeight * 0.1 + 'vh' }">
-            <!-- 用div包一下 避免父组件中absolute对子组件flex布局的影响 -->
+
+            <!-- 视频侧边栏组件 -->
             <div class="videoasideone">
                 <videoaside-vue :video-data="videoboxdata[index]"></videoaside-vue>
-
             </div>
+
+            <!-- 视频文章组件 -->
             <div class="videoarticle">
                 <videoarticle-vue :video-data="videoboxdata[index]"></videoarticle-vue>
-
             </div>
 
+            <!-- 视频播放 -->
             <video ref="videos" class="videoone" :src="videoboxdata[index].videoUrl" preload="true" loop
                 x5-video-player-type="h5-page" x5-video-player-fullscreen="false" webkit-playsinline="true"
                 x5-playsinline="true" playsinline="true">
                 <p>您的浏览器不支持 video 标签。</p>
             </video>
-
-
         </div>
-
-        <!-- <div class="videotesto" @click="videotest"></div> -->
 
     </div>
 </template>
@@ -32,173 +31,146 @@
 <script>
 import videoasideVue from './videoaside.vue';
 import videoarticleVue from './videoarticle.vue';
-import { eventBus } from '../main.ts'; // 导入事件总线
-
 import { homegetVideo, homegetVideomore, homegetVideocontent } from "../api/video"
+
 export default {
     components: {
         videoasideVue,
         videoarticleVue,
     },
-    watch: {
-
-    },
     data() {
         return {
-
-            // 使用props传递数据 使用props的数据在组件中是单向传输的 但是我可以通过请求异步修改数据库中的数据 就可以了
-            videoboxdata: [
-                {
-                    videoid: "1",
-                    videoUrl: "",
-                    videoArticle: "",
-                    username: "",
-                    userAvatar: "",
-                    likeNum: "1",
-                    commentNum: "10",
-                    shareNum: "100",
-                    collectNum: "1000",
-                    musicAvatar: "",
-                    musicName: ""
-                },
-                {
-                    videoid: "2",
-                    videoUrl: "",
-                    videoArticle: "",
-                    username: "",
-                    userAvatar: "",
-                    likeNum: "1",
-                    commentNum: "10",
-                    shareNum: "100",
-                    collectNum: "1000",
-                    musicAvatar: "",
-                    musicName: ""
-                }, {
-                    videoid: "3",
-                    videoUrl: "",
-                    videoArticle: "",
-                    username: "",
-                    userAvatar: "",
-                    likeNum: "1",
-                    commentNum: "10",
-                    shareNum: "100",
-                    collectNum: "1000",
-                    musicAvatar: "",
-                    musicName: ""
-                }, {
-                    videoid: "4",
-                    videoUrl: "",
-                    videoArticle: "",
-                    username: "",
-                    userAvatar: "",
-                    likeNum: "1",
-                    commentNum: "10",
-                    shareNum: "100",
-                    collectNum: "1000",
-                    musicAvatar: "",
-                    musicName: ""
-                },
-
-            ],
-            isDragging: false,
-            startY: 0,
-            currentY: 0,
-            boxWidth: "100%",
-            activeIndex: null,
-            // 因为受下面函数的影响  如果boxheight的数值太小  滑动会不流畅 因此我用了900 上面乘以0.01
-            boxHeight: 950,
-            boxes: [],
+            videoboxdata: [], // 初始的视频数据
+            isDragging: false, // 是否正在拖拽
+            startY: 0, // 拖拽起始 Y 坐标
+            currentY: 0, // 当前 Y 坐标
+            boxWidth: "100%", // 每个盒子的宽度
+            activeIndex: null, // 当前活跃的盒子索引
+            boxHeight: 950, // 每个盒子的高度
+            boxes: [], // 存储视频盒子的位置数据
+            videodatahistory: [], // 存储历史的视频数据
+            page: 1, // 当前页数
+            pageSize: 4, // 每次请求的视频数量
+            debounceTimer: null, // 防抖定时器
         };
     },
+
+    watch: {
+        // 当 videoboxdata 变化时，动态更新 boxes 数量
+        videoboxdata(newData) {
+            this.updateBoxesBasedOnVideoData(newData);
+        }
+    },
+
     created() {
-
-        this.boxes = [
-            { color: "black", top: 0 },
-            { color: "black", top: 1 * this.boxHeight },
-            { color: "black", top: 2 * this.boxHeight },
-            { color: "black", top: 3 * this.boxHeight },
-        ];
-
+        // 初始化时的视频盒子数据
+        this.updateBoxesBasedOnVideoData(this.videoboxdata);
     },
 
     mounted() {
-
-        this.updateVideoPlayback();
-
-        // 自动发送请求给后端
-        homegetVideo().then(videoArr => {
-            console.log(videoArr);
-
-            // 校验 videoArr.data 是否存在且为非空数组
-            if (Array.isArray(videoArr.data) && videoArr.data.length > 0) {
-                this.videoboxdata = videoArr.data;
-            } else {
-                console.log('获取到的视频数据为空或格式不正确:', videoArr.data);
-                // 你可以在这里进行其他处理，比如给用户提示
-            }
-        }).catch(error => {
-            console.error('获取视频出错:', error);
-            console.log("获取视频出错  videobox中的");
-        });
+        // 初始化视频数据
+        this.loadVideos();
     },
-    methods: {
 
-        videotest() {
-            console.log("cccccccccc")
-        },
-        startDrag(event) {
-            // event.preventDefault();
-            this.isDragging = true;
-            this.startY = this.getEventClientY(event) - this.currentY;
-        },
-        stopDrag(event) {
-            // event.preventDefault();
-            this.isDragging = false;
-            this.updateBoxPositionBasedOnCurrentY();
-            this.updateVideoPlayback();
-        },
-        drag(event) {
-            if (this.isDragging) {
-                let newY = this.getEventClientY(event) - this.startY;
-                newY = Math.max(-(this.boxHeight * (this.boxes.length - 1)), Math.min(newY, 0));
-                this.currentY = newY;
-                this.updateBoxesPosition();
-                this.updateVideoPlayback(); // 添加这一行
-            }
-        },
-        getEventClientY(event) {
-            return event.type.startsWith("touch") ? event.touches[0].clientY : event.clientY;
-        },
-        updateBoxesPosition() {
-            this.boxes.forEach((box, index) => {
-                box.top = this.currentY + index * this.boxHeight;
+    methods: {
+        // 请求视频数据
+        loadVideos() {
+            homegetVideo(this.page, this.pageSize).then(videoArr => {
+                if (Array.isArray(videoArr.data) && videoArr.data.length > 0) {
+                    this.videodatahistory.push(...videoArr.data); // 更新历史视频数据
+                    this.videoboxdata = [...this.videodatahistory]; // 更新 videoboxdata 显示的视频数据
+                }
+            }).catch(error => {
+                console.error('获取视频出错:', error);
             });
         },
-        updateBoxPositionBasedOnCurrentY() {
-            const nearestIndex = Math.round(Math.abs(this.currentY) / this.boxHeight);
-            this.currentY = -nearestIndex * this.boxHeight;
+
+        // 更新盒子的位置基于 videoboxdata 的长度
+        updateBoxesBasedOnVideoData(videoData) {
+            this.boxes = videoData.map((_, index) => ({
+                color: "black",
+                top: index * this.boxHeight,
+            }));
             this.updateBoxesPosition();
         },
+
+        // 防抖处理
+        debounceLoadVideos() {
+            if (this.debounceTimer) {
+                clearTimeout(this.debounceTimer); // 清除之前的定时器
+            }
+            this.debounceTimer = setTimeout(() => {
+                if (this.isAtBottom()) {
+                    this.page++; // 增加分页
+                    this.loadVideos(); // 加载更多视频
+                }
+            }, 300); // 延迟300ms执行
+        },
+
+        // 更新视频播放状态
         updateVideoPlayback() {
-            const containerHeight = this.$el.clientHeight; // 获取容器的实际高度
-            const threshold = 0.9; // 设置一个阈值，例如90%可见才算完全可见
+            const containerHeight = this.$el.clientHeight;
+            const threshold = 0.9;
 
             this.$refs.videos.forEach((video, index) => {
                 const box = this.boxes[index];
                 const boxTop = box.top;
-                const boxBottom = boxTop + this.boxHeight * 0.1; // 因为你的高度使用了 * 0.1 的缩放
+                const boxBottom = boxTop + this.boxHeight * 0.1;
 
-                // 计算视频在视口中可见的比例
                 const visibleHeight = Math.min(containerHeight, boxBottom) - Math.max(0, boxTop);
                 const visibleRatio = visibleHeight / (this.boxHeight * 0.1);
 
-                // 如果视频盒子几乎完全在视口内（根据阈值），播放视频，否则暂停
                 if (visibleRatio >= threshold) {
                     video.play();
                 } else {
                     video.pause();
                 }
             });
+        },
+
+        // 拖拽事件
+        startDrag(event) {
+            this.isDragging = true;
+            this.startY = this.getEventClientY(event) - this.currentY;
+        },
+
+        stopDrag(event) {
+            this.isDragging = false;
+            this.updateBoxPositionBasedOnCurrentY();
+            this.updateVideoPlayback();
+        },
+
+        drag(event) {
+            if (this.isDragging) {
+                let newY = this.getEventClientY(event) - this.startY;
+                newY = Math.max(-(this.boxHeight * (this.boxes.length - 1)), Math.min(newY, 0));
+                this.currentY = newY;
+                this.updateBoxesPosition();
+                this.updateVideoPlayback();
+                this.debounceLoadVideos();
+            }
+        },
+
+        getEventClientY(event) {
+            return event.type.startsWith("touch") ? event.touches[0].clientY : event.clientY;
+        },
+
+        updateBoxesPosition() {
+            this.boxes.forEach((box, index) => {
+                box.top = this.currentY + index * this.boxHeight;
+            });
+        },
+
+        updateBoxPositionBasedOnCurrentY() {
+            const nearestIndex = Math.round(Math.abs(this.currentY) / this.boxHeight);
+            this.currentY = -nearestIndex * this.boxHeight;
+            this.updateBoxesPosition();
+        },
+
+        isAtBottom() {
+            const lastBox = this.boxes[this.boxes.length - 1];
+            const containerHeight = this.$el.clientHeight;
+            return lastBox.top + this.boxHeight * 0.1 <= containerHeight;
         },
 
         go(index) {
@@ -213,22 +185,10 @@ export default {
 </script>
 
 <style scoped>
-.videotesto {
-    width: 200px;
-    height: 200px;
-    position: absolute;
-    right: 0px;
-    background-color: blue;
-    z-index: 10;
-}
-
-
-
 .videoasideone {
     display: block;
     z-index: 5;
     position: absolute;
-    /* 侧边栏的位置 */
     right: 0;
     bottom: 6vh;
     margin-right: 4vw;
@@ -238,13 +198,11 @@ export default {
     display: block;
     z-index: 5;
     position: absolute;
-    /* 侧边栏的位置 */
     left: 0;
     bottom: 2vh;
 }
 
 .videoone {
-
     display: block;
     z-index: 10;
     object-fit: cover;
@@ -258,12 +216,10 @@ export default {
     flex-direction: column;
     position: relative;
     height: 100vh;
-
 }
 
 .box {
     position: absolute;
     transition: top 0.3s ease;
-
 }
 </style>

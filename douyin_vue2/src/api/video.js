@@ -2,8 +2,13 @@ import request from "@/utils/request.js";
 
 // params 处理get请求  data处理post请求
 
-export const homegetVideo = () => {
-  return request.get("/video/test");
+export const homegetVideo = (page, size) => {
+  return request.get("/video/test", {
+    params: {
+      page,
+      size,
+    },
+  });
 };
 
 export const homegetVideomore = () => {
@@ -58,4 +63,17 @@ export const uploadFile = (file, additionalParams) => {
 // 前端代码
 export const getauthinfo = (params) => {
   return request.get("/user/friend/getauth", { params }); // 将参数放入 { params } 中
+};
+
+// 前端代码
+export const getcomment = (params) => {
+  return request.get("/comment/getfu", { params }); // 将参数放入 { params } 中
+};
+
+export const getmumsic = (music_id) => {
+  return request.get("/music/getmusic", {
+    params: {
+      music_id,
+    },
+  });
 };

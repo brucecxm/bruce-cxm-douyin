@@ -1,0 +1,65 @@
+6、什么是自动拆装箱  int和Integer有什么区别    难度系数：⭐
+基本数据类型，如int,float,double,boolean,char,byte,不具备对象的特征，不能调用方法。
+
+装箱：将基本类型转换成包装类对象
+拆箱：将包装类对象转换成基本类型的值
+java为什么要引入自动装箱和拆箱的功能？主要是用于java集合中，List<Inteter> list=new ArrayList<Integer>();
+
+list集合如果要放整数的话，只能放对象，不能放基本类型，因此需要将整数自动装箱成对象。
+
+实现原理：javac编译器的语法糖，底层是通过Integer.valueOf()和Integer.intValue()方法实现。
+
+区别：
+
+Integer是int的包装类，int则是java的一种基本数据类型
+Integer变量必须实例化后才能使用，而int变量不需要
+Integer实际是对象的引用，当new一个Integer时，实际上是生成一个指针指向此对象；而int则是直接存储数据值
+Integer的默认值是null，int的默认值是0
+
+
+
+
+7、==和equals区别    难度系数：⭐
+==
+如果比较的是基本数据类型，那么比较的是变量的值
+
+如果比较的是引用数据类型，那么比较的是地址值（两个对象是否指向同一块内存）
+
+equals
+如果没重写equals方法比较的是两个对象的地址值
+
+如果重写了equals方法后我们往往比较的是对象中的属性的内容
+
+equals方法是从Object类中继承的，默认的实现就是使用==
+int a=1 int b=1   a==b is true  基本数据类型比较的是值
+String a ="a"  String b ="a"   a==b is false 引用数据类型比较的是地址 a和b的地址不一样 所以要用equal
+
+
+
+8、String能被继承吗 为什么用final修饰    难度系数：⭐
+不能被继承，因为String类有final修饰符，而final修饰的类是不能被继承的。
+public final class String
+    implements java.io.Serializable, Comparable<String>, CharSequence {  String的底层有final修饰
+    public final class StringBuilder
+     public final class StringBuffer
+String 类是最常用的类之一，为了效率，禁止被继承和重写。
+为了安全。String 类中有native关键字修饰的调用系统级别的本地方法，调用了操作系统的 API，如果方法可以重写，可能被植入恶意代码，破坏程序。Java 的安全性也体现在这里。
+修饰变量：
+常量：使用 final 修饰的变量是常量，一旦赋值后，它的值就不能再修改。
+如果是基本数据类型，值不可变；如果是引用类型，引用不可变，但对象的内容可以改变。
+修饰方法：
+final 修饰的方法不能被子类重写。
+修饰类：final 修饰的类不能被继承。
+
+
+
+String buffer和String builder区别     StringBuffer用了锁修饰 线程安全 有锁占用 更慢  String builder没锁 更快 线程不安全
+
+
+
+
+
+final、finally、finalize    难度系数：⭐
+final：修饰符（关键字）有三种用法：修饰类、变量和方法。修饰类时，意味着它不能再派生出新的子类，即不能被继承，因此它和abstract是反义词。修饰变量时，该变量使用中不被改变，必须在声明时给定初值，在引用中只能读取不可修改，即为常量。修饰方法时，也同样只能使用，不能在子类中被重写。
+finally：通常放在try…catch的后面构造最终执行代码块，这就意味着程序无论正常执行还是发生异常，这里的代码只要JVM不关闭都能执行，可以将释放外部资源的代码写在finally块中。
+finalize：Object类中定义的方法，Java中允许使用finalize() 方法在垃圾收集器将对象从内存中清除出去之前做必要的清理工作。这个方法是由垃圾收集器在销毁对象时调用的，通过重写finalize() 方法可以整理系统资源或者执行其他清理工作。

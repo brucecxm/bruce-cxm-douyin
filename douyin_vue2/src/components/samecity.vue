@@ -13,7 +13,7 @@
             </div>
 
             <div class="videoarticle">
-                <div class="position" @click="showPosition">
+                <div class="position" @click="showPosition()">
                     距离你1km
                 </div>
 
@@ -146,7 +146,6 @@ export default {
 
         showPosition() {
             this.$router.push("/map")
-
         },
 
         startDrag(event) {

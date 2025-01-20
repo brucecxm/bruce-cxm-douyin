@@ -9,12 +9,28 @@
 
 export default {
     props: {
-        videoData: Object
+        videoData: {
+            type: Object,
+
+            default() {
+                return {
+                    collectNum: '',  // 收藏数量
+                    commentNum: '',  // 评论数量
+                    likeNum: '',    // 点赞数量
+                    shareNum: '',    // 分享数量
+                    userAvatar: "",
+                    userid: '',    // 用户 ID
+                    username: "",  // 用户名
+                    videoUrl: "",  // 视频 URL
+                    video_comment: "",  // 视频评论
+                    videoid: '',  // 视频 ID
+                };
+            },
+        },
     },
     data() {
         return {
-            article: "感谢穿越火线感谢穿越火线感谢穿越火线",
-            username: "你好"
+
         };
     },
     methods: {

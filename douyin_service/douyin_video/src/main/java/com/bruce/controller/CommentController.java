@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * (Comment)表控制层
@@ -27,9 +28,11 @@ private CommentoneService commentoneservice;
 
 @GetMapping("/getfu")
     //获得所有父评论的接口
-    public R getfu(){
+    public R getfu(Map params){
 
-    List<CommentDto>  x=commentoneservice.getcomment();
+    String videoid = String.valueOf(params.get("videoid"));
+
+    List<Map>  x=commentoneservice.getcomment();
 
 
     return R.ok(x);

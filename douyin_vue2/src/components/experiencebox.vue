@@ -63,13 +63,13 @@ export default {
         return {
             search: "",
             meumbox: [
-                { name: "超d市", menuImg: img1, hrefurl: "order" },
-                { name: "超d市", menuImg: img2, hrefurl: "chongzhi" },
-                { name: "超d市", menuImg: img3, hrefurl: "shopmessage" },
-                { name: "超d市", menuImg: img4, hrefurl: "" },
-                { name: "超d市", menuImg: img5, hrefurl: "" },
-                { name: "超d市", menuImg: img5, hrefurl: "" },
-                { name: "超d市", menuImg: img5, hrefurl: "" },
+                { name: "超d市", menuImg: imgn6, hrefurl: "order" },
+                { name: "超d市", menuImg: imgn6, hrefurl: "chongzhi" },
+                { name: "超d市", menuImg: imgn6, hrefurl: "shopmessage" },
+                { name: "超d市", menuImg: imgn6, hrefurl: "" },
+                { name: "超d市", menuImg: imgn6, hrefurl: "" },
+                { name: "超d市", menuImg: imgn6, hrefurl: "" },
+                { name: "超d市", menuImg: imgn6, hrefurl: "" },
             ],
             navbox: [
                 { navname: "ss", navImg: imgn6, navhrefurl: "order" },

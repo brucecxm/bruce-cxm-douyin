@@ -344,7 +344,7 @@
                     <option name="custom" value="false" />
                     <option name="ext" value="{}" />
                     <option name="name" value="shopName" />
-                    <option name="type" value="java.lang.Integer" />
+                    <option name="type" value="java.lang.String" />
                   </ColumnInfoDTO>
                   <ColumnInfoDTO>
                     <option name="custom" value="false" />
@@ -356,19 +356,19 @@
                     <option name="custom" value="false" />
                     <option name="ext" value="{}" />
                     <option name="name" value="shopDesc" />
-                    <option name="type" value="java.lang.Integer" />
+                    <option name="type" value="java.lang.String" />
                   </ColumnInfoDTO>
                   <ColumnInfoDTO>
                     <option name="custom" value="false" />
                     <option name="ext" value="{}" />
                     <option name="name" value="shopImg" />
-                    <option name="type" value="java.lang.Integer" />
+                    <option name="type" value="java.lang.String" />
                   </ColumnInfoDTO>
                   <ColumnInfoDTO>
                     <option name="custom" value="false" />
                     <option name="ext" value="{}" />
                     <option name="name" value="shopInfo" />
-                    <option name="type" value="java.lang.Integer" />
+                    <option name="type" value="java.lang.String" />
                   </ColumnInfoDTO>
                 </list>
               </option>
@@ -377,7 +377,7 @@
               <option name="saveModelName" value="douyin_shop" />
               <option name="savePackageName" value="com.bruce" />
               <option name="savePath" value="./douyin_service/douyin_shop/src/main/java/com/bruce" />
-              <option name="templateGroupName" value="Default" />
+              <option name="templateGroupName" value="MybatisPlus" />
             </TableInfoDTO>
           </value>
         </entry>

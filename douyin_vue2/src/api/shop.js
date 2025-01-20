@@ -2,9 +2,10 @@ import request from "@/utils/request.js";
 
 // params 处理get请求  data处理post请求
 
-export const shoplist = () => {
-  return request.get("/shop/dish/list");
+export const shoplist = (current, size) => {
+  return request.get(`/shop?current=${current}&size=${size}`);
 };
+
 export const searchForDish = (name) => {
   return request.get(`/shop/dish/sear/${name}`);
 };
