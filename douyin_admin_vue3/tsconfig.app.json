@@ -46,6 +46,7 @@
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "env.d.ts"
+    "env.d.ts",
+    "src/api/video/video.js"
   ]
 }

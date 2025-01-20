@@ -89,7 +89,6 @@ public class VideoController extends ApiController {
 
     @GetMapping("/test")
     public List<Map> getVideoInfo(
-            @RequestParam(defaultValue = "1") int videoid,
             @RequestParam(defaultValue = "1") int page,
 
             @RequestParam(defaultValue = "4") int size) {
@@ -160,9 +159,9 @@ public class VideoController extends ApiController {
 
 
 
-
-
-
+//
+//
+//
 //
 //    @GetMapping("/one")
 //    public R getone() {

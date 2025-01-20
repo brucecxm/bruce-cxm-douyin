@@ -47,7 +47,8 @@ api.interceptors.response.use(
       }
     }
     else {
-      useUserStore().requestLogout()
+      // useUserStore().requestLogout()
+      // console.log('没有得到正确的校验值')
     }
     return Promise.resolve(response.data)
   },

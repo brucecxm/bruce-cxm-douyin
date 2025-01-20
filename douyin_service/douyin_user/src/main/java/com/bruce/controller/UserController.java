@@ -3,6 +3,7 @@ package com.bruce.controller;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.api.R;
 import com.bruce.entity.User;
 import com.bruce.pojo.Result;
 import com.bruce.service.UserService;
@@ -76,6 +77,29 @@ private  UserService userService;
             System.out.println("无效的操作: " + action);
         }
     }
+
+
+
+
+
+
+    @RequestMapping("getall")
+    public R getAllUser() {
+
+     List<User> one=   userService.list();
+
+        return R.ok(one);
+
+    }
+
+
+
+
+
+
+
+
+
 
 
 
