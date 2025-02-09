@@ -31,3 +31,17 @@ export const getnav = (page = 1, pageSize = 10) => {
     },
   });
 };
+
+export const getwallet = (userid) => {
+  return request.get(`/shop/dish/sear/${name}`);
+};
+
+export const getlikeall = (key, current, size) => {
+  return request.get(`/shop/likeall`, {
+    params: {
+      key, // 作为查询参数传递 key
+      current, // 分页参数
+      size, // 分页参数
+    },
+  });
+};

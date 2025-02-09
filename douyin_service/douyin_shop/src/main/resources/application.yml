@@ -1,6 +1,14 @@
 server:
   port: 7426
 spring:
+
+  rabbitmq:
+    host: 192.168.200.130  # RabbitMQ 服务器的主机地址
+    port: 5672  # RabbitMQ 服务器的端口号
+    username: itcast  # RabbitMQ 的用户名
+    password: 123321  # RabbitMQ 的密码
+    virtual-host: /  # RabbitMQ 的虚拟主机
+
   application:
     #应用的名称，可选
     name: DouyinShopService

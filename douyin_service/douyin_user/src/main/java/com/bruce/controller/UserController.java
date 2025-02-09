@@ -14,11 +14,7 @@ import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-//import org.springframework.security.web.DefaultRedirectStrategy;
-//import org.springframework.security.web.RedirectStrategy;
-//import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
-//import org.springframework.security.web.savedrequest.RequestCache;
-//import org.springframework.security.web.savedrequest.SavedRequest;
+
 
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -162,42 +158,6 @@ public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-//
-//
-//    @Autowired
-//    private OAuth2AuthorizedClientService authorizedClientService;
-//
-//    @Autowired
-//    private RestTemplate restTemplate;
-//
-//    @GetMapping("/loginqq")
-//    public String login(@RegisteredOAuth2AuthorizedClient("qq") OAuth2AuthorizedClient authorizedClient) {
-//        OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
-//        String userInfo = getUserInfo(accessToken.getTokenValue());
-//        return userInfo;
-//    }
-//
-//    private String getUserInfo(String accessToken) {
-//        String url = "https://graph.qq.com/user/get_user_info?access_token=" + accessToken + "&oauth_consumer_key=YOUR_APP_ID";
-//        return restTemplate.getForObject(url, String.class);
-//    }
-//
-
-
-//
-//
-//@Autowired
-//private chatInfoDao chatInfoDaoone;
-//
-//    @GetMapping("/getuserinfo")
-//    public Result<User> getuserinfo(String user_id) {
-//
-//     User user=   chatInfoDaoone.queryUserInfoone(user_id);
-//
-//        return Result.success(user);
-//    }
-
-
     @Autowired
     private AmqpTemplate amqpTemplate;
 
@@ -216,7 +176,7 @@ public class UserController {
             //没有占用
             //注册
             userService.save(user);
-            amqpTemplate.convertAndSend("create_wallet_exampleExchange", "create_wallet_RoutingKey", user.getId());
+            amqpTemplate.convertAndSend("create_walletone_exampleExchange", "create_walletone_RoutingKey", user.getId());
             //这里用mq创建钱包 并且每天都会用定时任务  查询钱包表的用户是否和用户表的一致  如果不一致的话 就解决问题
             return Result.success();
         } else {
@@ -224,71 +184,6 @@ public class UserController {
             return Result.error("用户名已被占用");
         }
     }
-
-//    \\S: 代表一个非空白字符。它可以是字母、数字或其他符号，但不能是空格、制表符或其他空白字符。
-//    {5,16}:
-//            5 表示至少需要 5 个非空白字符。
-//            16 表示最多只能有 16 个非空白字符。
-
-//    @PostMapping("/login")
-//    public Result<String> login(
-//            @Pattern(regexp = "^\\S{5,16}$") @RequestParam(name = "username", defaultValue = "admin", required = true) String username,
-//            @Pattern(regexp = "^\\S{5,16}$") String password) {
-//
-//        // 根据用户名查询用户
-//        User loginUser = userService.findByUserName(username);
-//        // 判断该用户是否存在
-//        if (loginUser == null) {
-//            return Result.error("用户名错误");
-//        }
-//
-//        String hashedPassword = Md5Util.getMD5String(password);
-//        boolean isEmail = true;  // 假设这里是一个标志，您可以根据实际情况调整
-//        String yanzhengma = "5657"; // 验证码
-//
-//        // 检查密码
-//        if (isEmail) {
-////            if (hashedPassword.equals(loginUser.getPassword())) {
-////                return generateTokenAndStoreInRedis(loginUser);
-////            } else {
-////                return checkValidationCodeAndLogin(loginUser, yanzhengma);
-////            }
-//            return Result.error(String.valueOf(loginUser.getId()));
-//
-//        }
-//
-//        return Result.error("密码错误");
-//    }
-//
-//    private Result<String> generateTokenAndStoreInRedis(User loginUser) {
-//        Map<String, Object> claims = new HashMap<>();
-//        claims.put("id", loginUser.getId());
-//        claims.put("username", loginUser.getUsername());
-//        String token = JwtUtil.genToken(claims);
-//
-//        try {
-//            // 把token存储到redis中
-//            ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
-//            operations.set(token, token, 1, TimeUnit.HOURS);
-//        } catch (RedisConnectionFailureException ex) {
-//            System.out.println("Redis 连接失败，请检查 Redis 服务器是否运行。");
-//        } catch (Exception ex) {
-//            System.out.println("Redis 连接失败，请检查 Redis 服务器是否运行。");
-//        }
-//token=loginUser.getUsername();
-//        return Result.success(token);
-//    }
-
-//    //核对验证码
-//    //核对验证码
-//    private Result<String> checkValidationCodeAndLogin(User loginUser, String yanzhengma) {
-//        String operations = stringRedisTemplate.opsForValue().get("yancode");
-//        if (operations != null && operations.equals(yanzhengma)) {
-//            return generateTokenAndStoreInRedis(loginUser);
-//        } else {
-//            return Result.error("密码错误");
-//        }
-//    }
 
 
     @Autowired

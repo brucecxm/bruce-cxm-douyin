@@ -1,38 +1,13 @@
 server:
-  port: 74227
+  port: 7412
 spring:
   application:
     name: DouyinTestService
   datasource:
     username: root
     password: root
-    url: jdbc:mysql://localhost:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+    url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
 
-
-mybatis:
-  mapper-locations: classpath:mapper/**/*.xml
-
-mybatis-plus:
-  configuration:
-    #???????????????????????????????????????
-    map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  global-config:
-    db-config:
-      id-type: ASSIGN_ID
-
-
-token:
-  #  token有效时间，单位分钟 24*60=1440
-  tokenExpireTime: 1440
-  # 更新令牌时间 2*60=120
-  refreshCheckTime: 120
-  #  #  RefreshToken过期时间，单位：分钟, 24*60=1440
-  #  refreshTokenExpireTime: 1440
-  #  shiro缓存有效期，单位分钟,2*60=120
-  shiroCacheExpireTime: 120
-  #  token加密密钥
-  secretKey: abcdefghijklmnopqrstuvwxyz0123456789
 
 
 

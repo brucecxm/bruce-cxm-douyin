@@ -2,6 +2,7 @@ package com.bruce.controller;
 
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
@@ -41,6 +42,22 @@ public class ShopController extends ApiController {
         R one=success(this.shopService.page(page, new QueryWrapper<>(shop)));
         return one;
     }
+
+
+
+    @GetMapping("/likeall")
+    public R likeall(Page<Shop> page, String key) {
+
+        LambdaQueryWrapper<Shop> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+// 查询 name 字段中包含 "张" 的记录
+        lambdaQueryWrapper.like(Shop::getShopName, key);
+
+        List<Shop> shop = shopService.list(lambdaQueryWrapper);
+
+        R one=success(shop);
+        return one;
+    }
+
 
 
 

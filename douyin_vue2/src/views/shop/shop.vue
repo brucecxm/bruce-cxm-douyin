@@ -231,6 +231,8 @@ export default {
         searchmeth() {
             // 实现搜索操作
             console.log('搜索内容:', this.searchText);
+            // 使用查询参数传递搜索内容
+            this.$router.push({ path: '/searchshop', query: { search: this.searchText } });
         },
         submitlian(name) {
             this.search = name

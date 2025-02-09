@@ -329,6 +329,34 @@
             </TableInfoDTO>
           </value>
         </entry>
+        <entry key="douyintest.schedule">
+          <value>
+            <TableInfoDTO>
+              <option name="fullColumn">
+                <list>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="id" />
+                    <option name="type" value="java.lang.Integer" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="name" />
+                    <option name="type" value="java.lang.String" />
+                  </ColumnInfoDTO>
+                </list>
+              </option>
+              <option name="name" value="Schedule" />
+              <option name="preName" value="" />
+              <option name="saveModelName" value="douyin_schedule" />
+              <option name="savePackageName" value="com.bruce" />
+              <option name="savePath" value="./douyin_service/douyin_schedule/src/main/java/com/bruce" />
+              <option name="templateGroupName" value="MybatisPlus" />
+            </TableInfoDTO>
+          </value>
+        </entry>
         <entry key="douyintest.shop">
           <value>
             <TableInfoDTO>

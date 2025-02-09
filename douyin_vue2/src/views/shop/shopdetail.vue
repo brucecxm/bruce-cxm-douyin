@@ -73,6 +73,12 @@
             <img src="../../assets/op.jpg" alt="Detail Image 2" class="detail-img">
         </div>
 
+        <!-- Bottom Box -->
+        <div class="buy-box" v-if="showBuyBox">
+
+            <p @click="showBuyBox = false">{{ ">" }}</p>
+        </div>
+
         <!-- Footer -->
         <footer>
             <div class="footer-icons">
@@ -82,14 +88,13 @@
             </div>
             <div class="footer-buttons">
                 <button class="add-cart">加入购物车</button>
-                <button class="buy-now">立即购买</button>
+                <button class="buy-now" @click="showBuyBox = true">立即购买</button>
             </div>
         </footer>
     </div>
 </template>
-
 <script>
-
+import shopinfodetail from '@/components/shop/shopinfodetail.vue';
 export default {
     data() {
         return {
@@ -97,14 +102,13 @@ export default {
             recommendations: [
                 { id: 1, price: '¥47.83', name: 'Recommendation 1' },
                 { id: 2, price: '¥49.99', name: 'Recommendation 2' },
-                // more recommendation items...
             ],
             reviews: [
                 { id: 1, name: 'Reviewer 1', content: 'Great product!' },
                 { id: 2, name: 'Reviewer 2', content: 'Loved it!' },
-                // more reviews...
             ],
-            itemId: null // 用于存储传递的 ID
+            showBuyBox: false, // 控制盒子的显示与隐藏
+            itemId: null,
         };
     },
     methods: {
@@ -116,7 +120,7 @@ export default {
         },
         fetchItemDetails(id) {
             // 根据 ID 请求商品详情数据的逻辑
-        }
+        },
     },
     mounted() {
         window.addEventListener('scroll', this.handleScroll);
@@ -126,10 +130,9 @@ export default {
     },
     created() {
         this.itemId = this.$route.params.id;
-        console.log(this.itemId);
         this.fetchItemDetails(this.itemId);
-    }
-}
+    },
+};
 </script>
 
 <style scoped>
@@ -236,6 +239,32 @@ header.sticky {
 .additional-info {
     font-size: 14px;
     color: #999;
+}
+
+/* Bottom Box */
+.buy-box {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    height: 80%;
+    z-index: 20;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(100%);
+    animation: slideUp 0.5s forwards;
+    /* 平滑从下到上的动画 */
+}
+
+/* 动画效果 */
+@keyframes slideUp {
+    0% {
+        transform: translateY(100%);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
 }
 
 .additional-info span {

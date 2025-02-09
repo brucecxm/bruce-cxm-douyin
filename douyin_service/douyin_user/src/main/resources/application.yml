@@ -97,14 +97,18 @@ spring:
             token-uri: https://graph.qq.com/oauth2.0/token  # QQ的令牌URI
             user-info-uri: https://graph.qq.com/user/get_user_info  # QQ的用户信息URI
 
+
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+
 mybatis-plus:
   configuration:
-    # 在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射
-    map-underscore-to-camel-case: true  # 开启驼峰命名法映射
+    #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
-      id-type: ASSIGN_ID  # 全局主键策略，设置为分配ID
-
+      id-type: ASSIGN_ID
 eureka:
   client:
     service-url:

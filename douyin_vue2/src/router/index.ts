@@ -23,6 +23,11 @@ const router = new VueRouter({
       component: () => import("../views/shop/shopcat.vue"),
     },
     {
+      path: "/searchshop",
+      name: "searchshop",
+      component: () => import("../views/shop/searchshop.vue"),
+    },
+    {
       path: "/coupon",
       name: "coupon",
       component: () => import("../views/shop/coupon.vue"),
