@@ -155,7 +155,7 @@ public class redisController {
     }
 
 
-    @PostMapping
+    @PostMapping("/createOrder ")
     public ResponseEntity<Order> createOrder(@RequestBody Order order) {
         Order createdOrder = orderoneService.createOrder(order);
         return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
