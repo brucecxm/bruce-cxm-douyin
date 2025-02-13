@@ -143,7 +143,10 @@ public class redisController {
 
 
         /* 解法2：逻辑过期
-        如果有一个线程无法从redis获取值
+        如果有一个线程查询缓存 发现数据逻辑过期 那么会获取互斥锁  然后新建一个线程 去查询数据库完成同步并释放锁
+        然后主线程返回过期数据
+
+        此时另外一个线程查询缓存 发现逻辑过期 无法获取锁 直接返回过期数据 不会被阻塞
          */
 
 
@@ -183,14 +186,191 @@ public class redisController {
     }
 
 
-
-
+    //todo  这里解决并演示redis和mysql的双写一致性的问题
+    //todo  这里解决并演示redis和mysql的双写一致性的问题
     //todo  这里解决并演示redis和mysql的双写一致性的问题
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
+
+        /*
+         * 修改了数据库的数据也要同时更新缓存的数据， 缓存和数据库的数据要保持一致
+         *
+         * 极大的控制了脏数据的风险 但是也只是控制了一部分  因为延时的过程中  会有大量的请求过来 导致脏数据的产生
+         * 主要是延时的时间不好控制
+         *
+         * */
+
+//如果不是强一致的情况下
+
+        /*
+         * 读操作：缓存命中，直接返回 缓存未命中查询数据库 写入缓存 设定超时时间
+         * */
+
+        /*
+         * 写操作：采用延时双删 ---》先删除缓存 再修改数据库  再（延时一会）删除缓存
+         * ---》双删的目的是因此先删除数据库 或者删除缓存都会出问题 会出现脏数据 所以要删除两次缓存
+         * ---》延时的目的是因为redis一般是主从同步的结构 所以要延时一会等待主从同步再删除
+         * */
+
+//如果是强一致的情况下
+ /*
+ * 采用分布式锁：强一致 性能低
+ * */
+
+      /*  因为一般存入redis的数据 都是（读多写少）的数据，所以出现了两把锁
+                共享锁--》 读锁 readlock 加锁后 其他线程可以共享读操作
+                排他锁--》  独占锁writelock 加锁之后 ，阻塞其他线程读写操作
+
+                这两把锁 redission都有提供 直接引入依赖  调用即可
+
+*/
+
+//        如果是允许短暂的不一致的情况下 用到mq  一定要保证mq消息的可靠性  或者用canal 重点掌握mq的  这个策略是最常用到的
+
+
         orderoneService.deleteOrder(id);
         return ResponseEntity.noContent().build();
     }
+
+
+
+
+    //todo 这里演示解释redis持久化的问题
+    //todo 这里演示解释redis持久化的问题
+    //todo 这里演示解释redis持久化的问题
+    // 获取所有订单
+    @GetMapping("/chijiuhua")
+    public ResponseEntity<List<Order>> chijiuhua() {
+
+
+/*
+*
+* RDB：记录数据  会记录redis的所有数据到一个rdb文件 如果redis重启之类的  会到rdb读取数据
+*
+* */
+
+  /*
+  *
+  * AOP:记录命令（默认关闭 需要配置开启）  文件比较小 因为只记录命令
+  *
+  * */
+
+
+
+
+
+
+        List<Order> orders = orderoneService.getAllOrders();
+        return ResponseEntity.ok(orders);
+    }
+
+
+
+
+    //todo 这里演示解释缓存过期策略
+    //todo 这里演示解释缓存过期策略
+    //todo 这里演示解释缓存过期策略
+
+    // 获取所有订单
+    @GetMapping("/guoqi")
+    public ResponseEntity<List<Order>> guoqi() {
+
+
+        /*
+        * redis的数据过期之后 需要将数据从内存中删除 可以按照不同的规则进行删除  这种规则叫数据删除策略（数据过期策略）
+        * */
+
+
+        /*
+        * 1.惰性删除：key过期之后不去管他 知道有人访问这个key发现过期了再删除
+        * 对cpu友好 不用重复执行多余的操作
+        * 对内存不友好  会占用大量内存
+        * */
+
+        /*
+        * 2.定期删除：
+        * */
+
+
+        List<Order> orders = orderoneService.getAllOrders();
+        return ResponseEntity.ok(orders);
+    }
+
+
+
+
+
+
+    //todo 这里演示解释缓存数据淘汰策略
+
+    // 获取所有订单
+    @GetMapping("/taotai")
+    public ResponseEntity<List<Order>> taotai() {
+
+        List<Order> orders = orderoneService.getAllOrders();
+        return ResponseEntity.ok(orders);
+    }
+
+
+
+    //todo 这里演示解释redis的集群
+    //todo 这里演示解释redis的集群
+    //todo 这里演示解释redis的集群
+
+    @GetMapping("/jiqun")
+    public ResponseEntity<List<Order>> jiqun() {
+
+        /*
+        * 主从复制：单节点redis的并发能力是有上线的 要提高并发能力 就要搭建主从集群 实现读写分离 、
+        * 一般主节点负责写数据 从节点负责读数据
+        *  主节点 master  从节点 slave
+        *
+        * 主从全量同步：slave执行replicaof给master请求数据同步 master判断是否是第一次同步 如果是第一次 返回master的数据版本信息
+        * 给slave  slave保存版本信息  然后master执行bgsave 生成rdb文件发送给slave  slave情况本地数据 加载rdb文件
+        * （重点：在同步过程中 主节点也会收到别的命令 在整个同步过程中 主节点会记录rdb期间的所有命令 发送给slave  slave在执行完rdb后
+        * 会执行master发功过来的repl_baklog命令 完整全量同步）
+        *
+        *
+        * 主从增量同步：slave重启 后者后期数据变化  slave重启后 发送psync replid offset  master判断replid是否一致
+        * 如果一致 则不是第一次 增量同步 回复cotinue  然后master去repl_baklog获取offset后的数据 发送offset后的命令给
+        * slave  然后slave执行命令
+        *
+        * */
+
+
+
+
+        /*
+           主从模式有一个缺点 无法保证redis 的高可用  如果主节点丧失功能 redis集群丧失了写数据的能力 因此提供了哨兵模式解决这个问题
+         * 哨兵模式： redis提供了哨兵（sentinel）机制来实现主从集群的自动故障恢复
+         *
+         * 一般至少会提供三个哨兵  哨兵也是一个redis节点 是由多个redis组成的集群
+
+         *
+          功能1：监控  sentinel会不断检查master或者slave是否按照预期工作
+          功能2：自动故障恢复 如果master故障 sentinel会将一个slave提升未master  故障的master恢复之后依然以新的master为主
+          功能3：通知 sentinel会将新的master推给redis客户端 确保客户端能正确连接到新的redis的master节点
+
+
+         * */
+
+
+
+        /*
+         前面两个有两个问题没解决  1.海量数据存储问题  2.大量的写请求
+         * 分片集群：redis集群中有多个master 每个master存储不同的数据  每个master有多个从节点  master相互之间会执行ping命令检查
+         是否可用  redisclient的请求会被正确路由到对应的master
+
+         如何路由：（哈希槽）  每个master都会有一个范围 比如0-1000 1000-2000 2000-3000  存数据的时候 会通过哈希计算
+         将数据存入对应的范围的master  读数据同样 计算哈希值 到对应的master对应的slave读数据
+         * */
+
+
+        List<Order> orders = orderoneService.getAllOrders();
+        return ResponseEntity.ok(orders);
+    }
+
+
 
 
 }
