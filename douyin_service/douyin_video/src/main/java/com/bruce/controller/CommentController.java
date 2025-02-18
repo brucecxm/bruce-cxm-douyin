@@ -31,8 +31,8 @@ private CommentoneService commentoneservice;
     public R getfu(Map params){
 
     String videoid = String.valueOf(params.get("videoid"));
-
-    List<Map>  x=commentoneservice.getcomment();
+int videoId = Integer.valueOf(videoid);
+    List<Map>  x=commentoneservice.getcomment(videoId);
 
 
     return R.ok(x);

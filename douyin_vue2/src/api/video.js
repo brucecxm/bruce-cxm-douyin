@@ -2,11 +2,12 @@ import request from "@/utils/request.js";
 
 // params 处理get请求  data处理post请求
 
-export const homegetVideo = (page, size) => {
+export const homegetVideo = (page, size, videoType) => {
   return request.get("/video/test", {
     params: {
       page,
       size,
+      videoType,
     },
   });
 };

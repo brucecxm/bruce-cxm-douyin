@@ -1,4 +1,5 @@
 //package com.bruce.handlle;
+//import cn.dev33.satoken.stp.StpUtil;
 //import org.springframework.cloud.gateway.filter.GatewayFilter;
 //import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 //import org.springframework.http.HttpHeaders;
@@ -23,6 +24,7 @@
 //
 //
 //
+//                StpUtil.checkLogin();
 //
 //
 //

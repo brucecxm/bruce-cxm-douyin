@@ -5,7 +5,6 @@
 //import java.util.List;
 //
 //public class test {
-//
 //    public  void  one(){
 //        List<String> one= StpUtil.getPermissionList();
 //        for(String two:one){

@@ -1,5 +1,6 @@
 package com.bruce.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.bruce.dtos.User;
 import com.bruce.mapper.UserMapperone;
 import com.bruce.service.OrderService;
@@ -22,6 +23,9 @@ public class OrderController {
     @GetMapping("/test")
     @ResponseBody  // Adding @ResponseBody to return a response body
     public String OrderSelect() {
+        // 会话登录：参数填写要登录的账号id，建议的数据类型：long | int | String， 不可以传入复杂类型，如：User、Admin 等等
+        StpUtil.login(1);
+
         orderService.myMethod(); // Call the service method
         return "Order method executed successfully!"; // Returning a success message
     }

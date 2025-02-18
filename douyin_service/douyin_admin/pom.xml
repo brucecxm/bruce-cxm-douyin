@@ -17,6 +17,11 @@
     </properties>
 
 <dependencies>
+    <dependency>
+        <groupId>redis.clients</groupId>
+        <artifactId>jedis</artifactId>
+        <version>3.6.0</version>  <!-- 使用你需要的版本 -->
+    </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

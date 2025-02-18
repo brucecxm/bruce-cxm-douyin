@@ -1,10 +1,11 @@
-package com.bruce.utils;
+package com.bruce.util;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+
 @Component
 public class JwtUtil {
 

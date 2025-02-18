@@ -96,6 +96,9 @@
 <script>
 import shopinfodetail from '@/components/shop/shopinfodetail.vue';
 export default {
+    comments:{
+
+    },
     data() {
         return {
             isSticky: false,

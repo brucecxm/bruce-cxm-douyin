@@ -61,7 +61,42 @@ public interface VideoOneDao {
             "GROUP BY m.music_name, v.video_url, u.nickname, u.user_pic, v.video_id",
             "LIMIT #{limit} OFFSET #{offset}"
     })
-    List<Map> queryVideoInfo(@Param("limit") int limit, @Param("offset") int offset);
+    List<Map> queryVideoInfo(@Param("limit") int limit, @Param("offset") int offset,@Param("videoType") String videoType);
+
+
+    @Select({
+            "SELECT",
+            "    m.music_name as music,",
+            "    v.video_id as videoid,",
+            "    v.video_comment,",
+            "    u.id as userid,",
+            "    m.music_avatar as musicAvatar,",
+            "    m.music_id,",
+            "    v.video_url as videoUrl ,",
+            "    v.video_comment,",
+            "    u.nickname AS username,",
+            "    u.user_pic as userAvatar,",
+//            "    COUNT(c.comment) AS comment_count,",
+            "    (SELECT COUNT(ll.like) FROM likeone ll WHERE ll.like_videoid = v.video_id and `like` = 1 ) AS likeNum,",
+            "    (SELECT COUNT(cc.comment) FROM comment cc WHERE cc.comment_video_id = v.video_id and cc.comment is not null ) AS commentNum,",
+//            "    COUNT(l.share) AS share_num,",
+//            "    COUNT(l.collect) AS collect_num",
+            "    (SELECT COUNT(ll.share) FROM likeone ll WHERE ll.like_videoid = v.video_id and share = 1 ) AS shareNum,",
+            "    (SELECT COUNT(ll.collect) FROM likeone ll WHERE ll.like_videoid = v.video_id and collect = 1 ) AS collectNum",
+
+            "FROM video v",
+            "    left JOIN user u ON v.auth_id = u.id",
+            "    left JOIN music m ON v.music_id = m.music_video_id",
+            "    LEFT JOIN comment c ON v.video_id = c.comment_video_id",
+            "    LEFT JOIN likeone l ON v.video_id = l.like_videoid",
+            "GROUP BY m.music_name, v.video_url, u.nickname, u.user_pic, v.video_id",
+            "LIMIT #{limit} OFFSET #{offset}"
+    })
+    List<Map> queryVideoInfoNoLogin(@Param("limit") int limit, @Param("offset") int offset);
+
+
+
+
 
     @Update("UPDATE likeone SET `like` = 0 WHERE like_userid = #{userid} AND like_videoid = #{videoid}")
     int tolike(@Param("userid") int userid, @Param("videoid") int videoid);

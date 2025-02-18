@@ -39,8 +39,8 @@ public class excelImportController {
         return executor;
     }
 
-    @GetMapping
-    public String Setnxs() {
+    @GetMapping("/{id}")
+    public String Setnxs(@PathVariable int id) {
         int pageSize = 1000; // 每页查询1000条数据
         int currentPage = 1;
         boolean hasMoreData = true;
@@ -51,28 +51,38 @@ public class excelImportController {
         MemoryUsage beforeHeapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
         long beforeUsedHeapMemory = beforeHeapMemoryUsage.getUsed(); // 查询前的堆内存使用量
 
+        if(id==1)
+        {
+            while (hasMoreData) {
+                Page<Users> page = new Page<>(currentPage, pageSize);
+                QueryWrapper<Users> queryWrapper = new QueryWrapper<>();
+                // 添加查询条件（如果有的话）
+                // queryWrapper.eq("column_name", value);
 
-        while (hasMoreData) {
-            Page<Users> page = new Page<>(currentPage, pageSize);
-            QueryWrapper<Users> queryWrapper = new QueryWrapper<>();
-            // 添加查询条件（如果有的话）
-            // queryWrapper.eq("column_name", value);
+                Page<Users> userPage = usersService.page(page, queryWrapper);
+                List<Users> users = userPage.getRecords();
 
-            Page<Users> userPage = usersService.page(page, queryWrapper);
-            List<Users> users = userPage.getRecords();
-
-            if (users.isEmpty()) {
-                hasMoreData = false;
-            } else {
-                // 提交查询任务到线程池
-                taskExecutor().execute(() -> processUsers(users));
-                currentPage++;
+                if (users.isEmpty()) {
+                    hasMoreData = false;
+                } else {
+                    // 提交查询任务到线程池
+                    taskExecutor().execute(() -> processUsers(users));
+                    currentPage++;
+                }
             }
+        }else {
+            // 查询操作
+            List<Users> users = usersService.list(); // 查询数据
+for(Users users1:users)
+{
+    System.out.println(users1);
+}
         }
 
 
-        // 查询操作
-//        List<Users> users = usersService.list(); // 查询数据
+
+
+
 
         // 查询之后获取堆内存使用情况
         MemoryUsage afterHeapMemoryUsage = memoryMXBean.getHeapMemoryUsage();

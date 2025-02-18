@@ -10,12 +10,10 @@
             <p class="notice">登录后即可点赞喜欢的内容</p>
             <div v-if="!isRegistering" class="login-form">
                 <div class="input-group">
-                    <select class="country-code">
-                        <option value="+86">+86</option>
-                        <option value="+5">+5</option>
-                        <option value="+1">+1</option>
-                        <option value="+7">+7</option>
-                        <option value="+6">+6</option>
+                    <select v-model="selectedCode" class="country-code">
+                        <option v-for="country in countryCodes" :key="country.code" :value="country.code">
+                            {{ country.code }} - {{ country.name }}
+                        </option>
                     </select>
                     <input type="tel" v-model="loginpojo.username" placeholder="请输入手机号" />
                     <input type="password" v-model="loginpojo.password" placeholder="请输入密码" />
@@ -36,12 +34,10 @@
 
             <div v-if="isRegistering" class="login-form">
                 <div class="input-group">
-                    <select class="country-code">
-                        <option value="+86">+86</option>
-                        <option value="+5">+5</option>
-                        <option value="+1">+1</option>
-                        <option value="+7">+7</option>
-                        <option value="+6">+6</option>
+                    <select v-model="selectedCode" class="country-code">
+                        <option v-for="country in countryCodes" :key="country.code" :value="country.code">
+                            {{ country.code }} - {{ country.name }}
+                        </option>
                     </select>
                     <input type="tel" v-model="loginpojo.username" placeholder="请输入手机号" />
                     <input type="password" v-model="loginpojo.password" placeholder="请输入密码" />
@@ -67,7 +63,7 @@
 <script>
 import { userLoginService, userInfoService, userRegisterService } from "../../api/user"
 import { useTokenStore } from "../../stores/token"
-
+import axios from 'axios';
 export default {
     name: 'Login',
     data() {
@@ -80,8 +76,21 @@ export default {
             isPasswordLogin: false,
             isAgreed: false, // 协议同意状态
             isRegistering: false, // 是否处于注册页面
+            countryCodes: [], // 用来存储读取的国家代码
+            selectedCode: '+86',  // 用来存储选择的代码
         };
     },
+    mounted() {
+        // 假设你的 JSON 文件路径是 /assets/countryCodes.json
+        axios.get('src/assets/json/phone.json')
+            .then(response => {
+                this.countryCodes = response.data; // 将 JSON 数据赋值给 countryCodes
+            })
+            .catch(error => {
+                console.error('Error loading country codes:', error);
+            });
+    },
+
     methods: {
         closeScreen() {
             this.$router.go(-1); // 返回上一级
@@ -217,20 +226,7 @@ export default {
     /* 确保表单宽度为100% */
 }
 
-.input-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 2vh;
-    /* 使用 vh 进行下边距 */
-    width: 100%;
-    /* 确保输入组宽度为100% */
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 2vh;
-    /* 使用 vh 进行内边距 */
-    box-sizing: border-box;
-    /* 确保内边距和边框不影响总宽度 */
-}
+
 
 .country-code {
     border: none;
@@ -241,13 +237,31 @@ export default {
     /* 使用 vw 进行右边距 */
 }
 
+.input-group {
+    margin-bottom: 2vh;
+    /* 使用 vh 进行下边距 */
+    width: 100%;
+    /* 确保输入组宽度为100% */
+    padding: 2vh;
+    /* 使用 vh 进行内边距 */
+    box-sizing: border-box;
+    /* 确保内边距和边框不影响总宽度 */
+}
+
 .input-group input {
-    border: none;
-    outline: none;
     flex-grow: 1;
     font-size: 2.5vw;
-    /* 使用 vw 进行字体大小 */
+    display: block;
+    width: 80vw;
+    height: 4vh;
+    margin: 5px;
 }
+
+.input-group .country-code {
+    position: absolute;
+    left: 0px;
+}
+
 
 .clear-btn {
     font-size: 3vw;

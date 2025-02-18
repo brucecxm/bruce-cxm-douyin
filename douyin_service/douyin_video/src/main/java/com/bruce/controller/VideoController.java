@@ -1,20 +1,24 @@
 package com.bruce.controller;
 
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.bruce.dao.VideoOneDao;
 import com.bruce.entity.Video;
 import com.bruce.entity.VideoOne;
 import com.bruce.entity.VideoWithAvatar;
+import com.bruce.service.MessageQueueService;
 import com.bruce.service.VideoOneService;
 import com.bruce.service.VideoService;
 //import com.bruce.MusicClient;
 //import com.bruce.UserClient;
 import com.bruce.utils.ThreadLocalUtil;
 import io.swagger.annotations.*;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,6 +43,12 @@ public class VideoController extends ApiController {
      */
     @Resource
     private VideoService videoService;
+
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
+    @Resource
+    private MessageQueueService messageQueueService;
 
 //    @Autowired
 //    private UserClient userClient;
@@ -91,10 +101,31 @@ public class VideoController extends ApiController {
     public List<Map> getVideoInfo(
             @RequestParam(defaultValue = "1") int page,
 
-            @RequestParam(defaultValue = "4") int size) {
+            @RequestParam(defaultValue = "4") int size,
+            @RequestParam String videoType
+            ) {
+
+        String userid = StpUtil.getLoginIdAsString();
 
 
-        List<Map> one = videoOneService.getVideoInfo(page, size);
+//        if (videoType.equals("tuijian")) {
+//            List<Map> one = videoOneService.getVideoInfo(page, size,videoType);
+//
+//        } else if (videoType.equals("tongcheng")) {
+//            List<Map> one = videoOneService.getVideoInfo(page, size,videoType);
+//
+//        } else if (videoType.equals("guanzhu")) {
+//            List<Map> one = videoOneService.getVideoInfo(page, size,videoType);
+//
+//        } else if (videoType.equals("zhibo"))
+//        {
+//            List<Map> one = videoOneService.getVideoInfo(page, size,videoType);
+//
+//        }
+//
+
+
+        List<Map> one = videoOneService.getVideoInfo(page, size,videoType);
         return one;
     }
 
@@ -126,34 +157,50 @@ public class VideoController extends ApiController {
             @RequestParam(defaultValue = "1") int userid,
             @RequestParam(defaultValue = "4") int videoid) {
 
-        List<VideoOne> one = VideoOneDao.getlikeexit(userid, videoid);
-        int result = 0;
+//        List<VideoOne> one = VideoOneDao.getlikeexit(userid, videoid);
+//        int result = 0;
+//
+//        List<Map> two = VideoOneDao.getlikeexitMap(userid, videoid);
+//
+//
+//        if (one.size() > 0) {
+//            if (two.size() <= 0) {
+//                result = VideoOneDao.toFirstlike(userid, videoid);
+//
+//            } else {
+//                result = VideoOneDao.tolike(userid, videoid);
+//
+//            }
+//
+//        } else {
+//            result = VideoOneDao.toFirstlike(userid, videoid);
+//
+//        }
+//
+//
+//        if (result > 0) {
+//            // 更新成功
+//            return 1;
+//        } else {
+//            // 更新失败
+//            return 0;
+//        }
+        String redisKey = "like:content:" + videoid;
 
-        List<Map> two = VideoOneDao.getlikeexitMap(userid, videoid);
-
-
-        if (one.size() > 0) {
-            if (two.size() <= 0) {
-                result = VideoOneDao.toFirstlike(userid, videoid);
-
-            } else {
-                result = VideoOneDao.tolike(userid, videoid);
-
-            }
-
-        } else {
-            result = VideoOneDao.toFirstlike(userid, videoid);
-
+        // 1. 检查用户是否已点赞
+        Boolean isMember = redisTemplate.opsForSet().isMember(redisKey, userid);
+        if (Boolean.TRUE.equals(isMember)) {
+            // 用户已点赞，不需要再处理
+            throw new RuntimeException("User has already liked this content");
         }
 
+        // 2. 用户未点赞，将用户 ID 加入 Redis 的 Set
+        redisTemplate.opsForSet().add(redisKey, String.valueOf(userid));
+        // 3. 异步推送点赞事件到消息队列，稍后更新数据库中的点赞数
 
-        if (result > 0) {
-            // 更新成功
-            return 1;
-        } else {
-            // 更新失败
-            return 0;
-        }
+        messageQueueService.sendMessage(videoid);
+
+        return 1;
     }
 
 

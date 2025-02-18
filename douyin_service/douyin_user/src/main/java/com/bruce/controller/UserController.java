@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.extension.api.R;
 import com.bruce.entity.User;
 import com.bruce.pojo.Result;
 import com.bruce.service.UserService;
+import com.bruce.utils.JwtUtil;
+import com.bruce.utils.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -19,14 +21,26 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Random;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/user")
 @Validated
 public class UserController {
+    @Autowired
+    private JwtUtil jwtUtil ;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+
+    @Autowired
+    private RedisUtil redisUtil;
 
 
     //*******************sa-token***********************
@@ -87,12 +101,11 @@ public class UserController {
     }
 
 
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+
 
     // 测试登录，浏览器访问： http://localhost:8081/user/doLogin?username=zhang&password=123456
     @RequestMapping("doLogin")
-    public Result<String> doLogin(String username, String password) {
+    public Result doLogin(String username, String password) throws Exception {
         // 使用 QueryWrapper 构建查询条件
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);
@@ -100,19 +113,122 @@ public class UserController {
         // 查询符合条件的单条记录
         User user = userService.getOne(queryWrapper);
 
+if(user==null) {
+    return Result.error("登录失败");
 
-        // 此处仅作模拟示例，真实项目需要从数据库中查询数据进行比对
-        // 获取当前会话的 token 值
-        String token = StpUtil.getTokenValue();
-        if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
-            StpUtil.login(user.getId(), "PC");
-            StpUtil.getSession().set("user", user);
-            System.out.println("sss");
-            return Result.success("sssssssssssssssssssssssssssssss");
+}
+        // 存储密码的哈希和盐值
+        String storedPassword = hashPassword(user.getPassword());
+        String[] parts = storedPassword.split(":");
+        String storedHash = parts[0];
+        String storedSalt = parts[1];
+
+        // 从存储的哈希和盐值中恢复盐
+        byte[] salt = Base64.getDecoder().decode(storedSalt);
+
+        // 重新计算输入密码的哈希值
+        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 10000, 256);
+        SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        byte[] hash = skf.generateSecret(spec).getEncoded();
+
+        // 比较哈希值
+        String inputHash = Base64.getEncoder().encodeToString(hash);
+        boolean is_password= inputHash.equals(storedHash);
+
+        if (user.getUsername().equals(username) ) {
+
+
+// 获取当前会话是否已经登录，返回true=已登录，false=未登录
+            StpUtil.login(2);
+
+            String key= "user_login"+ String.valueOf(user.getId());
+// 获取当前会话的 token 值
+      String token_login= StpUtil.getTokenValue();
+
+//            redisUtil.set(key,token_login);
+
+            String token = jwtUtil.generateToken(user.getUsername());
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+
+
+            return Result.success(response);
         }
         return Result.error("登录失败");
     }
 
+
+    // Get mapping for test order selection
+    @GetMapping("/testaa")
+    @ResponseBody  // Adding @ResponseBody to return a response body
+    public String OrderSelect() {
+        // 会话登录：参数填写要登录的账号id，建议的数据类型：long | int | String， 不可以传入复杂类型，如：User、Admin 等等
+        StpUtil.login(1);
+
+        return "Order method executed successfully!"; // Returning a success message
+    }
+
+
+    //*******************sa-token***********************
+
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    @Autowired
+    private AmqpTemplate amqpTemplate;
+
+
+    @PostMapping("/register")
+    public Result register(String username, String password) throws NoSuchAlgorithmException, InvalidKeySpecException {
+
+        // 查询用户
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getUsername, username);
+        User u = userService.getOne(queryWrapper); // 获取用户名对应的用户
+
+        User user = new User();
+        // 生成一个16字节的随机盐值
+        byte[] salt = new byte[16];
+        new SecureRandom().nextBytes(salt);
+
+        // 使用密码、盐值、迭代次数（10000）以及输出长度（256位）来生成哈希
+        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 10000, 256);
+
+        // 使用 HMAC-SHA256 算法生成密钥
+        SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        byte[] hash = skf.generateSecret(spec).getEncoded();
+
+        String passwordjie= Base64.getEncoder().encodeToString(hash);
+
+
+
+        user.setUsername(username);
+        user.setPassword(passwordjie);
+        if (u == null) {
+            //没有占用
+            //注册
+            userService.save(user);
+            amqpTemplate.convertAndSend("create_walletone_exampleExchange", "create_walletone_RoutingKey", user.getId());
+            //这里用mq创建钱包 并且每天都会用定时任务  查询钱包表的用户是否和用户表的一致  如果不一致的话 就解决问题
+            return Result.success();
+        } else {
+            //占用
+            return Result.error("用户名已被占用");
+        }
+    }
+
+    // 哈希密码
+    public static String hashPassword(String password) throws Exception {
+        byte[] salt = new byte[16];
+        new SecureRandom().nextBytes(salt);
+        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 10000, 256);
+        SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        byte[] hash = skf.generateSecret(spec).getEncoded();
+        return Base64.getEncoder().encodeToString(hash) + ":" + Base64.getEncoder().encodeToString(salt); // 返回盐值和哈希值
+    }
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
     // 查询登录状态，浏览器访问： http://localhost:8081/user/isLogin
     @RequestMapping("isLogin")
     public Result isLogin() {
@@ -152,42 +268,6 @@ public class UserController {
 
     }
 
-
-    //*******************sa-token***********************
-
-
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-
-    @Autowired
-    private AmqpTemplate amqpTemplate;
-
-
-    @PostMapping("/register")
-    public Result register(String username, String password) {
-
-        // 查询用户
-        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(User::getUsername, username);
-        User u = userService.getOne(queryWrapper); // 获取用户名对应的用户
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(password);
-        if (u == null) {
-            //没有占用
-            //注册
-            userService.save(user);
-            amqpTemplate.convertAndSend("create_walletone_exampleExchange", "create_walletone_RoutingKey", user.getId());
-            //这里用mq创建钱包 并且每天都会用定时任务  查询钱包表的用户是否和用户表的一致  如果不一致的话 就解决问题
-            return Result.success();
-        } else {
-            //占用
-            return Result.error("用户名已被占用");
-        }
-    }
-
-
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
 
 
     //生成四位的验证吗

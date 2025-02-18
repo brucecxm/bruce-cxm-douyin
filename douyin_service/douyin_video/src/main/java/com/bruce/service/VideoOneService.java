@@ -11,6 +11,6 @@ import java.util.Map;
  * @since 2024-06-25 13:03:25
  */
 public interface VideoOneService {
- List<Map> getVideoInfo(int page, int size);
+ List<Map> getVideoInfo(int page, int size,String videoType);
 }
 

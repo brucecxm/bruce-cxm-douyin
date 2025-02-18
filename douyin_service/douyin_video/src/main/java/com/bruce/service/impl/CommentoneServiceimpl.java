@@ -15,9 +15,9 @@ public class CommentoneServiceimpl implements CommentoneService {
 private CommentMapper commentMapper;
 
     @Override
-    public List<Map> getcomment() {
+    public List<Map> getcomment(int videoId) {
         int video_id=1;
-        List<Map> one =commentMapper.getCommentid(1);
+        List<Map> one =commentMapper.getCommentid(videoId);
         return one;
     }
 
