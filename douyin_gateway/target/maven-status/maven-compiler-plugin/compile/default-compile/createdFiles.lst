@@ -1,3 +1,5 @@
+com\bruce\util\JwtUtil.class
+com\bruce\util\RedisUtil.class
 com\bruce\handlle\StpInterfaceImpl.class
 com\bruce\DouyinGatewayApplication.class
 com\bruce\filter\SaTokenConfigure.class

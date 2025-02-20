@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/orders")
 public class redisController {
 

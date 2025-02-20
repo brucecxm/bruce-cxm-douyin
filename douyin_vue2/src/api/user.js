@@ -36,3 +36,10 @@ export const userAvatarUpdateService = (avatarUrl) => {
   params.append("avatarUrl", avatarUrl);
   return request.patch("/user/updateAvatar", params);
 };
+
+
+//获取用户登录状态
+export const getVerificationCodeService = (username) => {
+  return request.put("/user/getVerificationCode", username);
+};
+

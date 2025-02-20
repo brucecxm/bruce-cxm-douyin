@@ -157,34 +157,7 @@ public class VideoController extends ApiController {
             @RequestParam(defaultValue = "1") int userid,
             @RequestParam(defaultValue = "4") int videoid) {
 
-//        List<VideoOne> one = VideoOneDao.getlikeexit(userid, videoid);
-//        int result = 0;
-//
-//        List<Map> two = VideoOneDao.getlikeexitMap(userid, videoid);
-//
-//
-//        if (one.size() > 0) {
-//            if (two.size() <= 0) {
-//                result = VideoOneDao.toFirstlike(userid, videoid);
-//
-//            } else {
-//                result = VideoOneDao.tolike(userid, videoid);
-//
-//            }
-//
-//        } else {
-//            result = VideoOneDao.toFirstlike(userid, videoid);
-//
-//        }
-//
-//
-//        if (result > 0) {
-//            // 更新成功
-//            return 1;
-//        } else {
-//            // 更新失败
-//            return 0;
-//        }
+
         String redisKey = "like:content:" + videoid;
 
         // 1. 检查用户是否已点赞

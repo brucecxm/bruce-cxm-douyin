@@ -1,309 +1,255 @@
 <route lang="yaml">
-meta:
-  title: 导航2-1
+  meta:
+    title: 配置管理
 </route>
 
 <script setup>
-import UserApi from '@/api/user/user' // 导入API请求方法
-import { onMounted, ref } from 'vue'
+import { ElButton, ElDialog, ElForm, ElFormItem, ElInput, ElOption, ElSelect, ElTable, ElTableColumn } from 'element-plus'
+import { reactive, ref } from 'vue'
 
-const users = ref([])
-const isModalVisible = ref(false)
-const isEditMode = ref(false)
-const currentUser = ref({
+const configs = ref([
+  { id: 1, configItem: '登录方式', currentConfig: 'sa-token', availableConfigs: ['sa-token', 'jwt'] },
+  { id: 2, configItem: '缓存策略', currentConfig: 'redis', availableConfigs: ['redis', 'memcached'] },
+])
+
+const showDialog = ref(false)
+const currentConfig = reactive({
   id: null,
-  username: '',
-  nickname: '',
-  email: '',
-  role: 'user',
+  configItem: '',
+  currentConfig: '',
+  availableConfigs: [],
 })
 
-// 页面加载时触发请求
-onMounted(async () => {
-  try {
-    const res = await UserApi.getAlluser() // 使用 await 等待请求完成
-    console.log('请求成功:', res.data)
-    users.value = res.data
-  }
-  catch (error) {
-    console.error('请求失败:', error)
-  }
-})
-
-// 打开添加用户的模态框
-function openAddUserModal() {
-  currentUser.value = { id: null, username: '', nickname: '', email: '', role: 'user' }
-  isModalVisible.value = true
-  isEditMode.value = false
+function addConfig() {
+  showDialog.value = true
+  currentConfig.id = null
+  currentConfig.configItem = ''
+  currentConfig.currentConfig = ''
+  currentConfig.availableConfigs = []
 }
 
-// 打开编辑用户的模态框
-function editUser(user) {
-  currentUser.value = { ...user }
-  isModalVisible.value = true
-  isEditMode.value = true
+function editConfig(config) {
+  showDialog.value = true
+  currentConfig.id = config.id
+  currentConfig.configItem = config.configItem
+  currentConfig.currentConfig = config.currentConfig
+  currentConfig.availableConfigs = [...config.availableConfigs]
 }
 
-// 保存用户信息（添加或编辑）
-function saveUser() {
-  if (isEditMode.value) {
-    // 调用API进行编辑
-    console.log('编辑用户:', currentUser.value)
+function deleteConfig(id) {
+  const index = configs.value.findIndex(config => config.id === id)
+  if (index !== -1) {
+    configs.value.splice(index, 1)
+  }
+}
+
+function saveConfig() {
+  if (currentConfig.id) {
+    const index = configs.value.findIndex(config => config.id === currentConfig.id)
+    if (index !== -1) {
+      configs.value[index] = { ...currentConfig }
+    }
   }
   else {
-    // 调用API进行添加
-    console.log('添加用户:', currentUser.value)
+    currentConfig.id = configs.value.length + 1
+    configs.value.push({ ...currentConfig })
   }
-  closeModal()
+  showDialog.value = false
 }
 
-// 关闭模态框
-function closeModal() {
-  isModalVisible.value = false
-}
-
-// 删除用户
-function deleteUser(userId) {
-  console.log('删除用户ID:', userId)
-  // 调用API进行删除
+function closeDialog() {
+  showDialog.value = false
 }
 </script>
 
 <template>
-  <div class="user-management">
-    <FaPageMain>
-      用户管理
-    </FaPageMain>
+  <div>
+    <!-- 操作按钮 -->
+    <ElButton type="primary" @click="addConfig">
+      新增配置
+    </ElButton>
 
-    <!-- 添加用户按钮 -->
-    <div class="add-user-container">
-      <button class="add-user-btn" @click="openAddUserModal">
-        添加用户
-      </button>
-    </div>
+    <!-- 配置表格 -->
+    <ElTable :data="configs" style="width: 100%">
+      <ElTableColumn prop="configItem" label="配置项" width="200" />
+      <ElTableColumn prop="currentConfig" label="当前配置的方式" width="200" />
+      <ElTableColumn label="待选的配置方式" width="300">
+        <template #default="{ row }">
+          <ElSelect v-model="row.currentConfig" placeholder="选择配置">
+            <ElOption
+              v-for="(config, index) in row.availableConfigs"
+              :key="index"
+              :label="config"
+              :value="config"
+            />
+          </ElSelect>
+        </template>
+      </ElTableColumn>
+      <ElTableColumn label="操作" width="150">
+        <template #default="{ row }">
+          <div class="operation-buttons">
+            <ElButton size="small" @click="editConfig(row)">
+              编辑
+            </ElButton>
+            <ElButton size="small" type="danger" @click="deleteConfig(row.id)">
+              删除
+            </ElButton>
+          </div>
+        </template>
+      </ElTableColumn>
+    </ElTable>
 
-    <!-- 用户列表 -->
-    <div class="table-container">
-      <table class="user-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>用户名</th>
-            <th>昵称</th>
-            <th>邮箱</th>
-            <th>角色</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="user in users" :key="user.id">
-            <td>{{ user.id }}</td>
-            <td>{{ user.username }}</td>
-            <td>{{ user.nickname }}</td>
-            <td>{{ user.email || '无' }}</td>
-            <td>{{ user.role || '未分配' }}</td>
-            <td>
-              <button class="edit-btn" @click="editUser(user)">
-                编辑
-              </button>
-              <button class="delete-btn" @click="deleteUser(user.id)">
-                删除
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 编辑/添加用户的模态框 -->
-    <div v-if="isModalVisible" class="modal-overlay">
-      <div class="modal-content">
-        <h3>{{ isEditMode ? '编辑用户' : '添加用户' }}</h3>
-        <form class="user-form" @submit.prevent="saveUser">
-          <div class="form-group">
-            <label for="username">用户名</label>
-            <input id="username" v-model="currentUser.username" type="text" required>
-          </div>
-          <div class="form-group">
-            <label for="nickname">昵称</label>
-            <input id="nickname" v-model="currentUser.nickname" type="text" required>
-          </div>
-          <div class="form-group">
-            <label for="email">邮箱</label>
-            <input id="email" v-model="currentUser.email" type="email">
-          </div>
-          <div class="form-group">
-            <label for="role">角色</label>
-            <select id="role" v-model="currentUser.role">
-              <option value="admin">
-                管理员
-              </option>
-              <option value="user">
-                用户
-              </option>
-              <option value="guest">
-                访客
-              </option>
-            </select>
-          </div>
-          <div class="form-actions">
-            <button type="submit" class="submit-btn">
-              {{ isEditMode ? '保存修改' : '添加用户' }}
-            </button>
-            <button type="button" class="cancel-btn" @click="closeModal">
-              取消
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <!-- 配置编辑/新增对话框 -->
+    <ElDialog v-model:visible="showDialog" title="配置管理" width="400px">
+      <ElForm :model="currentConfig">
+        <ElFormItem label="配置项" prop="configItem">
+          <ElInput v-model="currentConfig.configItem" placeholder="请输入配置项名称" />
+        </ElFormItem>
+        <ElFormItem label="当前配置的方式" prop="currentConfig">
+          <ElSelect v-model="currentConfig.currentConfig" placeholder="选择当前配置">
+            <ElOption
+              v-for="(config, index) in currentConfig.availableConfigs"
+              :key="index"
+              :label="config"
+              :value="config"
+            />
+          </ElSelect>
+        </ElFormItem>
+        <ElFormItem label="待选的配置方式" prop="availableConfigs">
+          <ElSelect
+            v-model="currentConfig.availableConfigs"
+            multiple
+            placeholder="选择待选配置"
+          >
+            <ElOption
+              v-for="(config, index) in ['sa-token', 'jwt', 'redis', 'memcached']"
+              :key="index"
+              :label="config"
+              :value="config"
+            />
+          </ElSelect>
+        </ElFormItem>
+      </ElForm>
+      <template #footer>
+        <ElButton @click="closeDialog">
+          取消
+        </ElButton>
+        <ElButton type="primary" @click="saveConfig">
+          保存
+        </ElButton>
+      </template>
+    </ElDialog>
   </div>
 </template>
 
 <style scoped>
-.user-management {
-  font-family: 'Arial', sans-serif;
-  padding: 2vh 4vw;
+/* 页面容器 */
+div {
+  margin: 20px;
 }
-
-.add-user-container {
+.operation-buttons {
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: 2vh;
-}
-
-.add-user-btn {
-  padding: 1vh 2vw;
-  font-size: 1.2rem;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.add-user-btn:hover {
-  background-color: #45a049;
-}
-
-.table-container {
-  overflow-x: auto;
-}
-
-.user-table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid #ddd;
-}
-
-.user-table th,
-.user-table td {
-  padding: 1vh 2vw;
-  text-align: left;
-}
-
-.user-table th {
-  background-color: #f4f4f4;
-}
-
-.edit-btn,
-.delete-btn {
-  padding: 0.5vh 1vw;
-  margin-right: 1vw;
-  border: none;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-.edit-btn {
-  background-color: #ffa500;
-  color: white;
-}
-
-.edit-btn:hover {
-  background-color: #e69500;
-}
-
-.delete-btn {
-  background-color: #f44336;
-  color: white;
-}
-
-.delete-btn:hover {
-  background-color: #e53935;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 }
 
-.modal-content {
-  background: white;
-  padding: 3vh 5vw;
+.operation-buttons .el-button {
+  margin-right: 10px;
+}
+
+.operation-buttons .el-button:last-child {
+  margin-right: 0;
+}
+
+/* 操作按钮 */
+.ElButton {
+  margin-bottom: 20px;
+}
+
+/* 表格 */
+.el-table {
   border-radius: 8px;
-  width: 40vw;
-  max-width: 600px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
 
-.user-form {
-  display: flex;
-  flex-direction: column;
+/* 表格列头 */
+.el-table th {
+  background-color: #f5f7fa;
+  color: #333;
 }
 
-.form-group {
-  margin-bottom: 2vh;
+/* 表格数据 */
+.el-table td {
+  color: #555;
 }
 
-label {
-  font-size: 1.1rem;
-  margin-bottom: 0.5vh;
+/* 表格内操作按钮 */
+.el-table .el-button {
+  margin-right: 10px;
 }
 
-input,
-select {
-  padding: 1vh;
-  font-size: 1rem;
-  border-radius: 4px;
-  border: 1px solid #ddd;
+/* 编辑/新增对话框 */
+.el-dialog {
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
 
-.form-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 2vh;
-}
-
-.submit-btn,
-.cancel-btn {
-  padding: 1vh 2vw;
-  font-size: 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.submit-btn {
-  background-color: #4CAF50;
+.el-dialog__header {
+  background-color: #409EFF;
   color: white;
 }
 
-.submit-btn:hover {
-  background-color: #45a049;
+/* 表单元素 */
+.el-form-item {
+  margin-bottom: 20px;
 }
 
-.cancel-btn {
-  background-color: #f44336;
-  color: white;
+.el-form-item label {
+  font-weight: bold;
 }
 
-.cancel-btn:hover {
-  background-color: #e53935;
+/* 选择框和输入框的宽度调整 */
+.el-select,
+.el-input {
+  width: 100%;
+}
+
+.el-button.primary {
+  background-color: #409EFF;
+  border-color: #409EFF;
+}
+
+.el-button.primary:hover {
+  background-color: #66b1ff;
+  border-color: #66b1ff;
+}
+
+.el-button[type='danger'] {
+  background-color: #f56c6c;
+  border-color: #f56c6c;
+}
+
+.el-button[type='danger']:hover {
+  background-color: #f79b9b;
+  border-color: #f79b9b;
+}
+
+/* 表格的列宽自适应 */
+.el-table-column {
+  text-align: center;
+}
+
+/* 让按钮有更好的间距 */
+.el-button + .el-button {
+  margin-left: 10px;
+}
+
+/* 表格行的背景色交替效果 */
+.el-table__row:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+.el-table__row:nth-child(even) {
+  background-color: #ffffff;
 }
 </style>

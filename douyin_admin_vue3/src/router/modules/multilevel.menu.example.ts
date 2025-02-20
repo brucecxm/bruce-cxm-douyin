@@ -78,6 +78,41 @@ const routes: RouteRecordRaw = {
       name: 'multilevelMenuExample3',
       redirect: '/multilevel_menu_example/level2_friends/page',
       meta: {
+        title: '系统管理',
+      },
+      children: [
+        {
+          path: 'page',
+          name: 'multilevelMenuExample3-1',
+          component: () => import('@/views/multilevel_menu_example/level2/page.vue'),
+          meta: {
+            title: '配置管理',
+          },
+        },
+        {
+          path: 'page',
+          name: 'multilevelMenuExample3-1',
+          component: () => import('@/views/multilevel_menu_example/level2/page.vue'),
+          meta: {
+            title: '权限管理',
+          },
+        },
+        {
+          path: 'page',
+          name: 'multilevelMenuExample3-1',
+          component: () => import('@/views/multilevel_menu_example/level2/page.vue'),
+          meta: {
+            title: '角色管理',
+          },
+        },
+
+      ],
+    },
+    {
+      path: 'level2_friends', // Changed to a unique path for Friend Management
+      name: 'multilevelMenuExample3',
+      redirect: '/multilevel_menu_example/level2_friends/page',
+      meta: {
         title: '好友管理',
       },
       children: [

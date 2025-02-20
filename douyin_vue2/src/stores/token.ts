@@ -20,6 +20,7 @@ export const useTokenStore = defineStore({
     getToken: (state) => state.token,
   },
 });
+
 export const VideoIdStore = defineStore({
   id: "VideoId",
   state: () => ({

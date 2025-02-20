@@ -16,6 +16,7 @@
     "axios": "^1.7.2",
     "element-china-area-data": "^6.1.0",
     "element-ui": "^2.15.14",
+    "jwt-decode": "^4.0.0",
     "leaflet": "^1.9.4",
     "pinia": "^2.0.16",
     "sockjs-client": "^1.6.1",

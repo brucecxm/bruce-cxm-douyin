@@ -10,14 +10,14 @@
             <p class="notice">登录后即可点赞喜欢的内容</p>
             <div v-if="!isRegistering" class="login-form">
                 <div class="input-group">
-                    <select v-model="selectedCode" class="country-code">
-                        <option v-for="country in countryCodes" :key="country.code" :value="country.code">
-                            {{ country.code }} - {{ country.name }}
-                        </option>
-                    </select>
-                    <input type="tel" v-model="loginpojo.username" placeholder="请输入手机号" />
+                    <input type="text" v-model="loginpojo.username" @blur="validateEmail" placeholder="请输入邮箱（暂支持邮箱）" />
                     <input type="password" v-model="loginpojo.password" placeholder="请输入密码" />
-                    <button class="clear-btn" @click="clearPhoneNumber">×</button>
+                </div>
+                <div class="input-group">
+                    <input type="text" v-model="verificationCode" placeholder="请输入验证码" />
+                    <button @click="getVerificationCode" :disabled="isCodeSent" class="get-code-btn">
+                        {{ countdown > 0 ? countdown + '秒' : '获取验证码' }}
+                    </button>
                 </div>
 
                 <p class="terms">
@@ -34,22 +34,22 @@
 
             <div v-if="isRegistering" class="login-form">
                 <div class="input-group">
-                    <select v-model="selectedCode" class="country-code">
-                        <option v-for="country in countryCodes" :key="country.code" :value="country.code">
-                            {{ country.code }} - {{ country.name }}
-                        </option>
-                    </select>
-                    <input type="tel" v-model="loginpojo.username" placeholder="请输入手机号" />
+                    <input type="text" v-model="loginpojo.username" @blur="validateEmail" placeholder="请输入邮箱（暂支持邮箱）" />
                     <input type="password" v-model="loginpojo.password" placeholder="请输入密码" />
                     <input type="password" v-model="loginpojo.confirmPassword" placeholder="确认密码" />
-                    <button class="clear-btn" @click="clearPhoneNumber">×</button>
+                </div>
+                <div class="input-group">
+                    <input type="text" v-model="verificationCode" placeholder="请输入验证码" />
+                    <button @click="getVerificationCode" :disabled="isCodeSent" class="get-code-btn">
+                        {{ countdown > 0 ? countdown + '秒' : '获取验证码' }}
+                    </button>
                 </div>
                 <p class="terms">
                     <input type="checkbox" v-model="isAgreed" /> 已阅读并同意 <a href="#">用户协议</a> 和 <a href="#">隐私政策</a> 以及
                     <a href="#">运营商服务协议</a>
                     ，运营商将对你的手机号进行验证
                 </p>
-                <button class="login-btn" @click="register">注册并登录</button>
+                <button class="login-btn" @click="register">注册并登录</button> 
                 <div class="login-options">
                     <button @click="switchToLogin">切换到登录</button>
                 </div>
@@ -61,9 +61,10 @@
 </template>
 
 <script>
-import { userLoginService, userInfoService, userRegisterService } from "../../api/user"
+import { userLoginService, userInfoService, userRegisterService,getVerificationCodeService } from "../../api/user"
 import { useTokenStore } from "../../stores/token"
 import axios from 'axios';
+
 export default {
     name: 'Login',
     data() {
@@ -73,11 +74,15 @@ export default {
                 password: "",
                 confirmPassword: ""  // for registration
             },
+            verificationCode: "", // 用于保存验证码
+            emailPattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
             isPasswordLogin: false,
             isAgreed: false, // 协议同意状态
             isRegistering: false, // 是否处于注册页面
             countryCodes: [], // 用来存储读取的国家代码
             selectedCode: '+86',  // 用来存储选择的代码
+            countdown: 0, // 用于倒计时
+            isCodeSent: false, // 是否已发送验证码
         };
     },
     mounted() {
@@ -92,6 +97,12 @@ export default {
     },
 
     methods: {
+        validateEmail() {
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailRegex.test(this.loginpojo.username)) {
+                alert("请输入有效的邮箱地址");
+            }
+        },
         closeScreen() {
             this.$router.go(-1); // 返回上一级
             console.log('关闭界面');
@@ -101,15 +112,46 @@ export default {
             this.loginpojo.password = ''; // 清空密码
             this.loginpojo.confirmPassword = ''; // 清空确认密码
         },
+        async getVerificationCode() {
+            if (!this.loginpojo.username) {
+                alert("请输入邮箱");
+                return;
+            }
+
+            try {
+                const response = await getVerificationCodeService(this.loginpojo.username); // 后端发送验证码
+                if (response.data.code === 1) {
+                    alert("获取验证码失败，请稍后再试");
+                    return;
+                }
+
+                this.isCodeSent = true;
+                this.countdown = 60; // 发送验证码后开始倒计时
+                const timer = setInterval(() => {
+                    if (this.countdown === 0) {
+                        clearInterval(timer);
+                        this.isCodeSent = false;
+                    } else {
+                        this.countdown--;
+                    }
+                }, 1000);
+            } catch (error) {
+                console.error("获取验证码失败：", error);
+            }
+        },
         async verifyPhoneNumber() {
-            if (!this.isAgreed) { // 检查用户是否勾选协议
+            if (!this.isAgreed) {
                 alert("请勾选用户协议以继续登录。");
+                return;
+            }
+            if (!this.verificationCode) {
+                alert("请输入验证码");
                 return;
             }
 
             console.log('验证手机号:', this.loginpojo);
             try {
-                const response = await userLoginService(this.loginpojo);
+                const response = await userLoginService({ ...this.loginpojo, verificationCode: this.verificationCode });
                 if (response.data.code === 1) {
                     console.error("登录失败：", error);
                 } else {
@@ -133,7 +175,7 @@ export default {
             this.isRegistering = false;
         },
         async register() {
-            if (!this.isAgreed) { // 检查用户是否勾选协议
+            if (!this.isAgreed) {
                 alert("请勾选用户协议以继续注册。");
                 return;
             }
@@ -143,9 +185,14 @@ export default {
                 return;
             }
 
+            if (!this.verificationCode) {
+                alert("请输入验证码");
+                return;
+            }
+
             console.log('注册手机号:', this.loginpojo);
             try {
-                const response = await userRegisterService(this.loginpojo);
+                const response = await userRegisterService({ ...this.loginpojo, verificationCode: this.verificationCode });
                 if (response.data.code === 1) {
                     alert("注册失败，请稍后再试");
                 } else {
@@ -246,6 +293,7 @@ export default {
     /* 使用 vh 进行内边距 */
     box-sizing: border-box;
     /* 确保内边距和边框不影响总宽度 */
+
 }
 
 .input-group input {
@@ -255,7 +303,13 @@ export default {
     width: 80vw;
     height: 4vh;
     margin: 5px;
+    border-radius: 10px;
+    border: none;
+    background-color: rgba(0, 0, 0, 0.1);
+
 }
+
+
 
 .input-group .country-code {
     position: absolute;
@@ -285,8 +339,19 @@ export default {
     text-decoration: none;
 }
 
+.terms input[type="checkbox"] {
+    vertical-align: middle;
+    /* 让 checkbox 与文本垂直居中 */
+    margin-top: 0;
+    /* 移除默认的顶部边距 */
+    margin-bottom: 0;
+    /* 移除默认的底部边距 */
+}
+
 .terms input {
     margin-right: 5px;
+
+
 }
 
 .login-btn {
@@ -332,5 +397,16 @@ export default {
 .recovery-text a {
     color: #007bff;
     text-decoration: none;
+}
+
+.get-code-btn {
+    font-size: 2.5vw;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 1vh 2vw;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 30vw;
 }
 </style>

@@ -97,6 +97,9 @@ export default {
     components: {
         footerVue
     },
+    mounted() {
+
+    },
     data() {
         return {
             userInfo: {

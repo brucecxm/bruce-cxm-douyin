@@ -10,9 +10,10 @@ public class EmailController {
     @Autowired
     private EmailService emailService;
 
-    @GetMapping("/send-email")
-    public String sendEmail() {
-        emailService.sendSimpleEmail("2945090920@qq.com", "Test Subject", "This is a test email.");
+    @GetMapping("/send-email" )
+    public String sendEmail(String code,String email) {
+
+        emailService.sendSimpleEmail(email, "仿抖音短视频--验证码", "您的验证码是"+code);
 
         return "Email sent successfully!";
     }
