@@ -1,4 +1,10 @@
 spring:
+
+  servlet:
+    multipart:
+      max-file-size: 10GB       # 允许大文件
+      max-request-size: 10GB
+
   redis:
     # Redis数据库索引（默认为0）
     database: 12
@@ -36,6 +42,10 @@ spring:
 
 server:
   port: 9573
+
+
+upload:
+  temp.dir: /tmp/upload_chunks  # 临时分片存储目录
 
 
 eureka:
