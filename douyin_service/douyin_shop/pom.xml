@@ -28,6 +28,24 @@
         </plugins>
     </build>
     <dependencies>
+            <!-- Redisson 依赖 -->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>3.16.3</version> <!-- 可以根据需要选择版本 -->
+            </dependency>
+            <!-- Spring Data Redis 依赖 -->
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-redis</artifactId>
+                <version>3.0.0</version> <!-- 选择适合的版本 -->
+            </dependency>
+            <!-- Jedis 依赖 -->
+            <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>4.3.1</version> <!-- 选择适合的版本 -->
+            </dependency>
 
         <dependency>
             <groupId>org.springframework.cloud</groupId>
