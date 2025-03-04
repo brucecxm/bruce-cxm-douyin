@@ -24,7 +24,6 @@ com\bruce\config\RabbitConfig.class
 com\bruce\controller\UserController.class
 com\bruce\utils\RedisUtil.class
 com\bruce\utils\Md5Util.class
-com\bruce\feign\userFeign.class
 com\bruce\dao\UserDao.class
 com\bruce\service\impl\UserServiceImpl.class
 com\bruce\entity\User.class

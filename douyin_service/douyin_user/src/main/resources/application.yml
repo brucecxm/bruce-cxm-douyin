@@ -2,72 +2,14 @@ server:
   port: 7456  # 设置应用的端口号为7456
 
 
-
-
-
-
-
-
-
-
 spring:
-  # redis配置
-  redis:
-    # Redis数据库索引（默认为0）
-    database: 12
-    # Redis服务器地址
-    host: 127.0.0.1
-    # Redis服务器连接端口
-    port: 6379
-    # Redis服务器连接密码（默认为空）
-    # password:
-    # 连接超时时间
-    timeout: 10s
-    lettuce:
-      pool:
-        # 连接池最大连接数
-        max-active: 200
-        # 连接池最大阻塞等待时间（使用负值表示没有限制）
-        max-wait: -1ms
-        # 连接池中的最大空闲连接
-        max-idle: 10
-        # 连接池中的最小空闲连接
-        min-idle: 0
-
-  application:
-    # 应用的名称，可选
-    name: DouyinUserService  # 设置应用名称为 DouyinUserService
-
-  rabbitmq:
-    host: 192.168.200.130  # RabbitMQ 服务器的主机地址
-    port: 5672  # RabbitMQ 服务器的端口号
-    username: itcast  # RabbitMQ 的用户名
-    password: 123321  # RabbitMQ 的密码
-    virtual-host: /  # RabbitMQ 的虚拟主机
-
-  datasource:
-    druid:
-      driver-class-name: com.mysql.cj.jdbc.Driver  # 数据库驱动类名
-      url: jdbc:mysql://localhost:3306/douyintest?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true  # 数据库连接URL
-      username: root  # 数据库用户名
-      password: root  # 数据库密码
+  profiles:
+    active: prod  # 生产环境
 
 
-  security:
-    oauth2:
-      client:
-        registration:
-          qq:
-            client-id: YOUR_APP_ID  # QQ应用的App ID
-            client-secret: YOUR_APP_KEY  # QQ应用的App Key
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"  # OAuth2重定向URI
-            authorization-grant-type: authorization_code  # 授权类型
-            scope: get_user_info  # 请求的权限范围
-        provider:
-          qq:
-            authorization-uri: https://graph.qq.com/oauth2.0/authorize  # QQ的授权URI
-            token-uri: https://graph.qq.com/oauth2.0/token  # QQ的令牌URI
-            user-info-uri: https://graph.qq.com/user/get_user_info  # QQ的用户信息URI
+
+
+
 
 
 mybatis:
@@ -105,8 +47,3 @@ sa-token:
 
 
 
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://127.0.0.1:10086/eureka  # Eureka 服务注册中心的地址

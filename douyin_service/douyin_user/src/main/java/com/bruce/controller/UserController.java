@@ -1,5 +1,5 @@
 package com.bruce.controller;
-
+import cn.hutool.core.util.IdUtil;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -13,6 +13,8 @@ import com.bruce.service.SaltService;
 import com.bruce.service.UserService;
 import com.bruce.utils.JwtUtil;
 import com.bruce.utils.RedisUtil;
+import com.wf.captcha.SpecCaptcha;
+import com.wf.captcha.base.Captcha;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -26,6 +28,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import javax.imageio.ImageIO;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -214,13 +220,61 @@ private systemClient systemClients;
     }
 
 
-    @GetMapping("/getVerificationCode")
+    //图片验证码接口
+    @PutMapping("/getVerificationCode")
     @ResponseBody  // Adding @ResponseBody to return a response body
-    public String getVerificationCode(String username,String codetype) {
+    public void getVerificationCode(HttpServletResponse response,@RequestParam(required = false) String uuid) throws IOException {
+        if (uuid == null) {
+            uuid = String.valueOf(System.currentTimeMillis()); // 生成唯一标识符
+        }
+
+        // 创建验证码对象（设置图片宽高和验证码字符数）
+        SpecCaptcha captcha = new SpecCaptcha(120, 40, 5);
+        captcha.setCharType(Captcha.TYPE_DEFAULT);
+
+        // 存入 Redis，过期时间 3 分钟
+        stringRedisTemplate.opsForValue().set("CAPTCHA_" + uuid, captcha.text(), 3, TimeUnit.MINUTES);
+
+        // 设置响应头
+        response.setContentType("image/png");
+        response.setHeader("Cache-Control", "no-store, no-cache");
+        response.setHeader("uuid", uuid);
+
+        // 使用 out() 方法生成并输出验证码图片
+        ServletOutputStream out = response.getOutputStream();
+        captcha.out(out); // 直接输出验证码到响应流
+        out.flush();
+        out.close();
+    }
 
 
 
-        return "Order method executed successfully!"; // Returning a success message
+
+    //短信验证码接口
+    @PutMapping("/getVerificationCodeImg")
+    @ResponseBody  // Adding @ResponseBody to return a response body
+    public void getVerificationCodeImg(HttpServletResponse response, @RequestParam(required = false) String uuid) throws IOException {
+        if (uuid == null) {
+            uuid = String.valueOf(System.currentTimeMillis()); // 生成唯一标识符
+        }
+
+        // 创建验证码对象（设置图片宽高和验证码字符数）
+        SpecCaptcha captcha = new SpecCaptcha(120, 40, 5);
+        captcha.setCharType(Captcha.TYPE_DEFAULT);
+
+        // 存入 Redis，过期时间 3 分钟
+        stringRedisTemplate.opsForValue().set("CAPTCHA_" + uuid, captcha.text(), 3, TimeUnit.MINUTES);
+
+        // 设置响应头
+        response.setContentType("image/png");
+        response.setHeader("Cache-Control", "no-store, no-cache");
+        response.setHeader("uuid", uuid);
+
+        // 使用 out() 方法生成并输出验证码图片
+        ServletOutputStream out = response.getOutputStream();
+        captcha.out(out); // 直接输出验证码到响应流
+        out.flush();
+        out.close();
     }
 
 

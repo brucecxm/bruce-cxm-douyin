@@ -1,13 +1,8 @@
 server:
   port: 7422
 spring:
-  application:
-    name: DouyinAdminService
-  datasource:
-    username: root
-    password: root
-    url: jdbc:mysql://localhost:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
-
+  profiles:
+    active: prod  # 生产环境
 
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
@@ -35,9 +30,3 @@ token:
   secretKey: abcdefghijklmnopqrstuvwxyz0123456789
 
 
-
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:10086/eureka  # Eureka服务器地址

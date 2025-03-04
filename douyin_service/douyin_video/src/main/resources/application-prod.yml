@@ -1,0 +1,41 @@
+spring:
+
+  servlet:
+    multipart:
+      max-file-size: 10GB       # 允许大文件
+      max-request-size: 10GB
+
+  redis:
+    # Redis数据库索引（默认为0）
+    database: 12
+    # Redis服务器地址
+    host: 127.0.0.1
+    # Redis服务器连接端口
+    port: 6379
+    # Redis服务器连接密码（默认为空）
+    # password:
+    # 连接超时时间
+    timeout: 10s
+    lettuce:
+      pool:
+        # 连接池最大连接数
+        max-active: 200
+        # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: -1ms
+        # 连接池中的最大空闲连接
+        max-idle: 10
+        # 连接池中的最小空闲连接
+        min-idle: 0
+
+  rabbitmq:
+    host: 192.168.200.130
+    port: 5672
+    username: itcast
+    password: 123321
+    virtual-host: /
+  application:
+    name: DouyinVideoService
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8

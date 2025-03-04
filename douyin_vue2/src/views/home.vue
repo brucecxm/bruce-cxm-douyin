@@ -226,7 +226,7 @@ export default {
 /* 视频播放区域 */
 .videobox {
     width: 100vw;
-    background-color: yellow;
+    background-color: black;
 }
 
 /* ****************************** */

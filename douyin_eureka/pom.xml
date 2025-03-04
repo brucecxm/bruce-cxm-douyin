@@ -34,6 +34,14 @@
                     <mainClass>com.bruce.EurekaApplication</mainClass>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <outputDirectory>${project.basedir}/../jar</outputDirectory>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

@@ -105,7 +105,6 @@ public class VideoController extends ApiController {
             @RequestParam String videoType
             ) {
 
-        String userid = StpUtil.getLoginIdAsString();
 
 
 //        if (videoType.equals("tuijian")) {

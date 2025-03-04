@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bruce.mapper.DishoneMapper">
+
+    <resultMap type="com.bruce.dto.dishoneDto" id="dishoedto">
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="imgUrl" column="imgurl" jdbcType="VARCHAR"/>
+        <result property="hrefUrl" column="hrefurl" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="VARCHAR"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="getdishone" resultMap="dishoedto" resultType="com.bruce.dto.dishoneDto">
+
+select d.name,d.price,d.description,c.img_url,c.href_url
+    from dish d inner join dish_store c on d.id = c.dish_id;
+    </select>
+
+    <select id="searchdish"  resultType="com.bruce.dto.DishDto">
+
+        select *
+        from dish  where name = #{name};
+    </select>
+
+    <select id="liansearchdish" resultType="com.bruce.dto.DishDto">
+        SELECT *
+        FROM dish
+        WHERE name LIKE CONCAT('%', #{name}, '%')
+    </select>
+
+
+    <select id="listdish" resultType="com.bruce.dto.DishDto">
+        SELECT *
+        FROM dish
+        WHERE name LIKE CONCAT('%', #{name}, '%')
+    </select>
+
+
+</mapper>
