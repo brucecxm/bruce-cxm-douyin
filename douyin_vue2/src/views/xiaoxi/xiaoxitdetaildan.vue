@@ -38,7 +38,7 @@ export default {
             type: String,
             required: true
         },
-      }
+      },
     mounted() {
         // 自动连接到 WebSocket，当组件挂载时调用
         this.connect();

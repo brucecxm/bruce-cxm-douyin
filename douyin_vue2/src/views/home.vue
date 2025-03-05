@@ -32,7 +32,7 @@
 </template>
 <script>
 import caidan from '../components/caidan.vue';
-import AllBoxVue from '@/components/AllBox.vue'
+import AllBoxVue from '../components/allbox.vue'
 import footerVue from '../components/footer.vue'
 import headerVue from '../components/header.vue'
 import videoboxVue from '../components/videobox.vue'

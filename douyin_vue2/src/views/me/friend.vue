@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <div class="container">
         <div class="header">
             <input type="text" placeholder="搜索好友" />
@@ -199,4 +199,4 @@ export default {
     cursor: pointer;
 }
 </style>
-  
+   -->
