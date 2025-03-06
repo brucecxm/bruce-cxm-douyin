@@ -20,11 +20,82 @@
 //   ]
 // }
 
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+//因为上面配置错误 浪费了我一天的时间  最没有怀疑的地方 问题确实出在这 报错信息 App.vue:32 Uncaught TypeError: Cannot read properties of undefined (reading 'accept')    at App.vue:32:17
+
+
+
+
+//下面是不会报错的版本  但是无法build  ts的语法检查会报错 因此得改造
+//下面是不会报错的版本  但是无法build  ts的语法检查会报错 因此得改造
+//下面是不会报错的版本  但是无法build  ts的语法检查会报错 因此得改造
+//下面是不会报错的版本  但是无法build  ts的语法检查会报错 因此得改造
+//下面是不会报错的版本  但是无法build  ts的语法检查会报错 因此得改造
+//下面是不会报错的版本  但是无法build  ts的语法检查会报错 因此得改造
+//下面是不会报错的版本  但是无法build  ts的语法检查会报错 因此得改造
+//下面是不会报错的版本  但是无法build  ts的语法检查会报错 因此得改造
+//下面是不会报错的版本  但是无法build  ts的语法检查会报错 因此得改造
+
+// {
+//   "extends": "@vue/tsconfig/tsconfig.web.json",
+//   "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
+//   "compilerOptions": {
+//     "baseUrl": ".",
+//     "paths": {
+//       "@/*": ["./src/*"]
+//     }
+//   },
+// 
+//   "references": [
+//     {
+//       "path": "./tsconfig.config.json"
+//     }
+//   ]
+// }
+
+
+
+
+
+
+
+// 下面是改造后的版本
+// 下面是改造后的版本
+// 下面是改造后的版本
+// 下面是改造后的版本
+// 下面是改造后的版本
+// 下面是改造后的版本
+// 下面是改造后的版本
+// 下面是改造后的版本
+// 下面是改造后的版本
 
 {
   "extends": "@vue/tsconfig/tsconfig.web.json",
   "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
   "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,  // 如果你不想检查 JavaScript 文件中的类型错误，可以将 checkJs 设置为 false
+    "strict": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]

@@ -1,0 +1,1 @@
+import{n as e}from"./index.d6cacc81.js";const a={data(){return{detairurl:"https://www.baidu.com"}},methods:{}};var n=function(){var r=this,t=r._self._c;return t("iframe",{attrs:{src:r.detairurl,width:"600",height:"400",frameborder:"0"}})},s=[],l=e(a,n,s,!1,null,null,null,null);const _=l.exports;export{_ as default};
