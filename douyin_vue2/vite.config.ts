@@ -18,13 +18,11 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
-  build: {
-    target: "esnext",  // 设置目标为 esnext，支持异步生成器函数
-  },
+
   server: {
-    host: '0.0.0.0',  // 允许外部访问
-    port: 5173,        // 使用的端口号
-    open: true,         // 启动时自动打开浏览器
+    // host: '0.0.0.0',  // 允许外部访问
+    // port: 5173,        // 使用的端口号
+    // open: true,         // 启动时自动打开浏览器
     proxy: {
       "/api": {
         target: "http://localhost:9430",

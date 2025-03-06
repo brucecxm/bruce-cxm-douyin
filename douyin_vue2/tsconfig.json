@@ -1,3 +1,26 @@
+// {
+//   "extends": "@vue/tsconfig/tsconfig.web.json",
+//   "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
+//   "compilerOptions": {
+//     "baseUrl": ".",
+//     "paths": {
+//       "@/*": ["./src/*"]
+//     },
+//     "allowJs": true,  // 允许 TypeScript 处理 JavaScript 文件
+//     "checkJs": false,  // 如果你不想对 JavaScript 文件进行严格检查，设置为 false
+//     "target": "ES6",  // 设置目标为 ES6
+//     "module": "ESNext",  // 使用 ESNext 模块系统
+//     "moduleResolution": "node",  // 设置模块解析方式为 Node.js
+//     "jsx": "preserve"  // 保留 JSX 语法（如果项目使用 Vue）
+//   },
+//   "references": [
+//     {
+//       "path": "./tsconfig.config.json"
+//     }
+//   ]
+// }
+
+
 {
   "extends": "@vue/tsconfig/tsconfig.web.json",
   "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
@@ -5,14 +28,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    },
-    "allowJs": true,  // 允许 TypeScript 处理 JavaScript 文件
-    "checkJs": false,  // 如果你不想对 JavaScript 文件进行严格检查，设置为 false
-    "target": "ES6",  // 设置目标为 ES6
-    "module": "ESNext",  // 使用 ESNext 模块系统
-    "moduleResolution": "node",  // 设置模块解析方式为 Node.js
-    "jsx": "preserve"  // 保留 JSX 语法（如果项目使用 Vue）
+    }
   },
+
   "references": [
     {
       "path": "./tsconfig.config.json"
