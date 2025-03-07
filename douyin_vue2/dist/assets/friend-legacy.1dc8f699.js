@@ -1,1 +1,0 @@
-System.register(["./index-legacy.a351f814.js"],(function(n,e){"use strict";var l;return{setters:[function(n){l=n.n}],execute:function(){n("default",l({},null,null,!1,null,null,null,null).exports)}}}));

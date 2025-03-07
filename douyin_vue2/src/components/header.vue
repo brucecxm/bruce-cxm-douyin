@@ -16,6 +16,10 @@
 </template>
 
 <script>
+import heicaidan from '@/assets/home/黑菜单.png';
+import heifangdajing from '@/assets/home/黑放大镜.png';
+import caidan from '@/assets/home/菜单.png';
+import fangdajing from '@/assets/home/放大镜.png';
 export default {
     props: {
         activeIndex: {
@@ -34,10 +38,10 @@ export default {
             underlineVisible: true, // 控制下划线的可见性
             isBlack: false, // 控制是否将所有文字变成黑色
             menuStyle: { // 默认的菜单图标样式
-                backgroundImage: 'url(src/assets/home/菜单.png)',
+                backgroundImage:`url(${caidan})`,
             },
             searchStyle: { // 默认的搜索图标样式
-                backgroundImage: 'url(src/assets/home/放大镜.png)',
+                backgroundImage:`url(${fangdajing})`,
             }
         };
     },
@@ -59,18 +63,18 @@ export default {
             ) {
                 this.isBlack = true;
                 this.menuStyle = {
-                    backgroundImage: 'url(src/assets/home/黑菜单.png)',
+                    backgroundImage:`url(${heicaidan})`,
                 };
                 this.searchStyle = {
-                    backgroundImage: 'url(src/assets/home/黑放大镜.png)',
+                    backgroundImage:`url(${heifangdajing})`,
                 };
             } else {
                 this.isBlack = false;
                 this.menuStyle = {
-                    backgroundImage: 'url(src/assets/home/菜单.png)',
+                    backgroundImage:`url(${caidan})`,
                 };
                 this.searchStyle = {
-                    backgroundImage: 'url(src/assets/home/放大镜.png)',
+                    backgroundImage:`url(${fangdajing})`,
                 };
             }
         },
