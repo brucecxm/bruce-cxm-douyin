@@ -37,7 +37,7 @@ import footerVue from '../components/footer.vue'
 import headerVue from '../components/header.vue'
 import videoboxVue from '../components/videobox.vue'
 import Pinglunqu from '@/components/Pinglunqu.vue'
-import { eventBus } from '../main.ts'; // 导入事件总线
+import { eventBus } from '../main.js'; // 导入事件总线
 
 export default {
     data() {

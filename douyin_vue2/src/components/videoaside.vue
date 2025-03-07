@@ -30,7 +30,7 @@
 
 <script>
 import { useTokenStore } from "../stores/token";
-import { eventBus } from '../main.ts'; // 导入事件总线
+import { eventBus } from '../main.js'; // 导入事件总线
 import { like } from '@/api/video';
 import { Result } from "element-ui";
 
