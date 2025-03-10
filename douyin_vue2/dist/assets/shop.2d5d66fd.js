@@ -1,0 +1,1 @@
+import{i as a}from"./request.aca4492d.js";const n=(s,e)=>a.get(`/shop?current=${s}&size=${e}`),o=s=>a.get(`/shop/dish/sear/${s}`),i=s=>a.get(`/shop/dish/liansear/${s}`),p=(s=1,e=10)=>a.get("/shop/fileImg",{params:{page:s,pageSize:e,type:"shop_menu"}}),h=(s,e,r)=>a.get("/shop/likeall",{params:{key:s,current:e,size:r}});export{p as a,o as b,h as g,i as l,n as s};

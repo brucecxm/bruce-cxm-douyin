@@ -4,37 +4,61 @@ import vue2 from "@vitejs/plugin-vue2";
 
 const { fileURLToPath, URL } = require("url");
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    vue2(),
-    legacy({
-      targets: ["ie >= 11"],
-      additionalLegacyPolyfills: ["regenerator-runtime/runtime"],
-    }),
-  ],
-  resolve: {
-    alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
-    },
-  },
-
-  server: {
-    // host: '0.0.0.0',  // 允许外部访问
-    // port: 5173,        // 使用的端口号
-    // open: true,         // 启动时自动打开浏览器
-    proxy: {
-      "/api": {
-        target: "http://localhost:9430",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+export default defineConfig(({ mode }) => {
+  // 这里根据 mode 来加载不同的配置
+  if (mode === 'development') {
+    return {
+      plugins: [
+        vue2(),
+        legacy({
+          targets: ["ie >= 11"],
+          additionalLegacyPolyfills: ["regenerator-runtime/runtime"],
+        }),
+      ],
+      build: {
+        outDir: 'dist',  // 开发环境输出到默认的 'build' 目录
       },
-      // "/websocket": {
-      //   target: "ws://localhost:9998/ws",
-      //   changeOrigin: true,
-      //   ws: true, // 开启 WebSocket 代理
-      //   rewrite: (path) => path.replace(/^\/websocket/, ""),
-      // },
-    },
-  },
+      resolve: {
+        alias: {
+          "@": fileURLToPath(new URL("./src", import.meta.url)),
+        },
+      },
+      server: {
+        proxy: {
+          "/api": {
+            target: "http://localhost:9430",
+            changeOrigin: true,
+            rewrite: (path) => path.replace(/^\/api/, ""),
+          },
+        },
+      },
+    };
+  } else if (mode === 'production') {
+    return {
+      plugins: [
+        vue2(),
+        legacy({
+          targets: ["ie >= 11"],
+          additionalLegacyPolyfills: ["regenerator-runtime/runtime"],
+        }),
+      ],
+      build: {
+        outDir: '/usr/share/nginx/html/dist',  // 生产环境输出到指定的 CentOS 目录
+      },
+      resolve: {
+        alias: {
+          "@": fileURLToPath(new URL("./src", import.meta.url)),
+        },
+      },
+      server: {
+        proxy: {
+          "/api": {
+            target: "http://localhost:9430",
+            changeOrigin: true,
+            rewrite: (path) => path.replace(/^\/api/, ""),
+          },
+        },
+      },
+    };
+  }
 });
