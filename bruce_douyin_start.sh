@@ -1,6 +1,21 @@
 #!/bin/bash
 
-# 1. 执行 mvn install
+# 1. 检查是否安装了 git，并从远程仓库获取最新代码
+if command -v git &> /dev/null; then
+    echo "git 已安装，正在从远程仓库获取最新代码..."
+    git pull origin main
+    # 检查 git pull 是否成功
+    if [ $? -eq 0 ]; then
+        echo "最新代码获取成功!"
+    else
+        echo "从远程仓库获取代码时出错!"
+        exit 1
+    fi
+else
+    echo "git 未安装，跳过更新代码步骤!"
+fi
+
+# 2. 执行 mvn install
 echo "开始执行 mvn install..."
 mvn install
 
@@ -12,10 +27,10 @@ else
     exit 1
 fi
 
-# 2. 进入 JAR 文件夹
+# 3. 进入 JAR 文件夹
 cd jar || { echo "无法进入 JAR 文件夹"; exit 1; }
 
-# 3. 关闭所有包含 'douyin' 和 '.jar' 的进程
+# 4. 关闭所有包含 'douyin' 和 '.jar' 的进程
 echo "正在关闭所有包含 'douyin' 和 '.jar' 字符串的进程..."
 
 # 获取匹配的进程 PID
@@ -36,7 +51,7 @@ else
     fi
 fi
 
-# 4. 对每个 JAR 文件执行 nohup java -jar
+# 5. 对每个 JAR 文件执行 nohup java -jar
 for jar_file in *.jar; do
     if [ -f "$jar_file" ]; then
         echo "正在启动 $jar_file ..."
@@ -49,7 +64,7 @@ echo "所有 JAR 文件已启动。"
 # 返回上级目录
 cd ..
 
-# 5. 进入 Vue 项目并执行构建
+# 6. 进入 Vue 项目并执行构建
 cd douyin_vue2 || { echo "无法进入 Vue 项目文件夹"; exit 1; }
 
 echo "开始执行 npm install..."
@@ -74,7 +89,7 @@ else
     exit 1
 fi
 
-# 6. 重启 Nginx
+# 7. 重启 Nginx
 echo "正在重启 Nginx..."
 sudo systemctl restart nginx
 
