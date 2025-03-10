@@ -1,10 +1,24 @@
 #!/bin/bash
 
-# 1. 检查是否安装了 git，并从远程仓库获取最新代码
+# 设置脚本执行失败时立即退出
+set -e
+
+echo "==================== 开始执行部署脚本 ===================="
+
+# 1. **检查并拉取最新代码**
 if command -v git &> /dev/null; then
     echo "git 已安装，正在从远程仓库获取最新代码..."
-    git pull origin main
-    # 检查 git pull 是否成功
+
+    # 检查是否有未提交的修改
+    if ! git diff --quiet || ! git diff --staged --quiet; then
+        echo "检测到未提交的本地修改，先进行 stash 处理..."
+        git stash
+        git pull origin main
+        git stash pop
+    else
+        git pull origin main
+    fi
+
     if [ $? -eq 0 ]; then
         echo "最新代码获取成功!"
     else
@@ -15,11 +29,10 @@ else
     echo "git 未安装，跳过更新代码步骤!"
 fi
 
-# 2. 执行 mvn install
+# 2. **执行 mvn install**
 echo "开始执行 mvn install..."
 mvn install
 
-# 检查 mvn install 是否执行成功
 if [ $? -eq 0 ]; then
     echo "mvn install 执行成功!"
 else
@@ -27,50 +40,42 @@ else
     exit 1
 fi
 
-# 3. 进入 JAR 文件夹
+# 3. **进入 JAR 文件夹**
 cd jar || { echo "无法进入 JAR 文件夹"; exit 1; }
 
-# 4. 关闭所有包含 'douyin' 和 '.jar' 的进程
+# 4. **关闭所有包含 'douyin' 和 '.jar' 的进程**
 echo "正在关闭所有包含 'douyin' 和 '.jar' 字符串的进程..."
+PIDS=$(ps aux | grep 'douyin.*\.jar' | grep -v 'grep' | awk '{print $2}')
 
-# 获取匹配的进程 PID
-pids=$(ps aux | grep 'douyin.*\.jar' | grep -v 'grep' | awk '{print $2}')
-
-# 检查是否有匹配的进程
-if [ -z "$pids" ]; then
-    echo "没有找到匹配的进程，无需关闭！"
+if [ -n "$PIDS" ]; then
+    echo "检测到正在运行的 douyin 相关进程: $PIDS"
+    echo "$PIDS" | xargs kill -9
+    echo "进程已关闭!"
 else
-    # 如果有进程，执行 kill
-    echo "找到匹配进程，正在关闭..."
-    echo "$pids" | xargs kill -9
-    if [ $? -eq 0 ]; then
-        echo "所有匹配的进程已成功关闭！"
-    else
-        echo "关闭进程时出错！"
-        exit 1
-    fi
+    echo "没有找到相关进程，无需关闭!"
 fi
 
-# 5. 对每个 JAR 文件执行 nohup java -jar
+# 5. **启动所有 JAR 文件**
 for jar_file in *.jar; do
     if [ -f "$jar_file" ]; then
         echo "正在启动 $jar_file ..."
         nohup java -Xms256m -Xmx512m -jar "$jar_file" --spring.profiles.active=dev > "$jar_file.log" 2>&1 &
+        echo "$jar_file 启动成功!"
     fi
 done
 
-echo "所有 JAR 文件已启动。"
+echo "所有 JAR 文件已启动!"
 
 # 返回上级目录
 cd ..
 
-# 6. 进入 Vue 项目并执行构建
+# 6. **进入 Vue 项目目录**
 cd douyin_vue2 || { echo "无法进入 Vue 项目文件夹"; exit 1; }
 
+# 7. **安装 npm 依赖**
 echo "开始执行 npm install..."
-npm install  # 修正拼写错误
+npm install
 
-# 检查 npm install 是否成功
 if [ $? -eq 0 ]; then
     echo "npm install 执行成功!"
 else
@@ -78,10 +83,10 @@ else
     exit 1
 fi
 
+# 8. **执行 Vue 项目构建**
 echo "开始执行 npm run build..."
 npm run build
 
-# 检查 npm build 是否成功
 if [ $? -eq 0 ]; then
     echo "npm build 执行成功!"
 else
@@ -89,11 +94,10 @@ else
     exit 1
 fi
 
-# 7. 重启 Nginx
+# 9. **重启 Nginx**
 echo "正在重启 Nginx..."
 sudo systemctl restart nginx
 
-# 检查 Nginx 是否重启成功
 if [ $? -eq 0 ]; then
     echo "Nginx 重启成功!"
 else
@@ -101,4 +105,4 @@ else
     exit 1
 fi
 
-echo "脚本执行完成。"
+echo "==================== 部署脚本执行完成! ===================="
