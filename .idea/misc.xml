@@ -9,18 +9,9 @@
     </option>
     <option name="ignoredFiles">
       <set>
-        <option value="$PROJECT_DIR$/douyin_basic/douyin_testSpringfactories/pom.xml" />
-        <option value="$PROJECT_DIR$/douyin_model/pom.xml" />
-        <option value="$PROJECT_DIR$/douyin_service/douyin_comment/pom.xml" />
-        <option value="$PROJECT_DIR$/douyin_service/douyin_file/pom.xml" />
-        <option value="$PROJECT_DIR$/douyin_service/douyin_introduce/pom.xml" />
-        <option value="$PROJECT_DIR$/douyin_service/douyin_music/pom.xml" />
-        <option value="$PROJECT_DIR$/douyin_service/minio-file-demo/pom.xml" />
-        <option value="$PROJECT_DIR$/douyin_test/douyin_satoken/pom.xml" />
-        <option value="$PROJECT_DIR$/douyin_test/pom.xml" />
-        <option value="$PROJECT_DIR$/sa-token-demo-sso-server/pom.xml" />
+        <option value="$PROJECT_DIR$/douyin_basic/bruce-id-service/pom.xml" />
       </set>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" project-jdk-name="21" project-jdk-type="JavaSDK" />
 </project>
