@@ -15,6 +15,7 @@
         <module name="douyin_file_starter" />
         <module name="douyin_feign" />
         <module name="douyin_sms" />
+        <module name="douyin-id-service" />
         <module name="douyin_gateway" />
         <module name="douyin_behavior" />
         <module name="douyin_eureka" />
@@ -24,6 +25,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="bruce-id-service" target="21" />
       <module name="douyin_comment" target="1.8" />
       <module name="douyin_Designpatterns" target="1.8" />
       <module name="douyin_file" target="1.8" />
@@ -41,6 +43,8 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="bruce-id-service" options="-parameters" />
+      <module name="douyin-id-service" options="-parameters" />
       <module name="douyin_Designpatterns" options="-parameters" />
       <module name="douyin_admin" options="-parameters" />
       <module name="douyin_article" options="-parameters" />
