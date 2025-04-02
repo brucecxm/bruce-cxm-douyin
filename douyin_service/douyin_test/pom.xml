@@ -100,7 +100,18 @@
                     <!-- 指定输出目录 -->
                     <outputDirectory>${project.basedir}/../../jar</outputDirectory>
                 </configuration>
-            </plugin>
+            </plugin>  <plugin>
+            <groupId>org.mybatis.generator</groupId>
+            <artifactId>mybatis-generator-maven-plugin</artifactId>
+            <version>1.4.0</version>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>generate</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
         </plugins>
     </build>
 </project>

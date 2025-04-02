@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+
+    <!-- 上下文配置 -->
+    <context id="MysqlContext" targetRuntime="MyBatis3">
+
+        <!-- 1. 可选的属性 -->
+        <!-- 可以在这里添加一些属性，比如 targetRuntime 等 -->
+        <property name="javaFileEncoding" value="UTF-8" />
+
+        <!-- 2. 可选插件 -->
+        <!-- 如果有插件，可以在这里配置 -->
+
+        <!-- 3. 注释生成器 -->
+        <commentGenerator>
+            <property name="suppressAllComments" value="true" />
+        </commentGenerator>
+
+        <!-- 4. 数据库连接 -->
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/douyintest"
+                        userId="root"
+                        password="root">
+        </jdbcConnection>
+
+        <!-- 5. 可选的 Java 类型解析器 -->
+        <!-- 你可以不添加此部分，除非需要定制 Java 类型解析行为 -->
+
+        <!-- 6. Java 模型生成器 -->
+        <javaModelGenerator targetPackage="com.bruce.entity" targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+            <property name="useActualColumnNames" value="false"/>
+        </javaModelGenerator>
+
+        <!-- 7. 可选的 SQL 映射生成器 -->
+        <sqlMapGenerator targetPackage="mapper" targetProject="src/main/resources">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+
+        <!-- 8. 可选的 Java 客户端生成器 -->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.bruce.mapper" targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+
+        <!-- 9. 需要生成的表 -->
+        <table tableName="music" domainObjectName="Music" />
+
+    </context>
+
+</generatorConfiguration>

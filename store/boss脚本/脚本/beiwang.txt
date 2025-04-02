@@ -1,0 +1,20 @@
+滑动命令：adb shell input swipe 500 1500 500 1100 500
+
+
+
+点击命令：
+
+左键：adb shell input tap 250 2300
+
+
+
+
+中键：adb shell input tap 520 2300
+
+右键：adb shell input tap 820 2300
+
+
+立即沟通按钮：adb shell input tap 520 2200
+
+
+选择按钮：adb shell input tap 520 1500

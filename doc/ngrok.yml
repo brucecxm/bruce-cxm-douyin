@@ -1,0 +1,16 @@
+authtoken: 2tq5jqicVNr4qf98hw6JJl7bWxI_2AmunBhWZcpGxiB9cZJoM
+version: "2"
+tunnels:
+  frontend:
+    proto: http
+    addr: 8011
+    domain: intense-lucky-possum.ngrok-free.app
+  backend:
+    proto: http
+    addr: 8080
+  fileendpoint:
+    proto: http
+    addr: 9000
+
+
+#运行命令 ngrok start --all
