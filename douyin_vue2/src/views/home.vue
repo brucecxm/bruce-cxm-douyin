@@ -83,11 +83,11 @@ export default {
             { color: "blue", left: this.boxWidth, boxtest: "同城" },
             { color: "yellow", left: 2 * this.boxWidth, boxtest: "关注" },
             { color: "pink", left: 3 * this.boxWidth, boxtest: "直播" },
-            { color: "pink", left: 4 * this.boxWidth, boxtest: "经验" },
-            { color: "white", left: 5 * this.boxWidth, boxtest: "商城" },
-            { color: "pink", left: 6 * this.boxWidth, boxtest: "团购" },
-            { color: "pink", left: 7 * this.boxWidth, boxtest: "精选" },
-            { color: "pink", left: 8 * this.boxWidth, boxtest: "热点" },
+            // { color: "pink", left: 4 * this.boxWidth, boxtest: "经验" },
+            // { color: "white", left: 5 * this.boxWidth, boxtest: "商城" },
+            // { color: "pink", left: 6 * this.boxWidth, boxtest: "团购" },
+            // { color: "pink", left: 7 * this.boxWidth, boxtest: "精选" },
+            // { color: "pink", left: 8 * this.boxWidth, boxtest: "热点" },
         ];
         eventBus.$on('messageSent', (msg) => {
             this.message = msg;

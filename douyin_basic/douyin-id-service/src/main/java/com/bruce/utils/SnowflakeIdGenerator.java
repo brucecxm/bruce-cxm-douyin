@@ -3,7 +3,6 @@ package com.bruce.utils;
 
 import org.springframework.stereotype.Component;
 
-@Component
 public class SnowflakeIdGenerator {
     // 系统开始时间
     private final long twepoch = 1288834974657L;
@@ -32,7 +31,7 @@ public class SnowflakeIdGenerator {
     private long datacenterId; // 数据中心ID
     private long sequence = 0L; // 序列号
 
-    public SnowflakeIdGenerator(long workerId, long datacenterId) {
+    public SnowflakeIdGenerator(Long  workerId, Long  datacenterId) {
         if (workerId > maxWorkerId || workerId < 0) {
             throw new IllegalArgumentException(String.format("workerId can't be greater than %d or less than 0", maxWorkerId));
         }

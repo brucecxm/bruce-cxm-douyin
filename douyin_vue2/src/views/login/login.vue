@@ -18,12 +18,12 @@
                     <button @click="getVerificationCode" :disabled="isCodeSent" class="get-code-btn">
                         {{ countdown > 0 ? countdown + '秒' : '获取验证码' }}
                     </button>
+    <img :src="captchaUrl"  alt="验证码" v-if="isShow" />
+
                 </div>
 
                 <p class="terms">
-                    <input type="checkbox" v-model="isAgreed" /> 已阅读并同意 <a href="#">用户协议</a> 和 <a href="#">隐私政策</a> 以及
-                    <a href="#">运营商服务协议</a>
-                    ，运营商将对你的手机号进行验证
+                    <input type="checkbox" v-model="isAgreed" /> 已阅读并同意协议，运营商将对你的手机号进行验证
                 </p>
                 <button class="login-btn" @click="verifyPhoneNumber">验证并登录</button>
                 <div class="login-options">
@@ -39,15 +39,14 @@
                     <input type="password" v-model="loginpojo.confirmPassword" placeholder="确认密码" />
                 </div>
                 <div class="input-group">
-                    <input type="text" v-model="verificationCode" placeholder="请输入验证码" />
+                    <input type="text" v-model="verificationCode" placeholder="请输入验证码"  />
                     <button @click="getVerificationCode" :disabled="isCodeSent" class="get-code-btn">
                         {{ countdown > 0 ? countdown + '秒' : '获取验证码' }}
                     </button>
                 </div>
+
                 <p class="terms">
-                    <input type="checkbox" v-model="isAgreed" /> 已阅读并同意 <a href="#">用户协议</a> 和 <a href="#">隐私政策</a> 以及
-                    <a href="#">运营商服务协议</a>
-                    ，运营商将对你的手机号进行验证
+                    <input type="checkbox" v-model="isAgreed" /> 已阅读并同意协议，运营商将对你的手机号进行验证
                 </p>
                 <button class="login-btn" @click="register">注册并登录</button> 
                 <div class="login-options">
@@ -61,6 +60,7 @@
 </template>
 
 <script>
+import { isShallow } from "vue";
 import { userLoginService, userInfoService, userRegisterService,getVerificationCodeService } from "../../api/user"
 import { useTokenStore } from "../../stores/token"
 import axios from 'axios';
@@ -69,6 +69,7 @@ export default {
     name: 'Login',
     data() {
         return {
+            
             loginpojo: {
                 username: '',
                 password: "",
@@ -83,17 +84,11 @@ export default {
             selectedCode: '+86',  // 用来存储选择的代码
             countdown: 0, // 用于倒计时
             isCodeSent: false, // 是否已发送验证码
+            isShow: false, // 是否为浅色模式
+            captchaUrl: '' // 用来绑定到 <img>
         };
     },
     mounted() {
-        // 假设你的 JSON 文件路径是 /assets/countryCodes.json
-        axios.get('src/assets/json/phone.json')
-            .then(response => {
-                this.countryCodes = response.data; // 将 JSON 数据赋值给 countryCodes
-            })
-            .catch(error => {
-                console.error('Error loading country codes:', error);
-            });
     },
 
     methods: {
@@ -103,42 +98,53 @@ export default {
                 alert("请输入有效的邮箱地址");
             }
         },
+        
         closeScreen() {
             this.$router.go(-1); // 返回上一级
             console.log('关闭界面');
         },
+
+
         clearPhoneNumber() {
             this.loginpojo.username = ''; // 清空手机号
             this.loginpojo.password = ''; // 清空密码
             this.loginpojo.confirmPassword = ''; // 清空确认密码
         },
         async getVerificationCode() {
-            if (!this.loginpojo.username) {
-                alert("请输入邮箱");
-                return;
-            }
+    if (!this.loginpojo.username) {
+        alert("请输入邮箱");
+        return;
+    }
 
-            try {
-                const response = await getVerificationCodeService(this.loginpojo.username); // 后端发送验证码
-                if (response.data.code === 1) {
-                    alert("获取验证码失败，请稍后再试");
-                    return;
-                }
+    try {
+        // 发送请求并获取验证码图片流，确保设置了 responseType: 'blob'
+        const response = await getVerificationCodeService(this.loginpojo.username); 
+        
+        // 判断后端返回的数据是否为成功状态
+        if (response.data.code === 1) {
+            alert("获取验证码失败，请稍后再试");
+            return;
+        }
 
-                this.isCodeSent = true;
-                this.countdown = 60; // 发送验证码后开始倒计时
-                const timer = setInterval(() => {
-                    if (this.countdown === 0) {
-                        clearInterval(timer);
-                        this.isCodeSent = false;
-                    } else {
-                        this.countdown--;
-                    }
-                }, 1000);
-            } catch (error) {
-                console.error("获取验证码失败：", error);
+        // 使用 Blob 包装数据并生成一个临时图片 URL
+        const blob = new Blob([response.data], { type: 'image/png' });
+        this.captchaUrl = URL.createObjectURL(blob);
+this.isShow = true; // 显示验证码图片
+        this.isCodeSent = true;
+        this.countdown = 60; // 发送验证码后开始倒计时
+        const timer = setInterval(() => {
+            if (this.countdown === 0) {
+                clearInterval(timer);
+                this.isCodeSent = false;
+            } else {
+                this.countdown--;
             }
-        },
+        }, 1000);
+    } catch (error) {
+        console.error("获取验证码失败：", error);
+    }
+}
+,
         async verifyPhoneNumber() {
             if (!this.isAgreed) {
                 alert("请勾选用户协议以继续登录。");
@@ -209,204 +215,191 @@ export default {
     },
 };
 </script>
-
 <style scoped>
 .login-screen {
     display: flex;
     flex-direction: column;
-    padding: 0 4vw;
-    /* 使用 vw 进行水平内边距 */
-    box-sizing: border-box;
-    background-color: #fff;
+    padding: 0 16px;
+    background: #fff;
     height: 100vh;
-    /* 使用 vh 进行高度设置 */
-    width: 100vw;
-    /* 使用 vw 进行宽度设置 */
-    overflow-x: hidden;
-    /* 去掉水平滚动条 */
+    position: relative;
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2vh 0;
-    /* 使用 vh 进行上下内边距 */
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
 }
 
 .close-btn {
-    font-size: 3vw;
-    /* 使用 vw 进行字体大小 */
+    font-size: 28px;
+    color: #666;
     background: none;
     border: none;
-    cursor: pointer;
+    padding: 8px;
 }
 
-.help-settings {
-    font-size: 2vw;
-    /* 使用 vw 进行字体大小 */
-    cursor: pointer;
+.help-settings span {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
 }
 
 .content {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    text-align: center;
-    overflow-y: auto;
-    /* 允许纵向滚动 */
+    padding: 20px 16px;
 }
 
 .notice {
-    font-size: 4vw;
-    /* 使用 vw 进行字体大小 */
-    margin-bottom: 2vh;
-    /* 使用 vh 进行下边距 */
+    font-size: 22px;
+    color: #333;
+    margin: 24px 0;
+    font-weight: 500;
 }
 
 .login-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     width: 100%;
-    /* 确保表单宽度为100% */
-}
-
-
-
-.country-code {
-    border: none;
-    background: none;
-    font-size: 2.5vw;
-    /* 使用 vw 进行字体大小 */
-    margin-right: 1vw;
-    /* 使用 vw 进行右边距 */
+    max-width: 400px;
+    margin: 0 auto;
 }
 
 .input-group {
-    margin-bottom: 2vh;
-    /* 使用 vh 进行下边距 */
-    width: 100%;
-    /* 确保输入组宽度为100% */
-    padding: 2vh;
-    /* 使用 vh 进行内边距 */
-    box-sizing: border-box;
-    /* 确保内边距和边框不影响总宽度 */
-
+    margin-bottom: 16px;
+    position: relative;
 }
 
 .input-group input {
-    flex-grow: 1;
-    font-size: 2.5vw;
-    display: block;
-    width: 80vw;
-    height: 4vh;
-    margin: 5px;
-    border-radius: 10px;
-    border: none;
-    background-color: rgba(0, 0, 0, 0.1);
-
+    width: 100%;
+    height: 48px;
+    padding: 0 16px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    font-size: 16px;
+    background: #f8f8f8;
+    margin: 8px 0;
+    transition: all 0.2s;
 }
 
+.input-group input:focus {
+    background: #fff;
+    border-color: #ff4757;
+    outline: none;
+}
 
-
-.input-group .country-code {
+.get-code-btn {
     position: absolute;
-    left: 0px;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 36px;
+    padding: 0 12px;
+    background: #fff;
+    border: 1px solid #ff4757;
+    border-radius: 6px;
+    color: #ff4757;
+    font-size: 14px;
+    transition: all 0.2s;
 }
 
-
-.clear-btn {
-    font-size: 3vw;
-    /* 使用 vw 进行字体大小 */
-    background: none;
-    border: none;
-    cursor: pointer;
+.get-code-btn:disabled {
+    background: #f8f8f8;
+    border-color: #eee;
+    color: #999;
 }
 
 .terms {
-    font-size: 2vw;
-    /* 使用 vw 进行字体大小 */
-    color: #888;
-    text-align: left;
-    margin: 2vh 0;
-    /* 使用 vh 进行上下边距 */
-}
-
-.terms a {
-    color: #007bff;
-    text-decoration: none;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.6;
+    margin: 24px 0;
+    display: flex;
+    align-items: center;
 }
 
 .terms input[type="checkbox"] {
-    vertical-align: middle;
-    /* 让 checkbox 与文本垂直居中 */
-    margin-top: 0;
-    /* 移除默认的顶部边距 */
-    margin-bottom: 0;
-    /* 移除默认的底部边距 */
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
 }
 
-.terms input {
-    margin-right: 5px;
-
-
+.terms a {
+    color: #ff4757;
+    text-decoration: none;
 }
 
 .login-btn {
-    background-color: #ff5252;
+    width: 100%;
+    height: 48px;
+    background: linear-gradient(45deg, #ff4757, #ff6b81);
     color: white;
     border: none;
-    padding: 2vh 0;
-    /* 使用 vh 进行上下内边距 */
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 2vh;
-    /* 使用 vh 进行上边距 */
-    font-size: 3vw;
-    /* 使用 vw 进行字体大小 */
+    border-radius: 24px;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 16px 0;
+    box-shadow: 0 4px 12px rgba(255, 71, 87, 0.2);
+    transition: all 0.2s;
+}
+
+.login-btn:active {
+    transform: scale(0.98);
 }
 
 .login-options {
     display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin-top: 2vh;
-    /* 使用 vh 进行上边距 */
+    justify-content: center;
+    gap: 24px;
+    margin-top: 24px;
 }
 
 .login-options button {
     background: none;
     border: none;
-    color: #007bff;
-    cursor: pointer;
-    font-size: 2vw;
-    /* 使用 vw 进行字体大小 */
+    color: #ff4757;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px;
 }
 
 .recovery-text {
-    font-size: 2vw;
-    /* 使用 vw 进行字体大小 */
-    color: #888;
-    margin-top: 2vh;
-    /* 使用 vh 进行上边距 */
+    font-size: 12px;
+    color: #666;
+    margin-top: 24px;
 }
 
 .recovery-text a {
-    color: #007bff;
+    color: #ff4757;
     text-decoration: none;
 }
 
-.get-code-btn {
-    font-size: 2.5vw;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 1vh 2vw;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 30vw;
+/* 验证码图片样式 */
+.input-group img {
+    width: 120px;
+    height: 40px;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 4px;
+    border: 1px solid #eee;
+}
+
+/* 注册表单调整 */
+.login-form.register-form .input-group input {
+    margin: 6px 0;
+}
+
+@media (max-width: 375px) {
+    .input-group input {
+        height: 44px;
+        font-size: 14px;
+    }
+    
+    .login-btn {
+        height: 44px;
+        font-size: 15px;
+    }
 }
 </style>

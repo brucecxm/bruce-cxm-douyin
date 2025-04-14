@@ -3,6 +3,9 @@
 
 /douyin_admin_vue3/node_modules/
 
+/.idea/
+
+
 # Compiled class file
 *.class
 

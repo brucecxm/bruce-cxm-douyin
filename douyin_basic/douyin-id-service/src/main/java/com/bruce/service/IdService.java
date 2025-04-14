@@ -1,6 +1,6 @@
 package com.bruce.service;
 
-public interface idService {
+public interface IdService {
     //uuid
     String uuidGen();
     //雪花算法

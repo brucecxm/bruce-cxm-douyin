@@ -36,10 +36,9 @@ export const userAvatarUpdateService = (avatarUrl) => {
   params.append("avatarUrl", avatarUrl);
   return request.patch("/user/updateAvatar", params);
 };
-
-
-//获取用户登录状态
+// 获取验证码服务，确保发送正确的请求，且设置 responseType: 'blob'
 export const getVerificationCodeService = (username) => {
-  return request.put("/user/getVerificationCode", username);
+  return request.put("/user/getVerificationCode", username, {
+    responseType: 'blob'  // 确保返回值是图片流
+  });
 };
-

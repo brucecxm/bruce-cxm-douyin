@@ -17,7 +17,7 @@ import java.io.Serializable;
 @ApiModel(description = "视频实体类")
 public class Video implements Serializable {
     @ApiModelProperty(value = "视频ID", example = "1")
-    private Integer videoId;
+    private Long videoId;
 
     private Integer authId;
 
@@ -32,11 +32,11 @@ public class Video implements Serializable {
     // 新增的属性
     private String videoTitle; // 视频标题
 
-    public Integer getVideoId() {
+    public Long getVideoId() {
         return videoId;
     }
 
-    public void setVideoId(Integer videoId) {
+    public void setVideoId(Long videoId) {
         this.videoId = videoId;
     }
 

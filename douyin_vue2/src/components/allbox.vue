@@ -10,7 +10,9 @@
         <experiencebox v-if="boxtype === '团购'"></experiencebox>
         <experiencebox v-if="boxtype === '精选'"></experiencebox>
         <experiencebox v-if="boxtype === '热点'"></experiencebox>
-
+<!-- 其实可以通过传入一个type  yongv-if等控制组件的显示和消失  避免创建这么多组件 -->
+<!-- 其实可以通过传入一个type  yongv-if等控制组件的显示和消失  避免创建这么多组件 -->
+<!-- 其实可以通过传入一个type  yongv-if等控制组件的显示和消失  避免创建这么多组件 -->
     </div>
 </template>
 

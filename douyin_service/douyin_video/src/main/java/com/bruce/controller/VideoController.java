@@ -8,21 +8,27 @@ import com.bruce.dao.VideoOneDao;
 import com.bruce.entity.Video;
 import com.bruce.entity.VideoOne;
 import com.bruce.entity.VideoWithAvatar;
+import com.bruce.file.service.FileStorageService;
+import com.bruce.service.IdService;
 import com.bruce.service.MessageQueueService;
 import com.bruce.service.VideoOneService;
 import com.bruce.service.VideoService;
 //import com.bruce.MusicClient;
 //import com.bruce.UserClient;
+import com.bruce.service.impl.IdServiceImpl;
 import com.bruce.utils.ThreadLocalUtil;
 import io.swagger.annotations.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +56,9 @@ public class VideoController extends ApiController {
     @Resource
     private MessageQueueService messageQueueService;
 
+    @Autowired
+    private IdService idService;
+
 //    @Autowired
 //    private UserClient userClient;
 //
@@ -61,9 +70,9 @@ public class VideoController extends ApiController {
 
     @Autowired
     private VideoOneDao VideoOneDao;
+    @Autowired
+    private FileStorageService fileStorageService;
 
-
-    @PostMapping("/upvideo")
     @ApiOperation(value = "上传视频的接口", notes = "将视频上传到文件服务器")
     @ApiImplicitParams({
             @ApiImplicitParam(name = " file,", value = "文件", required = true, dataType = "MultipartFile", paramType = "query"),
@@ -74,26 +83,43 @@ public class VideoController extends ApiController {
             @ApiResponse(code = 404, message = "用户不存在"),
             @ApiResponse(code = 500, message = "服务器内部错误")
     })
-    public void upvideo(
+    @PostMapping("/upvideo")
+    public ResponseEntity<?> upvideo(
             @ApiParam(value = "文件", required = true) @RequestParam("file") MultipartFile file,
-            @RequestParam("params") Map params) {
+            @RequestParam Map<String, String> params) {
 
-        String videoTitle = String.valueOf(params.get("videoTitle"));
-        String videoContext = String.valueOf(params.get("videoContext"));
-        String authId = "100112";
-        String VideoId = "100112";
-        String MusicId = "100112";
-        String fileName = file.getName();
-        StringBuilder videoUrl = new StringBuilder("http://192.168.200.130:9000/mybucket/");
-        videoUrl.append(fileName);
-        Video video = new Video();
-        video.setVideoId(Integer.valueOf(VideoId));
-        video.setVideoComment(videoContext);
-        video.setVideoUrl(videoUrl.toString());
-        video.setAuthId(Integer.valueOf(authId));
-        video.setMusicId(Integer.valueOf(MusicId));
-        video.setVideoTitle(videoTitle);
-        this.videoService.save(video);
+        try {
+            // 1. 参数处理
+            String videoTitle = params.get("videoTitle");
+            String videoContext = params.get("videoContext");
+            if (file == null || file.isEmpty()) {
+                return ResponseEntity.badRequest().body("上传失败：文件不能为空");
+            }
+            // 2. 模拟写死的数据
+            String authId = "100112";
+            String videoId = String.valueOf(idService.SnowflakeGen());
+            String musicId = "100112";
+            // 3. 拼接文件地址（MinIO上传部分略）
+            String fileName = file.getOriginalFilename(); // 更推荐使用 getOriginalFilename
+            String videoUrl = "http://192.168.200.130:9000/mybucket/" + fileName;
+            // 4. 构造 video 实体
+            Video video = new Video();
+            video.setVideoId(Long.parseLong(videoId));
+            video.setVideoComment(videoContext);
+            video.setVideoUrl(videoUrl);
+            video.setAuthId(Integer.parseInt(authId));
+            video.setMusicId(Integer.parseInt(musicId));
+            video.setVideoTitle(videoTitle);
+            InputStream in= file.getInputStream();
+            fileStorageService.uploadImgFile(videoId,videoId,in);
+            // 5. 保存到数据库
+            videoService.save(video);
+            return ResponseEntity.ok("上传成功");
+        } catch (Exception e) {
+            e.printStackTrace(); // 控制台输出异常
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("服务器错误：" + e.getMessage());
+        }
     }
 
 

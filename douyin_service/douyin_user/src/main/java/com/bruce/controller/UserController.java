@@ -1,4 +1,5 @@
 package com.bruce.controller;
+
 import cn.hutool.core.util.IdUtil;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
@@ -143,16 +144,8 @@ public class UserController {
     }
 
 
-
-
-
-
-
-
-@Autowired
-private systemClient systemClients;
-
-
+    @Autowired
+    private systemClient systemClients;
 
 
     // 测试登录，浏览器访问： http://localhost:8081/user/doLogin?username=zhang&password=123456
@@ -168,49 +161,33 @@ private systemClient systemClients;
         if (user == null) {
             return Result.error("请核对用户名是否正确");
         }
-
         LambdaQueryWrapper<Salt> queryWrapperone = new LambdaQueryWrapper<>();
         // 使用查询条件，假设Salt类有一个用户名字段叫username
         queryWrapperone.eq(Salt::getUsername, username);
         // 获取盐值
         Salt salt = saltService.getOne(queryWrapperone);
-
         // 加密输入的密码
-        String encryptedPassword =saltedDoubleHashPassword(password, salt.getSalt());
-
-
-
-
-        if (user.getUsername().equals(username)&&encryptedPassword.equals(user.getPassword())) {
-
-
-
-
-
+        String encryptedPassword = saltedDoubleHashPassword(password, salt.getSalt());
+        if (user.getUsername().equals(username) && encryptedPassword.equals(user.getPassword())) {
             //1.使用sa-token产生的token
-            R result=  systemClients.findById(1);
-            String login_token="sa-token";
-            if(result!=null)
-            {
-                HashMap resultMap= (HashMap) result.getData();
-                 login_token  = String.valueOf(resultMap.get("value"));
+            R result = systemClients.findById(1);
+            String login_token = "sa-token";
+            if (result != null) {
+                HashMap resultMap = (HashMap) result.getData();
+                login_token = String.valueOf(resultMap.get("value"));
             }
-
             Map<String, String> response = new HashMap<>();
-
-            if(login_token.equals("sa-token"))
-            {
+            if (login_token.equals("sa-token")) {
 // 获取当前会话是否已经登录，返回true=已登录，false=未登录
                 StpUtil.login(user.getId());
                 String token_login = StpUtil.getTokenValue();
                 response.put("token", token_login);
 
-            }else if(login_token.equals("jwt"))
-            {
+            } else if (login_token.equals("jwt")) {
                 String token = jwtUtil.generateToken(user.getUsername());
                 response.put("token", token);
 
-            }else {
+            } else {
 
             }
 
@@ -219,35 +196,32 @@ private systemClient systemClients;
         return Result.error("登录失败");
     }
 
-
-    //图片验证码接口
+    // 图片验证码接口
     @PutMapping("/getVerificationCode")
-    @ResponseBody  // Adding @ResponseBody to return a response body
-    public void getVerificationCode(HttpServletResponse response,@RequestParam(required = false) String uuid) throws IOException {
+    @ResponseBody  // 直接返回响应体
+    public void getVerificationCode(HttpServletResponse response, @RequestParam(required = false) String uuid) throws IOException {
         if (uuid == null) {
             uuid = String.valueOf(System.currentTimeMillis()); // 生成唯一标识符
         }
 
         // 创建验证码对象（设置图片宽高和验证码字符数）
-        SpecCaptcha captcha = new SpecCaptcha(120, 40, 5);
-        captcha.setCharType(Captcha.TYPE_DEFAULT);
+        SpecCaptcha captcha = new SpecCaptcha(120, 40, 5); // 验证码宽度 120px, 高度 40px，5个字符
+        captcha.setCharType(Captcha.TYPE_DEFAULT); // 设置验证码类型为数字字母组合
 
         // 存入 Redis，过期时间 3 分钟
         stringRedisTemplate.opsForValue().set("CAPTCHA_" + uuid, captcha.text(), 3, TimeUnit.MINUTES);
 
         // 设置响应头
-        response.setContentType("image/png");
-        response.setHeader("Cache-Control", "no-store, no-cache");
-        response.setHeader("uuid", uuid);
+        response.setContentType("image/png"); // 设置返回类型为 PNG 格式的图片
+        response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate"); // 防止缓存
+        response.setHeader("uuid", uuid); // 返回 uuid，供前端请求时使用
 
         // 使用 out() 方法生成并输出验证码图片
-        ServletOutputStream out = response.getOutputStream();
-        captcha.out(out); // 直接输出验证码到响应流
-        out.flush();
-        out.close();
+        try (ServletOutputStream out = response.getOutputStream()) {
+            captcha.out(out); // 直接输出验证码到响应流
+            out.flush();
+        }
     }
-
-
 
 
     //短信验证码接口

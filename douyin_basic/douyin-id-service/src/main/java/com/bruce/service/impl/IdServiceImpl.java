@@ -1,6 +1,6 @@
 package com.bruce.service.impl;
 
-import com.bruce.service.idService;
+import com.bruce.service.IdService;
 import com.bruce.utils.IdGenerator;
 import com.bruce.utils.SimpleIdGenerator;
 import com.bruce.utils.SnowflakeIdGenerator;
@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class idServiceImpl implements idService {
+public class IdServiceImpl implements IdService {
     @Autowired
     private IdGenerator idGenerator;
     @Autowired
