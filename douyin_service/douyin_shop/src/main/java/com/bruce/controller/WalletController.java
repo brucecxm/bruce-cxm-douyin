@@ -21,7 +21,7 @@ import java.util.List;
  * @since 2025-01-21 00:22:01
  */
 @RestController
-@RequestMapping("wallet")
+@RequestMapping("/shop/wallet")
 public class WalletController extends ApiController {
     /**
      * 服务对象

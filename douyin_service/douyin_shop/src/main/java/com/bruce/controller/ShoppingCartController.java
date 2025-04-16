@@ -1,5 +1,6 @@
 package com.bruce.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.bruce.common.BaseContext;
 import com.bruce.common.R;
@@ -32,15 +33,17 @@ public class ShoppingCartController {
     @PostMapping("/add")
     public R<ShoppingCart> add(@RequestBody ShoppingCart shoppingCart){
         log.info("购物车数据:{}",shoppingCart);
-
-        //设置用户id，指定当前是哪个用户的购物车数据
-        Long currentId = BaseContext.getCurrentId();
-        shoppingCart.setUserId(currentId);
+        String loginId = StpUtil.getLoginId().toString();  // 转换为字符串
+        Long userId = Long.parseLong(loginId);  // 将字符串转为 Long 类型
+        System.out.println("当前用户的ID: " + userId);
+//        //设置用户id，指定当前是哪个用户的购物车数据
+//        Long currentId = BaseContext.getCurrentId();
+        shoppingCart.setUserId(userId);
 
         Long dishId = shoppingCart.getDishId();
 
         LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(ShoppingCart::getUserId,currentId);
+        queryWrapper.eq(ShoppingCart::getUserId,userId);
 
         if(dishId != null){
             //添加到购物车的是菜品
@@ -78,9 +81,11 @@ public class ShoppingCartController {
     @GetMapping("/list")
     public R<List<ShoppingCart>> list(){
         log.info("查看购物车...");
-
+        String loginId = StpUtil.getLoginId().toString();  // 转换为字符串
+        Long userId = Long.parseLong(loginId);  // 将字符串转为 Long 类型
+        System.out.println("当前用户的ID: " + userId);
         LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(ShoppingCart::getUserId,BaseContext.getCurrentId());
+        queryWrapper.eq(ShoppingCart::getUserId,userId);
         queryWrapper.orderByAsc(ShoppingCart::getCreateTime);
 
         List<ShoppingCart> list = shoppingCartService.list(queryWrapper);
@@ -95,9 +100,11 @@ public class ShoppingCartController {
     @DeleteMapping("/clean")
     public R<String> clean(){
         //SQL:delete from shopping_cart where user_id = ?
-
+        String loginId = StpUtil.getLoginId().toString();  // 转换为字符串
+        Long userId = Long.parseLong(loginId);  // 将字符串转为 Long 类型
+        System.out.println("当前用户的ID: " + userId);
         LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(ShoppingCart::getUserId,BaseContext.getCurrentId());
+        queryWrapper.eq(ShoppingCart::getUserId,userId);
 
         shoppingCartService.remove(queryWrapper);
 

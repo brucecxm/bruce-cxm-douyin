@@ -1,0 +1,6 @@
+com\bruce\utils\IdGenerator.class
+com\bruce\config\AppConfig.class
+com\bruce\service\IdService.class
+com\bruce\service\impl\IdServiceImpl.class
+com\bruce\utils\SimpleIdGenerator.class
+com\bruce\utils\SnowflakeIdGenerator.class

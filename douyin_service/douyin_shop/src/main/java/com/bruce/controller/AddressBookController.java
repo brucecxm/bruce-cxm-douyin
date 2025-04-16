@@ -1,5 +1,6 @@
 package com.bruce.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 
@@ -77,7 +78,9 @@ public class AddressBookController {
     public R<AddressBook> setDefault(@RequestBody AddressBook addressBook) {
         log.info("addressBook:{}", addressBook);
         LambdaUpdateWrapper<AddressBook> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.eq(AddressBook::getUserId, BaseContext.getCurrentId());
+        Object userId = StpUtil.getLoginId();
+        System.out.println("当前用户的ID: " + userId);
+        wrapper.eq(AddressBook::getUserId, userId);
         wrapper.set(AddressBook::getIsDefault, 0);
         //SQL:update address_book set is_default = 0 where user_id = ?
         addressBookService.update(wrapper);
@@ -107,12 +110,13 @@ public class AddressBookController {
     @GetMapping("default")
     public R<AddressBook> getDefault() {
         LambdaQueryWrapper<AddressBook> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(AddressBook::getUserId, BaseContext.getCurrentId());
+        StpUtil.checkLogin(); // 检查是否登录（自动从请求头拿 token，去 Redis 查）
+        Object userId = StpUtil.getLoginId();
+        System.out.println("当前用户的ID: " + userId);
+        queryWrapper.eq(AddressBook::getUserId,userId);
         queryWrapper.eq(AddressBook::getIsDefault, 1);
-
         //SQL:select * from address_book where user_id = ? and is_default = 1
         AddressBook addressBook = addressBookService.getOne(queryWrapper);
-
         if (null == addressBook) {
             return R.error("没有找到该对象");
         } else {
@@ -125,7 +129,9 @@ public class AddressBookController {
      */
     @GetMapping("/list")
     public R<List<AddressBook>> list(AddressBook addressBook) {
-        addressBook.setUserId(BaseContext.getCurrentId());
+        Object userId = StpUtil.getLoginId();
+        System.out.println("当前用户的ID: " + userId);
+        addressBook.setUserId((Long) userId);
         log.info("addressBook:{}", addressBook);
 
         //条件构造器

@@ -1,0 +1,5 @@
+com\bruce\file\service\impl\MinIOFileStorageService.class
+com\bruce\file\service\FileStorageService.class
+com\bruce\file\config\MinIOConfig.class
+META-INF\spring-configuration-metadata.json
+com\bruce\file\config\MinIOConfigProperties.class

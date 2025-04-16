@@ -88,6 +88,14 @@ public class VideoController extends ApiController {
             @ApiParam(value = "文件", required = true) @RequestParam("file") MultipartFile file,
             @RequestParam Map<String, String> params) {
 
+
+        StpUtil.checkLogin(); // 检查是否登录（自动从请求头拿 token，去 Redis 查）
+        Object loginId = StpUtil.getLoginId(); // 获取当前登录用户 ID
+
+
+
+
+
         try {
             // 1. 参数处理
             String videoTitle = params.get("videoTitle");

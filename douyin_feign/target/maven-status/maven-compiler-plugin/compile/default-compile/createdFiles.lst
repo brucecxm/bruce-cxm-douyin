@@ -1,2 +1,4 @@
+com\bruce\MusicClient.class
 com\bruce\entity\Friend.class
 com\bruce\entity\User.class
+com\bruce\UserClient.class

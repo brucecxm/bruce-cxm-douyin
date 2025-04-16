@@ -16,11 +16,9 @@ com\bruce\dto\dishtwoDto.class
 com\bruce\service\impl\WalletDetailServiceImpl.class
 com\bruce\controller\CommonController.class
 com\bruce\dao\FileImgDao.class
-com\bruce\controller\EmployeeController.class
 com\bruce\service\impl\WalletServiceImpl.class
 com\bruce\config\WebMvcConfig.class
 com\bruce\service\impl\SetmealDishServiceImpl.class
-com\bruce\controller\SsoClientController.class
 com\bruce\common\GlobalExceptionHandler.class
 com\bruce\controller\OrderDetailController.class
 com\bruce\controller\WalletController.class
@@ -33,6 +31,7 @@ com\bruce\dto\DishDto.class
 com\bruce\dto\categoryDto.class
 com\bruce\Listener\create_wallet_listener.class
 com\bruce\entity\User.class
+com\bruce\feign\UserServiceClient.class
 com\bruce\entity\FileImg.class
 com\bruce\entity\WalletDetail.class
 com\bruce\service\CategoryoneService.class
@@ -50,7 +49,6 @@ com\bruce\service\OrderDetailService.class
 com\bruce\entity\ShoppingCart.class
 com\bruce\controller\ShoppingCartController.class
 com\bruce\dto\dishoneDto.class
-com\bruce\controller\couponController.class
 com\bruce\service\TicketService.class
 com\bruce\dao\ShopDao.class
 com\bruce\service\DishService.class
@@ -63,7 +61,6 @@ com\bruce\entity\Wallet.class
 com\bruce\entity\Setmeal.class
 com\bruce\mapper\UserMapper.class
 com\bruce\utils\ValidateCodeUtils.class
-com\bruce\threading\DistributedLockExample.class
 com\bruce\entity\OrderDetail.class
 com\bruce\entity\Orders.class
 com\bruce\utils\SMSUtils.class
@@ -89,9 +86,9 @@ com\bruce\controller\DishController.class
 com\bruce\entity\AddressBook.class
 com\bruce\config\MybatisPlusConfig.class
 com\bruce\threading\OrderProcessing.class
-com\bruce\threading\PaymentCallbackProcessor.class
 com\bruce\service\impl\dishoneServiceimpl.class
 com\bruce\service\impl\SetmealServiceImpl.class
+com\bruce\controller\CouponController.class
 com\bruce\mapper\OrderDetailMapper.class
 com\bruce\mapper\categoryone.class
 com\bruce\service\impl\DishFlavorServiceImpl.class

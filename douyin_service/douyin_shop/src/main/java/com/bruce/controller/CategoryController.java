@@ -1,13 +1,11 @@
 package com.bruce.controller;
-
+import com.bruce.service.IdService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.bruce.common.BaseContext;
 import com.bruce.common.R;
 import com.bruce.dto.categoryDto;
 import com.bruce.dto.dishoneDto;
 import com.bruce.entity.Category;
-import com.bruce.entity.ShoppingCart;
 import com.bruce.mapper.DishoneMapper;
 import com.bruce.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +24,8 @@ import java.util.List;
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
-
+    @Autowired
+    private IdService idService;
     /**
      * 新增分类
      * @param category
@@ -35,6 +34,8 @@ public class CategoryController {
     @PostMapping
     public R<String> save(@RequestBody Category category){
         log.info("category:{}",category);
+        Long id=idService.SnowflakeGen();
+        category.setId(id);
         categoryService.save(category);
         return R.success("新增分类成功");
     }
@@ -48,11 +49,6 @@ public class CategoryController {
     @GetMapping("/page")
     public R<Page> page(int page,int pageSize){
         //分页构造器
-
-
-
-//sdddddddddddddddddddddddddd
-
         Page<Category> pageInfo = new Page<>(page,pageSize);
         //条件构造器
         LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();

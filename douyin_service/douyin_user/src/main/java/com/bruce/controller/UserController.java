@@ -14,6 +14,8 @@ import com.bruce.service.SaltService;
 import com.bruce.service.UserService;
 import com.bruce.utils.JwtUtil;
 import com.bruce.utils.RedisUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
 import org.slf4j.Logger;
@@ -168,31 +170,57 @@ public class UserController {
         Salt salt = saltService.getOne(queryWrapperone);
         // 加密输入的密码
         String encryptedPassword = saltedDoubleHashPassword(password, salt.getSalt());
+// 判断用户名和加密后的密码是否匹配，验证通过进入登录流程
         if (user.getUsername().equals(username) && encryptedPassword.equals(user.getPassword())) {
-            //1.使用sa-token产生的token
-            R result = systemClients.findById(1);
-            String login_token = "sa-token";
-            if (result != null) {
-                HashMap resultMap = (HashMap) result.getData();
-                login_token = String.valueOf(resultMap.get("value"));
-            }
-            Map<String, String> response = new HashMap<>();
-            if (login_token.equals("sa-token")) {
-// 获取当前会话是否已经登录，返回true=已登录，false=未登录
-                StpUtil.login(user.getId());
-                String token_login = StpUtil.getTokenValue();
-                response.put("token", token_login);
 
+            // 1. 默认使用 sa-token 登录方式
+//            R result = systemClients.findById(1); // 从配置中心或系统管理服务查询id为1的登录方式配置
+            String login_token = "sa-token"; // 默认登录方式为 sa-token
+
+//            if (result != null) {
+//                // 获取配置项中的值（可能是 "sa-token" 或 "jwt"）
+//                HashMap resultMap = (HashMap) result.getData();
+//                login_token = String.valueOf(resultMap.get("value"));
+//            }
+
+            // 构建返回给前端的 token 响应数据
+            Map<String, String> response = new HashMap<>();
+
+            // 如果配置的是 sa-token 方式
+            if (login_token.equals("sa-token")) {
+                // 使用 Sa-Token 登录，传入用户 ID，表示登录成功
+                StpUtil.login(user.getId());
+//                stringRedisTemplate.opsForValue().set();
+                // 获取生成的 token 值
+                String token_login = StpUtil.getTokenValue();
+                // 将 token 放入返回 map
+                response.put("token", token_login);
+                String loginId = StpUtil.getLoginId().toString();  // 转换为字符串
+                Long userId = Long.parseLong(loginId);  // 将字符串转为 Long 类型
+                String useridStr= String.valueOf(userId);  // 将 user 对象转换为 JSON 字符串
+                try {
+                    String userJson = objectMapper.writeValueAsString(user);
+
+                    String key=useridStr+"_user_info";
+                    stringRedisTemplate.opsForValue().set(key,userJson,10,TimeUnit.MINUTES);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+                // 如果配置的是 jwt 方式
             } else if (login_token.equals("jwt")) {
+                // 使用自定义 jwt 工具类生成 token（一般以用户名作为 payload）
                 String token = jwtUtil.generateToken(user.getUsername());
+                // 将 token 放入返回 map
                 response.put("token", token);
 
             } else {
-
+                // 如果配置了不支持的 token 类型，可以在这里补充报错或记录日志（建议完善）
             }
 
+            // 登录成功，返回包含 token 的成功结果给前端
             return Result.success(response);
         }
+
         return Result.error("登录失败");
     }
 
@@ -376,19 +404,28 @@ public class UserController {
 
         return code.toString();
     }
-//
-//
-//
-//    @GetMapping("/userInfo")
-//    public Result<User> userInfo(/*@RequestHeader(name = "Authorization") String token*/) {
-//        //根据用户名查询用户
-//       /* Map<String, Object> map = JwtUtil.parseToken(token);
-//        String username = (String) map.get("username");*/
-//        Map<String, Object> map = ThreadLocalUtil.get();
-//        String username = (String) map.get("username");
-//        User user = userService.findByUserName(username);
-//        return Result.success(user);
-//    }
+
+
+    @Autowired
+    private ObjectMapper objectMapper;  // 用于将对象转换为JSON字符串
+
+    @GetMapping("/userInfo")
+    public User userInfo(Long userId) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+queryWrapper.eq(User::getId, userId);
+     User user=   userService.getOne(queryWrapper);
+     String useridStr= String.valueOf(userId);  // 将 user 对象转换为 JSON 字符串
+        try {
+            String userJson = objectMapper.writeValueAsString(user);
+
+            String key=useridStr+"_user_info";
+            stringRedisTemplate.opsForValue().set(key,userJson,10,TimeUnit.MINUTES);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        return user;
+    }
 //
 //    @PutMapping("/update")
 //    public Result update(@RequestBody @Validated User user) {

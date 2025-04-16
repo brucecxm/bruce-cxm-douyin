@@ -1,40 +1,40 @@
 package com.bruce.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.io.Serializable;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import java.time.LocalDateTime;
 
-/**
- * 用户信息
- */
 @Data
-public class User implements Serializable {
+public class User {
+    @NotNull
+    private Integer id;
+    private String username;
+    @JsonIgnore
+    private String password;
+    @NotEmpty
+    private String nickname;
+    @NotEmpty
+    @Email
+    private String email;
+    private String userPic;
+    private String backImg;
+    private String city;
+    private String jieshao;
+    private String age;
+    private String school;
 
-    private static final long serialVersionUID = 1L;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createTime;
 
-    private Long id;
-
-
-    //姓名
-    private String name;
-
-
-    //手机号
-    private String phone;
-
-
-    //性别 0 女 1 男
-    private String sex;
-
-
-    //身份证号
-    private String idNumber;
-
-
-    //头像
-    private String avatar;
-
-
-    //状态 0:禁用，1:正常
-    private Integer status;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updateTime;
 }

@@ -30,7 +30,9 @@ public class SnowflakeIdGenerator {
     private long workerId; // 工作机器ID
     private long datacenterId; // 数据中心ID
     private long sequence = 0L; // 序列号
-
+    public SnowflakeIdGenerator() {
+        this(1L, 1L); // 或者默认值
+    }
     public SnowflakeIdGenerator(Long  workerId, Long  datacenterId) {
         if (workerId > maxWorkerId || workerId < 0) {
             throw new IllegalArgumentException(String.format("workerId can't be greater than %d or less than 0", maxWorkerId));

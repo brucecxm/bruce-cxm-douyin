@@ -139,34 +139,35 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <!-- 指定当前模块的主类 -->
-                    <mainClass>com.bruce.EurekaApplication</mainClass>
-                    <mainClass>com.bruce.DouyinGatewayApplication</mainClass>
-                    <mainClass>com.bruce.DouyinAdminService</mainClass>
-                    <mainClass>com.bruce.DouyinArticleApplication</mainClass>
-                    <mainClass>com.bruce.DouyinBehaviorService</mainClass>
-                    <mainClass>com.bruce.DouyinChatService</mainClass>
-                    <mainClass>com.bruce.DouyinCommentApplication</mainClass>
-                    <mainClass>com.bruce.DouyinFileService</mainClass>
-                    <mainClass>com.bruce.DouyinIntroduceApplication</mainClass>
-                    <mainClass>com.bruce.DouyinMusicApplication</mainClass>
-                    <mainClass>com.bruce.DouyinScheduleApplication</mainClass>
-                    <mainClass>com.bruce.DouyinSearchApplication</mainClass>
-                    <mainClass>com.com.bruce.DouyinShopApplication</mainClass>
-                    <mainClass>com.bruce.DouyinUserApplication</mainClass>
-                    <mainClass>com.bruce.DouyinVideoApplication</mainClass>
-                    <mainClass>com.bruce.minioApplication</mainClass>
-                    <mainClass>com.bruce.smsApplication</mainClass>
-                    <mainClass>com.bruce.DouyinSpringApplication</mainClass>
-                    <mainClass>com.bruce.SaSsoServerApplication</mainClass>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+<!--    下面的是一种错误的写法 不能这样写-->
+<!--    <build>-->
+<!--        <plugins>-->
+<!--            <plugin>-->
+<!--                <groupId>org.springframework.boot</groupId>-->
+<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
+<!--                <configuration>-->
+<!--                    &lt;!&ndash; 指定当前模块的主类 &ndash;&gt;-->
+<!--                    <mainClass>com.bruce.EurekaApplication</mainClass>-->
+<!--                    <mainClass>com.bruce.DouyinGatewayApplication</mainClass>-->
+<!--                    <mainClass>com.bruce.DouyinAdminService</mainClass>-->
+<!--                    <mainClass>com.bruce.DouyinArticleApplication</mainClass>-->
+<!--                    <mainClass>com.bruce.DouyinBehaviorService</mainClass>-->
+<!--                    <mainClass>com.bruce.DouyinChatService</mainClass>-->
+<!--                    <mainClass>com.bruce.DouyinCommentApplication</mainClass>-->
+<!--                    <mainClass>com.bruce.DouyinFileService</mainClass>-->
+<!--                    <mainClass>com.bruce.DouyinIntroduceApplication</mainClass>-->
+<!--                    <mainClass>com.bruce.DouyinMusicApplication</mainClass>-->
+<!--                    <mainClass>com.bruce.DouyinScheduleApplication</mainClass>-->
+<!--                    <mainClass>com.bruce.DouyinSearchApplication</mainClass>-->
+<!--                    <mainClass>com.com.bruce.DouyinShopApplication</mainClass>-->
+<!--                    <mainClass>com.bruce.DouyinUserApplication</mainClass>-->
+<!--                    <mainClass>com.bruce.DouyinVideoApplication</mainClass>-->
+<!--                    <mainClass>com.bruce.minioApplication</mainClass>-->
+<!--                    <mainClass>com.bruce.smsApplication</mainClass>-->
+<!--                    <mainClass>com.bruce.DouyinSpringApplication</mainClass>-->
+<!--                    <mainClass>com.bruce.SaSsoServerApplication</mainClass>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
+<!--        </plugins>-->
+<!--    </build>-->
 </project>

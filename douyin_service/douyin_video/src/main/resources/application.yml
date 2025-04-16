@@ -30,6 +30,8 @@ logging:
     jdbc.sqlonly: DEBUG    # 打印 SQL 查询语句
     jdbc.resultset: DEBUG  # 打印 JDBC 查询结果集
     jdbc.statement: DEBUG  # 打印 JDBC 执行的语句
+    org.springframework.amqp: OFF
+    com.rabbitmq: OFF
 
 
 mybatis:
