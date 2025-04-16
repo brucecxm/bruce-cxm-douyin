@@ -10,9 +10,9 @@
         <module name="douyin_user" />
         <module name="douyin_schedule" />
         <module name="douyin_admin" />
-        <module name="douyin_test" />
         <module name="douyin_chat" />
         <module name="douyin_file_starter" />
+        <module name="douyin_model" />
         <module name="douyin_feign" />
         <module name="douyin_sms" />
         <module name="douyin-id-service" />
@@ -26,11 +26,11 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="bruce-id-service" target="21" />
+      <module name="douyin_comm_model" target="1.8" />
       <module name="douyin_comment" target="1.8" />
       <module name="douyin_Designpatterns" target="1.8" />
       <module name="douyin_file" target="1.8" />
       <module name="douyin_introduce" target="1.8" />
-      <module name="douyin_model" target="1.8" />
       <module name="douyin_music" target="1.8" />
       <module name="douyin_satoken" target="1.8" />
       <module name="douyin_spring" target="1.8" />
@@ -51,6 +51,7 @@
       <module name="douyin_article" options="-parameters" />
       <module name="douyin_behavior" options="-parameters" />
       <module name="douyin_chat" options="-parameters" />
+      <module name="douyin_comm_model" options="-parameters" />
       <module name="douyin_comment" options="-parameters" />
       <module name="douyin_eureka" options="-parameters" />
       <module name="douyin_feign" options="-parameters" />

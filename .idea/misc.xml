@@ -10,6 +10,7 @@
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/douyin_basic/bruce-id-service/pom.xml" />
+        <option value="$PROJECT_DIR$/douyin_comm_model/pom.xml" />
       </set>
     </option>
   </component>

@@ -5,10 +5,12 @@
     <file url="file://$PROJECT_DIR$/douyin_basic/douyin-id-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_basic/douyin_file_starter/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_basic/douyin_file_starter/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_basic/douyin_model/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_basic/douyin_testSpringfactories/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_basic/douyin_testSpringfactories/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_basic/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_basic/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douyin_comm_model/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_eureka/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_eureka/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/douyin_feign/src/main/java" charset="UTF-8" />

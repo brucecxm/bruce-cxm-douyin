@@ -78,6 +78,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.example</groupId>
+            <artifactId>douyin_file_starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
 <!--        <dependency>-->
 <!--            <groupId>org.example</groupId>-->
 <!--            <artifactId>douyin_basic</artifactId>-->
@@ -86,16 +95,16 @@
     </dependencies>
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.example</groupId>
-                <artifactId>douyin-id-service</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.example</groupId>
-                <artifactId>douyin_file_starter</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.example</groupId>-->
+<!--                <artifactId>douyin-id-service</artifactId>-->
+<!--                <version>1.0-SNAPSHOT</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.example</groupId>-->
+<!--                <artifactId>douyin_file_starter</artifactId>-->
+<!--                <version>1.0-SNAPSHOT</version>-->
+<!--            </dependency>-->
         </dependencies>
     </dependencyManagement>
 
