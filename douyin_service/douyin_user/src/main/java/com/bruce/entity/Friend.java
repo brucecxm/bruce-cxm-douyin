@@ -1,37 +1,50 @@
 package com.bruce.entity;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 
-import com.baomidou.mybatisplus.extension.activerecord.Model;
-import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
- * (Friend)表实体类
- *
- * @author makejava
- * @since 2024-11-10 20:23:22
+ * 好友关系实体类
  */
-@SuppressWarnings("serial")
-public class Friend extends Model<Friend> {
-    
-    private Integer userId;
-    
-    private Integer friendId;
-    
-    private Integer status;
+@TableName("friend") // 表明这是对应数据库中的 friend 表
+public class Friend {
 
+    @TableId
+    private Long id; // 好友关系记录的ID
 
-    public Integer getUserId() {
+    private Long userId; // 当前用户ID
+    private Long friendId; // 好友ID
+
+    private Integer status; // 好友关系的状态，1表示已同意，0表示待处理
+    private LocalDateTime createdTime; // 记录创建时间
+
+    @TableField(exist = false) // 不映射到数据库字段
+    private String remark; // 好友备注
+
+    // Getter 和 Setter 方法
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    public Integer getFriendId() {
+    public Long getFriendId() {
         return friendId;
     }
 
-    public void setFriendId(Integer friendId) {
+    public void setFriendId(Long friendId) {
         this.friendId = friendId;
     }
 
@@ -43,5 +56,19 @@ public class Friend extends Model<Friend> {
         this.status = status;
     }
 
-}
+    public LocalDateTime getCreatedTime() {
+        return createdTime;
+    }
 
+    public void setCreatedTime(LocalDateTime createdTime) {
+        this.createdTime = createdTime;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+}

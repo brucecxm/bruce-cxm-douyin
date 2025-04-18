@@ -1,6 +1,7 @@
 package com.bruce.controller;
 
 
+import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
@@ -51,7 +52,7 @@ public class VideoController extends ApiController {
     private VideoService videoService;
 
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private RedisTemplate redisTemplate;
 
     @Resource
     private MessageQueueService messageQueueService;
@@ -186,30 +187,99 @@ public class VideoController extends ApiController {
 
 
     @PostMapping("/like")
-    public int like(
-            @RequestParam(defaultValue = "1") int userid,
-            @RequestParam(defaultValue = "4") int videoid) {
-
-
-        String redisKey = "like:content:" + videoid;
-
-        // 1. 检查用户是否已点赞
-        Boolean isMember = redisTemplate.opsForSet().isMember(redisKey, userid);
-        if (Boolean.TRUE.equals(isMember)) {
-            // 用户已点赞，不需要再处理
-            throw new RuntimeException("User has already liked this content");
+    public ResponseEntity<String> like(@RequestBody Map<String, Object> request) {
+        try {
+            // 检查用户是否已登录
+            StpUtil.checkLogin();
+        } catch (NotLoginException e) {
+            // 捕获未登录异常并返回 false
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("用户未登录");
         }
 
-        // 2. 用户未点赞，将用户 ID 加入 Redis 的 Set
-        redisTemplate.opsForSet().add(redisKey, String.valueOf(userid));
-        // 3. 异步推送点赞事件到消息队列，稍后更新数据库中的点赞数
+        Object userIdOb = StpUtil.getLoginId();
+        Long userId = null;
 
-        messageQueueService.sendMessage(videoid);
+        if (userIdOb != null) {
+            // 先将 userIdOb 转换为 String，再转换为 Long
+            userId = Long.valueOf(userIdOb.toString());
+        }
 
-        return 1;
+        // 从 Map 中获取内容 ID 和 type（表示红心的颜色）
+        Long contentId = Long.valueOf(request.get("contentId").toString());
+        String type = (String) request.get("type");  // type 值判断
+        String content_type = (String) request.get("content_type");  // type 值判断
+
+
+
+        // 生成 Redis 键，通常以内容 ID 和用户 ID 组成
+        String redisKey = "like:content:" +content_type +contentId;
+
+        // 如果 type 是 "red"，表示已点赞，进行取消点赞操作
+        if ("red".equals(type)) {
+            // 判断用户是否已经点赞（可以存储用户已点赞的状态）
+            if (!redisTemplate.opsForSet().isMember(redisKey, userId)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("您尚未点赞");
+            }
+
+            // 将用户 ID 从 Redis 中移除，表示取消点赞
+            redisTemplate.opsForSet().remove(redisKey, userId);
+
+            // 将点赞数减 1
+            redisTemplate.opsForValue().decrement(redisKey + ":count", 1);
+
+            // 异步将数据更新到数据库
+            messageQueueService.sendMessage(contentId);
+
+            return ResponseEntity.ok(content_type+"取消点赞成功");
+        } else {
+            // 如果 type 不是 "red"，表示未点赞，进行点赞操作
+
+            // 判断用户是否已经点赞
+            if (redisTemplate.opsForSet().isMember(redisKey, userId)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("您已点赞");
+            }
+
+            // 将用户 ID 存入 Redis，表示该用户已点赞
+            redisTemplate.opsForSet().add(redisKey, userId);
+
+            // 将点赞数加 1
+            redisTemplate.opsForValue().increment(redisKey + ":count", 1);
+
+            // 异步将数据更新到数据库
+            messageQueueService.sendMessage(contentId);
+
+            return ResponseEntity.ok(content_type+"点赞成功");
+        }
     }
 
+    @GetMapping("/likeData")
+    public ResponseEntity<Map<String, Object>> getLikeData(@RequestParam Long contentId) {
+        try {
+            // 检查用户是否已登录
+            StpUtil.checkLogin();
+        } catch (NotLoginException e) {
+            // 如果用户未登录，返回未登录状态
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
 
+        Object userIdOb = StpUtil.getLoginId();
+        Long userId = (Long) userIdOb;
+
+        // 生成 Redis 键，获取点赞数
+        String redisKey = "like:content:" + contentId;
+        Object likeCountOb = redisTemplate.opsForValue().get(redisKey + ":count");
+            Long likeCount=(Long) likeCountOb;
+        // 检查用户是否已点赞
+        boolean hasLiked = redisTemplate.opsForSet().isMember(redisKey, userId);
+
+        // 构建响应数据
+        Map<String, Object> response = new HashMap<>();
+        response.put("likeCount", likeCount != null ? likeCount : 0);  // 点赞数量
+        response.put("hasLiked", hasLiked);  // 用户是否已点赞
+
+        // 返回点赞数据
+        return ResponseEntity.ok(response);
+    }
 
 
 //

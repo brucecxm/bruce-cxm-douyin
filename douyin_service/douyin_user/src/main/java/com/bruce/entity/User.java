@@ -20,7 +20,8 @@ public class User extends Model<User> {
     private int id;
     
     private String username;
-    
+    private String gender;
+
     private String password;
     
     private String nickname;
@@ -29,6 +30,7 @@ public class User extends Model<User> {
     
     private String userPic;
 
+    private String avatar;       // 发起人头像URL
 
     private Date createTime;
 

@@ -7,11 +7,16 @@ import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.dao.chatInfoDao;
+import com.bruce.dto.FriendRequestDTO;
+import com.bruce.dto.FriendRequestVO;
+import com.bruce.dto.FriendVO;
+import com.bruce.dto.HandleRequestDTO;
 import com.bruce.entity.Friend;
 import com.bruce.pojo.UserVideoDTO;
 import com.bruce.pojo.Video;
 import com.bruce.service.FriendService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -191,5 +196,65 @@ private chatInfoDao chatInfoDaoone;
     public R delete(@RequestParam("idList") List<Long> idList) {
         return success(this.friendService.removeByIds(idList));
     }
+
+
+
+
+
+
+
+
+
+
+    /**
+     * 1. 发送好友请求
+     */
+    @PostMapping("/request")
+    public ResponseEntity<?> sendFriendRequest(@RequestBody FriendRequestDTO dto) {
+        friendService.sendFriendRequest(dto.getToUserId(), dto.getVerifyMsg());
+        return ResponseEntity.ok("好友请求已发送");
+    }
+
+    /**
+     * 2. 获取收到的好友请求列表
+     */
+    @GetMapping("/requests")
+    public ResponseEntity<?> getFriendRequests() {
+        List<FriendRequestVO> list = friendService.getReceivedRequests();
+        return ResponseEntity.ok(list);
+    }
+
+    /**
+     * 3. 同意或拒绝好友请求
+     */
+    @PostMapping("/handle")
+    public ResponseEntity<?> handleFriendRequest(@RequestBody HandleRequestDTO dto) {
+        friendService.handleRequest(dto.getRequestId(), dto.getAction());
+        return ResponseEntity.ok("操作成功");
+    }
+
+    /**
+     * 4. 获取当前用户好友列表
+     */
+    @GetMapping("/list")
+    public ResponseEntity<?> getFriendList() {
+        List<FriendVO> list = friendService.getFriendList();
+        return ResponseEntity.ok(list);
+    }
+
+    /**
+     * 5. 删除好友
+     */
+    @DeleteMapping("/{friendId}")
+    public ResponseEntity<?> deleteFriend(@PathVariable Long friendId) {
+        friendService.deleteFriend(friendId);
+        return ResponseEntity.ok("好友已删除");
+    }
+
+
+
+
+
+
 }
 

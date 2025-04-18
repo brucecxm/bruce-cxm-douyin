@@ -41,6 +41,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -287,10 +289,16 @@ public class UserController {
 
     @Autowired
     private AmqpTemplate amqpTemplate;
+    private ExecutorService executorService;
+
+    public UserController() {
+        // 创建一个固定大小的线程池
+        this.executorService = Executors.newFixedThreadPool(10);
+    }
 
 
     @PostMapping("/register")
-    public Result register(String username, String password) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public Result register(String username, String password) throws NoSuchAlgorithmException, InvalidKeySpecException, JsonProcessingException {
 
         // 查询用户
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
@@ -318,10 +326,57 @@ public class UserController {
             //没有占用
             //注册
             userService.save(user);
+            LambdaQueryWrapper queryWrapper1=new LambdaQueryWrapper<>();
+            queryWrapper.eq(User::getUsername, username); // 等价于 SQL 中的 WHERE username = ?
+            User userResult=userService.getOne(queryWrapper);
             saltService.save(saltone);
-            amqpTemplate.convertAndSend("create_walletone_exampleExchange", "create_walletone_RoutingKey", user.getId());
+            executorService.submit(() -> {
+                try {
+                    // 发送消息的代码
+                    amqpTemplate.convertAndSend("create_walletone_exampleExchange", "create_walletone_RoutingKey", user.getId());
+                } catch (Exception e) {
+                    int maxRetryCount = 10;  // 最大重试次数
+                    int retryCount = 0;
+                    int retryInterval = 3600 * 1000;  // 每次重试的间隔，单位为毫秒，1 小时
+                    retryCount++;
+                    while (retryCount < maxRetryCount) {
+                        try {
+                            // 发送消息
+                            amqpTemplate.convertAndSend("create_walletone_exampleExchange", "create_walletone_RoutingKey", user.getId());
+                            return;  // 如果发送成功，则直接返回
+
+                        } catch (Exception ee) {
+                            retryCount++;
+                            logger.error("发送消息失败, userId: " + user.getId() + ", 尝试次数: " + retryCount, e);
+
+                            if (retryCount >= maxRetryCount) {
+                                // 达到最大重试次数，记录失败并退出
+                                logger.error("最大重试次数已达到, 发送失败, userId: " + user.getId());
+                                // 可以触发补偿机制，记录日志等
+                                break;
+                            }
+
+                            // 等待 1 小时后再试
+                            try {
+                                Thread.sleep(retryInterval);  // 等待 1 小时后再试
+                            } catch (InterruptedException ie) {
+                                Thread.currentThread().interrupt();  // 恢复中断状态
+                            }
+                        }
+                    }
+                }
+            });
+            String userStr;
+                // 创建 ObjectMapper 实例
+                ObjectMapper objectMapper = new ObjectMapper();
+
+                // 序列化对象为 JSON 字符串
+                userStr = objectMapper.writeValueAsString(userResult);
+
+
+
             //这里用mq创建钱包 并且每天都会用定时任务  查询钱包表的用户是否和用户表的一致  如果不一致的话 就解决问题
-            return Result.success();
+            return Result.success(userStr);
         } else {
             //占用
             return Result.error("用户名已被占用");

@@ -43,8 +43,7 @@ public class SaTokenConfigure {
 
                                 System.out.println("这里要从redis获取登录的token");
                                 System.out.println( StpUtil.isLogin());
-                                StpUtil.checkLogin(); // 检查是否登录（自动从请求头拿 token，去 Redis 查）
-                                Object loginId = StpUtil.getLoginId(); // 获取当前登录用户 ID
+
                                 System.out.println("这里要从redis获取登录的token");
 
                             }
