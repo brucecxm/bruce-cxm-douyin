@@ -23,10 +23,11 @@ public class ChatMessageRequest {
     @Size(min = 1, max = 1024, message = "消息内容长度应在1到1024个字符之间")
     private String messageContent;  // 消息内容
 
-    private Boolean isGroup;        // 是否是群聊消息，默认是单聊，群聊设置为true
+    private Boolean isGroup = false;        // 是否是群聊消息，默认是单聊，群聊设置为true
+
     // Getter 和 Setter 方法
     public boolean isGroup() {
-        return isGroup;
+        return isGroup != null && isGroup;  // 确保 isGroup 不是 null，避免 NullPointerException
     }
 
     public void setGroup(boolean group) {
