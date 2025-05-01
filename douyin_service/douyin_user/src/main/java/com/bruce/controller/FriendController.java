@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.dao.chatInfoDao;
+import com.bruce.entity.Video;
 import com.bruce.pojo.FriendRequestDTO;
 import com.bruce.pojo.FriendRequestVO;
 import com.bruce.pojo.FriendVO;
