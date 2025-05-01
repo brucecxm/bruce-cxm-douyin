@@ -86,10 +86,7 @@
                         <groupId>org.example</groupId>
                         <artifactId>douyin-id-service</artifactId>
                     </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
-        </dependency>
+
 
 <!--        <dependency>-->
 <!--            <groupId>org.example</groupId>-->

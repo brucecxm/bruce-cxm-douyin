@@ -115,7 +115,6 @@ export default {
         alert("请输入邮箱");
         return;
     }
-
     try {
         // 发送请求并获取验证码图片流，确保设置了 responseType: 'blob'
         const response = await getVerificationCodeService(this.loginpojo.username); 
@@ -161,7 +160,8 @@ this.isShow = true; // 显示验证码图片
                 if (response.data.code === 1) {
                     console.error("登录失败：", error);
                 } else {
-                    const token = response.data.data;
+                    
+                    const token = response.data.data.token;
                     const usertoken = useTokenStore();
                     usertoken.setToken(token);
                     localStorage.setItem('token', token);
@@ -208,10 +208,7 @@ this.isShow = true; // 显示验证码图片
                 console.error("注册失败：", error);
             }
         },
-        async getinfo() {
-            const response = await userInfoService();
-            const info = response.data;
-        }
+   
     },
 };
 </script>

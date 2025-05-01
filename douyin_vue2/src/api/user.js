@@ -22,7 +22,7 @@ export const userLoginService = (loginData) => {
 
 //获取用户登录状态
 export const userInfoService = () => {
-  return request.get("/user/isLogin");
+  return request.get("/user/userInfo");
 };
 
 //修改个人信息

@@ -1,30 +1,28 @@
 <template>
     <div class="container">
 
-
-
         <!-- 顶部背景图 -->
         <div class="profile-header">
-            <img class="cover-image" :src="userInfo.coverImg" alt="背景图" />
+            <img class="cover-image" :src="userInfo.backImg" alt="背景图" />
 
             <!-- 用户基本信息区 -->
             <div class="user-info">
                 <img class="avatar" :src="userInfo.avatar" alt="头像" />
                 <div class="user-name">{{ userInfo.nickname }}</div>
-                <div class="user-id">抖音号：{{ userInfo.userId }}</div>
+                <div class="user-id">抖音号：{{ userInfo.id }}</div>
 
                 <!-- 用户统计信息 -->
                 <div class="user-stats">
                     <div class="stat-item">
-                        <div class="num">{{ userInfo.followers }}</div>
+                        <div class="num">{{ userInfo.followers || '0' }}</div>
                         <div class="label">粉丝</div>
                     </div>
                     <div class="stat-item">
-                        <div class="num">{{ userInfo.following }}</div>
+                        <div class="num">{{ userInfo.following || '0' }}</div>
                         <div class="label">关注</div>
                     </div>
                     <div class="stat-item">
-                        <div class="num">{{ userInfo.likes }}</div>
+                        <div class="num">{{ userInfo.likes || '0' }}</div>
                         <div class="label">获赞</div>
                     </div>
                 </div>
@@ -33,9 +31,9 @@
 
                 <!-- 个人简介 -->
                 <div class="bio">
-                    <div>{{ userInfo.bio }}</div>
-                    <div class="location">{{ userInfo.location }}</div>
-                    <div class="school">{{ userInfo.school }}</div>
+                    <div>{{ userInfo.jieshao || '暂无个人简介' }}</div>
+                    <div class="location">{{ userInfo.city }}</div>
+                    <div class="school">{{ userInfo.school || '暂无学校信息' }}</div>
                 </div>
             </div>
         </div>
@@ -93,27 +91,30 @@
 
 <script>
 import footerVue from '@/components/footer.vue'
+import { userLoginService, userInfoService, userRegisterService, getVerificationCodeService } from "@/api/user"
+
 export default {
     components: {
         footerVue
     },
     mounted() {
-
+        this.getUserInfo();
+    },
+    methods: {
+        getUserInfo() {
+            userInfoService()
+                .then(res => {
+                    this.userInfo = res.data;
+                    console.log(this.userInfo); // 调试输出
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+        }
     },
     data() {
         return {
-            userInfo: {
-                nickname: "单曲循环",
-                userId: "dy123456",
-                avatar: "http://gips3.baidu.com/it/u=1821127123,1149655687&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280",
-                coverImg: "http://gips3.baidu.com/it/u=1821127123,1149655687&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280",
-                followers: "1.47万",
-                following: "189",
-                likes: "754",
-                bio: "点击关注内容，让大家认识你",
-                location: "南京",
-                school: "南京信息科技大学"
-            },
+            userInfo: {}, // 通过接口返回的用户信息
             videos: [
                 { cover: "http://gips0.baidu.com/it/u=1690853528,2506870245&fm=3028&app=3028&f=JPEG&fmt=auto?w=1024&h=1024", playCount: "512" },
                 { cover: "http://gips0.baidu.com/it/u=1690853528,2506870245&fm=3028&app=3028&f=JPEG&fmt=auto?w=1024&h=1024", playCount: "1693" },

@@ -23,6 +23,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <!--    这样做的效果是：虽然插件仍然存在，但它不会在任何生命周期阶段被执行，达到了“排除”的效果。-->
-
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>mybatis-plus-boot-starter</artifactId>
+        <version>3.4.2</version>
+    </dependency>
+</dependencies>
 
 </project>

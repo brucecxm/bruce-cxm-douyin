@@ -1,5 +1,17 @@
 <template>
     <div class="xiaoxi">
+        <!-- <el-button type="primary" @click="dialogVisible = true">打开对话框</el-button>
+
+<el-dialog
+  title="提示"
+  :visible.sync="dialogVisible"
+  width="30%">
+  <span>这是一段内容</span>
+  <span slot="footer" class="dialog-footer">
+    <el-button @click="dialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+  </span>
+</el-dialog> -->
         <caidan :style="caidancss"></caidan>
 
         <div class="forposition">
@@ -35,7 +47,7 @@ export default {
         footerVue, caidan
     },
     data() {
-        return {
+        return {  dialogVisible: false,
             userinfos: [
                 {
                     username: "互动消息",

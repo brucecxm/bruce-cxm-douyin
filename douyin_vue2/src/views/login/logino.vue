@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <div class="login-screen">
         <div class="header">
             <button class="close-btn" @click="closeScreen">×</button>
@@ -269,4 +269,4 @@ export default {
     color: #007bff;
     text-decoration: none;
 }
-</style>
+</style> -->

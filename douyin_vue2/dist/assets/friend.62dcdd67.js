@@ -1,1 +1,0 @@
-import{n as e}from"./index.f6d0a6bc.js";const o={},l=null,s=null;var n=e(o,l,s,!1,null,null,null,null);n.options.__file="F:/GitHub/bruce-cxm-douyin/douyin_vue2/src/views/me/friend.vue";const r=n.exports;export{r as default};

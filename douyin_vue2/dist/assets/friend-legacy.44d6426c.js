@@ -1,1 +1,0 @@
-System.register(["./index-legacy.d81978a6.js"],(function(e,n){"use strict";var u;return{setters:[function(e){u=e.n}],execute:function(){var n=u({},null,null,!1,null,null,null,null);n.options.__file="F:/GitHub/bruce-cxm-douyin/douyin_vue2/src/views/me/friend.vue",e("default",n.exports)}}}));

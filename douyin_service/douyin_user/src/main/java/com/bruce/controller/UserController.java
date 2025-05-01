@@ -1,11 +1,11 @@
 package com.bruce.controller;
 
-import cn.hutool.core.util.IdUtil;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.R;
+import com.bruce.entity.MeInfo;
 import com.bruce.entity.Salt;
 import com.bruce.entity.User;
 import com.bruce.feign.systemClient;
@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
@@ -31,11 +32,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -465,11 +464,20 @@ public class UserController {
     private ObjectMapper objectMapper;  // 用于将对象转换为JSON字符串
 
     @GetMapping("/userInfo")
-    public User userInfo(Long userId) {
+    public MeInfo userInfo() {
+        Object userId = StpUtil.getLoginId();
+        System.out.println("当前用户的ID: " + userId);
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-queryWrapper.eq(User::getId, userId);
-     User user=   userService.getOne(queryWrapper);
-     String useridStr= String.valueOf(userId);  // 将 user 对象转换为 JSON 字符串
+        queryWrapper.eq(User::getId, userId);
+
+        MeInfo meInfo=new MeInfo();
+       User user=   userService.getOne(queryWrapper);
+
+// 使用 BeanUtils 复制相同属性
+        BeanUtils.copyProperties(user, meInfo);
+       String useridStr= String.valueOf(userId);  // 将 user 对象转换为 JSON 字符串
+//        List<Video> videoList = videoService.getVideosByUserId(user.getId());
+
         try {
             String userJson = objectMapper.writeValueAsString(user);
 
@@ -479,7 +487,8 @@ queryWrapper.eq(User::getId, userId);
             throw new RuntimeException(e);
         }
 
-        return user;
+
+        return meInfo;
     }
 //
 //    @PutMapping("/update")

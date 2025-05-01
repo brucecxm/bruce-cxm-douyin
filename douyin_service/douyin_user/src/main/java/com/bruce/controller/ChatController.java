@@ -1,9 +1,9 @@
 package com.bruce.controller;
 
-import com.bruce.dto.AddGroupMemberRequest;
-import com.bruce.dto.ChatMessageRequest;
-import com.bruce.dto.ChatMessageVO;
-import com.bruce.dto.CreateGroupRequest;
+import com.bruce.pojo.AddGroupMemberRequest;
+import com.bruce.pojo.ChatMessageRequest;
+import com.bruce.pojo.ChatMessageVO;
+import com.bruce.pojo.CreateGroupRequest;
 import com.bruce.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
