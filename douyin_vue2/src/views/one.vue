@@ -1,16 +1,6 @@
-<template>
+<!-- <template>
     <div class="one">
-        <!-- 这些东西最后都应该通过路由  只有一个页面来实习  把中间的部分路由
-这些东西最后都应该通过路由  只有一个页面来实习  把中间的部分路由  分支222222222222
-这些东西最后都应该通过路由  只有一个页面来实习  把中间的部分路由
-这些东西最后都应该通过路由  只有一个页面来实习  把中间的部分路由
-这些东西最后都应该通过路由  只有一个页面来实习  把中间的部分路由
-这些东西最后都应该通过路由  只有一个页面来实习  把中间的部分路由    ddddddddddd
-这些东西最后都应该通过路由  只有一个页面来实习  把中间的部分路由
-这些东西最后都应该通过路由  只有一个页面来实习  把中间的部分路由
-这些东西最后都应该通过路由  只有一个页面来实习  把中间的部分路由
-这些东西最后都应该通过路由  只有一个页面来实习  把中间的部分路由
-这些东西最后都应该通过路由  只有一个页面来实习  把中间的部分路由 -->
+
         <tan-chuang class="tanchuang" v-show="receivedMessage.istanchuangshow"></tan-chuang>
 
         <div :class="receivedMessage.home">
@@ -23,8 +13,8 @@
         </div>
     </div>
 </template>
- 
-<script>
+  -->
+<!-- <script>
 import BaseFooter from '../components/BaseFooter.vue'
 import BaseHeader from '../components/BaseHeader.vue'
 import BaseMain from '../components/BaseMain.vue'
@@ -69,8 +59,8 @@ export default {
 
 
 }
-</script>
-
+</script> -->
+<!-- 
  
 <style scoped>
 .tanchuang {
@@ -285,6 +275,4 @@ ul {
     margin: 0px;
 }
 </style>
-
-
-../shop.js/video
+ -->

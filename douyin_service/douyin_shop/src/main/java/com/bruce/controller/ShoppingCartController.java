@@ -2,7 +2,6 @@ package com.bruce.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.bruce.common.BaseContext;
 import com.bruce.common.R;
 import com.bruce.entity.ShoppingCart;
 import com.bruce.service.ShoppingCartService;

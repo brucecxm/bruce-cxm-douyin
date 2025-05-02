@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <div class="home">
 
         <div class="main">
@@ -404,3 +404,4 @@ ul {
     margin: 0px;
 }
 </style>
+ -->

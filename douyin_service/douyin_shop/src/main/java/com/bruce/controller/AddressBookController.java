@@ -9,15 +9,11 @@ import com.bruce.common.R;
 import com.bruce.entity.AddressBook;
 import com.bruce.service.AddressBookService;
 import com.bruce.service.TicketService;
-import com.bruce.utils.MD5Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 地址簿管理

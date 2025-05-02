@@ -93,8 +93,6 @@
         <dependency>
             <groupId>org.example</groupId>
             <artifactId>douyin-id-service</artifactId>
-
-
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>org.example</groupId>-->

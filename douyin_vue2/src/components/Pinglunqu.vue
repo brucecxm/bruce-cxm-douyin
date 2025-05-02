@@ -29,7 +29,7 @@
 
 <script>
 import { eventBus } from '../main.js'; // 导入事件总线
-import { getcomment } from '@/api/video'
+import { getcomment ,homegetVideocontent} from '@/api/video'
 
 export default {
     name: "Pinglunqu",
@@ -46,6 +46,7 @@ export default {
     },
     methods: {
         sendMessage() {
+
             console.log("评论区已关闭");
             eventBus.$emit('messageSent', false); // 关闭评论区
         },
@@ -63,9 +64,14 @@ export default {
             // this.$router.push({ name: 'userProfile', params: { userId } });
         },
         getcommentone() {
-            const one = { videoid: this.videoData.videoid }; // 获取当前视频的 videoid
+            
+         const videoid=    this.videoData.videoid
+            const one = { videoid: videoid}; // 获取当前视频的 videoid
+        
+
             getcomment(one) // 调用 API 获取评论数据
                 .then(videoArr => {
+                    
                     this.commentsData = videoArr.data.data; // 将评论数据保存到组件的 data 中
                 })
                 .catch(error => {
@@ -92,20 +98,25 @@ export default {
         }
     },
     created() {
-        eventBus.$on('eventName', (data) => {
-            console.log(data);
-            this.receivedData = data;
-        });
+        // eventBus.$on('eventName', (data) => {
+        //     console.log(data);
+        //     this.receivedData = data;
+        // });
     },
     mounted() {
+        debugger
         eventBus.$on('messageSent_videoid', (msg) => {
-            this.videoData = msg;
-        });
+            
+        
+            debugger
+            this.videoData = msg.videoInfo;
+            console.log(this.videoData);
         this.getcommentone();
+
+        });
     },
     beforeDestroy() {
         eventBus.$off('messageSent_videoid');
-        eventBus.$off('eventName');
     },
 };
 </script>

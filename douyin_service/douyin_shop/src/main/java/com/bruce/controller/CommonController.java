@@ -13,8 +13,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.UUID;
 
 /**
  * 文件上传和下载

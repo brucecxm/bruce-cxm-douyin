@@ -51,11 +51,16 @@ export default {
     },
     methods: {
         showcomment() {
+            debugger
+
             eventBus.$emit('messageSent', true);
-            eventBus.$emit('messageSent_videoid', this.videoDateOne);
+            const params={videoInfo:{}}
+            params.videoInfo=this.videoDateOne
+            eventBus.$emit('messageSent_videoid',params);
             console.log(this.videoData)
         },
         toggleComment() {
+            
             this.isCommentClicked = true; // 设置评论图标点击状态
             setTimeout(() => {
                 this.isCommentClicked = false; // 0.5秒后恢复状态
@@ -74,9 +79,15 @@ export default {
             }
             this.behaviour('like');
 
-            // 调用 API 或其他逻辑处理
-            var params = {};
-            like(this.videoData.videoId)
+
+// 调用 API 或其他逻辑处理
+var params = {
+    type: this.isLiked ? 'red' : 'nored',
+    content_type: 'video',
+    contentId: this.videoDateOne.videoid
+};
+
+            like(params)
                 .then((result) => {
                     console.log('点赞成功:', result);
                 })

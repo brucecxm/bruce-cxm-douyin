@@ -1,5 +1,5 @@
 package com.bruce.entity;
-
+import java.io.Serializable;
 
 import lombok.Data;
 
@@ -14,7 +14,8 @@ import java.util.List;
  */
 @Data
 @SuppressWarnings("serial")
-public class Comment {
+public class Comment  implements Serializable{
+    private static final long serialVersionUID = 1L;
     private Long id;
     private String commentType;  // 评论类型：视频、商品等
     private Boolean isFollow;  // 是否是跟评

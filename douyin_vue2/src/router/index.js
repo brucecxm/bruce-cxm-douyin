@@ -112,6 +112,7 @@ const router = new VueRouter({
       name: "XiaoXiVue",
       component: () => import("../views/xiaoxi/xiaoxi.vue"),
     },
+
     {
       path: "/shangchuan",
       name: "ShangchuanVue",
@@ -148,6 +149,11 @@ const router = new VueRouter({
       path: "/friend",
       name: "FriendVue",
       component: () => import("../views/me/friend.vue"),
+    },
+    {
+      path: "/editMeInfo",
+      name: "editMeInfoVue",
+      component: () => import("../views/me/editMeInfo.vue"),
     },
     {
       path: "/articledetail",

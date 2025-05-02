@@ -8,10 +8,12 @@ import com.baomidou.mybatisplus.extension.api.R;
 import com.bruce.entity.MeInfo;
 import com.bruce.entity.Salt;
 import com.bruce.entity.User;
+import com.bruce.entity.Video;
 import com.bruce.feign.systemClient;
 import com.bruce.pojo.Result;
 import com.bruce.service.SaltService;
 import com.bruce.service.UserService;
+import com.bruce.service.VideoService;
 import com.bruce.utils.JwtUtil;
 import com.bruce.utils.RedisUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -463,6 +465,8 @@ public class UserController {
     @Autowired
     private ObjectMapper objectMapper;  // 用于将对象转换为JSON字符串
 
+    @Autowired
+    private VideoService videoService;  // 用于将对象转换为JSON字符串
     @GetMapping("/userInfo")
     public MeInfo userInfo() {
         Object userId = StpUtil.getLoginId();
@@ -472,9 +476,12 @@ public class UserController {
 
         MeInfo meInfo=new MeInfo();
        User user=   userService.getOne(queryWrapper);
-
+        LambdaQueryWrapper<Video> queryWrapperV = new LambdaQueryWrapper<>();
+        queryWrapperV.eq(Video::getAuthId, userId);
+List<Video> videoList=videoService.list(queryWrapperV);
 // 使用 BeanUtils 复制相同属性
         BeanUtils.copyProperties(user, meInfo);
+        meInfo.setVideoList(videoList);
        String useridStr= String.valueOf(userId);  // 将 user 对象转换为 JSON 字符串
 //        List<Video> videoList = videoService.getVideosByUserId(user.getId());
 

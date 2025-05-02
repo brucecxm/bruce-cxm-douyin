@@ -180,7 +180,8 @@ public class VideoController extends ApiController {
 
 
     @PostMapping("/like")
-    public ResponseEntity<String> like(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<String> like(@RequestBody Map<String, Object> requestone) {
+        Map<String, Object> request= (Map<String, Object>) requestone.get("params");
         try {
             // 检查用户是否已登录
             StpUtil.checkLogin();
@@ -221,7 +222,7 @@ public class VideoController extends ApiController {
             redisTemplate.opsForValue().decrement(redisKey + ":count", 1);
 
             // 异步将数据更新到数据库
-            messageQueueService.sendMessage(contentId);
+            messageQueueService.sendMessage(contentId,type);
 
             return ResponseEntity.ok(content_type+"取消点赞成功");
         } else {
@@ -239,7 +240,7 @@ public class VideoController extends ApiController {
             redisTemplate.opsForValue().increment(redisKey + ":count", 1);
 
             // 异步将数据更新到数据库
-            messageQueueService.sendMessage(contentId);
+            messageQueueService.sendMessage(contentId,type);
 
             return ResponseEntity.ok(content_type+"点赞成功");
         }

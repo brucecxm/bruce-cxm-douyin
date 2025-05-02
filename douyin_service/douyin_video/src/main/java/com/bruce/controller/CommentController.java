@@ -23,7 +23,7 @@ import java.util.concurrent.*;
  * @since 2024-06-26 23:27:01
  */
 @RestController
-@RequestMapping("/comment")
+@RequestMapping("/video/comment")
 public class CommentController extends ApiController {
 @Autowired
 private CommentoneService commentoneservice;

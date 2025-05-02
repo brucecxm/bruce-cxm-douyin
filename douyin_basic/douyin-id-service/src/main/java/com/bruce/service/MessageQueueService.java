@@ -28,7 +28,7 @@ int one=(int)likeCount;
     }
 
     // 模拟发送消息到消息队列（例如 RabbitMQ）
-    public void sendMessage(Long contentId) {
+    public void sendMessage(Long contentId,String type) {
         // 这里省略了消息队列的具体实现
         // 可以将 contentId 推送到队列，后台系统会处理并更新 MySQL 中的数据
         System.out.println("Message sent to queue to update like count for content: " + contentId);

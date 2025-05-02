@@ -4,7 +4,6 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.bruce.common.BaseContext;
 import com.bruce.common.CustomException;
 import com.bruce.entity.*;
 import com.bruce.mapper.OrderMapper;

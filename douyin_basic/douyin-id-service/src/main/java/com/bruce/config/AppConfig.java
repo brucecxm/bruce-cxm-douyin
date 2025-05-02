@@ -4,11 +4,16 @@ import com.bruce.utils.SnowflakeIdGenerator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 @ConditionalOnClass(SnowflakeIdGenerator.class)
 public class AppConfig {
 
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
     @Bean
     public Long workerId() {
         return 1L;  // 示例值

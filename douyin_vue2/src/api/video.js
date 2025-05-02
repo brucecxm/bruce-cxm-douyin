@@ -16,7 +16,7 @@ export const homegetVideomore = () => {
   return request.get("/video/more");
 };
 export const homegetVideocontent = (params) => {
-  return request.get("/comment/getcomment", { params });
+  return request.get("/video/comment/getcomment", { params });
 };
 
 // 修改 getauthzzz 函数
@@ -68,7 +68,7 @@ export const getauthinfo = (params) => {
 
 // 前端代码
 export const getcomment = (params) => {
-  return request.get("/comment/getfu", { params }); // 将参数放入 { params } 中
+  return request.get("/video/comment/getfu", { params }); // 将参数放入 { params } 中
 };
 
 export const getmumsic = (music_id) => {
