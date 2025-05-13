@@ -107,7 +107,6 @@ public class JingyiningController extends ApiController {
     /**
      * 删除数据
      *
-     * @param idList 主键结合
      * @return 删除结果
      */
     @PostMapping("/shan")
