@@ -24,7 +24,7 @@
                     <div class="videobox"><all-box-vue v-if="visibleIndexes.includes(index)" :boxtype="boxes[index].boxtest"></all-box-vue></div>
                 </div>
             </div>
-            <pinglunqu class="lpinglunqu" v-if="message"></pinglunqu>
+            <pinglunqu class="lpinglunqu" v-if="message"   @send-message="handleChildMessage" ></pinglunqu>
 
 
             <footer-vue></footer-vue>
@@ -41,6 +41,12 @@ import Pinglunqu from '@/components/Pinglunqu.vue'
 import { eventBus } from '../main.js'; // 导入事件总线
 
 export default {
+    provide() {
+    // 提供一个回调函数给后代组件调用
+    return {
+      fromAside: this.handleAside
+    };
+  },
     data() {
         return {
             message: false,
@@ -75,7 +81,7 @@ export default {
         footerVue,
         AllBoxVue,
         caidan,
-        Pinglunqu
+        Pinglunqu,
     },
     mounted() {
   this.boxes.forEach((_, index) => {
@@ -107,14 +113,27 @@ export default {
             // { color: "pink", left: 7 * this.boxWidth, boxtest: "精选" },
             // { color: "pink", left: 8 * this.boxWidth, boxtest: "热点" },
         ];
-        eventBus.$on('messageSent', (msg) => {
-            this.message = msg;
-        });
+        // eventBus.$on('messageSent', (msg) => {
+        //     this.message = msg;
+        // });
     },
     beforeDestroy() {
-        eventBus.$off('messageSent'); // 组件销毁前移除事件监听
+        // eventBus.$off('messageSent'); 
     },
     methods: {
+
+        handleAside(msg) {
+            
+            // 处理来自子组件的消息
+            console.log('父组件收到的消息：', msg);
+            this.message = msg;
+        },
+
+        handleChildMessage(msg) {
+            
+      console.log('父组件收到的消息：', msg);
+      this.message = msg;
+    },
         updateActiveIndex(index) {
             this.activeIndex = index;
             this.go(index);

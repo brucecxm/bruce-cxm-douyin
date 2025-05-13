@@ -19,7 +19,7 @@ export const userInfoStore = defineStore({
   actions: {
     // 设置 userInfo 的值，同时更新 localStorage（实现持久化）
     setuserInfo(newToken) {
-      debugger
+
 
 
       this.userInfo = newToken; // 更新 store 中的状态

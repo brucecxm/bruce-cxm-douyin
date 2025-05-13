@@ -73,7 +73,7 @@ name:1
       });
     },
     gai() {
-debugger
+
 
 var data = {
 id: 1,

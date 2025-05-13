@@ -48,7 +48,8 @@ export default {
         sendMessage() {
 
             console.log("评论区已关闭");
-            eventBus.$emit('messageSent', false); // 关闭评论区
+            // eventBus.$emit('messageSent', false); // 关闭评论区
+            this.$emit('send-message', false);
         },
         likeComment(index) {
             this.commentsData[index].likes++; // 增加点赞量
@@ -79,7 +80,7 @@ export default {
         },
         submitComment() {
     ;
-    debugger
+    
     const userInfo = userInfoStore();
     var userInfoMap={};
     userInfoMap=userInfo.userInfo;
@@ -145,7 +146,6 @@ export default {
 
     },
     beforeDestroy() {
-        // eventBus.$off('messageSent_videoid');
     },
 };
 </script>

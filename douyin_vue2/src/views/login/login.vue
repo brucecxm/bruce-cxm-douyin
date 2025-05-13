@@ -156,13 +156,13 @@ this.isShow = true; // 显示验证码图片
             }
 
             console.log('验证手机号:', this.loginpojo);
-            debugger
+            
             try {
                 const response = await userLoginService({ ...this.loginpojo, verificationCode: this.verificationCode });
                 if (response.data.code === 1) {
                     console.error("登录失败：", error);
                 } else {
-                    debugger
+                    
 const userInfo = userInfoStore();
 
 var text = response.data.data.userInfo;
