@@ -103,6 +103,11 @@ const router = new VueRouter({
       component: () => import("../views/login/login.vue"),
     },
     {
+      path: "/d",
+      name: "dVue",
+      component: () => import("../views/testone/d.vue"),
+    },
+    {
       path: "/search",
       name: "SearchVue",
       component: () => import("../views/search/search.vue"),

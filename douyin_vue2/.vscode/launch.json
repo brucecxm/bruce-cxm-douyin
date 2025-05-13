@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Chrome: Vue.js",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:5173", // 这里改成你的本地开发服务器地址
+      "webRoot": "${workspaceFolder}",
+      "sourceMapPathOverrides": {
+        "webpack:///*": "${webRoot}/*"
+      }
+    }
+  ]
+}

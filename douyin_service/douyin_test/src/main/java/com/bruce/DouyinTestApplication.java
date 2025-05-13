@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @ServletComponentScan
 @EnableTransactionManagement
-@MapperScan("com.bruce.mapper")
 public class DouyinTestApplication {
     public static void main(String[] args) {
         SpringApplication.run(DouyinTestApplication.class,args);

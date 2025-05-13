@@ -30,6 +30,7 @@
 
 <script>
 import { useTokenStore } from "../stores/token";
+import { videoInfoStore } from "../stores/videoInfo";
 import { eventBus } from '../main.js'; // 导入事件总线
 import { like } from '@/api/video';
 import { Result } from "element-ui";
@@ -51,13 +52,13 @@ export default {
     },
     methods: {
         showcomment() {
-            debugger
-
+const videoInfo=videoInfoStore();
+videoInfo.setvideoInfo(this.videoDateOne);
             eventBus.$emit('messageSent', true);
-            const params={videoInfo:{}}
-            params.videoInfo=this.videoDateOne
-            eventBus.$emit('messageSent_videoid',params);
-            console.log(this.videoData)
+            // const params={videoInfo:{}}
+            // params.videoInfo=this.videoDateOne
+            // eventBus.$emit('messageSent_videoid',params);
+            // console.log(this.videoData)
         },
         toggleComment() {
             

@@ -18,9 +18,10 @@
             <div class="videomain">
                 <!-- 循环渲染每个box，设置样式 -->
                 <div v-for="( box, index ) in boxes " :key="index" class="box"
+                    :ref="'box-' + index"
                     :style="{ left: box.left * 0.1 + 'vw', backgroundColor: box.color, width: boxWidth * 0.1 + 'vw', height: boxHeight + 'vh' }">
                     <!-- <div class="videobox"><videobox-vue></videobox-vue></div> -->
-                    <div class="videobox"><all-box-vue :boxtype="boxes[index].boxtest"></all-box-vue></div>
+                    <div class="videobox"><all-box-vue v-if="visibleIndexes.includes(index)" :boxtype="boxes[index].boxtest"></all-box-vue></div>
                 </div>
             </div>
             <pinglunqu class="lpinglunqu" v-if="message"></pinglunqu>
@@ -50,7 +51,7 @@ export default {
             activeIndex: 0, // 默认高亮推荐项
             boxHeight: 95,
             boxes: [], // box的数据，包括颜色和左边距
-
+            visibleIndexes: [] ,// 存储进入视口的 box 的索引
             caidancss: {
                 position: 'absolute',
                 right: '100vw',
@@ -76,13 +77,30 @@ export default {
         caidan,
         Pinglunqu
     },
+    mounted() {
+  this.boxes.forEach((_, index) => {
+    const el = this.$refs['box-' + index][0]; // 注意：ref 是数组
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        if (!this.visibleIndexes.includes(index)) {
+          this.visibleIndexes.push(index);
+        }
+      }
+    }, {
+      threshold: 1.0 // 100% 进入才触发
+    });
+
+    if (el) observer.observe(el);
+  });
+},
+
     created() {
         // 初始化 boxes 的数据，包括颜色和左边距
         this.boxes = [
-            { color: "red", left: 0, boxtest: "推荐" },
-            { color: "blue", left: this.boxWidth, boxtest: "同城" },
-            { color: "yellow", left: 2 * this.boxWidth, boxtest: "关注" },
-            { color: "pink", left: 3 * this.boxWidth, boxtest: "直播" },
+            { color: "black", left: 0, boxtest: "推荐" },
+            { color: "black", left: this.boxWidth, boxtest: "同城" },
+            { color: "black", left: 2 * this.boxWidth, boxtest: "关注" },
+            { color: "black", left: 3 * this.boxWidth, boxtest: "直播" },
             // { color: "pink", left: 4 * this.boxWidth, boxtest: "经验" },
             // { color: "white", left: 5 * this.boxWidth, boxtest: "商城" },
             // { color: "pink", left: 6 * this.boxWidth, boxtest: "团购" },

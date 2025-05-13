@@ -127,6 +127,9 @@ public class UserController {
         for (int i = 0; i < length; i++) {
             salt.append(characters.charAt(rand.nextInt(characters.length())));
         }
+
+
+
         return salt.toString();
     }
 
@@ -159,7 +162,7 @@ public class UserController {
         // 使用 QueryWrapper 构建查询条件
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);
-
+        System.out.println();
         // 查询符合条件的单条记录
         User user = userService.getOne(queryWrapper);
 
@@ -187,7 +190,7 @@ public class UserController {
 //            }
 
             // 构建返回给前端的 token 响应数据
-            Map<String, String> response = new HashMap<>();
+            Map response = new HashMap<>();
 
             // 如果配置的是 sa-token 方式
             if (login_token.equals("sa-token")) {
@@ -196,8 +199,13 @@ public class UserController {
 //                stringRedisTemplate.opsForValue().set();
                 // 获取生成的 token 值
                 String token_login = StpUtil.getTokenValue();
+                LambdaQueryWrapper<User> queryWrapper1 = new LambdaQueryWrapper<>();
+                queryWrapper1.eq(User::getId, user.getId()); // 构建查询条件：username 等于传入的 username
+
+                User user1 = userService.getOne(queryWrapper1); // 执行查询，返回满足条件的第一条 User 记录
                 // 将 token 放入返回 map
                 response.put("token", token_login);
+                response.put("userInfo", user1);
                 String loginId = StpUtil.getLoginId().toString();  // 转换为字符串
                 Long userId = Long.parseLong(loginId);  // 将字符串转为 Long 类型
                 String useridStr= String.valueOf(userId);  // 将 user 对象转换为 JSON 字符串
@@ -497,12 +505,13 @@ List<Video> videoList=videoService.list(queryWrapperV);
 
         return meInfo;
     }
-//
-//    @PutMapping("/update")
-//    public Result update(@RequestBody @Validated User user) {
+
+    @PutMapping("/update")
+    public Result update(@RequestBody @Validated User user) {
 //        userService.update(user);
-//        return Result.success();
-//    }
+        System.out.println("daople");
+        return Result.success();
+    }
 
 //    @PatchMapping("updateAvatar")
 //    public Result updateAvatar(@RequestParam @URL String avatarUrl) {

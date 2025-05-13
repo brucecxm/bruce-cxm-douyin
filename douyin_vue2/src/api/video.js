@@ -78,3 +78,15 @@ export const getmumsic = (music_id) => {
     },
   });
 };
+
+// // 前端代码
+// export const addcomment = (params) => {
+//   return request.post("/video/comment/addVideoComment", { params }); // 将参数放入 { params } 中
+// };
+export const addcomment = (params) => {
+  return request.post("/video/comment/addVideoComment", params, {
+    headers: {
+      'Content-Type': 'application/json',  // 设置请求头为 JSON
+    }
+  });
+};
