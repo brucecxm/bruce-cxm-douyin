@@ -22,20 +22,20 @@ export const useTokenStore = defineStore({
     },
   },
 });
-
-export const VideoIdStore = defineStore({
-  id: "VideoId",
-  state: () => ({
-    videoId: "",
-  }),
-  actions: {
-    setVideoId(newVideoId) {
-      this.videoId = newVideoId;
-    },
-  },
-  getters: {
-    getVideoId(state) {
-      return state.videoId;
-    },
-  },
-});
+//
+// export const VideoIdStore = defineStore({
+//   id: "VideoId",
+//   state: () => ({
+//     videoId: "",
+//   }),
+//   actions: {
+//     setVideoId(newVideoId) {
+//       this.videoId = newVideoId;
+//     },
+//   },
+//   getters: {
+//     getVideoId(state) {
+//       return state.videoId;
+//     },
+//   },
+// });

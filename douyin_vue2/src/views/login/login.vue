@@ -63,6 +63,7 @@
 import { isShallow } from "vue";
 import { userLoginService, userInfoService, userRegisterService,getVerificationCodeService } from "../../api/user"
 import { useTokenStore } from "../../stores/token"
+import { userInfoStore } from "../../stores/userInfo"
 import axios from 'axios';
 
 export default {
@@ -155,12 +156,20 @@ this.isShow = true; // 显示验证码图片
             }
 
             console.log('验证手机号:', this.loginpojo);
+            
             try {
                 const response = await userLoginService({ ...this.loginpojo, verificationCode: this.verificationCode });
                 if (response.data.code === 1) {
                     console.error("登录失败：", error);
                 } else {
                     
+const userInfo = userInfoStore();
+
+var text = response.data.data.userInfo;
+                   
+
+userInfo.setuserInfo(text);
+
                     const token = response.data.data.token;
                     const usertoken = useTokenStore();
                     usertoken.setToken(token);

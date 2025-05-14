@@ -109,10 +109,22 @@ int videoId = Integer.valueOf(videoid);
 
     return R.ok(x);
 
-
-
     }
 
+
+    @PostMapping("/addVideoComment")
+    public R addVideoComment(@RequestBody Map<String, Object> params) {
+        // 输出接收到的参数
+        System.out.println("收到的评论数据: " + params);
+
+        Comment comment=new Comment();
+        comment.setComment((String) params.get("comment"));
+        comment.setCommentVideoId((Integer) params.get("videoId"));
+        comment.setCommentUserId((Integer) params.get("userId"));
+       commentoneservice.save(comment);
+        // 这里可以处理评论逻辑
+        return null;  // 返回成功响应
+    }
 
 @GetMapping("/getzi")
     //获得对应父评论的子评论

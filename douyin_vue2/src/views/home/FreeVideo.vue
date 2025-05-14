@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <div class="home">
         <BaseHeader customClass="custom-header"></BaseHeader>
 
@@ -161,4 +161,4 @@ export default {
     /* 修改背景颜色为蓝色 */
     /* 添加其他样式 */
 }
-</style>
+</style> -->

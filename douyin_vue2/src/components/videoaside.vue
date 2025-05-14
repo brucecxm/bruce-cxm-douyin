@@ -30,7 +30,7 @@
 
 <script>
 import { useTokenStore } from "../stores/token";
-import { eventBus } from '../main.js'; // 导入事件总线
+import { videoInfoStore } from "../stores/videoInfo";
 import { like } from '@/api/video';
 import { Result } from "element-ui";
 
@@ -49,15 +49,19 @@ export default {
             videoDateOne: {},
         };
     },
+    inject: ['fromAside'],
     methods: {
-        showcomment() {
-            debugger
 
-            eventBus.$emit('messageSent', true);
-            const params={videoInfo:{}}
-            params.videoInfo=this.videoDateOne
-            eventBus.$emit('messageSent_videoid',params);
-            console.log(this.videoData)
+        send() {
+      // 直接调用祖先注入的函数进行传值
+   
+    },
+
+        showcomment() {
+            
+            this.fromAside(true);
+const videoInfo=videoInfoStore();
+videoInfo.setvideoInfo(this.videoDateOne);
         },
         toggleComment() {
             

@@ -20,6 +20,10 @@ spring:
           uri: lb://DouyinAdminService
           predicates:
             - Path=/admin/**
+        - id: DouyinTestService
+          uri: lb://DouyinTestService
+          predicates:
+            - Path=/test/**
         - id: DouyinChatService
           uri: lb://DouyinChatService
           predicates:

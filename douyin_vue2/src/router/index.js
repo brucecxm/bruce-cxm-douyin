@@ -82,11 +82,11 @@ const router = new VueRouter({
       name: "authhome",
       component: () => import("../views/auth/auth.vue"),
     },
-    {
-      path: "/freevideo",
-      name: "FreeVideoVue",
-      component: () => import("../views/home/FreeVideo.vue"),
-    },
+    // {
+    //   path: "/freevideo",
+    //   name: "FreeVideoVue",
+    //   component: () => import("../views/home/FreeVideo.vue"),
+    // },
     {
       path: "/me",
       name: "MeVue",
@@ -101,6 +101,11 @@ const router = new VueRouter({
       path: "/login",
       name: "LoginVue",
       component: () => import("../views/login/login.vue"),
+    },
+    {
+      path: "/d",
+      name: "dVue",
+      component: () => import("../views/testone/d.vue"),
     },
     {
       path: "/search",
