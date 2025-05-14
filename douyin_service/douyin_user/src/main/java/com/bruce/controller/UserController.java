@@ -66,6 +66,27 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+
+    @RequestMapping("cha")
+    public List handleLogoutAction() {
+
+        System.out.println("comming");
+
+List one= userService.list();//查数据库
+
+
+List two=new ArrayList();
+String ss="sss";
+int ass=1;
+two.add(ss);
+two.add(ass);
+return two;
+
+    }
+
+
+
+
     @RequestMapping("logout")
     public void handleLogoutAction(String action, Object param) {
         if ("logout".equals(action)) {

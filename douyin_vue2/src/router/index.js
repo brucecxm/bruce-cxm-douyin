@@ -14,8 +14,8 @@ const router = new VueRouter({
     },
     {
       path: "/test",
-      name: "test",
-      component: () => import("@/views/test/testshop.vue"),
+      name: "testtwo",
+      component: () => import("@/views/test/testtwo.vue"),
     },
     {
       path: "/shopcat",
