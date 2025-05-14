@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <div class="home">
         <div class='header'>
             <div class="caidan"></div>
@@ -188,4 +188,4 @@ li.active::after {
     color: black !important;
     /* 修改字体颜色为黄色 */
 }
-</style>
+</style> -->

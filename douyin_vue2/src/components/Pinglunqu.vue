@@ -28,7 +28,6 @@
 </template>
 
 <script>
-import { eventBus } from '../main.js'; // 导入事件总线
 import { getcomment ,homegetVideocontent} from '@/api/video'
 import { videoInfoStore } from "../stores/videoInfo";
 import {addcomment} from '@/api/video.js'; // 导入 API 函数
@@ -48,7 +47,6 @@ export default {
         sendMessage() {
 
             console.log("评论区已关闭");
-            // eventBus.$emit('messageSent', false); // 关闭评论区
             this.$emit('send-message', false);
         },
         likeComment(index) {
@@ -133,10 +131,7 @@ export default {
 
     },
     created() {
-        // eventBus.$on('eventName', (data) => {
-        //     console.log(data);
-        //     this.receivedData = data;
-        // });
+ 
     },
     mounted() {
         

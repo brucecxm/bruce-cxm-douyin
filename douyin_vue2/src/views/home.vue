@@ -38,7 +38,6 @@ import footerVue from '../components/footer.vue'
 import headerVue from '../components/header.vue'
 import videoboxVue from '../components/videobox.vue'
 import Pinglunqu from '@/components/Pinglunqu.vue'
-import { eventBus } from '../main.js'; // 导入事件总线
 
 export default {
     provide() {
@@ -113,12 +112,8 @@ export default {
             // { color: "pink", left: 7 * this.boxWidth, boxtest: "精选" },
             // { color: "pink", left: 8 * this.boxWidth, boxtest: "热点" },
         ];
-        // eventBus.$on('messageSent', (msg) => {
-        //     this.message = msg;
-        // });
     },
     beforeDestroy() {
-        // eventBus.$off('messageSent'); 
     },
     methods: {
 
