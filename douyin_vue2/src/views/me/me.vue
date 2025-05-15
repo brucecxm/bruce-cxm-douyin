@@ -43,7 +43,7 @@
         </div>
     <!-- 内容标签页 -->
     <div class="content-tabs">
-      <under-line-tags-vue></under-line-tags-vue>
+      <under-line-tags-vue :navItems="parentMessage"></under-line-tags-vue>
 
       <!-- 视频列表 -->
       <div class="video-grid">
@@ -79,8 +79,8 @@ export default {
   },
   data() {
     return {
+      parentMessage:['视频', '评论', '点赞','确定'],
       userInfo: {},
-      activeTab: 'works'
     };
   },
   mounted() {

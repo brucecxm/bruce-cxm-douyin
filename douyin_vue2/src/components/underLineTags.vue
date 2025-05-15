@@ -23,9 +23,11 @@
 
 <script>
 export default {
+  props: {
+    navItems: String  // 定义接收的 props
+  },
   data() {
     return {
-      navItems: ['视频', '评论', '点赞'],
       activeIndex: 0,
       underlineStyle: {
         width: 0,
