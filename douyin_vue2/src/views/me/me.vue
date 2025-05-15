@@ -5,6 +5,8 @@
 
  
         <img class="avatar" :src="userInfo.avatar" alt="头像" />
+        <img class="avatar" :src="userInfo.avatar" alt="头像" />
+        <img class="avatar" :src="userInfo.avatar" alt="头像" />
         <div class="douyinnum">
           <div class="user-name">{{ userInfo.nickname }}</div>
           <div class="user-id">抖音号：{{ userInfo.id }}</div>
