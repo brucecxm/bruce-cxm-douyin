@@ -19,21 +19,18 @@
 
 ### 业务说明
 
-![image-20210407204405774](D:/专业/项目/黑马头条项目/day1/讲义/01-环境搭建、SpringCloud微服务(注册发现、服务调用、网关).assets/image-20210407204405774.png)
+![](doc/img/5.png)
 
 项目演示地址：
 
-- 平台管理：[http://heima-admin-java.research.itcast.cn](http://heima-admin-java.research.itcast.cn/) 
+- 平台管理：暂无
 
-- 自媒体：[http://heime-media-java.research.itcast.cn](http://heime-media-java.research.itcast.cn/) 
+- app端：暂无
 
-- app端：[http://heima-app-java.research.itcast.cn](http://heima-app-java.research.itcast.cn/) 
-
-- 
 
 技术栈
 
-![img](D:/专业/项目/黑马头条项目/day1/讲义/01-环境搭建、SpringCloud微服务(注册发现、服务调用、网关).assets/f3accd2ba01c41b0a9ac98370241eba3.png)
+![](doc/img/6.png)
 
 - Spring-Cloud-Gateway : 微服务之前架设的网关服务，实现服务注册中的API请求路由，以及控制流速控制和熔断处理都是常用的架构手段，而这些功能Gateway天然支持
 - 运用Spring Boot快速开发框架，构建项目工程；并结合Spring Cloud全家桶技术，实现后端个人中心、自媒体、管理中心等微服务。
@@ -48,6 +45,256 @@
 - 运用ES搜索技术，对冷数据、文章数据建立索引，以保证冷数据、文章查询性能
 - 运用AI技术，来完成系统自动化功能，以提升效率及节省成本。比如实名认证自动化
 - PMD&P3C : 静态代码扫描工具，在项目中扫描项目代码，检查异常点、优化点、代码规范等，为开发团队提供规范统一，提升项目代码质量
+
+
+
+nginx配置文件
+
+```
+worker_processes 1;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+    keepalive_timeout  65;
+
+    server {
+        listen       8011;
+        server_name  localhost;
+
+        # Serve static files from the dist folder
+        location / {
+            root   /usr/share/nginx/html/dist;  # Path to your dist folder
+            index  index.html index.htm;
+            try_files $uri $uri/ /index.html;  # Ensure SPA routing works correctly
+        }
+
+        # Proxy API requests
+        location /api/ {
+            rewrite ^/api/(.*)$ /$1 break;  # 去掉 /api 前缀
+            proxy_pass http://localhost:9430;  # 代理到后端服务
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        # WebSocket proxy if needed
+        # location /websocket/ {
+        #     proxy_pass http://localhost:9998/ws;  # Adjust to your WebSocket server
+        #     proxy_set_header Host $host;
+        #     proxy_set_header X-Real-IP $remote_addr;
+        #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        #     proxy_set_header X-Forwarded-Proto $scheme;
+        #     proxy_http_version 1.1;
+        #     proxy_set_header Upgrade $http_upgrade;
+        #     proxy_set_header Connection 'upgrade';
+        # }
+
+        # Error pages
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /usr/share/nginx/html;
+        }
+    }
+}
+
+```
+
+
+
+
+
+
+
+本项目提供了内网穿透的脚本 可以通过norok把此项目部署到公网
+
+```
+authtoken: 2tq5jqicVNr4qf98hw6JJl7bWxI_2AmunBhWZcpGxiB9cZJoM
+version: "2"
+tunnels:
+  frontend:
+    proto: http
+    addr: 8011
+    domain: intense-lucky-possum.ngrok-free.app
+  backend:
+    proto: http
+    addr: 8080
+  fileendpoint:
+    proto: http
+    addr: 9000
+
+
+#运行命令 ngrok start --all
+
+```
+
+
+
+
+
+一键部署（centos）
+
+本项目提供了一键部署的shell脚本 bruce_douyin_start.sh
+
+```
+#!/bin/bash
+
+# 设置脚本执行失败时立即退出
+set -e
+
+echo "==================== 开始执行部署脚本 ===================="
+
+# 1. **检查并拉取最新代码**
+if command -v git &> /dev/null; then
+    echo "git 已安装，正在从远程仓库获取最新代码..."
+
+    # 检查是否有未提交的修改
+    if ! git diff --quiet || ! git diff --staged --quiet; then
+        echo "检测到未提交的本地修改，先进行 stash 处理..."
+        git stash
+        git pull origin main
+        git stash pop
+    else
+        git pull origin main
+    fi
+
+    if [ $? -eq 0 ]; then
+        echo "最新代码获取成功!"
+    else
+        echo "从远程仓库获取代码时出错!"
+        exit 1
+    fi
+else
+    echo "git 未安装，跳过更新代码步骤!"
+fi
+
+# 2. **执行 mvn install**
+echo "开始执行 mvn install..."
+mvn install
+
+if [ $? -eq 0 ]; then
+    echo "mvn install 执行成功!"
+else
+    echo "mvn install 执行失败!"
+    exit 1
+fi
+
+# 3. **进入 JAR 文件夹**
+cd jar || { echo "无法进入 JAR 文件夹"; exit 1; }
+
+# 4. **检查并启动 Redis**
+echo "正在检查 Redis 是否运行..."
+if command -v redis-cli &> /dev/null; then
+    if redis-cli ping | grep -q "PONG"; then
+        echo "Redis 已经在运行!"
+    else
+        echo "Redis 未运行，尝试启动..."
+        if systemctl list-units --type=service | grep -q "redis"; then
+            sudo systemctl start redis
+            if redis-cli ping | grep -q "PONG"; then
+                echo "Redis 启动成功!"
+            else
+                echo "Redis 启动失败! 请手动检查。"
+                exit 1
+            fi
+        else
+            echo "Redis 未安装，请先安装 Redis!"
+            exit 1
+        fi
+    fi
+else
+    echo "Redis 未安装，请先安装 Redis!"
+    exit 1
+fi
+
+# 5. **关闭所有包含 'douyin' 和 '.jar' 的进程**
+echo "正在关闭所有包含 'douyin' 和 '.jar' 字符串的进程..."
+PIDS=$(ps aux | grep 'douyin.*\.jar' | grep -v 'grep' | awk '{print $2}')
+
+if [ -n "$PIDS" ]; then
+    echo "检测到正在运行的 douyin 相关进程: $PIDS"
+    echo "$PIDS" | xargs kill -9
+    echo "进程已关闭!"
+else
+    echo "没有找到相关进程，无需关闭!"
+fi
+
+# 6. **启动所有 JAR 文件**
+for jar_file in *.jar; do
+    if [ -f "$jar_file" ]; then
+        echo "正在启动 $jar_file ..."
+        nohup java -Xms256m -Xmx512m -jar "$jar_file" --spring.profiles.active=dev > "$jar_file.log" 2>&1 &
+        echo "$jar_file 启动成功!"
+    fi
+done
+
+echo "所有 JAR 文件已启动!"
+
+# 返回上级目录
+cd ..
+
+# 7. **进入 Vue 项目目录**
+cd douyin_vue2 || { echo "无法进入 Vue 项目文件夹"; exit 1; }
+
+# 8. **安装 npm 依赖**
+echo "开始执行 npm install..."
+npm install
+
+if [ $? -eq 0 ]; then
+    echo "npm install 执行成功!"
+else
+    echo "npm install 执行失败!"
+    exit 1
+fi
+
+# 9. **执行 Vue 项目构建**
+echo "开始执行 npm run build..."
+npm run build
+
+if [ $? -eq 0 ]; then
+    echo "npm build 执行成功!"
+else
+    echo "npm build 执行失败!"
+    exit 1
+fi
+
+# 10. **重启 Nginx**
+echo "正在重启 Nginx..."
+sudo systemctl restart nginx
+
+if [ $? -eq 0 ]; then
+    echo "Nginx 重启成功!"
+else
+    echo "Nginx 重启失败!"
+    exit 1
+fi
+
+echo "==================== 部署脚本执行完成! ===================="
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -73,7 +320,7 @@
 
 ### 主体结构
 
-![image-20210412141711919](D:/专业/项目/黑马头条项目/day1/讲义/01-环境搭建、SpringCloud微服务(注册发现、服务调用、网关).assets/image-20210412141711919.png)
+![](doc/img/7.png)
 
 
 
@@ -81,7 +328,7 @@
 
 ### 需求分析
 
-![image-20210412141809919](D:/专业/项目/黑马头条项目/day1/讲义/01-环境搭建、SpringCloud微服务(注册发现、服务调用、网关).assets/image-20210412141809919.png)
+![](doc/img/登录.png)
 
 - 用户点击**开始使用**
 
@@ -91,26 +338,7 @@
 
 ​       游客只有查看的权限
 
-### 表结构分析
 
-关于app端用户相关的内容较多，可以单独设置一个库leadnews_user
-
-| **表名称**       | **说明**          |
-| ---------------- | ----------------- |
-| ap_user          | APP用户信息表     |
-| ap_user_fan      | APP用户粉丝信息表 |
-| ap_user_follow   | APP用户关注信息表 |
-| ap_user_realname | APP实名认证信息表 |
-
-从当前资料中找到对应数据库并导入到mysql中
-
-
-
-登录需要用到的是ap_user表，表结构如下：
-
-![image-20210412142006558](D:/专业/项目/黑马头条项目/day1/讲义/01-环境搭建、SpringCloud微服务(注册发现、服务调用、网关).assets/image-20210412142006558.png)
-
-![image-20210412142055047](D:/专业/项目/黑马头条项目/day1/讲义/01-环境搭建、SpringCloud微服务(注册发现、服务调用、网关).assets/image-20210412142055047.png)
 
 项目中的持久层使用的mybatis-plus，一般都使用mybais-plus逆向生成对应的实体类
 
@@ -120,17 +348,17 @@ md5是不可逆加密，md5相同的密码每次加密都一样，不太安全�
 
 注册->生成盐
 
-![image-20210412142315248](D:/专业/项目/黑马头条项目/day1/讲义/01-环境搭建、SpringCloud微服务(注册发现、服务调用、网关).assets/image-20210412142315248.png)
+![](doc/img/1.png)
 
 登录->使用盐来配合验证
 
-![image-20210412142428499](D:/专业/项目/黑马头条项目/day1/讲义/01-环境搭建、SpringCloud微服务(注册发现、服务调用、网关).assets/image-20210412142428499.png)
+![](doc/img/2.png)
 
 
 
 ### 思路分析
 
-![image-20210412142536782](D:/专业/项目/黑马头条项目/day1/讲义/01-环境搭建、SpringCloud微服务(注册发现、服务调用、网关).assets/image-20210412142536782.png)
+![](/doc/img/3.png)
 
 1，用户输入了用户名和密码进行登录，校验成功后返回jwt(基于当前用户的id生成)
 
@@ -140,7 +368,7 @@ md5是不可逆加密，md5相同的密码每次加密都一样，不太安全�
 
 ### 全局过滤器实现jwt校验
 
-![image-20210705110434492](D:/专业/项目/黑马头条项目/day1/讲义/01-环境搭建、SpringCloud微服务(注册发现、服务调用、网关).assets/image-20210705110434492.png)
+![](doc/img/4.png)
 
 思路分析：
 

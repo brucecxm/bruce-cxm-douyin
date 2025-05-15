@@ -24,18 +24,19 @@
                 {{ box }}
             </div> -->
             <div class="meum">
-                <div class="box1" v-for="(meum, index) in meumbox" :key="index">
+                <!-- <div class="box1" v-for="(meum, index) in meumbox" :key="index">
                     <img :src="meum.menuImg" alt="" style="width: 100%; height: 100%;" @click="go(meum.hrefurl)">
-                    <!--  <p>{{ meum.name }}</p> -->
-
-                </div>
+                </div> -->
+                <scroll-nav :navItems="parentMsg"></scroll-nav>
             </div>
 
-            <div class="nav">
-                <div class="box2" v-for="(nav, index) in navbox" :key="index">
-                    <img :src="nav.navImg" alt="" style="width: 100%; height: 100%;">
-                    <!-- <p>{{ nav.navname }}</p> -->
-                </div>
+            <div class="nav" style="width: 100%;">
+    <GridDisplay
+      :itemWidth="80"
+      :itemHeight="100"
+      :items="items"
+      :gap="5"
+    />
             </div>
 
             <div class="main">
@@ -55,7 +56,9 @@
 
 <script>
 import { shoplist, searchForDish, liansearchForDish, shoplistpage, getnav } from "@/api/shop"
+import ScrollNav from "../../components/ScrollNav.vue"
 import { shopmenulist } from "@/api/menu"
+import GridDisplay from '@/components/GridDisplay.vue'
 import { shopnavlist } from "@/api/menu"
 import { useTokenStore } from "@/stores/token"
 import footerVue from '@/components/footer.vue'
@@ -79,10 +82,32 @@ export default {
         document.removeEventListener('click', this.handleOutsideClick);
     },
     components: {
-        footerVue
+        footerVue,
+        ScrollNav,
+        GridDisplay
     },
     data() {
         return {
+            items: [
+        { icon: 'https://cdn-icons-png.flaticon.com/512/616/616408.png', name: '图标1' },
+        { icon: 'https://cdn-icons-png.flaticon.com/512/616/616429.png', name: '图标2' },
+        { icon: 'https://cdn-icons-png.flaticon.com/512/616/616490.png', name: '图标3' },
+        { icon: 'https://cdn-icons-png.flaticon.com/512/616/616554.png', name: '图标4' },
+        { icon: 'https://cdn-icons-png.flaticon.com/512/616/616494.png', name: '图标5' },
+        { icon: 'https://cdn-icons-png.flaticon.com/512/616/616409.png', name: '图标6' },
+        { icon: 'https://cdn-icons-png.flaticon.com/512/616/616426.png', name: '图标7' },
+        { icon: 'https://cdn-icons-png.flaticon.com/512/616/616453.png', name: '图标8' },
+      ],
+               parentMsg: [
+        { icon: "🏠", label: "首页" },
+        { icon: "🔥", label: "热门" },
+        { icon: "🛍", label: "商城" },
+        { icon: "💬", label: "消息" },
+        { icon: "👤", label: "我的" },
+        { icon: "📺", label: "直播" },
+        { icon: "🎮", label: "游戏" },
+        { icon: "📷", label: "相册" },
+      ],
             searchText: '',  // 输入框的内容
             showSuggestions: false,  // 是否显示联想框
             suggestions: ['苹果', '香蕉', '橙子', '葡萄', '西瓜', '草莓', '芒果'],

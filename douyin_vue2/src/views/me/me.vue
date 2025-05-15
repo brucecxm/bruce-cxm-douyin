@@ -43,36 +43,7 @@
         </div>
     <!-- 内容标签页 -->
     <div class="content-tabs">
-      <div class="tab-header">
-        <div
-          class="tab-item"
-          :class="{ active: activeTab === 'works' }"
-          @click="activeTab = 'works'"
-        >
-          作品
-        </div>
-        <div
-          class="tab-item"
-          :class="{ active: activeTab === 'recommend' }"
-          @click="activeTab = 'recommend'"
-        >
-          推荐
-        </div>
-        <div
-          class="tab-item"
-          :class="{ active: activeTab === 'favorites' }"
-          @click="activeTab = 'favorites'"
-        >
-          收藏
-        </div>
-        <div
-          class="tab-item"
-          :class="{ active: activeTab === 'likes' }"
-          @click="activeTab = 'likes'"
-        >
-          喜欢
-        </div>
-      </div>
+      <under-line-tags-vue :navItems="parentMessage"></under-line-tags-vue>
 
       <!-- 视频列表 -->
       <div class="video-grid">
@@ -95,27 +66,57 @@
 </template>
 <script>
 import footerVue from '@/components/footer.vue';
+import underLineTagsVue from '../../components/underLineTags.vue';
+
 import {
   userInfoService
 } from '@/api/user';
 
 export default {
   components: {
-    footerVue
+    footerVue,
+    underLineTagsVue
   },
   data() {
     return {
+      parentMessage:['视频', '评论', '点赞','确定'],
       userInfo: {},
-      activeTab: 'works'
     };
   },
   mounted() {
     // this.getUserInfo();
-  },
-  created(){
-  this.getUserInfo();
+    this.getUserInfojia();
   },
   methods: {
+    getUserInfojia() {
+    // 假数据
+    this.userInfo = {
+      id: '12345678',
+      nickname: '测试用户',
+      avatar: 'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
+      backImg: 'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
+      followers: 888,
+      following: 123,
+      likes: 9999,
+      jieshao: '这是一段个人简介。',
+      city: '西安',
+      school: '西安财经大学',
+      videoList: [
+        {
+          videoUrl: 'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
+          playCount: 1234
+        },
+        {
+          videoUrl: 'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
+          playCount: 5678
+        },
+        {
+          videoUrl: 'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
+          playCount: 9999
+        }
+      ]
+    };
+  },
     goEditMeInfo() {
       this.$router.push({ path: '/editMeInfo' });
     },
