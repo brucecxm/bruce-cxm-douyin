@@ -11,6 +11,7 @@ import com.bruce.entity.User;
 import com.bruce.entity.Video;
 import com.bruce.feign.systemClient;
 import com.bruce.pojo.Result;
+import com.bruce.service.FriendService;
 import com.bruce.service.SaltService;
 import com.bruce.service.UserService;
 import com.bruce.service.VideoService;
@@ -66,24 +67,65 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private FriendService friendService;
+
+
+
+    @RequestMapping("chashop")
+    public List handleLogoutAssction() {
+
+        friendService.list();
+
+        return null;
+    }
+
+
+
+
+
+
+
 
     @RequestMapping("cha")
     public List handleLogoutAction() {
-
         System.out.println("comming");
-
 List one= userService.list();//查数据库
 
-
-List two=new ArrayList();
-String ss="sss";
-int ass=1;
-two.add(ss);
-two.add(ass);
-return two;
-
+return one;
+    }
+    @RequestMapping("zeng")
+    public String x(@RequestBody User user){
+        userService.save(user);
+        return "新增成功";
     }
 
+    @RequestMapping("gai")
+    public String gai(@RequestBody User user){
+        userService.updateById(user);
+        return "新增成功";
+    }
+
+    @RequestMapping("shan")
+    public String shan(@RequestBody User user){
+        userService.removeById(user.getId());
+        return "删除成功";
+    }
+
+    @RequestMapping("login")
+    public R login(@RequestBody User user){
+    User x=userService.getOne(new QueryWrapper<User>().eq("username",user.getUsername()));
+    if(x==null){
+        return R.failed("用户不存在");
+
+    }
+        if (!x.getPassword().equals(user.getPassword())) {
+
+            return R.failed("密码错误");
+
+        }
+        return R.ok("1");
+    }
 
 
 

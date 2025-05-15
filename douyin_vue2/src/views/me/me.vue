@@ -110,7 +110,10 @@ export default {
     };
   },
   mounted() {
-    this.getUserInfo();
+    // this.getUserInfo();
+  },
+  created(){
+  this.getUserInfo();
   },
   methods: {
     goEditMeInfo() {
