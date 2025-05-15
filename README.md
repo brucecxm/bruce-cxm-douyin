@@ -19,21 +19,18 @@
 
 ### 业务说明
 
-![image-20210407204405774](D:/专业/项目/黑马头条项目/day1/讲义/01-环境搭建、SpringCloud微服务(注册发现、服务调用、网关).assets/image-20210407204405774.png)
+![](\doc\img\5.png)
 
 项目演示地址：
 
-- 平台管理：[http://heima-admin-java.research.itcast.cn](http://heima-admin-java.research.itcast.cn/) 
+- 平台管理：暂无
 
-- 自媒体：[http://heime-media-java.research.itcast.cn](http://heime-media-java.research.itcast.cn/) 
+- app端：暂无
 
-- app端：[http://heima-app-java.research.itcast.cn](http://heima-app-java.research.itcast.cn/) 
-
-- 
 
 技术栈
 
-![img](D:/专业/项目/黑马头条项目/day1/讲义/01-环境搭建、SpringCloud微服务(注册发现、服务调用、网关).assets/f3accd2ba01c41b0a9ac98370241eba3.png)
+![](\doc\img\6.png)
 
 - Spring-Cloud-Gateway : 微服务之前架设的网关服务，实现服务注册中的API请求路由，以及控制流速控制和熔断处理都是常用的架构手段，而这些功能Gateway天然支持
 - 运用Spring Boot快速开发框架，构建项目工程；并结合Spring Cloud全家桶技术，实现后端个人中心、自媒体、管理中心等微服务。
@@ -323,7 +320,7 @@ echo "==================== 部署脚本执行完成! ===================="
 
 ### 主体结构
 
-![image-20210412141711919](D:/专业/项目/黑马头条项目/day1/讲义/01-环境搭建、SpringCloud微服务(注册发现、服务调用、网关).assets/image-20210412141711919.png)
+![](doc/img/7.png)
 
 
 
@@ -331,7 +328,7 @@ echo "==================== 部署脚本执行完成! ===================="
 
 ### 需求分析
 
-![](..\bruce-cxm-douyin\doc\img\登录.png)
+![](doc/img/登录.png)
 
 - 用户点击**开始使用**
 
@@ -351,17 +348,17 @@ md5是不可逆加密，md5相同的密码每次加密都一样，不太安全�
 
 注册->生成盐
 
-![](..\bruce-cxm-douyin\doc\img\1.png)
+![](doc/img\1.png)
 
 登录->使用盐来配合验证
 
-![](..\bruce-cxm-douyin\doc\img\2.png)
+![](\doc\img\2.png)
 
 
 
 ### 思路分析
 
-![](..\bruce-cxm-douyin\doc\img\3.png)
+![](\doc\img\3.png)
 
 1，用户输入了用户名和密码进行登录，校验成功后返回jwt(基于当前用户的id生成)
 
@@ -371,7 +368,7 @@ md5是不可逆加密，md5相同的密码每次加密都一样，不太安全�
 
 ### 全局过滤器实现jwt校验
 
-![](..\bruce-cxm-douyin\doc\img\4.png)
+![](\doc\img\4.png)
 
 思路分析：
 
