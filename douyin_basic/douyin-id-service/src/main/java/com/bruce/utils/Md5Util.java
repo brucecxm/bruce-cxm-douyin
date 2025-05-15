@@ -1,6 +1,8 @@
 package com.bruce.utils;
 
 
+import org.springframework.util.DigestUtils;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -21,6 +23,9 @@ public class Md5Util {
         }
     }
 
+    public static String generateMD5(String input) {
+        return DigestUtils.md5DigestAsHex(input.getBytes());
+    }
     /**
      * 生成字符串的md5校验值
      *

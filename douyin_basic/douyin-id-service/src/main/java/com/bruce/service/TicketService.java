@@ -1,5 +1,5 @@
 package com.bruce.service;
-import com.bruce.utils.MD5Util;
+import com.bruce.utils.Md5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -40,7 +40,7 @@ public class TicketService {
         sb.append("key=").append(SECRET_KEY);
 
         // 生成 MD5 签名
-        String sign = MD5Util.generateMD5(sb.toString());
+        String sign = Md5Util.generateMD5(sb.toString());
 
         // 创建请求参数
         Map<String, String> params = new HashMap<>();
