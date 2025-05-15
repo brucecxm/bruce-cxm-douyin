@@ -116,8 +116,9 @@ return one;
     public R login(@RequestBody User user){
     User x=userService.getOne(new QueryWrapper<User>().eq("username",user.getUsername()));
     if(x==null){
-        return R.failed("用户不存在");
+        System.out.println("ss");
 
+        return R.failed("用户不存在");
     }
         if (!x.getPassword().equals(user.getPassword())) {
 
