@@ -28,7 +28,9 @@ public class ChatController {
                 request.getMessageContent(),
                 request.getMessageType(),
                 request.isGroup()
+                
         );
+        System.out.println("ss");
         return ResponseEntity.ok("Message sent successfully");
     }
 
