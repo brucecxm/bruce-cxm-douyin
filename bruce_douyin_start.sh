@@ -29,17 +29,27 @@ else
     echo "git 未安装，跳过更新代码步骤!"
 fi
 
-# 2. **执行 mvn install**
-echo "开始执行 mvn install..."
-mvn install
+## 2. **执行 mvn install**
+#echo "开始执行 mvn install..."
+#mvn install
+#
+#if [ $? -eq 0 ]; then
+#    echo "mvn install 执行成功!"
+#else
+#    echo "mvn install 执行失败!"
+#    exit 1
+#fi
+# 2. **先 install douyin_basic 模块**
+echo "先安装基础模块 douyin_basic ..."
+cd douyin_basic || { echo "无法进入 douyin_basic 模块目录"; exit 1; }
 
+mvn install
 if [ $? -eq 0 ]; then
-    echo "mvn install 执行成功!"
+    echo "douyin_basic 安装成功!"
 else
-    echo "mvn install 执行失败!"
+    echo "douyin_basic 安装失败!"
     exit 1
 fi
-
 # 3. **进入 JAR 文件夹**
 cd jar || { echo "无法进入 JAR 文件夹"; exit 1; }
 
