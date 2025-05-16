@@ -135,13 +135,28 @@ tunnels:
 
 ```
 
+服务器拉取代码时用这个强制覆盖  服务端一般不改代码
+
+```
+# 清除本地所有未提交的改动（已追踪文件和未追踪文件都会删除）
+git reset --hard HEAD
+git clean -fd
+
+# 强制拉取远程 main 分支并覆盖本地
+git fetch origin
+git reset --hard origin/main
+
+```
+
+
+
 
 
 
 
 一键部署（centos）
 
-本项目提供了一键部署的shell脚本 bruce_douyin_start.sh
+本项目提供了一键部署的shell脚本 bruce_douyin_start.sh  打包的时候切记先打basic包
 
 ```
 #!/bin/bash
@@ -175,17 +190,27 @@ else
     echo "git 未安装，跳过更新代码步骤!"
 fi
 
-# 2. **执行 mvn install**
-echo "开始执行 mvn install..."
-mvn install
+## 2. **执行 mvn install**
+#echo "开始执行 mvn install..."
+#mvn install
+#
+#if [ $? -eq 0 ]; then
+#    echo "mvn install 执行成功!"
+#else
+#    echo "mvn install 执行失败!"
+#    exit 1
+#fi
+# 2. **先 install douyin_basic 模块**
+echo "先安装基础模块 douyin_basic ..."
+cd douyin_basic || { echo "无法进入 douyin_basic 模块目录"; exit 1; }
 
+mvn install
 if [ $? -eq 0 ]; then
-    echo "mvn install 执行成功!"
+    echo "douyin_basic 安装成功!"
 else
-    echo "mvn install 执行失败!"
+    echo "douyin_basic 安装失败!"
     exit 1
 fi
-
 # 3. **进入 JAR 文件夹**
 cd jar || { echo "无法进入 JAR 文件夹"; exit 1; }
 
