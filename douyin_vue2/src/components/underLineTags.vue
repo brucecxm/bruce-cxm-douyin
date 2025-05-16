@@ -24,7 +24,10 @@
 <script>
 export default {
   props: {
-    navItems: String  // 定义接收的 props
+    navItems: {
+    required: true
+    // 没有 type，表示任何类型都可以
+  }
   },
   data() {
     return {

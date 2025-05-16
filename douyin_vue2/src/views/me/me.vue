@@ -1,75 +1,63 @@
 <template>
   <div class="container">
+    <InfiniteList  >
+      <template v-slot:header>
+   
     <!-- 顶部背景图 -->
     <div class="profile-header " :style="{ backgroundImage: 'url(' + userInfo.backImg + ')' }">
 
  
-        <img class="avatar" :src="userInfo.avatar" alt="头像" />
-        <img class="avatar" :src="userInfo.avatar" alt="头像" />
-        <img class="avatar" :src="userInfo.avatar" alt="头像" />
-        <div class="douyinnum">
-          <div class="user-name">{{ userInfo.nickname }}</div>
-          <div class="user-id">抖音号：{{ userInfo.id }}</div>
-        </div>
+<img class="avatar" :src="userInfo.avatar" alt="头像" />
 
-    </div>
-   <!-- 用户统计信息 -->
-   <div class="user-stats">
-          <div class="stat-item">
-            <div class="num">{{ userInfo.followers || '0' }}</div>
-            <div class="label">粉丝</div>
-          </div>
-          <div class="stat-item">
-            <div class="num">{{ userInfo.following || '0' }}</div>
-            <div class="label">关注</div>
-          </div>
-          <div class="stat-item">
-            <div class="num">{{ userInfo.likes || '0' }}</div>
-            <div class="label">获赞</div>
-          </div>
-          <div class="stat-item">
-            <div class="num">{{ userInfo.likes || '0' }}</div>
-            <div class="label">获赞</div>
-          </div>
-        <el-button @click="goEditMeInfo">编辑主页</el-button>
+<div class="douyinnum" style="color: white;">
+  <div class="user-name">{{ userInfo.nickname }}</div>
+  <div class="user-id">抖音号：{{ userInfo.id }}</div>
+</div>
 
-   </div>
-        <!-- <div class="edit-profile-btn" @click="goEditMeInfo">编辑主页</div> -->
-        <!-- 个人简介 -->
-        <div style="font-size: 15px; margin-top: 10px;">{{ userInfo.jieshao || '暂无个人简介' }}</div>
+</div>
+<!-- 用户统计信息 -->
+<div class="user-stats">
+  <div class="stat-item">
+    <div class="num">{{ userInfo.followers || '0' }}</div>
+    <div class="label">粉丝</div>
+  </div>
+  <div class="stat-item">
+    <div class="num">{{ userInfo.following || '0' }}</div>
+    <div class="label">关注</div>
+  </div>
+  <div class="stat-item">
+    <div class="num">{{ userInfo.likes || '0' }}</div>
+    <div class="label">获赞</div>
+  </div>
+  <div class="stat-item">
+    <div class="num">{{ userInfo.likes || '0' }}</div>
+    <div class="label">获赞</div>
+  </div>
+<el-button @click="goEditMeInfo">编辑主页</el-button>
 
-        <div class="bio">
+</div>
+<div class="userinfo">
+<div style="font-size: 15px; margin-top: 10px;">{{ userInfo.jieshao || '暂无个人简介' }}</div>
+<div class="bio">
+  <div class="location">{{ userInfo.city }}</div>
+  <div class="school">{{ userInfo.school || '暂无学校信息' }}</div>
+</div>
+</div>
 
-          <div class="location">{{ userInfo.city }}</div>
-          <div class="school">{{ userInfo.school || '暂无学校信息' }}</div>
-        </div>
-    <!-- 内容标签页 -->
-    <div class="content-tabs">
-      <under-line-tags-vue :navItems="parentMessage"></under-line-tags-vue>
+<under-line-tags-vue :navItems="parentMessage"></under-line-tags-vue>
 
-      <!-- 视频列表 -->
-      <div class="video-grid">
-        <div
-          class="video-item"
-          v-for="(video, index) in userInfo.videoList"
-          :key="index"
-        >
-          <img :src="video.videoUrl" alt="视频封面" />
-          <div class="play-count">
-            <i class="iconfont icon-bofang1"></i>
-            <span>{{ video.playCount }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
+
+  </template>
+    </InfiniteList>
 
     <footer-vue class="footer"></footer-vue>
   </div>
 </template>
 <script>
+import InfiniteList from '../../components/InfiniteList.vue';
 import footerVue from '@/components/footer.vue';
 import underLineTagsVue from '../../components/underLineTags.vue';
-
+import RecommendList from '../../components/RecommendList.vue'
 import {
   userInfoService
 } from '@/api/user';
@@ -77,7 +65,9 @@ import {
 export default {
   components: {
     footerVue,
-    underLineTagsVue
+    underLineTagsVue,
+    RecommendList,
+    InfiniteList,
   },
   data() {
     return {
@@ -90,6 +80,27 @@ export default {
     this.getUserInfojia();
   },
   methods: {
+    async fetchData(page, pageSize) {
+    // 模拟延迟
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // 模拟总数据量为 50 条
+    const total = 50;
+    const start = (page - 1) * pageSize;
+    const end = Math.min(start + pageSize, total);
+
+    if (start >= total) return [];
+
+    const data = Array.from({ length: end - start }).map((_, index) => {
+      const id = start + index + 1;
+      return {
+        title: `推荐内容 #${id}`,
+        image: `https://picsum.photos/300/200?random=${id}`
+      };
+    });
+
+    return data;
+  },
     getUserInfojia() {
     // 假数据
     this.userInfo = {
@@ -135,6 +146,28 @@ export default {
 };
 </script>
 <style scoped>
+
+.main {
+  width: 95vw;
+  margin: 0 auto;
+  overflow-x: hidden; /* 禁止横向滚动 */
+}
+
+.recommend-item {
+  width: 100%;
+  box-sizing: border-box;
+  break-inside: avoid;
+  background: #fff;
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.cover {
+  width: 100%;
+  display: block;
+  height: auto;
+}
+
 .container {
   min-height: 100vh;
   background: #f8f8f8;
@@ -144,6 +177,9 @@ export default {
   background-size: cover;
   height: 20vh;
   display: flex;
+  flex-direction: row;
+  align-items:flex-end ;
+ 
 }
 
 .cover-image {
@@ -157,12 +193,12 @@ export default {
   color: #fff;
 }
 .douyinnum{
-  margin-top: 10vw;
+  margin-bottom: 8vw;
   margin-left: 3vw;
 }
 
 .avatar {
-  margin-top: 5vw;
+  margin-bottom: 5vw;
   display: block;
   width: 25vw;
   height: 25vw;

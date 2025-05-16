@@ -40,13 +40,15 @@
             </div>
 
             <div class="main">
-                <!-- 给这里的页面传入商品的唯一id  然后对应商品的详情页 -->
-                <div class="boxm" v-for="(item, index ) in mainbox" :key="index" @click="goshopdetail(item.shopId)"
-                    :style="{ backgroundImage: 'url(' + item.image + ')' }">
-                    <!-- <p>{{ item.name }}</p> -->
-                </div>
-            </div>
-            <div v-if="loading" class="loadingaaa">加载中...</div>
+    <RecommendList :columns="2" :loadData="fetchData">
+      <template v-slot:default="{ item }">
+        <div class="recommend-item">
+          <img :src="item.image" class="cover" />
+          <div class="title">{{ item.title }}</div>
+        </div>
+      </template>
+    </RecommendList>
+  </div>
         </div>
 
         <footer-vue class="footer"></footer-vue>
@@ -76,6 +78,7 @@ import imgm1 from '@/assets/shop/maininfo/1.png';
 import imgm2 from '@/assets/shop/maininfo/2.png';
 import imgm3 from '@/assets/shop/maininfo/3.png';
 import imgm4 from '@/assets/shop/maininfo/4.png';
+import RecommendList from '../../components/RecommendList.vue'
 export default {
     beforeDestroy() {
         // 移除事件监听
@@ -84,7 +87,9 @@ export default {
     components: {
         footerVue,
         ScrollNav,
-        GridDisplay
+        GridDisplay,
+     
+        RecommendList,
     },
     data() {
         return {
@@ -159,6 +164,7 @@ export default {
         },
     },
     mounted() {
+        
         // 监听点击外部区域事件
         document.addEventListener('click', this.handleOutsideClick);
         // // 自动发送请求给后端
@@ -227,6 +233,27 @@ export default {
 
     },
     methods: {
+        async fetchData(page, pageSize) {
+    // 模拟延迟
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // 模拟总数据量为 50 条
+    const total = 50;
+    const start = (page - 1) * pageSize;
+    const end = Math.min(start + pageSize, total);
+
+    if (start >= total) return [];
+
+    const data = Array.from({ length: end - start }).map((_, index) => {
+      const id = start + index + 1;
+      return {
+        title: `推荐内容 #${id}`,
+        image: `https://picsum.photos/300/200?random=${id}`
+      };
+    });
+
+    return data;
+  },
         selectSuggestion(suggestion) {
             // 点击某个联想词时更新输入框的内容
             this.searchText = suggestion;
@@ -477,12 +504,29 @@ body {
 }
 
 .main {
-    width: 95vw;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-content: center;
-    margin: 0 auto;
+  width: 95vw;
+  margin: 0 auto;
+  overflow-x: hidden; /* 禁止横向滚动 */
+}
+
+.recommend-item {
+  width: 100%;
+  box-sizing: border-box;
+  break-inside: avoid;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cover {
+  width: 100%;
+  display: block;
+  height: auto;
+}
+
+.title {
+  padding: 8px;
+  font-size: 16px;
 }
 
 .nav img,

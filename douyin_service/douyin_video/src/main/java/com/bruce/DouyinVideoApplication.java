@@ -10,7 +10,6 @@ import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 @EnableFeignClients
-@MapperScan("com.bruce.dao")
 public class DouyinVideoApplication {
     public static void main(String[] args) {
         SpringApplication.run(DouyinVideoApplication.class);

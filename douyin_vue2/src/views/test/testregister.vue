@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { testregister } from '@/api/test'; // 注册接口
+import { testlogin } from '@/api/test'; // 注册接口
 
 export default {
   data() {

@@ -6,6 +6,9 @@ import router from "./router";
 import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 // 引入组件库的少量全局样式变量
+import InfiniteScroll from 'vue-infinite-scroll';
+
+Vue.use(InfiniteScroll);
 
 Vue.config.productionTip = false;
 

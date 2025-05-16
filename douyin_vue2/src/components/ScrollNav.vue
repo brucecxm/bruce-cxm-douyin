@@ -21,8 +21,11 @@
 export default {
   name: "ScrollableNavbar",
   props: {
-    navItems: String
-  },
+  navItems: {
+    type: Array,
+    required: true
+  }
+},
   data() {
     return {
      
