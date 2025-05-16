@@ -50,6 +50,20 @@ else
     echo "douyin_basic 安装失败!"
     exit 1
 fi
+
+cd ..
+
+# 2. **执行 mvn install**
+echo "开始执行 mvn install..."
+mvn install
+
+if [ $? -eq 0 ]; then
+    echo "mvn install 执行成功!"
+else
+    echo "mvn install 执行失败!"
+    exit 1
+fi
+
 # 3. **进入 JAR 文件夹**
 cd jar || { echo "无法进入 JAR 文件夹"; exit 1; }
 
