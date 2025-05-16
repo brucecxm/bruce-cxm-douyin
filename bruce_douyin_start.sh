@@ -4,30 +4,28 @@
 set -e
 
 echo "==================== 开始执行部署脚本 ===================="
-
-# 1. **检查并拉取最新代码**
+# 1. **强制获取最新代码，覆盖本地所有改动**
 if command -v git &> /dev/null; then
-    echo "git 已安装，正在从远程仓库获取最新代码..."
+    echo "git 已安装，正在强制从远程仓库获取最新代码，覆盖本地改动..."
 
-    # 检查是否有未提交的修改
-    if ! git diff --quiet || ! git diff --staged --quiet; then
-        echo "检测到未提交的本地修改，先进行 stash 处理..."
-        git stash
-        git pull origin main
-        git stash pop
-    else
-        git pull origin main
-    fi
+    # 清除本地所有未提交改动（包括未追踪文件）
+    git reset --hard HEAD
+    git clean -fd
+
+    # 强制拉取远程 main 分支覆盖本地
+    git fetch origin
+    git reset --hard origin/main
 
     if [ $? -eq 0 ]; then
-        echo "最新代码获取成功!"
+        echo "强制获取最新代码成功，已覆盖本地修改！"
     else
-        echo "从远程仓库获取代码时出错!"
+        echo "强制获取代码失败！"
         exit 1
     fi
 else
     echo "git 未安装，跳过更新代码步骤!"
 fi
+
 
 ## 2. **执行 mvn install**
 #echo "开始执行 mvn install..."
