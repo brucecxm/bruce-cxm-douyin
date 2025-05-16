@@ -14,6 +14,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    <packaging>jar</packaging>
 
     <dependencies>
 
@@ -75,5 +76,18 @@
         </dependency>
     </dependencies>
 <!--    这样做的效果是：虽然插件仍然存在，但它不会在任何生命周期阶段被执行，达到了“排除”的效果。-->
+    <build>
+        <plugins>
+            <!-- 普通 Maven 插件打 JAR 包 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <outputDirectory>${project.basedir}/../../jar</outputDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

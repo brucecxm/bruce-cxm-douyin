@@ -34,5 +34,18 @@
         <version>3.4.2</version>
     </dependency>
 </dependencies>
+    <build>
+        <plugins>
+            <!-- 普通 Maven 插件打 JAR 包 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <outputDirectory>${project.basedir}/../../jar</outputDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

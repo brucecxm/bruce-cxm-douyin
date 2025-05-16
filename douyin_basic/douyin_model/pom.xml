@@ -8,6 +8,7 @@
         <artifactId>douyin_basic</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
+    <packaging>jar</packaging>
 
     <artifactId>douyin_model</artifactId>
 

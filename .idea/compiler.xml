@@ -49,6 +49,7 @@
       <module name="douyin_Designpatterns" options="-parameters" />
       <module name="douyin_admin" options="-parameters" />
       <module name="douyin_article" options="-parameters" />
+      <module name="douyin_basic" options="" />
       <module name="douyin_behavior" options="-parameters" />
       <module name="douyin_chat" options="-parameters" />
       <module name="douyin_comm_model" options="-parameters" />

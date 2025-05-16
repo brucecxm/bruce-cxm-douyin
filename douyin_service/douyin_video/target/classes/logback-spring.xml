@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 开启log4jdbc的SQL打印 -->
+    <logger name="jdbc.sqlonly" level="DEBUG" />
+    <logger name="jdbc.sqltiming" level="DEBUG" />
+    <logger name="jdbc.audit" level="DEBUG" />
+    <logger name="jdbc.resultset" level="DEBUG" />
+    <logger name="jdbc.connection" level="DEBUG" />
+
+    <!-- 关闭 Spring 的默认SQL日志，否则可能重复 -->
+    <logger name="org.springframework.jdbc.core" level="WARN" />
+    <logger name="org.springframework.jdbc.datasource" level="WARN" />
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
