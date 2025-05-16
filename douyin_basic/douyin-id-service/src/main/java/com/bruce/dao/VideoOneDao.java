@@ -20,7 +20,7 @@ public interface VideoOneDao {
 
 
 
-@Select("Select u.user_pic as touimg,u.nickname,u.back_img as backing,u.city,v.video_img as videoimgurl,v.video_url as videohref from " +
+@Select("Select u.user_pic as touimg,u.nickname,u.back_img as backimg,u.city,v.video_img as videoimgurl,v.video_url as videohref from " +
         "user u left join video v on u.id=v.auth_id where u.id=#{userid}")
     List<Map>  getauth(@Param("userid") Integer userid);
 

@@ -26,7 +26,6 @@ export default {
   props: {
     navItems: {
     required: true
-    // 没有 type，表示任何类型都可以
   }
   },
   data() {

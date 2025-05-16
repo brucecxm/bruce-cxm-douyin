@@ -25,7 +25,7 @@ import java.util.Map;
  * @since 2024-06-25 18:10:38
  */
 @RestController
-@RequestMapping("/music")
+@RequestMapping("/video/music")
 public class MusicController extends ApiController {
 
 

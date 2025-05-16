@@ -72,7 +72,7 @@ export const getcomment = (params) => {
 };
 
 export const getmumsic = (music_id) => {
-  return request.get("/music/getmusic", {
+  return request.get("/video/music/getmusic", {
     params: {
       music_id,
     },

@@ -1,52 +1,58 @@
 <template>
   <div class="container">
-    <InfiniteList  >
+    <InfiniteList 
+    :itemInfo="userInfo"
+  :itemsPerRow="3"
+  boxWidth="33%"   
+  boxHeight="250px"
+  :gap="3"
+    >
       <template v-slot:header>
    
     <!-- 顶部背景图 -->
     <div class="profile-header " :style="{ backgroundImage: 'url(' + userInfo.backImg + ')' }">
 
  
-<img class="avatar" :src="userInfo.avatar" alt="头像" />
+        <img class="avatar" :src="userInfo.avatar" alt="头像" />
+      
+        <div class="douyinnum" style="color: white;">
+          <div class="user-name">{{ userInfo.nickname }}</div>
+          <div class="user-id">抖音号：{{ userInfo.id }}</div>
+        </div>
 
-<div class="douyinnum" style="color: white;">
-  <div class="user-name">{{ userInfo.nickname }}</div>
-  <div class="user-id">抖音号：{{ userInfo.id }}</div>
-</div>
+    </div>
+   <!-- 用户统计信息 -->
+   <div class="user-stats">
+          <div class="stat-item">
+            <div class="num">{{ userInfo.followers || '0' }}</div>
+            <div class="label">粉丝</div>
+          </div>
+          <div class="stat-item">
+            <div class="num">{{ userInfo.following || '0' }}</div>
+            <div class="label">关注</div>
+          </div>
+          <div class="stat-item">
+            <div class="num">{{ userInfo.likes || '0' }}</div>
+            <div class="label">获赞</div>
+          </div>
+          <div class="stat-item">
+            <div class="num">{{ userInfo.likes || '0' }}</div>
+            <div class="label">获赞</div>
+          </div>
+        <el-button @click="goEditMeInfo">编辑主页</el-button>
 
-</div>
-<!-- 用户统计信息 -->
-<div class="user-stats">
-  <div class="stat-item">
-    <div class="num">{{ userInfo.followers || '0' }}</div>
-    <div class="label">粉丝</div>
-  </div>
-  <div class="stat-item">
-    <div class="num">{{ userInfo.following || '0' }}</div>
-    <div class="label">关注</div>
-  </div>
-  <div class="stat-item">
-    <div class="num">{{ userInfo.likes || '0' }}</div>
-    <div class="label">获赞</div>
-  </div>
-  <div class="stat-item">
-    <div class="num">{{ userInfo.likes || '0' }}</div>
-    <div class="label">获赞</div>
-  </div>
-<el-button @click="goEditMeInfo">编辑主页</el-button>
+   </div>
+    <div class="userinfo">
+      <div style="font-size: 15px; margin-top: 10px;">{{ userInfo.jieshao || '暂无个人简介' }}</div>
+        <div class="bio">
+          <div class="location">{{ userInfo.city }}</div>
+          <div class="school">{{ userInfo.school || '暂无学校信息' }}</div>
+        </div>
+    </div>
+   
+      <under-line-tags-vue :navItems="parentMessage"></under-line-tags-vue>
 
-</div>
-<div class="userinfo">
-<div style="font-size: 15px; margin-top: 10px;">{{ userInfo.jieshao || '暂无个人简介' }}</div>
-<div class="bio">
-  <div class="location">{{ userInfo.city }}</div>
-  <div class="school">{{ userInfo.school || '暂无学校信息' }}</div>
-</div>
-</div>
-
-<under-line-tags-vue :navItems="parentMessage"></under-line-tags-vue>
-
-
+    
   </template>
     </InfiniteList>
 
