@@ -116,7 +116,6 @@
           getauthzzz(id)
             .then(result => {
               console.log(result);
-              debugger
               this.auth = result.data.auth || this.auth;
               this.videobox = result.data.videobox || this.videobox;
               this.videonum = result.data.videonum || this.videonum;

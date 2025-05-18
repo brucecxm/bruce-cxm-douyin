@@ -39,4 +39,3 @@ spring:
     username: root
     password: root
     url: jdbc:log4jdbc:mysql://localhost:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
-    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy

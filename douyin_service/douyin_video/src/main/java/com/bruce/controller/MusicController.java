@@ -1,7 +1,6 @@
 package com.bruce.controller;
 
 
-
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.bruce.dao.musiconeDao;
@@ -32,11 +31,8 @@ public class MusicController extends ApiController {
     private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
 
 
-
-
-
-@Autowired
-private musiconeDao musiconedao;
+    @Autowired
+    private musiconeDao musiconedao;
 
     /**
      * 服务对象
@@ -64,24 +60,19 @@ private musiconeDao musiconedao;
     }
 
     @GetMapping("/getmusic")
-    public Map selectOne( String music_id) {
-
-        List<Map> one=musiconedao.one(music_id);
-
-List<Map> videoArr=new ArrayList<Map>();
-for(Map a:one) {
-  Map ss=new HashMap<>();
-  ss.put("video_img",a.get("video_img"));
-  ss.put("linkurl",a.get("linkurl"));
-    videoArr.add(ss);
-}
-
-Map oneww =new HashMap();
-
-oneww.put("videoimg",videoArr);
-oneww.put("music_info",one.get(0));
-
-return oneww;
+    public Map selectOne(String music_id) {
+        List<Map> one = musiconedao.one(music_id);
+        List<Map> videoArr = new ArrayList<Map>();
+        for (Map a : one) {
+            Map ss = new HashMap<>();
+            ss.put("video_img", a.get("video_img"));
+            ss.put("linkurl", a.get("linkurl"));
+            videoArr.add(ss);
+        }
+        Map oneww = new HashMap();
+        oneww.put("videoimg", videoArr);
+        oneww.put("music_info", one.get(0));
+        return oneww;
 
     }
 

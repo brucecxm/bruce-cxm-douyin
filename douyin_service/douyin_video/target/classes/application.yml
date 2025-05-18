@@ -4,7 +4,7 @@
 
 spring:
   profiles:
-    active: prod  # 生产环境
+    active: dev  # 生产环境
 
 
 
@@ -25,9 +25,9 @@ eureka:
 
 mybatis:
   configuration:
-    log-impl: SLF4J   # 使用 SLF4J 作为 MyBatis 日志实现
 
 
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 ############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
 sa-token:
@@ -54,17 +54,16 @@ minio:
   endpoint: http://192.168.200.130:9000
   readPath: http://192.168.200.130:9000
 
-
 logging:
   level:
-    root: INFO
-    org.mybatis: DEBUG
-    java.sql: DEBUG
-    jdbc.sqlonly: DEBUG
-    jdbc.resultset: DEBUG
-    jdbc.statement: DEBUG
-    org.springframework.amqp: OFF
-    com.rabbitmq: OFF
+    root: info
+    jdbc: debug
+    jdbc.sqlonly: debug
+    jdbc.sqltiming: debug
+    jdbc.audit: debug
+    jdbc.resultset: debug
+    jdbc.connection: debug
+    com.example.mapper: debug  # 替换成你的 Mapper 包路径
 
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

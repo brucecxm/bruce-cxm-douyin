@@ -77,8 +77,8 @@ export default {
                 });
         },
         submitComment() {
-    ;
     
+    debugger
     const userInfo = userInfoStore();
     var userInfoMap={};
     userInfoMap=userInfo.userInfo;
