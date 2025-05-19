@@ -79,7 +79,6 @@ export default {
         },
         submitComment() {
     
-    debugger
     const userInfo = useUserInfoStore();
     var userInfoMap={};
     userInfoMap=userInfo.userInfo;
@@ -113,7 +112,7 @@ export default {
             userId: newCommentObj.userId,
             comment: newCommentObj.comment,
         };
-
+debugger
 
 // const params=newCommentObj
         addcomment(params).then(res => {

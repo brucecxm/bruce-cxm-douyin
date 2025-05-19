@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.api.R;
 import com.bruce.dto.CommentDto;
 import com.bruce.entity.Comment;
 import com.bruce.service.CommentoneService;
+import com.bruce.service.IdService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,8 @@ private CommentoneService commentoneservice;
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @Autowired
+    private IdService idService;
 
     // 使用线程池来异步上传图片
     private static final ExecutorService executorService = Executors.newCachedThreadPool();
@@ -119,11 +122,14 @@ int videoId = Integer.valueOf(videoid);
 
         Comment comment=new Comment();
         comment.setComment((String) params.get("comment"));
-        comment.setCommentVideoId((Integer) params.get("videoId"));
+        long commentId=   idService.SnowflakeGen();
+        comment.setCommentId(commentId);
+        comment.setId(commentId);
+        comment.setCommentVideoId((Integer) params.get("videoid"));
         comment.setCommentUserId((Integer) params.get("userId"));
        commentoneservice.save(comment);
         // 这里可以处理评论逻辑
-        return null;  // 返回成功响应
+        return R.ok("评论成功");  // 返回成功响应
     }
 
 @GetMapping("/getzi")
