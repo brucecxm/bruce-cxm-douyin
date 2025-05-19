@@ -161,16 +161,23 @@ else
     echo "npm build 执行失败!"
     exit 1
 fi
-
 # 10. **重启 Nginx**
-echo "正在重启 Nginx..."
-sudo systemctl restart nginx
-
-if [ $? -eq 0 ]; then
-    echo "Nginx 重启成功!"
+echo "🔄 正在重启 Nginx..."
+if sudo systemctl restart nginx; then
+    echo "✅ Nginx 重启成功!"
 else
-    echo "Nginx 重启失败!"
+    echo "❌ Nginx 重启失败!"
     exit 1
 fi
 
-echo "==================== 部署脚本执行完成! ===================="
+# 11. **赋予主脚本执行权限**
+SCRIPT_NAME="bruce_douyin_start.sh"
+if [ -f "$SCRIPT_NAME" ]; then
+    chmod +x "$SCRIPT_NAME"
+    echo "✅ 已为 $SCRIPT_NAME 设置执行权限!"
+else
+    echo "⚠️ 未找到 $SCRIPT_NAME 脚本，跳过权限设置!"
+fi
+
+# 12. **结束提示**
+echo "==================== ✅ 部署脚本执行完成! ===================="
