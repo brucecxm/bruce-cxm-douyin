@@ -61,53 +61,74 @@ else
     echo "mvn install 执行失败!"
     exit 1
 fi
+#!/bin/bash
 
-# 3. **进入 JAR 文件夹**
+# 进入 JAR 文件夹
 cd jar || { echo "无法进入 JAR 文件夹"; exit 1; }
 
-# 4. **检查并启动 Redis**
+# 检查并启动 Redis
 echo "正在检查 Redis 是否运行..."
 if command -v redis-cli &> /dev/null; then
     if redis-cli ping | grep -q "PONG"; then
-        echo "Redis 已经在运行!"
+        echo "✅ Redis 已经在运行!"
     else
-        echo "Redis 未运行，尝试启动..."
+        echo "⚠️ Redis 未运行，尝试启动..."
         if systemctl list-units --type=service | grep -q "redis"; then
             sudo systemctl start redis
             if redis-cli ping | grep -q "PONG"; then
-                echo "Redis 启动成功!"
+                echo "✅ Redis 启动成功!"
             else
-                echo "Redis 启动失败! 请手动检查。"
+                echo "❌ Redis 启动失败! 请手动检查。"
                 exit 1
             fi
         else
-            echo "Redis 未安装，请先安装 Redis!"
+            echo "❌ Redis 未安装，请先安装 Redis!"
             exit 1
         fi
     fi
 else
-    echo "Redis 未安装，请先安装 Redis!"
+    echo "❌ 未安装 redis-cli，请先安装 Redis!"
     exit 1
 fi
 
-# 5. **关闭所有包含 'douyin' 和 '.jar' 的进程**
+# 关闭已有的 'douyin' jar 进程
 echo "正在关闭所有包含 'douyin' 和 '.jar' 字符串的进程..."
 PIDS=$(ps aux | grep 'douyin.*\.jar' | grep -v 'grep' | awk '{print $2}')
-
 if [ -n "$PIDS" ]; then
     echo "检测到正在运行的 douyin 相关进程: $PIDS"
     echo "$PIDS" | xargs kill -9
-    echo "进程已关闭!"
+    echo "✅ 进程已关闭!"
 else
-    echo "没有找到相关进程，无需关闭!"
+    echo "🔍 没有找到相关进程，无需关闭!"
 fi
 
-# 6. **启动所有 JAR 文件**
-for jar_file in *.jar; do
-    if [ -f "$jar_file" ]; then
-        echo "正在启动 $jar_file ..."
+# 扫描所有 JAR 文件
+jar_files=(*.jar)
+if [ ${#jar_files[@]} -eq 0 ]; then
+    echo "❌ 当前目录下没有找到任何 .jar 文件"
+    exit 1
+fi
+
+# 显示列表
+echo ""
+echo "可用的 JAR 文件如下："
+for i in "${!jar_files[@]}"; do
+    echo "[$i] ${jar_files[$i]}"
+done
+
+# 用户输入选择
+echo ""
+read -p "请输入要启动的 JAR 文件编号（用空格分隔，如：0 2 3）: " -a selected_indexes
+
+# 启动选择的 JAR 文件
+for index in "${selected_indexes[@]}"; do
+    if [[ "$index" =~ ^[0-9]+$ ]] && [ "$index" -ge 0 ] && [ "$index" -lt "${#jar_files[@]}" ]; then
+        jar_file="${jar_files[$index]}"
+        echo "🚀 正在启动 $jar_file ..."
         nohup java -Xms256m -Xmx512m -jar "$jar_file" --spring.profiles.active=dev > "$jar_file.log" 2>&1 &
-        echo "$jar_file 启动成功!"
+        echo "✅ $jar_file 启动成功!"
+    else
+        echo "❌ 无效编号: $index"
     fi
 done
 
