@@ -103,7 +103,7 @@ private CommentoneService commentoneservice;
 
 @GetMapping("/getfu")
     //获得所有父评论的接口
-    public R getfu(Map params){
+    public R getfu(@RequestParam Map params){
 
     String videoid = String.valueOf(params.get("videoid"));
 int videoId = Integer.valueOf(videoid);
@@ -122,6 +122,7 @@ int videoId = Integer.valueOf(videoid);
 
         Comment comment=new Comment();
         comment.setComment((String) params.get("comment"));
+        comment.setLastId((String) params.get("lastId"));
         long commentId=   idService.SnowflakeGen();
         comment.setCommentId(commentId);
         comment.setId(commentId);

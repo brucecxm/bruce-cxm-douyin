@@ -64,11 +64,10 @@ export default {
             // this.$router.push({ name: 'userProfile', params: { userId } });
         },
         getcommentone() {
-         const videoid=    this.videoData.videoid
-            const one = { videoid: videoid}; // 获取当前视频的 videoid
-        
+         const videoId=    this.videoData.videoid
+            const params = { videoid: videoId}; // 获取当前视频的 videoid
 
-            getcomment(one) // 调用 API 获取评论数据
+            getcomment(params) // 调用 API 获取评论数据
                 .then(videoArr => {
                     
                     this.commentsData = videoArr.data.data; // 将评论数据保存到组件的 data 中
@@ -107,12 +106,13 @@ export default {
         // 清空输入框
         this.newComment = '';
 
-        const params={
-            videoid: this.videoData.videoid,
-            userId: newCommentObj.userId,
-            comment: newCommentObj.comment,
-        };
-debugger
+        const params = {
+    videoid: parseInt(this.videoData.videoid, 10),
+    userId: newCommentObj.userId,
+    comment: newCommentObj.comment,
+    lastId:'-1',
+};
+
 
 // const params=newCommentObj
         addcomment(params).then(res => {
@@ -137,8 +137,7 @@ debugger
         
         const videoInfo=videoInfoStore();
        this.videoData= videoInfo.getvideoInfo;
-        this.getcommentone();
-
+this.getcommentone()
     },
     beforeDestroy() {
     },

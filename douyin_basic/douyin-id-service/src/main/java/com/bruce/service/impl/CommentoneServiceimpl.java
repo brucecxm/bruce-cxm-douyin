@@ -22,7 +22,7 @@ private CommentMapper commentMapper;
 
     @Override
     public List<Map> getcomment(int videoId) {
-        int video_id=1;
+
         List<Map> one =commentMapper.getCommentid(videoId);
         return one;
     }

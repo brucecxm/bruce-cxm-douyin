@@ -19,6 +19,7 @@ public class Comment  implements Serializable{
     private Long id;
     private String commentType;  // 评论类型：视频、商品等
     private Boolean isFollow;  // 是否是跟评
+    private String LastId;  // 是否是跟评
     private Long commentId;  // 被评论的对象 ID
     private String content;  // 评论内容
     private List<String> imageUrls;  // 图片URL列表
