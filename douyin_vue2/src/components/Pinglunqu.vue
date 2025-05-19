@@ -31,7 +31,8 @@
 import { getcomment ,homegetVideocontent} from '@/api/video'
 import { videoInfoStore } from "../stores/videoInfo";
 import {addcomment} from '@/api/video.js'; // 导入 API 函数
-import { userInfoStore } from "@/stores/userInfo"
+import { useUserInfoStore } from '@/stores/userInfo'
+
 export default {
     name: "Pinglunqu",
     data() {
@@ -79,7 +80,7 @@ export default {
         submitComment() {
     
     debugger
-    const userInfo = userInfoStore();
+    const userInfo = useUserInfoStore();
     var userInfoMap={};
     userInfoMap=userInfo.userInfo;
     // const userInfo=userInfoStore();
