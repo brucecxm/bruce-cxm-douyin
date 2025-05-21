@@ -1,11 +1,7 @@
 <template>
   <div class="recommend-list">
     <div class="masonry" :style="masonryStyle">
-      <div
-        class="item"
-        v-for="(item, index) in items"
-        :key="index"
-      >
+      <div class="item" v-for="(item, index) in items" :key="index">
         <slot :item="item" />
       </div>
     </div>
@@ -17,7 +13,7 @@
 
 <script>
 export default {
-  name: "RecommendList",
+  name: 'RecommendList',
   props: {
     columns: {
       type: Number,
@@ -47,10 +43,10 @@ export default {
   },
   mounted() {
     this.loadMore();
-    window.addEventListener("scroll", this.handleWindowScroll);
+    window.addEventListener('scroll', this.handleWindowScroll);
   },
   beforeDestroy() {
-    window.removeEventListener("scroll", this.handleWindowScroll);
+    window.removeEventListener('scroll', this.handleWindowScroll);
   },
   methods: {
     async loadMore() {
@@ -101,9 +97,8 @@ export default {
   box-sizing: border-box;
   break-inside: avoid;
 
-  white-space: normal;      /* 允许换行 */
-  word-wrap: break-word;    /* 遇到长词强制换行 */
-  word-break: break-word;   /* 兼容性好 */
+  white-space: normal; /* 允许换行 */
+  word-wrap: break-word; /* 遇到长词强制换行 */
+  word-break: break-word; /* 兼容性好 */
 }
-
 </style>

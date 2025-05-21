@@ -3,7 +3,14 @@
     <div class="header">
       <div class="fanhui" @click="onBackClick" title="返回">
         <svg viewBox="0 0 24 24" class="icon">
-          <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <path
+            d="M15 18l-6-6 6-6"
+            stroke="white"
+            stroke-width="2"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
       </div>
 
@@ -21,8 +28,21 @@
 
       <div class="shezhi" @click="onSettingsClick" title="设置">
         <svg viewBox="0 0 24 24" class="icon">
-          <circle cx="12" cy="12" r="3" stroke="white" stroke-width="2" fill="none"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="white" stroke-width="2" fill="none" stroke-linejoin="round"/>
+          <circle
+            cx="12"
+            cy="12"
+            r="3"
+            stroke="white"
+            stroke-width="2"
+            fill="none"
+          />
+          <path
+            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+            stroke="white"
+            stroke-width="2"
+            fill="none"
+            stroke-linejoin="round"
+          />
         </svg>
       </div>
     </div>
@@ -48,7 +68,7 @@
 
 <script>
 import UserInfo from '../../components/userInfo.vue';
-import {getrequestFriendApi,getFriendApi} from "@/api/user"; // 假设你有一个API来获取用户数据
+import { getrequestFriendApi, getFriendApi } from '@/api/user'; // 假设你有一个API来获取用户数据
 export default {
   components: { UserInfo },
   data() {
@@ -64,7 +84,7 @@ export default {
   computed: {
     filteredUserList() {
       if (!this.input) return this.userList;
-      return this.userList.filter(user =>
+      return this.userList.filter((user) =>
         user.username.toLowerCase().includes(this.input.toLowerCase())
       );
     }
@@ -85,73 +105,69 @@ export default {
       // 模拟不同标签获取不同用户数据（你可以在此接入真实后端接口）
       switch (tag) {
         case '互关':
-        this.userList = [];
-        getFriendApi().then((result) => {
-          
-          this.userList = result.data.map((item) => ({
-            username: item.nickname,
-            userId: item.fromUserId,
-            status: '在线',
-            avatar: item.avatar,
-            height: '60px'
-          }));
-        }).catch((err) => {
-          
-        });
+          this.userList = [];
+          getFriendApi()
+            .then((result) => {
+              this.userList = result.data.map((item) => ({
+                username: item.nickname,
+                userId: item.fromUserId,
+                status: '在线',
+                avatar: item.avatar,
+                height: '60px'
+              }));
+            })
+            .catch((err) => {});
           break;
         case '关注':
-        this.userList = [];
-        getrequestFriendApi()
-  .then((result) => {
-    this.userList = result.data
-      .filter(item => item.status === '待处理') // 只保留 status 为 "待处理" 的
-      .map(item => ({
-        username: item.nickname,
-        status: '在线',
-        userId: item.fromUserId,
-        avatar: item.avatar,
-        height: '60px'
-      }));
-  })
-  .catch((err) => {
-    console.error('请求失败', err);
-  });
+          this.userList = [];
+          getrequestFriendApi()
+            .then((result) => {
+              this.userList = result.data
+                .filter((item) => item.status === '待处理') // 只保留 status 为 "待处理" 的
+                .map((item) => ({
+                  username: item.nickname,
+                  status: '在线',
+                  userId: item.fromUserId,
+                  avatar: item.avatar,
+                  height: '60px'
+                }));
+            })
+            .catch((err) => {
+              console.error('请求失败', err);
+            });
 
           break;
         case '粉丝':
-        this.userList = [];
-        getrequestFriendApi().then((result) => {
-          
-          this.userList = result.data.map((item) => ({
-            username: item.nickname,
-            status: '在线',
-            userId: item.fromUserId,
-            avatar: item.avatar,
-            height: '60px'
-          }));
-        }).catch((err) => {
-          
-        });
-
+          this.userList = [];
+          getrequestFriendApi()
+            .then((result) => {
+              this.userList = result.data.map((item) => ({
+                username: item.nickname,
+                status: '在线',
+                userId: item.fromUserId,
+                avatar: item.avatar,
+                height: '60px'
+              }));
+            })
+            .catch((err) => {});
 
           // this.userList = [
           //   { username: 'david', status: '在线', avatar: 'https://example.com/d.jpg', height: '60px' },
           // ];
           break;
         case '朋友':
-        this.userList = [];
-        getFriendApi().then((result) => {
-          
-          this.userList = result.data.map((item) => ({
-            username: item.nickname,
-            status: '在线',
-            userId: item.fromUserId,
-            avatar: item.avatar,
-            height: '60px'
-          }));
-        }).catch((err) => {
-          
-        });
+          this.userList = [];
+          getFriendApi()
+            .then((result) => {
+              this.userList = result.data.map((item) => ({
+                username: item.nickname,
+                status: '在线',
+                userId: item.fromUserId,
+                avatar: item.avatar,
+                height: '60px'
+              }));
+            })
+            .catch((err) => {});
 
           break;
         default:
@@ -167,7 +183,6 @@ export default {
   }
 };
 </script>
-
 
 <style scoped>
 .friend {
@@ -192,7 +207,8 @@ export default {
 }
 
 /* 左右按钮 */
-.fanhui, .shezhi {
+.fanhui,
+.shezhi {
   width: 40px;
   height: 40px;
   cursor: pointer;
@@ -201,7 +217,8 @@ export default {
   align-items: center;
 }
 
-.fanhui:hover, .shezhi:hover {
+.fanhui:hover,
+.shezhi:hover {
   background: rgba(255, 255, 255, 0.15);
   border-radius: 6px;
 }
@@ -277,7 +294,8 @@ export default {
 }
 
 /* 保留之前的滑动动画 */
-.slide-left-enter-active, .slide-left-leave-active {
+.slide-left-enter-active,
+.slide-left-leave-active {
   transition: all 0.3s ease;
   position: relative;
 }
@@ -302,7 +320,8 @@ export default {
   opacity: 0;
 }
 
-.slide-right-enter-active, .slide-right-leave-active {
+.slide-right-enter-active,
+.slide-right-leave-active {
   transition: all 0.3s ease;
   position: relative;
 }

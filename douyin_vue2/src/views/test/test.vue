@@ -1,11 +1,11 @@
 <template>
-    <div
+  <div
     class="infinite-list-wrapper"
     v-infinite-scroll="loadMore"
     :infinite-scroll-disabled="loading || noMoreData"
     :infinite-scroll-distance="10"
   >
-  <header>
+    <header>
       <slot name="header">默认头部</slot>
     </header>
     <ul class="infinite-list">
@@ -16,7 +16,6 @@
     <div class="loading-text" v-if="loading">加载中...</div>
     <div class="loading-text" v-if="noMoreData">没有更多数据了</div>
   </div>
- 
 </template>
 
 <script>
@@ -58,7 +57,11 @@ export default {
       const tryLoad = () => {
         this.$nextTick(() => {
           const container = this.$el.querySelector('.infinite-list-wrapper');
-          if (container && container.scrollHeight <= container.clientHeight && !this.noMoreData) {
+          if (
+            container &&
+            container.scrollHeight <= container.clientHeight &&
+            !this.noMoreData
+          ) {
             this.loadMore();
             tryLoad(); // 继续尝试直到撑满容器
           }

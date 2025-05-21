@@ -6,7 +6,10 @@
     "build": "vite build --mode production",
     "build:dev": "vite build --mode development",
     "preview": "vite preview --port 4173",
-    "build-only": "vite build"
+    "build-only": "vite build",
+  "lint": "eslint --fix src/**/*.{js,vue}",
+    "lintvue": "eslint src/**/*.{js,vue}",
+  "format": "prettier --write src/**/*.{js,vue,ts,json,css,scss,html}"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.5.2",
@@ -22,7 +25,6 @@
     "sockjs-client": "^1.6.1",
     "spark-md5": "^3.0.2",
     "stompjs": "^2.3.3",
-    "tdesign-vue": "^1.11.2-naruto",
     "vue": "^2.7.16",
     "vue-infinite-scroll": "^2.0.2",
     "vue-router": "^3.6.5",
@@ -31,9 +33,17 @@
     "vuex": "^3.6.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.27.0",
     "@vitejs/plugin-legacy": "^2.0.0",
     "@vitejs/plugin-vue2": "^1.1.2",
+    "@vue/eslint-config-prettier": "^10.2.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.0",
+    "eslint-plugin-vue": "^7.20.0",
+    "globals": "^16.1.0",
     "npm-run-all": "^4.1.5",
+    "prettier": "^3.5.3",
     "sass": "^1.79.4",
     "sass-loader": "^16.0.2",
     "terser": "^5.14.2",

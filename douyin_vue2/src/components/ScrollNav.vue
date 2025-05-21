@@ -19,28 +19,27 @@
 
 <script>
 export default {
-  name: "ScrollableNavbar",
+  name: 'ScrollableNavbar',
   props: {
-  navItems: {
-    type: Array,
-    required: true
-  }
-},
+    navItems: {
+      type: Array,
+      required: true
+    }
+  },
   data() {
     return {
-     
       thumbWidth: 0,
-      thumbLeft: 0,
+      thumbLeft: 0
     };
   },
   mounted() {
     this.updateThumb();
-    this.$refs.scrollContainer.addEventListener("scroll", this.updateThumb);
-    window.addEventListener("resize", this.updateThumb);
+    this.$refs.scrollContainer.addEventListener('scroll', this.updateThumb);
+    window.addEventListener('resize', this.updateThumb);
   },
   beforeDestroy() {
-    this.$refs.scrollContainer.removeEventListener("scroll", this.updateThumb);
-    window.removeEventListener("resize", this.updateThumb);
+    this.$refs.scrollContainer.removeEventListener('scroll', this.updateThumb);
+    window.removeEventListener('resize', this.updateThumb);
   },
   methods: {
     updateThumb() {
@@ -55,8 +54,8 @@ export default {
       this.thumbWidth = (visibleWidth / totalWidth) * 100 * trackVisibleRatio;
       this.thumbLeft =
         (scrollLeft / (totalWidth - visibleWidth)) * (100 * trackVisibleRatio);
-    },
-  },
+    }
+  }
 };
 </script>
 

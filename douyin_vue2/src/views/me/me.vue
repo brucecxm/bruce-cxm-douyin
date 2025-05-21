@@ -1,28 +1,27 @@
 <template>
   <div class="container">
-    <InfiniteList 
-    :itemInfo="userInfo"
-  :itemsPerRow="3"
-  boxWidth="33%"   
-  boxHeight="250px"
-  :gap="3"
+    <InfiniteList
+      :itemInfo="userInfo"
+      :itemsPerRow="3"
+      boxWidth="33%"
+      boxHeight="250px"
+      :gap="3"
     >
       <template v-slot:header>
-   
-    <!-- 顶部背景图 -->
-    <div class="profile-header " :style="{ backgroundImage: 'url(' + userInfo.backImg + ')' }">
-
- 
-        <img class="avatar" :src="userInfo.avatar" alt="头像" />
-      
-        <div class="douyinnum" style="color: white;">
-          <div class="user-name">{{ userInfo.nickname }}</div>
-          <div class="user-id">抖音号：{{ userInfo.id }}</div>
+        <!-- 顶部背景图 -->
+        <div
+          class="profile-header"
+          :style="{ backgroundImage: 'url(' + userInfo.backImg + ')' }"
+        >
+          >
+          <img class="avatar" :src="userInfo.avatar" alt="头像" />
+          <div class="douyinnum" style="color: white">
+            <div class="user-name">{{ userInfo.nickname }}</div>
+            <div class="user-id">抖音号：{{ userInfo.id }}</div>
+          </div>
         </div>
-
-    </div>
-   <!-- 用户统计信息 -->
-   <div class="user-stats">
+        <!-- 用户统计信息 -->
+        <div class="user-stats">
           <div class="stat-item">
             <div class="num">{{ userInfo.followers || '0' }}</div>
             <div class="label">粉丝</div>
@@ -39,21 +38,20 @@
             <div class="num">{{ userInfo.likes || '0' }}</div>
             <div class="label">获赞</div>
           </div>
-        <el-button @click="goEditMeInfo">编辑主页</el-button>
-
-   </div>
-    <div class="userinfo">
-      <div style="font-size: 15px; margin-top: 10px;">{{ userInfo.jieshao || '暂无个人简介' }}</div>
-        <div class="bio">
-          <div class="location">{{ userInfo.city }}</div>
-          <div class="school">{{ userInfo.school || '暂无学校信息' }}</div>
+          <el-button @click="goEditMeInfo">编辑主页</el-button>
         </div>
-    </div>
-   
-      <under-line-tags-vue :navItems="parentMessage"></under-line-tags-vue>
+        <div class="userinfo">
+          <div style="font-size: 15px; margin-top: 10px">
+            {{ userInfo.jieshao || '暂无个人简介' }}
+          </div>
+          <div class="bio">
+            <div class="location">{{ userInfo.city }}</div>
+            <div class="school">{{ userInfo.school || '暂无学校信息' }}</div>
+          </div>
+        </div>
 
-    
-  </template>
+        <under-line-tags-vue :navItems="parentMessage"></under-line-tags-vue>
+      </template>
     </InfiniteList>
 
     <footer-vue class="footer"></footer-vue>
@@ -63,22 +61,20 @@
 import InfiniteList from '../../components/InfiniteList.vue';
 import footerVue from '@/components/footer.vue';
 import underLineTagsVue from '../../components/underLineTags.vue';
-import RecommendList from '../../components/RecommendList.vue'
-import {
-  userInfoService
-} from '@/api/user';
+import RecommendList from '../../components/RecommendList.vue';
+import { userInfoService } from '@/api/user';
 
 export default {
   components: {
     footerVue,
     underLineTagsVue,
     RecommendList,
-    InfiniteList,
+    InfiniteList
   },
   data() {
     return {
-      parentMessage:['视频', '评论', '点赞','确定'],
-      userInfo: {},
+      parentMessage: ['视频', '评论', '点赞', '确定'],
+      userInfo: {}
     };
   },
   mounted() {
@@ -87,64 +83,69 @@ export default {
   },
   methods: {
     async fetchData(page, pageSize) {
-    // 模拟延迟
-    await new Promise(resolve => setTimeout(resolve, 500));
+      // 模拟延迟
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-    // 模拟总数据量为 50 条
-    const total = 50;
-    const start = (page - 1) * pageSize;
-    const end = Math.min(start + pageSize, total);
+      // 模拟总数据量为 50 条
+      const total = 50;
+      const start = (page - 1) * pageSize;
+      const end = Math.min(start + pageSize, total);
 
-    if (start >= total) return [];
+      if (start >= total) return [];
 
-    const data = Array.from({ length: end - start }).map((_, index) => {
-      const id = start + index + 1;
-      return {
-        title: `推荐内容 #${id}`,
-        image: `https://picsum.photos/300/200?random=${id}`
-      };
-    });
+      const data = Array.from({ length: end - start }).map((_, index) => {
+        const id = start + index + 1;
+        return {
+          title: `推荐内容 #${id}`,
+          image: `https://picsum.photos/300/200?random=${id}`
+        };
+      });
 
-    return data;
-  },
+      return data;
+    },
     getUserInfojia() {
-    // 假数据
-    this.userInfo = {
-      id: '12345678',
-      nickname: '测试用户',
-      avatar: 'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
-      backImg: 'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
-      followers: 888,
-      following: 123,
-      likes: 9999,
-      jieshao: '这是一段个人简介。',
-      city: '西安',
-      school: '西安财经大学',
-      videoList: [
-        {
-          videoUrl: 'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
-          playCount: 1234
-        },
-        {
-          videoUrl: 'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
-          playCount: 5678
-        },
-        {
-          videoUrl: 'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
-          playCount: 9999
-        }
-      ]
-    };
-  },
+      // 假数据
+      this.userInfo = {
+        id: '12345678',
+        nickname: '测试用户',
+        avatar:
+          'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
+        backImg:
+          'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
+        followers: 888,
+        following: 123,
+        likes: 9999,
+        jieshao: '这是一段个人简介。',
+        city: '西安',
+        school: '西安财经大学',
+        videoList: [
+          {
+            videoUrl:
+              'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
+            playCount: 1234
+          },
+          {
+            videoUrl:
+              'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
+            playCount: 5678
+          },
+          {
+            videoUrl:
+              'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
+            playCount: 9999
+          }
+        ]
+      };
+    },
     goEditMeInfo() {
       this.$router.push({ path: '/editMeInfo' });
     },
     getUserInfo() {
       userInfoService()
-        .then(res => {
+        .then((res) => {
           this.userInfo = res.data;
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
         });
     }
@@ -152,7 +153,6 @@ export default {
 };
 </script>
 <style scoped>
-
 .main {
   width: 95vw;
   margin: 0 auto;
@@ -184,8 +184,7 @@ export default {
   height: 20vh;
   display: flex;
   flex-direction: row;
-  align-items:flex-end ;
- 
+  align-items: flex-end;
 }
 
 .cover-image {
@@ -198,7 +197,7 @@ export default {
   padding: 0 4vw;
   color: #fff;
 }
-.douyinnum{
+.douyinnum {
   margin-bottom: 8vw;
   margin-left: 3vw;
 }
@@ -259,9 +258,9 @@ export default {
   margin-top: 1.5vh;
   font-size: 3.5vw;
 }
-.bio > div{
+.bio > div {
   margin: 2px;
-  background-color: rgba(0,0,0,0.1);
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .location,

@@ -7,7 +7,11 @@
           <el-input v-model="form.username" autocomplete="off" />
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input type="password" v-model="form.password" autocomplete="off" />
+          <el-input
+            type="password"
+            v-model="form.password"
+            autocomplete="off"
+          />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="login">登录</el-button>
@@ -18,7 +22,7 @@
 </template>
 
 <script>
-import { testlogin } from '@/api/test' // 假设你有一个登录接口
+import { testlogin } from '@/api/test'; // 假设你有一个登录接口
 
 export default {
   data() {
@@ -28,31 +32,33 @@ export default {
         password: ''
       },
       rules: {
-        username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' }
+        ],
         password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
       }
-    }
+    };
   },
   methods: {
     login() {
-      this.$refs.loginForm.validate(valid => {
+      this.$refs.loginForm.validate((valid) => {
         if (valid) {
           testlogin(this.form)
-            .then(res => {
-              console.log('登录成功', res)
+            .then((res) => {
+              console.log('登录成功', res);
               // 假设 token 在 res.data.token
-              localStorage.setItem('token', res.data.token)
-              this.$message.success('登录成功')
-              this.$router.push('/home') // 跳转到首页
+              localStorage.setItem('token', res.data.token);
+              this.$message.success('登录成功');
+              this.$router.push('/home'); // 跳转到首页
             })
-            .catch(err => {
-              this.$message.error('登录失败：' + (err.message || ''))
-            })
+            .catch((err) => {
+              this.$message.error('登录失败：' + (err.message || ''));
+            });
         }
-      })
+      });
     }
   }
-}
+};
 </script>
 
 <style scoped>

@@ -1,22 +1,20 @@
 // axios-instance.js
-import { ElMessage } from "element-ui";
-import axios from "axios";
-import { useTokenStore } from "../stores/token";
-import router from "../router/index";
+import axios from 'axios';
+import { useTokenStore } from '../stores/token';
 // 定义公共的 baseURL
-const baseURL = "/api"; // 根据实际情况设置你的后端 API 地址
+const baseURL = '/api'; // 根据实际情况设置你的后端 API 地址
 
 // 创建 Axios 实例
 const instance = axios.create({
   withCredentials: true, // 允许携带 cookies
-  baseURL,
+  baseURL
 });
 // 添加请求拦截器
 instance.interceptors.request.use(
   (config) => {
     const usertoken = useTokenStore();
     const storeToken = usertoken.getToken;
-    const localToken = localStorage.getItem("token");
+    const localToken = localStorage.getItem('token');
 
     // 优先使用 Pinia 中的 token，如果没有再用 localStorage
     const token = storeToken || localToken;
@@ -33,10 +31,8 @@ instance.interceptors.request.use(
   }
 );
 
-
 // 添加响应拦截器
 instance.interceptors.response.use(
-
   (result) => {
     //判断业务状态码
     //判断业务状态码
@@ -49,7 +45,6 @@ instance.interceptors.response.use(
     // ElMessage.error(result.data.msg ? result.data.msg : "服务异常");
     //异步操作的状态转换为失败
     return result;
-
   },
   (err) => {
     //判断响应状态码,如果为401,则证明未登录,提示请登录,并跳转到登录页面

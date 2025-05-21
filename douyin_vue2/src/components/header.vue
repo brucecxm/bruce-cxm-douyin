@@ -2,9 +2,17 @@
   <div class="header">
     <div class="menu" :style="menuStyle" @click="triggerParentEvent"></div>
     <div class="nav" ref="nav">
-      <p v-for="(item, index) in navItems" :key="index"
-         :class="{ 'active': activeIndex === index, 'black-text': isBlack, 'white-text': !isBlack }"
-         @click="changeIndex(index)" ref="navItem">
+      <p
+        v-for="(item, index) in navItems"
+        :key="index"
+        :class="{
+          active: activeIndex === index,
+          'black-text': isBlack,
+          'white-text': !isBlack
+        }"
+        @click="changeIndex(index)"
+        ref="navItem"
+      >
         {{ item }}
       </p>
       <div class="underline-container">
@@ -28,26 +36,38 @@ export default {
     },
     onChildEvent: {
       type: Function,
-      required: true,
-    },
+      required: true
+    }
   },
 
   data() {
     return {
-      navItems: ["推荐", "同城", "关注", "直播", "经验", "商城", "团购", "精选", "热点"],
+      navItems: [
+        '推荐',
+        '同城',
+        '关注',
+        '直播',
+        '经验',
+        '商城',
+        '团购',
+        '精选',
+        '热点'
+      ],
       underlineVisible: true, // 控制下划线的可见性
       isBlack: false, // 控制是否将所有文字变成黑色
-      menuStyle: { // 默认的菜单图标样式
-        backgroundImage:`url(${caidan})`,
+      menuStyle: {
+        // 默认的菜单图标样式
+        backgroundImage: `url(${caidan})`
       },
-      searchStyle: { // 默认的搜索图标样式
-        backgroundImage:`url(${fangdajing})`,
+      searchStyle: {
+        // 默认的搜索图标样式
+        backgroundImage: `url(${fangdajing})`
       }
     };
   },
   methods: {
     gosearch() {
-      this.$router.push("/search")
+      this.$router.push('/search');
     },
     triggerParentEvent() {
       // 调用父组件的方法
@@ -58,23 +78,28 @@ export default {
       this.updateUnderline(); // 更新下划线位置
 
       // 如果选择了商城、团购或经验，将所有文字变成黑色，并修改图标
-      if (this.navItems[index] === "商城" || this.navItems[index] === "团购" || this.navItems[index] === "经验"
-          || this.navItems[index] === "团购" || this.navItems[index] === "精选" || this.navItems[index] === "热点"
+      if (
+        this.navItems[index] === '商城' ||
+        this.navItems[index] === '团购' ||
+        this.navItems[index] === '经验' ||
+        this.navItems[index] === '团购' ||
+        this.navItems[index] === '精选' ||
+        this.navItems[index] === '热点'
       ) {
         this.isBlack = true;
         this.menuStyle = {
-          backgroundImage:`url(${heicaidan})`,
+          backgroundImage: `url(${heicaidan})`
         };
         this.searchStyle = {
-          backgroundImage:`url(${heifangdajing})`,
+          backgroundImage: `url(${heifangdajing})`
         };
       } else {
         this.isBlack = false;
         this.menuStyle = {
-          backgroundImage:`url(${caidan})`,
+          backgroundImage: `url(${caidan})`
         };
         this.searchStyle = {
-          backgroundImage:`url(${fangdajing})`,
+          backgroundImage: `url(${fangdajing})`
         };
       }
     },
@@ -92,10 +117,9 @@ export default {
         const navScrollLeft = nav.scrollLeft;
         const navWidth = nav.clientWidth;
 
-        const isVisible = (
-            itemOffsetLeft >= navScrollLeft &&
-            itemOffsetLeft + itemWidth <= navScrollLeft + navWidth
-        );
+        const isVisible =
+          itemOffsetLeft >= navScrollLeft &&
+          itemOffsetLeft + itemWidth <= navScrollLeft + navWidth;
 
         this.underlineVisible = isVisible; // 根据是否可见更新下划线
       }
@@ -166,7 +190,9 @@ export default {
   bottom: 0;
   height: 0.1rem;
   background-color: white;
-  transition: left 0.3s ease, width 0.3s ease;
+  transition:
+    left 0.3s ease,
+    width 0.3s ease;
 }
 
 .header {

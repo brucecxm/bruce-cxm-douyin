@@ -25,8 +25,8 @@
 export default {
   props: {
     navItems: {
-    required: true
-  }
+      required: true
+    }
   },
   data() {
     return {
@@ -91,6 +91,8 @@ export default {
   bottom: 0;
   height: 2px;
   background-color: black;
-  transition: transform 0.3s ease, width 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    width 0.3s ease;
 }
 </style>

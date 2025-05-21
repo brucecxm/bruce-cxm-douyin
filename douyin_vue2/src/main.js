@@ -1,10 +1,10 @@
-import Vue from "vue";
-import "@/assets/base.css";
-import { createPinia, PiniaVuePlugin } from "pinia";
-import App from "./App.vue";
-import router from "./router";
-import ElementUI from "element-ui";
-import "element-ui/lib/theme-chalk/index.css";
+import Vue from 'vue';
+import '@/assets/base.css';
+import { createPinia, PiniaVuePlugin } from 'pinia';
+import App from './App.vue';
+import router from './router';
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
 // 引入组件库的少量全局样式变量
 import InfiniteScroll from 'vue-infinite-scroll';
 
@@ -19,5 +19,5 @@ Vue.use(PiniaVuePlugin);
 new Vue({
   router,
   pinia: createPinia(),
-  render: (h) => h(App),
-}).$mount("#app");
+  render: (h) => h(App)
+}).$mount('#app');

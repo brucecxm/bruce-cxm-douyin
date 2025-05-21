@@ -1,8 +1,10 @@
-<!-- <template>
+<template>
   <div class="profile-page">
     <!-- 封面 -->
     <div class="cover">
-      <el-button class="change-cover-btn" type="primary" size="mini">更换封面</el-button>
+      <el-button class="change-cover-btn" type="primary" size="mini"
+        >更换封面</el-button
+      >
     </div>
 
     <!-- 用户信息展示 -->
@@ -18,7 +20,9 @@
         </el-form-item>
 
         <el-form-item label="简介" @click.native="openEdit('bio')">
-          <span class="placeholder">{{ userInfo.jieshao || '介绍喜好、个性或@你的亲友' }}</span>
+          <span class="placeholder">{{
+            userInfo.jieshao || '介绍喜好、个性或@你的亲友'
+          }}</span>
         </el-form-item>
 
         <el-form-item label="性别" @click.native="genderDialogVisible = true">
@@ -59,30 +63,47 @@
     </transition>
 
     <!-- 性别弹窗 -->
-    <el-dialog title="选择性别" :visible.sync="genderDialogVisible" append-to-body custom-class="bottom-dialog">
-      <el-radio-group v-model="userInfo.gender" style="display: flex; justify-content: space-around;">
+    <el-dialog
+      title="选择性别"
+      :visible.sync="genderDialogVisible"
+      append-to-body
+      custom-class="bottom-dialog"
+    >
+      <el-radio-group
+        v-model="userInfo.gender"
+        style="display: flex; justify-content: space-around"
+      >
         <el-radio-button label="男" />
         <el-radio-button label="女" />
         <el-radio-button label="不展示" />
       </el-radio-group>
       <span slot="footer">
         <el-button @click="genderDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="genderDialogVisible = false">确定</el-button>
+        <el-button type="primary" @click="genderDialogVisible = false"
+          >确定</el-button
+        >
       </span>
     </el-dialog>
 
     <!-- 生日弹窗 -->
-    <el-dialog title="选择生日" :visible.sync="birthdayDialogVisible" append-to-body custom-class="bottom-dialog">
+    <el-dialog
+      title="选择生日"
+      :visible.sync="birthdayDialogVisible"
+      append-to-body
+      custom-class="bottom-dialog"
+    >
       <el-date-picker
         v-model="userInfo.birthday"
         type="date"
         placeholder="选择日期"
-        style="width: 100%;"
+        style="width: 100%"
         value-format="yyyy-MM-dd"
       />
       <span slot="footer">
         <el-button @click="birthdayDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="birthdayDialogVisible = false">确定</el-button>
+        <el-button type="primary" @click="birthdayDialogVisible = false"
+          >确定</el-button
+        >
       </span>
     </el-dialog>
   </div>
@@ -115,10 +136,10 @@ export default {
     // 获取用户信息
     getUserInfo() {
       userInfoService()
-        .then(res => {
+        .then((res) => {
           this.userInfo = res.data; // 更新用户信息
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
         });
     },
@@ -193,7 +214,8 @@ export default {
 .edit-content {
   margin-top: 30px;
 }
-.slide-enter-active, .slide-leave-active {
+.slide-enter-active,
+.slide-leave-active {
   transition: all 0.3s ease;
 }
 .slide-enter {
@@ -210,4 +232,5 @@ export default {
   position: absolute;
   width: 100%;
 }
-</style> -->
+</style>
+-->

@@ -1,91 +1,91 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
+import Vue from 'vue';
+import VueRouter from 'vue-router';
 
 Vue.use(VueRouter);
 
 const router = new VueRouter({
-  mode: "history",
+  mode: 'history',
   base: import.meta.env.BASE_URL,
   routes: [
     {
-      path: "/wallet",
-      name: "wallet",
-      component: () => import("../views/shop/wallet.vue"),
+      path: '/wallet',
+      name: 'wallet',
+      component: () => import('../views/shop/wallet.vue')
     },
     {
-      path: "/test",
-      name: "testregister",
-      component: () => import("@/views/test/testregister.vue"),
+      path: '/test',
+      name: 'testregister',
+      component: () => import('@/views/test/testregister.vue')
     },
     {
-      path: "/testone",
-      name: "test",
-      component: () => import("@/views/test/testshop.vue"),
+      path: '/testone',
+      name: 'test',
+      component: () => import('@/views/test/testshop.vue')
     },
     {
-      path: "/shopcat",
-      name: "shopcat",
-      component: () => import("../views/shop/shopcat.vue"),
+      path: '/shopcat',
+      name: 'shopcat',
+      component: () => import('../views/shop/shopcat.vue')
     },
     {
-      path: "/searchshop",
-      name: "searchshop",
-      component: () => import("../views/shop/searchshop.vue"),
+      path: '/searchshop',
+      name: 'searchshop',
+      component: () => import('../views/shop/searchshop.vue')
     },
     {
-      path: "/coupon",
-      name: "coupon",
-      component: () => import("../views/shop/coupon.vue"),
+      path: '/coupon',
+      name: 'coupon',
+      component: () => import('../views/shop/coupon.vue')
     },
     {
-      path: "/videodetail",
-      name: "videodetail",
-      component: () => import("@/views/video/videodetail.vue"),
+      path: '/videodetail',
+      name: 'videodetail',
+      component: () => import('@/views/video/videodetail.vue')
     },
     {
-      path: "/videobox",
-      name: "videobox",
-      component: () => import("../components/videobox.vue"),
+      path: '/videobox',
+      name: 'videobox',
+      component: () => import('../components/videobox.vue')
     },
     {
-      path: "/testmap",
-      name: "testmap",
-      component: () => import("../components/leftmap.vue"),
+      path: '/testmap',
+      name: 'testmap',
+      component: () => import('../components/leftmap.vue')
     },
     {
-      path: "/map",
-      name: "map",
-      component: () => import("../views/gaode.vue"),
+      path: '/map',
+      name: 'map',
+      component: () => import('../views/gaode.vue')
     },
     {
-      path: "/homeone",
-      name: "home",
-      component: () => import("../views/one.vue"),
+      path: '/homeone',
+      name: 'home',
+      component: () => import('../views/one.vue')
     },
     {
-      path: "/order/:userid", // 动态路由参数 :id
-      name: "order",
-      component: () => import("../views/shop/order.vue"),
+      path: '/order/:userid', // 动态路由参数 :id
+      name: 'order',
+      component: () => import('../views/shop/order.vue')
     },
     {
-      path: "/chongzhi/:userid", // 动态路由参数 :id
-      name: "chongzhi",
-      component: () => import("../views/shop/chongzhi.vue"),
+      path: '/chongzhi/:userid', // 动态路由参数 :id
+      name: 'chongzhi',
+      component: () => import('../views/shop/chongzhi.vue')
     },
     {
-      path: "/shopmessage/:userid", // 动态路由参数 :id
-      name: "shopmessage",
-      component: () => import("../views/shop/shopmessage.vue"),
+      path: '/shopmessage/:userid', // 动态路由参数 :id
+      name: 'shopmessage',
+      component: () => import('../views/shop/shopmessage.vue')
     },
     {
-      path: "/",
-      name: "homeone",
-      component: () => import("../views/home.vue"),
+      path: '/',
+      name: 'homeone',
+      component: () => import('../views/home.vue')
     },
     {
-      path: "/authhome",
-      name: "authhome",
-      component: () => import("../views/auth/auth.vue"),
+      path: '/authhome',
+      name: 'authhome',
+      component: () => import('../views/auth/auth.vue')
     },
     // {
     //   path: "/freevideo",
@@ -93,97 +93,95 @@ const router = new VueRouter({
     //   component: () => import("../views/home/FreeVideo.vue"),
     // },
     {
-      path: "/me",
-      name: "MeVue",
-      component: () => import("../views/me/me.vue"),
+      path: '/me',
+      name: 'MeVue',
+      component: () => import('../views/me/me.vue')
     },
     {
-      path: "/shop",
-      name: "ShopVue",
-      component: () => import("../views/shop/shop.vue"),
+      path: '/shop',
+      name: 'ShopVue',
+      component: () => import('../views/shop/shop.vue')
     },
     {
-      path: "/login",
-      name: "LoginVue",
-      component: () => import("../views/login/login.vue"),
+      path: '/login',
+      name: 'LoginVue',
+      component: () => import('../views/login/login.vue')
     },
     {
-      path: "/d",
-      name: "dVue",
-      component: () => import("../views/testone/d.vue"),
+      path: '/d',
+      name: 'dVue',
+      component: () => import('../views/testone/d.vue')
     },
     {
-      path: "/search",
-      name: "SearchVue",
-      component: () => import("../views/search/search.vue"),
+      path: '/search',
+      name: 'SearchVue',
+      component: () => import('../views/search/search.vue')
     },
     {
-      path: "/xiaoxi",
-      name: "XiaoXiVue",
-      component: () => import("../views/xiaoxi/xiaoxi.vue"),
+      path: '/xiaoxi',
+      name: 'XiaoXiVue',
+      component: () => import('../views/xiaoxi/xiaoxi.vue')
     },
 
     {
-      path: "/shangchuan",
-      name: "ShangchuanVue",
-      component: () => import("../views/shangchuan/shangchuan.vue"),
+      path: '/shangchuan',
+      name: 'ShangchuanVue',
+      component: () => import('../views/shangchuan/shangchuan.vue')
     },
     {
-      path: "/music/:musicid",
-      name: "MusicVue",
-      component: () => import("../views/music/music.vue"),
+      path: '/music/:musicid',
+      name: 'MusicVue',
+      component: () => import('../views/music/music.vue')
     },
 
     {
-      path: "/auth/:userId",
-      name: "AuthVue",
-      component: () => import("../views/auth/auth.vue"),
+      path: '/auth/:userId',
+      name: 'AuthVue',
+      component: () => import('../views/auth/auth.vue')
     },
 
     {
-      path: "/xiaodetail/:id",
-      name: "XiaoDetailVue",
-      component: () => import("../views/xiaoxi/xiaoxitdetail.vue"),
+      path: '/xiaodetail/:id',
+      name: 'XiaoDetailVue',
+      component: () => import('../views/xiaoxi/xiaoxitdetail.vue')
     },
     {
-      path: "/shopdetail/:id",
-      name: "ShopDetailVue",
-      component: () => import("../views/shop/shopdetail.vue"),
+      path: '/shopdetail/:id',
+      name: 'ShopDetailVue',
+      component: () => import('../views/shop/shopdetail.vue')
     },
     {
-      path: "/setting",
-      name: "SettingVue",
-      component: () => import("../views/setting.vue"),
+      path: '/setting',
+      name: 'SettingVue',
+      component: () => import('../views/setting.vue')
     },
     {
-      path: "/friend",
-      name: "FriendVue",
-      component: () => import("../views/me/friend.vue"),
+      path: '/friend',
+      name: 'FriendVue',
+      component: () => import('../views/me/friend.vue')
     },
     {
-      path: "/editMeInfo",
-      name: "editMeInfoVue",
-      component: () => import("../views/me/editMeInfo.vue"),
+      path: '/editMeInfo',
+      name: 'editMeInfoVue',
+      component: () => import('../views/me/editMeInfo.vue')
     },
     {
-      path: "/articledetail",
-      name: "Articledetail",
-      component: () => import("../views/home/articledetail.vue"),
+      path: '/articledetail',
+      name: 'Articledetail',
+      component: () => import('../views/home/articledetail.vue')
     },
     {
-      path: "/searchdetail",
-      name: "Searchdetail",
-      component: () => import("../views/search/searchdetail.vue"),
-    },
+      path: '/searchdetail',
+      name: 'Searchdetail',
+      component: () => import('../views/search/searchdetail.vue')
+    }
     // Add more routes as needed
     // {
     //   path: '/about',
     //   name: 'about',
     //   component: () => import('../views/AboutView.vue')
     // }
-
-
-  ],
+  ]
 });
 
 export default router;

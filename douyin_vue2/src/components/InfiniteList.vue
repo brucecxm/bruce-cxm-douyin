@@ -21,7 +21,8 @@
         :key="item"
         :style="{
           height: typeof boxHeight === 'number' ? boxHeight + 'px' : boxHeight,
-          lineHeight: typeof boxHeight === 'number' ? boxHeight + 'px' : boxHeight
+          lineHeight:
+            typeof boxHeight === 'number' ? boxHeight + 'px' : boxHeight
         }"
       >
         {{ item }}
