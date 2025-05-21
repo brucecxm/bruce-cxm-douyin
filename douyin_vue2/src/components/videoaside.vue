@@ -22,7 +22,7 @@
         <div class="num">{{ videoData.shareNum }}</div>
 
         <!-- 音乐 -->
-        <div class="touxiang music" @click="gomusic(videoData.music_id)">
+        <div class="touxiang music" @click="gomusic(videoData.musicId)">
             <img :src="videoData.musicAvatar" alt="music" style="width: 1.4rem;height: 1.4rem;">
         </div>
     </div>

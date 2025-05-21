@@ -26,11 +26,8 @@ public class musicFeign extends ApiController {
 
     @GetMapping("/avatar")
 public String avatar(@RequestParam int musicId) {
-    LambdaQueryWrapper<Music> queryWrapper=new LambdaQueryWrapper();
-    queryWrapper.eq(Music::getMusicVideoId, musicId);
-    System.out.println(musicId);
-    System.out.println("comming");
-  Music music=  this.musicService.getOne(queryWrapper);
+
+  Music music=  this.musicService.getById(musicId);
   return music.getMusicAvatar();
 }
 

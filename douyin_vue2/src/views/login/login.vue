@@ -163,7 +163,7 @@ this.isShow = true; // 显示验证码图片
                 if (response.data.code === 1) {
                     console.error("登录失败：", error);
                 } else {
-debugger
+
                     
 var text = response.data.data.userInfo;
 const userInfoStore = useUserInfoStore()      

@@ -75,7 +75,7 @@ export default {
     methods: {
         // 请求视频数据
         loadVideos() {
-            homegetVideo(this.page, this.pageSize, "tuijian").then(videoArr => {
+            homegetVideo(this.page, this.pageSize, "w").then(videoArr => {
                 if (Array.isArray(videoArr.data) && videoArr.data.length > 0) {
                     this.videodatahistory.push(...videoArr.data); // 更新历史视频数据
                     this.videoboxdata = [...this.videodatahistory]; // 更新 videoboxdata 显示的视频数据

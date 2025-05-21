@@ -1,6 +1,7 @@
 package com.bruce.entity;
 
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 /**
@@ -16,8 +17,8 @@ public class Music  {
     private String musicAvatar;
     
     private String musicName;
-    
-    private Integer musicVideoId;
+    @TableId(value = "id")
+    private int id;
 
 
 

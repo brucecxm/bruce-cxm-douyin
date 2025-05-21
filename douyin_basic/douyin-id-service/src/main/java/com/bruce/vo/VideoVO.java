@@ -13,6 +13,7 @@ public class VideoVO {
 
     private String music;
     private String musicAvatar;
+    private int musicId;
 
     private Long likeNum;
     private Long commentNum;

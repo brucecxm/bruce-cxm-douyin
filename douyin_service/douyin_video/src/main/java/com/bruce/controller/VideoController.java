@@ -188,6 +188,7 @@ public class VideoController extends ApiController {
             if (music != null) {
                 vo.setMusic(music.getMusicName());
                 vo.setMusicAvatar(music.getMusicAvatar());
+                vo.setMusicId(music.getId());
             }
 
             // 点赞数 (count 返回 int，转为 Long)
@@ -227,6 +228,7 @@ public class VideoController extends ApiController {
             map.put("commentNum", vo.getCommentNum());
             map.put("collectNum", vo.getCollectNum());
             map.put("shareNum", vo.getShareNum());
+            map.put("musicId", vo.getMusicId());
 
             result.add(map);
         }

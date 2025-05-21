@@ -1,10 +1,15 @@
 package com.bruce.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.dao.musiconeDao;
+import com.bruce.entity.Music;
+import com.bruce.entity.Video;
 import com.bruce.service.MusicService;
+import com.bruce.service.VideoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +45,10 @@ public class MusicController extends ApiController {
     @Resource
     private MusicService musicService;
 
+
+    @Resource
+    private VideoService videoService;
+
     /**
      * 分页查询所有数据
      *
@@ -59,8 +68,8 @@ public class MusicController extends ApiController {
         return success(this.musicService.getById(id));
     }
 
-    @GetMapping("/getmusic")
-    public Map selectOne(String music_id) {
+    @GetMapping("/getmusicbefore")
+    public Map selectOnebefore(String music_id) {
         List<Map> one = musiconedao.one(music_id);
         List<Map> videoArr = new ArrayList<Map>();
         for (Map a : one) {
@@ -75,6 +84,41 @@ public class MusicController extends ApiController {
         return oneww;
 
     }
+    @GetMapping("/getmusic")
+    public Map<String, Object> selectOne(
+            @RequestParam String music_id,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        // 查询music信息
+        Music music = musicService.getOne(new QueryWrapper<Music>().eq("id", music_id));
+        if (music == null) {
+            throw new RuntimeException("未找到该音乐信息");
+        }
+
+        // 分页查询视频
+        Page<Video> videoPage = new Page<>(page, size);
+        videoService.page(videoPage, new QueryWrapper<Video>().eq("music_id", music.getId()));
+
+        // 封装视频数组
+        List<Map<String, Object>> videoArr = new ArrayList<>();
+        for (Video video : videoPage.getRecords()) {
+            Map<String, Object> videoMap = new HashMap<>();
+            videoMap.put("video_img", video.getVideoImg());
+            videoMap.put("link_url", video.getVideoId()); // 建议用实际视频ID
+            videoArr.add(videoMap);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("videoimg", videoArr);
+        result.put("music_info", music);
+        result.put("total", videoPage.getTotal()); // 总条数
+        result.put("page", page);
+        result.put("size", size);
+
+        return result;
+    }
+
 
     /**
      * 新增数据
