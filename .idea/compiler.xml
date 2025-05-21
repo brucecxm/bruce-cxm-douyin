@@ -6,7 +6,6 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="douyin_article" />
         <module name="douyin_user" />
         <module name="douyin_admin" />
         <module name="douyin_file_starter" />
@@ -23,6 +22,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="bruce-id-service" target="21" />
+      <module name="douyin_article" target="1.8" />
       <module name="douyin_behavior" target="1.8" />
       <module name="douyin_chat" target="1.8" />
       <module name="douyin_comm_model" target="1.8" />

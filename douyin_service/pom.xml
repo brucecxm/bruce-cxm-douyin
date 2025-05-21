@@ -18,7 +18,7 @@
 
 <!--        <module>douyin_chat</module>-->
         <module>douyin_search</module>
-        <module>douyin_article</module>
+<!--        <module>douyin_article</module>-->
 <!--        <module>douyin_schedule</module>-->
         <module>douyin_admin</module>
 <!--        <module>douyin_behavior</module>-->

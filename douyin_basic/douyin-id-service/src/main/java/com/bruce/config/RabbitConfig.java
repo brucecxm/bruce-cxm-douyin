@@ -31,6 +31,24 @@ public class RabbitConfig {
         return rabbitTemplate;
     }
 
+    public static final String EXCHANGE = "like.exchange";
+    public static final String QUEUE = "like.video.queue";
+    public static final String ROUTING_KEY = "like.video";
+
+    @Bean
+    public TopicExchange likeExchange() {
+        return new TopicExchange(EXCHANGE);
+    }
+
+    @Bean
+    public Queue likeQueue() {
+        return new Queue(QUEUE);
+    }
+
+    @Bean
+    public Binding likeBinding() {
+        return BindingBuilder.bind(likeQueue()).to(likeExchange()).with(ROUTING_KEY);
+    }
 
 
     // 定义队列

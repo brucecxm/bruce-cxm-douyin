@@ -3,17 +3,21 @@ package com.bruce.controller;
 
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.api.ApiController;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.dao.VideoOneDao;
-import com.bruce.entity.Video;
+import com.bruce.dto.LikeMessage;
+import com.bruce.entity.*;
 import com.bruce.file.service.FileStorageService;
-import com.bruce.service.IdService;
-import com.bruce.service.MessageQueueService;
-import com.bruce.service.VideoOneService;
-import com.bruce.service.VideoService;
+import com.bruce.service.*;
 //import com.bruce.MusicClient;
 //import com.bruce.UserClient;
+import com.bruce.vo.VideoVO;
 import io.swagger.annotations.*;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -125,36 +129,111 @@ public class VideoController extends ApiController {
     }
 
 
-    @GetMapping("/test")
-    public List<Map> getVideoInfo(
+    @GetMapping("/testbefore")
+    public List<Map> getVideoInfobefore(
             @RequestParam(defaultValue = "1") int page,
-
             @RequestParam(defaultValue = "4") int size,
             @RequestParam String videoType
             ) {
 
-
-
-//        if (videoType.equals("tuijian")) {
-//            List<Map> one = videoOneService.getVideoInfo(page, size,videoType);
-//
-//        } else if (videoType.equals("tongcheng")) {
-//            List<Map> one = videoOneService.getVideoInfo(page, size,videoType);
-//
-//        } else if (videoType.equals("guanzhu")) {
-//            List<Map> one = videoOneService.getVideoInfo(page, size,videoType);
-//
-//        } else if (videoType.equals("zhibo"))
-//        {
-//            List<Map> one = videoOneService.getVideoInfo(page, size,videoType);
-//
-//        }
-//
-
-
         List<Map> one = videoOneService.getVideoInfo(page, size,videoType);
+
         return one;
     }
+
+    @Resource
+    private UserService userService;
+
+    @Resource
+    private MusicService musicService;
+
+    @Resource
+    private LikeoneService likeoneService;
+
+    @Resource
+    private CommentService commentService;
+    @GetMapping("/test")
+    public List<Map<String, Object>> getVideoInfo(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "4") int size,
+            @RequestParam String videoType
+    ) {
+
+        Page<Video> pageInfo = new Page<>(page, size);
+
+        // 查询视频基本信息（含作者、音乐，按需要 join 查询或后处理）
+        IPage<Video> videoPage = videoService.page(pageInfo,
+                new QueryWrapper<Video>()
+                        .eq("video_type", videoType) // 假设你有 video_type 字段
+                        .orderByDesc("video_id")
+        );
+
+        List<Video> videos = videoPage.getRecords();
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (Video video : videos) {
+            VideoVO vo = new VideoVO();
+            BeanUtils.copyProperties(video, vo);
+
+            // 用户信息
+            User user = userService.getById(video.getAuthId());
+            if (user != null) {
+                vo.setUsername(user.getNickname());
+                vo.setUserAvatar(user.getUserPic());
+            }
+
+            // 音乐信息
+            Music music = musicService.getById(video.getMusicId());
+            if (music != null) {
+                vo.setMusic(music.getMusicName());
+                vo.setMusicAvatar(music.getMusicAvatar());
+            }
+
+            // 点赞数 (count 返回 int，转为 Long)
+            int likeCount = likeoneService.count(
+                    new QueryWrapper<Likeone>().eq("like_videoid", video.getVideoId()).eq("`like`", 1)
+            );
+            vo.setLikeNum((long) likeCount);
+
+            // 评论数
+            int commentCount = commentService.count(
+                    new QueryWrapper<Comment>().eq("comment_video_id", video.getVideoId()).isNotNull("comment")
+            );
+            vo.setCommentNum((long) commentCount);
+
+            // 收藏数
+            int collectCount = likeoneService.count(
+                    new QueryWrapper<Likeone>().eq("like_videoid", video.getVideoId()).eq("collect", 1)
+            );
+            vo.setCollectNum((long) collectCount);
+
+            // 分享数
+            int shareCount = likeoneService.count(
+                    new QueryWrapper<Likeone>().eq("like_videoid", video.getVideoId()).eq("share", 1)
+            );
+            vo.setShareNum((long) shareCount);
+
+            // 把 VideoVO 转 Map 返回
+            Map<String, Object> map = new HashMap<>();
+            map.put("videoId", vo.getVideoId());
+            map.put("videoUrl", vo.getVideoUrl());
+            map.put("videoComment", vo.getVideoComment());
+            map.put("username", vo.getUsername());
+            map.put("userAvatar", vo.getUserAvatar());
+            map.put("music", vo.getMusic());
+            map.put("musicAvatar", vo.getMusicAvatar());
+            map.put("likeNum", vo.getLikeNum());
+            map.put("commentNum", vo.getCommentNum());
+            map.put("collectNum", vo.getCollectNum());
+            map.put("shareNum", vo.getShareNum());
+
+            result.add(map);
+        }
+
+        return result;
+    }
+
 
 
     @GetMapping("/auth")
@@ -178,7 +257,8 @@ public class VideoController extends ApiController {
         return result;
     }
 
-
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
     @PostMapping("/like")
     public ResponseEntity<String> like(@RequestBody Map<String, Object> requestone) {
         Map<String, Object> request= (Map<String, Object>) requestone.get("params");
@@ -221,8 +301,12 @@ public class VideoController extends ApiController {
             // 将点赞数减 1
             redisTemplate.opsForValue().decrement(redisKey + ":count", 1);
 
-            // 异步将数据更新到数据库
-            messageQueueService.sendMessage(contentId,type);
+            // 构建消息对象（可以是 DTO）
+            LikeMessage message = new LikeMessage(contentId, userId,"del", System.currentTimeMillis());
+
+            // 发送到 MQ
+            rabbitTemplate.convertAndSend("like.exchange", "like.video", message);
+
 
             return ResponseEntity.ok(content_type+"取消点赞成功");
         } else {
@@ -239,8 +323,13 @@ public class VideoController extends ApiController {
             // 将点赞数加 1
             redisTemplate.opsForValue().increment(redisKey + ":count", 1);
 
-            // 异步将数据更新到数据库
-            messageQueueService.sendMessage(contentId,type);
+
+            // 构建消息对象（可以是 DTO）
+            LikeMessage message = new LikeMessage(contentId, userId,"add", System.currentTimeMillis());
+
+            // 发送到 MQ
+            rabbitTemplate.convertAndSend("like.exchange", "like.video", message);
+
 
             return ResponseEntity.ok(content_type+"点赞成功");
         }

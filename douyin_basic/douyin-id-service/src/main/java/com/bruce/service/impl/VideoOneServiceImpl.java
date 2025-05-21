@@ -26,7 +26,6 @@ public class VideoOneServiceImpl implements VideoOneService {
     public List<Map> getVideoInfo(int page, int size,String videoType) {
         int limit = size;
         int offset = (page - 1) * size;
-
         List<Map> one =videoOneDao.queryVideoInfo(limit, offset,videoType);
         return one ;
     }

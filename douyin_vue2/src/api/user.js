@@ -46,8 +46,23 @@ export const userInfoUpdateService = (User) => {
   });
 };
 
+export const requestFriendApi = (User) => {
+  return request.post("/user/friend/request", User, {
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+};
 
 
+//获取用户登录状态
+export const getrequestFriendApi = () => {
+  return request.get("/user/friend/requests");
+};
+//获取用户登录状态
+export const getFriendApi = () => {
+  return request.get("/user/friend/list");
+};
 
 //修改头像
 export const userAvatarUpdateService = (avatarUrl) => {

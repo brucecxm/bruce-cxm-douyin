@@ -51,7 +51,7 @@
             <div class="city">
               <span>IP:{{ auth.city }}</span>
             </div>
-            <div class="followbutt">+ 关注</div>
+            <div  @click="requestFriend" class="followbutt">+ 关注</div>
           </div>
           <under-line-tags-vue :navItems="parentMessage"></under-line-tags-vue>
         </template>
@@ -63,7 +63,7 @@
   import { getauthzzz } from "@/api/video";
   import InfiniteList from '../../components/InfiniteList.vue';
   import underLineTagsVue from '../../components/underLineTags.vue';
-  
+  import {requestFriendApi } from "@/api/user";
   export default {
     created() {
       this.userId = this.$route.params.userId;
@@ -93,6 +93,15 @@
 
     },
     methods: {
+      requestFriend() {
+        const User ={toUserId:this.userId,verifyMsg:"请求关注"}; // 这里的 verifyMsg 可以根据需要修改
+        requestFriendApi(User).then.catch(error => {
+          console.error('请求关注失败:', error);
+        });
+        // 处理关注操作
+        console.log('关注操作');
+      },
+
       govideodetail(videoid) {
         this.$router.push(`/videodetail?type=auth&videoid=${videoid}`);
       },

@@ -30,16 +30,17 @@
     <transition :name="transitionName" mode="out-in">
       <div class="user-list" :key="activeName">
         <el-input
-    v-model="input"
-    placeholder="请输入用户名"
-    prefix-icon="el-icon-search">
-  </el-input>
+          v-model="input"
+          placeholder="请输入用户名"
+          prefix-icon="el-icon-search"
+        ></el-input>
+
         <user-info
-          v-for="(item, index) in filteredUserInfo"
+          v-for="(item, index) in filteredUserList"
           :key="index"
           :message="item"
         />
-        <div v-if="filteredUserInfo.length === 0" class="no-data">暂无数据</div>
+        <div v-if="filteredUserList.length === 0" class="no-data">暂无数据</div>
       </div>
     </transition>
   </div>
@@ -47,74 +48,29 @@
 
 <script>
 import UserInfo from '../../components/userInfo.vue';
-
+import {getrequestFriendApi,getFriendApi} from "@/api/user"; // 假设你有一个API来获取用户数据
 export default {
   components: { UserInfo },
   data() {
     return {
       input: '',
-      transitionName: 'slide-left', // 默认动画
+      transitionName: 'slide-left',
       tags: ['互关', '关注', '粉丝', '朋友'],
       activeName: '关注',
-      previousIndex: 1, // 默认选中“关注”的索引
-      allUserInfo: {
-        '互关': [
-          {
-            username: 'wang',
-            status: '在线',
-            avatar: 'http://gips0.baidu.com/it/u=3560029307,576412274&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
-            height: '60px',
-          },
-          {
-            username: 'wang',
-            status: '在线',
-            avatar: 'http://gips0.baidu.com/it/u=3560029307,576412274&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
-            height: '60px',
-          },
-          {
-            username: 'wang',
-            status: '在线',
-            avatar: 'http://gips0.baidu.com/it/u=3560029307,576412274&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
-            height: '60px',
-          },
-          {
-            username: 'wang',
-            status: '在线',
-            avatar: 'http://gips0.baidu.com/it/u=3560029307,576412274&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
-            height: '60px',
-          },
-        ],
-        '关注': [
-          {
-            username: 'li',
-            status: '在线',
-            avatar: 'http://gips0.baidu.com/it/u=3560029307,576412274&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
-            height: '60px',
-          },
-        ],
-        '粉丝': [
-          {
-            username: 'chen',
-            status: '在线',
-            avatar: 'http://gips0.baidu.com/it/u=3560029307,576412274&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
-            height: '60px',
-          },
-        ],
-        '朋友': [
-          {
-            username: 'zhao',
-            status: '在线',
-            avatar: 'http://gips0.baidu.com/it/u=3560029307,576412274&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
-            height: '60px',
-          },
-        ],
-      },
+      previousIndex: 1,
+      userList: [] // 当前标签下的用户列表
     };
   },
   computed: {
-    filteredUserInfo() {
-      return this.allUserInfo[this.activeName] || [];
-    },
+    filteredUserList() {
+      if (!this.input) return this.userList;
+      return this.userList.filter(user =>
+        user.username.toLowerCase().includes(this.input.toLowerCase())
+      );
+    }
+  },
+  created() {
+    this.fetchUsersByTag(this.activeName);
   },
   methods: {
     changeTab(tag) {
@@ -123,16 +79,95 @@ export default {
       this.transitionName = newIndex > oldIndex ? 'slide-left' : 'slide-right';
       this.activeName = tag;
       this.previousIndex = newIndex;
+      this.fetchUsersByTag(tag);
+    },
+    fetchUsersByTag(tag) {
+      // 模拟不同标签获取不同用户数据（你可以在此接入真实后端接口）
+      switch (tag) {
+        case '互关':
+        this.userList = [];
+        getFriendApi().then((result) => {
+          
+          this.userList = result.data.map((item) => ({
+            username: item.nickname,
+            userId: item.fromUserId,
+            status: '在线',
+            avatar: item.avatar,
+            height: '60px'
+          }));
+        }).catch((err) => {
+          
+        });
+          break;
+        case '关注':
+        this.userList = [];
+        getrequestFriendApi()
+  .then((result) => {
+    this.userList = result.data
+      .filter(item => item.status === '待处理') // 只保留 status 为 "待处理" 的
+      .map(item => ({
+        username: item.nickname,
+        status: '在线',
+        userId: item.fromUserId,
+        avatar: item.avatar,
+        height: '60px'
+      }));
+  })
+  .catch((err) => {
+    console.error('请求失败', err);
+  });
+
+          break;
+        case '粉丝':
+        this.userList = [];
+        getrequestFriendApi().then((result) => {
+          
+          this.userList = result.data.map((item) => ({
+            username: item.nickname,
+            status: '在线',
+            userId: item.fromUserId,
+            avatar: item.avatar,
+            height: '60px'
+          }));
+        }).catch((err) => {
+          
+        });
+
+
+          // this.userList = [
+          //   { username: 'david', status: '在线', avatar: 'https://example.com/d.jpg', height: '60px' },
+          // ];
+          break;
+        case '朋友':
+        this.userList = [];
+        getFriendApi().then((result) => {
+          
+          this.userList = result.data.map((item) => ({
+            username: item.nickname,
+            status: '在线',
+            userId: item.fromUserId,
+            avatar: item.avatar,
+            height: '60px'
+          }));
+        }).catch((err) => {
+          
+        });
+
+          break;
+        default:
+          this.userList = [];
+      }
     },
     onBackClick() {
       alert('点击了返回按钮');
     },
     onSettingsClick() {
       alert('点击了设置按钮');
-    },
-  },
+    }
+  }
 };
 </script>
+
 
 <style scoped>
 .friend {
