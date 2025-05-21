@@ -1,0 +1,103 @@
+{
+  "open-in-browser.default": "chrome",
+  "editor.renderWhitespace": "all",
+  "liveServer.settings.donotShowInfoMsg": true,
+  "editor.tabSize": 2,
+  "files.autoSave": "onFocusChange",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true                     // ✅ 修复为 true，而不是 "explicit"
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "vue",
+    "html"
+  ],
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint", // ✅ 默认使用 ESLint 格式化
+  "editor.formatOnSave": true,
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "less.compile": {
+    "outExt": ".css"
+  },
+  "liveServer.settings.donotVerifyTags": true,
+  "easysass.formats": [
+    {
+      "format": "expanded",
+      "extension": ".css"
+    }
+  ],
+  "easysass.targetDir": "./css/",
+  "px-to-rem.px-per-rem": 37,
+  "eslint.options": {},
+  "eslint.alwaysShowStatus": true,
+  "eslint.format.enable": true,
+  "eslint.codeAction.showDocumentation": {
+    "enable": true
+  },
+  "search.followSymlinks": false,
+  "workbench.colorTheme": "Monokai",
+  "editor.minimap.enabled": false,
+  "files.associations": {
+    "*.vue": "vue"
+  },
+  "[vue]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint" // ✅ Vue 默认格式化为 ESLint
+  },
+  "editor.comments.ignoreEmptyLines": false,
+  "editor.indentSize": "tabSize",
+  "gitlens.gitCommands.skipConfirmations": [
+    "fetch:command",
+    "switch:command",
+    "stash-rename:command",
+    "stash-push:command"
+  ],
+  "editor.fontSize": 16,
+  "search.exclude": {
+    "**/node_modules": false
+  },
+  "diffEditor.ignoreTrimWhitespace": false,
+  "security.workspace.trust.untrustedFiles": "open",
+  "explorer.confirmDelete": false,
+  "window.zoomLevel": 1,
+  "thiefBook.filePath": "/Users/lifengxia/Desktop/book/gbk.txt",
+  "thiefBook.currPageNumber": 18,
+  "git.autofetch": true,
+  "winopacity.opacity": 255,
+  "workbench.startupEditor": "none",
+  "diffEditor.renderSideBySide": true,
+  "workbench.editor.enablePreview": false,
+  "gitlens.views.commits.files.layout": "tree",
+  "eslint.codeActionsOnSave.rules": null,
+  "explorer.confirmPasteNative": false,
+  "explorer.confirmDragAndDrop": false,
+  "git.ignoreRebaseWarning": true,
+  "git.useCommitInputAsStashMessage": true,
+  "git.autoStash": true,
+  "gitlens.views.scm.grouped.views": {
+    "commits": false,
+    "branches": true,
+    "remotes": true,
+    "stashes": false,
+    "tags": true,
+    "worktrees": true,
+    "contributors": true,
+    "repositories": false,
+    "searchAndCompare": false,
+    "launchpad": false
+  },
+  // 对于 .vue 文件，禁用 vetur 格式化器，交给 ESLint 控制
+  "vetur.format.defaultFormatter.css": "none",
+  "vetur.format.defaultFormatter.html": "none",
+  "vetur.format.defaultFormatter.js": "none",
+  "vetur.format.defaultFormatter.less": "none",
+  "vetur.format.defaultFormatter.postcss": "none",
+  "vetur.format.defaultFormatter.scss": "none",
+  "vetur.format.defaultFormatter.stylus": "none",
+  "vetur.format.defaultFormatter.ts": "none",
+  "window.menuBarVisibility": "compact"
+}
