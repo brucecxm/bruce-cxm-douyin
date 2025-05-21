@@ -47,10 +47,38 @@ export default {
   data() {
     return {
       cartItems: [
-        { id: 1, image: '../../assets/op.jpg', price: 666, name: '商品名称写这里', specs: '粉丝, 22码', quantity: 1 },
-        { id: 2, image: '../../assets/op.jpg', price: 666, name: '商品名称写这里', specs: '粉丝, 22码', quantity: 1 },
-        { id: 3, image: '../../assets/op.jpg', price: 666, name: '商品名称写这里', specs: '粉丝, 22码', quantity: 1 },
-        { id: 4, image: '../../assets/op.jpg', price: 666, name: '商品名称写这里', specs: '粉丝, 22码', quantity: 1 },
+        {
+          id: 1,
+          image: '../../assets/op.jpg',
+          price: 666,
+          name: '商品名称写这里',
+          specs: '粉丝, 22码',
+          quantity: 1
+        },
+        {
+          id: 2,
+          image: '../../assets/op.jpg',
+          price: 666,
+          name: '商品名称写这里',
+          specs: '粉丝, 22码',
+          quantity: 1
+        },
+        {
+          id: 3,
+          image: '../../assets/op.jpg',
+          price: 666,
+          name: '商品名称写这里',
+          specs: '粉丝, 22码',
+          quantity: 1
+        },
+        {
+          id: 4,
+          image: '../../assets/op.jpg',
+          price: 666,
+          name: '商品名称写这里',
+          specs: '粉丝, 22码',
+          quantity: 1
+        }
         // ... more cart items
       ]
     };
@@ -60,9 +88,12 @@ export default {
       return this.cartItems.length; //  Since all are selected in the image
     },
     totalPrice() {
-      return this.cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+      return this.cartItems.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      );
     }
-  }
+  },
   methods: {
     incrementQuantity(item) {
       item.quantity++;

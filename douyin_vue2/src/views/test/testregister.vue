@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import { testlogin } from '@/api/test'; // 注册接口
+import { testshan } from '@/api/test'; // 注册接口
 
 export default {
   data() {
@@ -74,9 +74,10 @@ export default {
             username: this.form.username,
             password: this.form.password
           };
-          testregister(user)
+          testshan(user)
             .then((res) => {
               this.$message.success('注册成功');
+              console.log(res);
               this.$router.push('/login');
             })
             .catch((err) => {

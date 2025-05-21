@@ -47,7 +47,8 @@ export default {
   name: 'Pinglunqu',
   data() {
     return {
-      commentsData: [ // 示例评论数据
+      commentsData: [
+        // 示例评论数据
         // 示例评论数据
       ],
       newComment: '', // 用于绑定输入框的评论内容
@@ -73,21 +74,21 @@ export default {
       // this.$router.push({ name: 'userProfile', params: { userId } });
     },
     getcommentone() {
-      const videoId=    this.videoData.videoid;
+      const videoId = this.videoData.videoid;
       const params = { videoid: videoId }; // 获取当前视频的 videoid
 
       getcomment(params) // 调用 API 获取评论数据
-        .then(videoArr => {
+        .then((videoArr) => {
           this.commentsData = videoArr.data.data; // 将评论数据保存到组件的 data 中
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('获取视频评论出错:', error);
         });
     },
     submitComment() {
       const userInfo = useUserInfoStore();
-      var userInfoMap={};
-      userInfoMap=userInfo.userInfo;
+      var userInfoMap = {};
+      userInfoMap = userInfo.userInfo;
       // const userInfo=userInfoStore();
       // const userInfoMap= userInfo.getuserInfo;
       // 确保 newComment 不为空
@@ -98,13 +99,13 @@ export default {
           avatar: userInfoMap.avatar, // 使用用户头像
           username: userInfoMap.nickname,
           comment: this.newComment,
-          likes: 0,
+          likes: 0
         };
 
         // 确保 commentsData 是一个数组
         if (!Array.isArray(this.commentsData)) {
           console.log('commentsData 不是数组，初始化为空数组');
-          this.commentsData = [];  // 如果不是数组，初始化为空数组
+          this.commentsData = []; // 如果不是数组，初始化为空数组
         }
 
         // 将新评论添加到评论列表的顶部
@@ -117,16 +118,16 @@ export default {
           videoid: parseInt(this.videoData.videoid, 10),
           userId: newCommentObj.userId,
           comment: newCommentObj.comment,
-          lastId:'-1',
+          lastId: '-1'
         };
 
         // const params=newCommentObj
         addcomment(params)
           .then((res) => {
-          console.log('评论发布成功:', res);
+            console.log('评论发布成功:', res);
           })
           .catch((error) => {
-          console.error('评论发布失败:', error);
+            console.error('评论发布失败:', error);
           });
 
         console.log('发布评论:', newCommentObj);
@@ -135,17 +136,14 @@ export default {
         console.log('评论内容不能为空');
       }
     }
-    }
-  created() {
-
   },
+
   mounted() {
     const videoInfo = videoInfoStore();
-    this.videoData= videoInfo.getvideoInfo;
+    this.videoData = videoInfo.getvideoInfo;
     this.getcommentone();
   },
-  beforeDestroy() {
-  },
+  beforeDestroy() {}
 };
 </script>
 <style scoped>

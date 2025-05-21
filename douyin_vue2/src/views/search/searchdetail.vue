@@ -69,103 +69,94 @@ export default {
       searchQuery: '',
       selectedTab: '综合',
       postsData: {
-        '综合': [
-          // 综合标签对应的帖子
+        综合: [
           {
             id: 1,
             username: '关注入海无名之辈',
             date: '2019.08.25',
-            avatar: '//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_859859bd152f82fb7889b9d91ff3d56f.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/81392394beb5481faecd2236cfdce182~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=DFL5to8UnmMI55fN2bhyMFqAqoc%3D',
-            description: '电视剧《搜索》: 叶蓝秋死了，并不是死于疾病，而是死于网络暴力',
+            avatar:
+              '//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_859859bd152f82fb7889b9d91ff3d56f.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/81392394beb5481faecd2236cfdce182~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=DFL5to8UnmMI55fN2bhyMFqAqoc%3D',
+            description:
+              '电视剧《搜索》: 叶蓝秋死了，并不是死于疾病，而是死于网络暴力',
             views: '5.1万',
             likes: 139,
             comments: 13,
             shares: 36
-          }, {
-            id: 1,
-            username: '关注入海无名之辈',
-            date: '2019.08.25',
-            avatar: '//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_859859bd152f82fb7889b9d91ff3d56f.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/81392394beb5481faecd2236cfdce182~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=DFL5to8UnmMI55fN2bhyMFqAqoc%3D',
-            description: '电视剧《搜索》: 叶蓝秋死了，并不是死于疾病，而是死于网络暴力',
-            views: '5.1万',
-            likes: 139,
-            comments: 13,
-            shares: 36
-          }, {
-            id: 1,
-            username: '关注入海无名之辈',
-            date: '2019.08.25',
-            avatar: '//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_859859bd152f82fb7889b9d91ff3d56f.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/81392394beb5481faecd2236cfdce182~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=DFL5to8UnmMI55fN2bhyMFqAqoc%3D',
-            description: '电视剧《搜索》: 叶蓝秋死了，并不是死于疾病，而是死于网络暴力',
-            views: '5.1万',
-            likes: 139,
-            comments: 13,
-            shares: 36
-          },
-          // 其他综合标签下的帖子...
+          }
         ],
-        '视频': [
-          // 视频标签对应的帖子
+        视频: [
           {
             id: 2,
             username: '热榜',
             date: '2024.07.04',
-            avatar: '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
-            description: '周鸿祎谈OpenAI进军搜索',
-            views: '4.7万',
-            likes: 85,
-            comments: 8,
-            shares: 24
-          }, {
-            id: 2,
-            username: '热榜',
-            date: '2024.07.04',
-            avatar: '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
-            description: '周鸿祎谈OpenAI进军搜索',
-            views: '4.7万',
-            likes: 85,
-            comments: 8,
-            shares: 24
-          }, {
-          {
-            id: 2,
-            username: '热榜',
-            date: '2024.07.04',
-            avatar: '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
-            description: '周鸿祎谈OpenAI进军搜索',
-            views: '4.7万',
-            likes: 85,
-            comments: 8,
-            shares: 24
-          }, {
-            id: 2,
-            username: '热榜',
-            date: '2024.07.04',
-            avatar: '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
+            avatar:
+              '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
             description: '周鸿祎谈OpenAI进军搜索',
             views: '4.7万',
             likes: 85,
             comments: 8,
             shares: 24
           },
+          {
+            id: 2,
+            username: '热榜',
+            date: '2024.07.04',
+            avatar:
+              '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
+            description: '周鸿祎谈OpenAI进军搜索',
+            views: '4.7万',
+            likes: 85,
+            comments: 8,
+            shares: 24
+          },
+          {
+            id: 2,
+            username: '热榜',
+            date: '2024.07.04',
+            avatar:
+              '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
+            description: '周鸿祎谈OpenAI进军搜索',
+            views: '4.7万',
+            likes: 85,
+            comments: 8,
+            shares: 24
+          },
+          {
+            id: 2,
+            username: '热榜',
+            date: '2024.07.04',
+            avatar:
+              '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
+            description: '周鸿祎谈OpenAI进军搜索',
+            views: '4.7万',
+            likes: 85,
+            comments: 8,
+            shares: 24
+          }
           // 其他视频标签下的帖子...
         ],
-        '用户': [
+        用户: [
           // 视频标签对应的帖子
           {
             id: 1,
             username: '关注入海无名之辈',
             date: '2019.08.25',
-            avatar: '//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_859859bd152f82fb7889b9d91ff3d56f.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/81392394beb5481faecd2236cfdce182~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=DFL5to8UnmMI55fN2bhyMFqAqoc%3D',
-            description: '电视剧《搜索》: 叶蓝秋死了，并不是死于疾病，而是死于网络暴力',
+            avatar:
+              '//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_859859bd152f82fb7889b9d91ff3d56f.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/81392394beb5481faecd2236cfdce182~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=DFL5to8UnmMI55fN2bhyMFqAqoc%3D',
+            description:
+              '电视剧《搜索》: 叶蓝秋死了，并不是死于疾病，而是死于网络暴力',
             views: '5.1万',
             likes: 139,
             comments: 13,
@@ -175,167 +166,206 @@ export default {
             id: 2,
             username: '热榜',
             date: '2024.07.04',
-            avatar: '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
-            description: '周鸿祎谈OpenAI进军搜索',
-            views: '4.7万',
-            likes: 85,
-            comments: 8,
-            shares: 24
-          }, {
-            id: 2,
-            username: '热榜',
-            date: '2024.07.04',
-            avatar: '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
-            description: '周鸿祎谈OpenAI进军搜索',
-            views: '4.7万',
-            likes: 85,
-            comments: 8,
-            shares: 24
-          }, {
-            id: 2,
-            username: '热榜',
-            date: '2024.07.04',
-            avatar: '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
-            description: '周鸿祎谈OpenAI进军搜索',
-            views: '4.7万',
-            likes: 85,
-            comments: 8,
-            shares: 24
-          }, {
-            id: 2,
-            username: '热榜',
-            date: '2024.07.04',
-            avatar: '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
+            avatar:
+              '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
             description: '周鸿祎谈OpenAI进军搜索',
             views: '4.7万',
             likes: 85,
             comments: 8,
             shares: 24
           },
-          // 其他视频标签下的帖子...
-        ], '经验': [
-          // 视频标签对应的帖子
           {
             id: 2,
             username: '热榜',
             date: '2024.07.04',
-            avatar: '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
-            description: '周鸿祎谈OpenAI进军搜索',
-            views: '4.7万',
-            likes: 85,
-            comments: 8,
-            shares: 24
-          }, {
-            id: 2,
-            username: '热榜',
-            date: '2024.07.04',
-            avatar: '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
-            description: '周鸿祎谈OpenAI进军搜索',
-            views: '4.7万',
-            likes: 85,
-            comments: 8,
-            shares: 24
-          }, {
-            id: 2,
-            username: '热榜',
-            date: '2024.07.04',
-            avatar: '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
-            description: '周鸿祎谈OpenAI进军搜索',
-            views: '4.7万',
-            likes: 85,
-            comments: 8,
-            shares: 24
-          }, {
-            id: 2,
-            username: '热榜',
-            date: '2024.07.04',
-            avatar: '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
+            avatar:
+              '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
             description: '周鸿祎谈OpenAI进军搜索',
             views: '4.7万',
             likes: 85,
             comments: 8,
             shares: 24
           },
-          // 其他视频标签下的帖子...
-        ], 'AI搜': [
-          {
-            id: 1,
-            username: '关注入海无名之辈',
-            date: '2019.08.25',
-            avatar: '//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_859859bd152f82fb7889b9d91ff3d56f.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/81392394beb5481faecd2236cfdce182~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=DFL5to8UnmMI55fN2bhyMFqAqoc%3D',
-            description: '电视剧《搜索》: 叶蓝秋死了，并不是死于疾病，而是死于网络暴力',
-            views: '5.1万',
-            likes: 139,
-            comments: 13,
-            shares: 36
-          },
-          // 视频标签对应的帖子
           {
             id: 2,
             username: '热榜',
             date: '2024.07.04',
-            avatar: '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
-            description: '周鸿祎谈OpenAI进军搜索',
-            views: '4.7万',
-            likes: 85,
-            comments: 8,
-            shares: 24
-          }, {
-            id: 2,
-            username: '热榜',
-            date: '2024.07.04',
-            avatar: '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
-            description: '周鸿祎谈OpenAI进军搜索',
-            views: '4.7万',
-            likes: 85,
-            comments: 8,
-            shares: 24
-          }, {
-            id: 2,
-            username: '热榜',
-            date: '2024.07.04',
-            avatar: '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
-            description: '周鸿祎谈OpenAI进军搜索',
-            views: '4.7万',
-            likes: 85,
-            comments: 8,
-            shares: 24
-          }, {
-            id: 2,
-            username: '热榜',
-            date: '2024.07.04',
-            avatar: '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
-            image: '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
+            avatar:
+              '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
             description: '周鸿祎谈OpenAI进军搜索',
             views: '4.7万',
             likes: 85,
             comments: 8,
             shares: 24
           },
+          {
+            id: 2,
+            username: '热榜',
+            date: '2024.07.04',
+            avatar:
+              '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
+            description: '周鸿祎谈OpenAI进军搜索',
+            views: '4.7万',
+            likes: 85,
+            comments: 8,
+            shares: 24
+          }
           // 其他视频标签下的帖子...
         ],
-        // 其他标签的数据...
+        经验: [
+          // 视频标签对应的帖子
+          {
+            id: 2,
+            username: '热榜',
+            date: '2024.07.04',
+            avatar:
+              '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
+            description: '周鸿祎谈OpenAI进军搜索',
+            views: '4.7万',
+            likes: 85,
+            comments: 8,
+            shares: 24
+          },
+          {
+            id: 2,
+            username: '热榜',
+            date: '2024.07.04',
+            avatar:
+              '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
+            description: '周鸿祎谈OpenAI进军搜索',
+            views: '4.7万',
+            likes: 85,
+            comments: 8,
+            shares: 24
+          },
+          {
+            id: 2,
+            username: '热榜',
+            date: '2024.07.04',
+            avatar:
+              '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
+            description: '周鸿祎谈OpenAI进军搜索',
+            views: '4.7万',
+            likes: 85,
+            comments: 8,
+            shares: 24
+          },
+          {
+            id: 2,
+            username: '热榜',
+            date: '2024.07.04',
+            avatar:
+              '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
+            description: '周鸿祎谈OpenAI进军搜索',
+            views: '4.7万',
+            likes: 85,
+            comments: 8,
+            shares: 24
+          }
+          // 其他视频标签下的帖子...
+        ],
+        AI搜: [
+          {
+            id: 1,
+            username: '关注入海无名之辈',
+            date: '2019.08.25',
+            avatar:
+              '//p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_859859bd152f82fb7889b9d91ff3d56f.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/81392394beb5481faecd2236cfdce182~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=DFL5to8UnmMI55fN2bhyMFqAqoc%3D',
+            description:
+              '电视剧《搜索》: 叶蓝秋死了，并不是死于疾病，而是死于网络暴力',
+            views: '5.1万',
+            likes: 139,
+            comments: 13,
+            shares: 36
+          },
+          // 视频标签对应的帖子
+          {
+            id: 2,
+            username: '热榜',
+            date: '2024.07.04',
+            avatar:
+              '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
+            description: '周鸿祎谈OpenAI进军搜索',
+            views: '4.7万',
+            likes: 85,
+            comments: 8,
+            shares: 24
+          },
+          {
+            id: 2,
+            username: '热榜',
+            date: '2024.07.04',
+            avatar:
+              '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
+            description: '周鸿祎谈OpenAI进军搜索',
+            views: '4.7万',
+            likes: 85,
+            comments: 8,
+            shares: 24
+          },
+          {
+            id: 2,
+            username: '热榜',
+            date: '2024.07.04',
+            avatar:
+              '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
+            description: '周鸿祎谈OpenAI进军搜索',
+            views: '4.7万',
+            likes: 85,
+            comments: 8,
+            shares: 24
+          },
+          {
+            id: 2,
+            username: '热榜',
+            date: '2024.07.04',
+            avatar:
+              '//p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-i-c9aec8xkvj_cdb6e753b6fa4c3dbf80c22d84ac7964~c5_300x300.jpeg?from=2956013662',
+            image:
+              '//p3-pc-sign.douyinpic.com/tos-cn-i-pk90l89vgd/d4836254e2764565a359883e2a847d16~tplv-dy-cropcenter:323:430.jpeg?biz_tag=pcweb_cover&from=327834062&s=PackSourceEnum_PUBLISH&sc=cover&se=true&sh=323_430&x-expires=2038143600&x-signature=ma2EwvmFioXogcAHIHar154AQCY%3D',
+            description: '周鸿祎谈OpenAI进军搜索',
+            views: '4.7万',
+            likes: 85,
+            comments: 8,
+            shares: 24
+          }
+          // 其他视频标签下的帖子...
+        ]
       }
     };
   },
   computed: {
     filteredPosts() {
       const posts = this.postsData[this.selectedTab] || [];
-      return posts.filter(post => post.description.includes(this.searchQuery));
+      return posts.filter((post) =>
+        post.description.includes(this.searchQuery)
+      );
     }
-  }
+  },
   methods: {
     onSearch() {
       // Handle search input

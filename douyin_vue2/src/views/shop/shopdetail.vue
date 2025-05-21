@@ -103,7 +103,6 @@
   </div>
 </template>
 <script>
-import shopinfodetail from '@/components/shop/shopinfodetail.vue';
 export default {
   comments: {},
   data() {
@@ -128,7 +127,7 @@ export default {
     handleScroll() {
       this.isSticky = window.scrollY > 0;
     },
-    fetchItemDetails(id) {
+    fetchItemDetails() {
       // 根据 ID 请求商品详情数据的逻辑
     }
   },

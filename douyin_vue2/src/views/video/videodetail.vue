@@ -42,7 +42,7 @@ export default {
     console.log('接收到的视频ID:', this.videoid);
   },
   watch: {
-    type(newType) {
+    type() {
       // 监听 type 的变化
       this.updateAaa();
     },

@@ -78,13 +78,13 @@ export default {
       activeIndex: 0, // 默认高亮推荐项
       boxHeight: 95,
       boxes: [], // box的数据，包括颜色和左边距
-      visibleIndexes: [] ,// 存储进入视口的 box 的索引
+      visibleIndexes: [], // 存储进入视口的 box 的索引
       caidancss: {
         position: 'absolute',
         right: '100vw',
         bottom: '0px',
         transition: 'right 0.5s ease',
-        height: '100vh', /* 控制位置变化的动画 */
+        height: '100vh' /* 控制位置变化的动画 */
       },
       boxvideocss: {
         transform: 'translateX(0px)',
@@ -100,20 +100,23 @@ export default {
     footerVue,
     AllBoxVue,
     caidan,
-    Pinglunqu,
+    Pinglunqu
   },
   mounted() {
     this.boxes.forEach((_, index) => {
       const el = this.$refs['box-' + index][0]; // 注意：ref 是数组
-      const observer = new IntersectionObserver(([entry]) => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
           if (entry.isIntersecting) {
             if (!this.visibleIndexes.includes(index)) {
-            this.visibleIndexes.push(index);
+              this.visibleIndexes.push(index);
             }
           }
-      }, {
+        },
+        {
           threshold: 1.0 // 100% 进入才触发
-      });
+        }
+      );
 
       if (el) observer.observe(el);
     });
@@ -125,7 +128,7 @@ export default {
       { color: 'black', left: 0, boxtest: '推荐' },
       { color: 'black', left: this.boxWidth, boxtest: '同城' },
       { color: 'black', left: 2 * this.boxWidth, boxtest: '关注' },
-      { color: 'black', left: 3 * this.boxWidth, boxtest: '直播' },
+      { color: 'black', left: 3 * this.boxWidth, boxtest: '直播' }
       // { color: "pink", left: 4 * this.boxWidth, boxtest: "经验" },
       // { color: "white", left: 5 * this.boxWidth, boxtest: "商城" },
       // { color: "pink", left: 6 * this.boxWidth, boxtest: "团购" },
@@ -133,8 +136,7 @@ export default {
       // { color: "pink", left: 8 * this.boxWidth, boxtest: "热点" },
     ];
   },
-  beforeDestroy() {
-  },
+  beforeDestroy() {},
   methods: {
     handleAside(msg) {
       // 处理来自子组件的消息
@@ -164,12 +166,17 @@ export default {
     drag(event) {
       if (this.isDragging) {
         let newX = this.getEventClientX(event) - this.startX;
-        newX = Math.max(-(this.boxWidth * (this.boxes.length - 1)), Math.min(newX, 0));
+        newX = Math.max(
+          -(this.boxWidth * (this.boxes.length - 1)),
+          Math.min(newX, 0)
+        );
         this.currentX = newX;
         this.updateBoxesPosition();
 
         // 计算当前索引并更新
-        const nearestIndex = Math.round(Math.abs(this.currentX) / this.boxWidth);
+        const nearestIndex = Math.round(
+          Math.abs(this.currentX) / this.boxWidth
+        );
         this.activeIndex = nearestIndex; // 更新 activeIndex
 
         // 将索引传递给子组件
@@ -177,7 +184,9 @@ export default {
       }
     },
     getEventClientX(event) {
-      return event.type.startsWith('touch') ? event.touches[0].clientX : event.clientX;
+      return event.type.startsWith('touch')
+        ? event.touches[0].clientX
+        : event.clientX;
     },
     updateBoxesPosition() {
       this.boxes.forEach((box, index) => {
@@ -202,13 +211,19 @@ export default {
 
     showcaidanone() {
       // 更新 caidancss 的位置
-      this.caidancss.right = this.caidancss.right === '100vw' ? '20vw' : '100vw';
+      this.caidancss.right =
+        this.caidancss.right === '100vw' ? '20vw' : '100vw';
 
       // 使用 Vue 的 $set 方法来触发响应式系统检测到 transform 属性变化
-      this.$set(this.boxvideocss, 'transform', this.boxvideocss.transform === 'translateX(0px)' ? 'translateX(80vw)' : 'translateX(0px)');
+      this.$set(
+        this.boxvideocss,
+        'transform',
+        this.boxvideocss.transform === 'translateX(0px)'
+          ? 'translateX(80vw)'
+          : 'translateX(0px)'
+      );
     }
   }
-  };
 };
 </script>
 <style scoped>

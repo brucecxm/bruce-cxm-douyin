@@ -48,7 +48,7 @@ export const uploadFile = (file, additionalParams) => {
     });
   } else {
     for (const key in additionalParams) {
-      if (additionalParams.hasOwnProperty(key)) {
+      if (additionalParams.Object.prototype.hasOwnPropertyhasOwnProperty(key)) {
         formData.append(key, additionalParams[key]);
       }
     }

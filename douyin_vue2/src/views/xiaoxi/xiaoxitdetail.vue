@@ -40,7 +40,6 @@
 <script>
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
-import { useTokenStore } from '../../stores/token';
 
 export default {
   data() {
@@ -62,7 +61,6 @@ export default {
     connect() {
       const socket = new SockJS('http://localhost:9998/chat');
       this.stompClient = Stomp.over(socket);
-      const usertoken = useTokenStore();
 
       this.stompClient.connect(
         {},
@@ -107,7 +105,7 @@ export default {
         };
 
         this.stompClient.send(
-          `/app/chat.sendMessage/${userId}/${friendId}`,
+          `/app/chat.sendMessage/${this.userId}/${this.friendId}`,
           {},
           JSON.stringify(chatMessage)
         );

@@ -39,7 +39,7 @@ export default {
       searchQuery: this.$route.query.search || '', // 从 URL 获取初始搜索查询
       products: [], // 商品数据
       current: 1, // 当前页
-      size: 10, // 每页显示的商品数量
+      size: 10 // 每页显示的商品数量
     };
   },
 
@@ -54,18 +54,20 @@ export default {
 
       // 调用 API 获取商品列表
       getlikeall(this.searchQuery, this.current, this.size)
-        .then(response => {
+        .then((response) => {
           console.log('获取数据成功:', response.data.data); // 打印成功响应
           this.products = response.data.data; // 更新商品数据
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('请求失败:', error); // 打印错误信息
         });
 
       // 更新 URL 参数，保持当前搜索状态
-      this.$router.push({ path: '/searchshop', query: { search: this.searchQuery } });
-    },
-  }
+      this.$router.push({
+        path: '/searchshop',
+        query: { search: this.searchQuery }
+      });
+    }
   }
 };
 </script>

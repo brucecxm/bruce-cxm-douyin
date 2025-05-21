@@ -6,20 +6,22 @@ module.exports = {
     es6: true
   },
   extends: [
-    'plugin:vue/essential',        // Vue 2 重要规则
-    'eslint:recommended',          // ESLint 推荐规则
-    'plugin:prettier/recommended'  // 让 Prettier 作为 ESLint 规则运行
+    'plugin:vue/essential', // Vue 2 重要规则
+    'eslint:recommended' // ESLint 推荐规则
   ],
   plugins: ['vue', 'prettier'],
   rules: {
     // prettier 相关格式规则
-    'prettier/prettier': ['error', {
-      singleQuote: true,
-      semi: true,
-      tabWidth: 2,
-      trailingComma: 'none',
-      endOfLine: 'auto'
-    }],
+    'prettier/prettier': [
+      'error',
+      {
+        singleQuote: true,
+        semi: true,
+        tabWidth: 2,
+        trailingComma: 'none',
+        endOfLine: 'auto'
+      }
+    ],
 
     // 命名规范 - 驼峰
     camelcase: ['error', { properties: 'always' }],
@@ -40,13 +42,16 @@ module.exports = {
     'vue/html-indent': ['error', 2],
 
     // Vue 属性换行规则
-    'vue/max-attributes-per-line': ['error', {
-      singleline: 3,
-      multiline: {
-        max: 1,
-        allowFirstLine: false
+    'vue/max-attributes-per-line': [
+      'error',
+      {
+        singleline: 3,
+        multiline: {
+          max: 1,
+          allowFirstLine: false
+        }
       }
-    }],
+    ],
 
     // console 和 debugger 生产环境提示
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
