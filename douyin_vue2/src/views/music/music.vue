@@ -1,16 +1,18 @@
 <template>
   <div class="music">
     <InfiniteList
-      :itemInfo="userInfo"
+      :itemInfo="videobox"
       :itemsPerRow="3"
       boxWidth="33%"
       boxHeight="250px"
       :gap="3"
+      :loading="loading"
+      :noMoreData="noMoreData"
+      @loadMore="fetchMoreData"
     >
       <template v-slot:header>
         <div class="header">
           <i class="fas fa-arrow-left" @click="goBack"></i>
-          <!-- <label>转发</label> -->
         </div>
 
         <div class="musicbody">
@@ -44,10 +46,18 @@
             </div>
           </div>
         </div>
-
-        <div class="wanfa" v-if="false">
-          <!-- 玩法说明区域（预留） -->
-        </div>
+      </template>
+      <template #item="{ item }">
+        <div
+          class="itemdetail"
+          :style="{
+            backgroundImage: `url(${item.video_img})`,
+            width: '100%',
+            height: '100%',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center'
+          }"
+        ></div>
       </template>
     </InfiniteList>
   </div>
@@ -58,33 +68,24 @@ import { getmumsic } from '@/api/video';
 import InfiniteList from '../../components/InfiniteList.vue';
 
 export default {
-  created() {
-    this.musicid = this.$route.params.musicid;
-    console.log(this.musicid);
-    this.fetchItemDetails(this.musicid);
-  },
   components: {
     InfiniteList
   },
   data() {
     return {
+      videobox: [], // 视频列表，初始为空
+      loading: false,
+      noMoreData: false,
+      page: 0, // 当前页码
+      pageSize: 10,
       musicinfo: {},
       musicid: '1',
-      is_wanfa: false,
-      name: '歌曲作者名字',
-      videobox: [
-        {
-          imgurl:
-            'https://gips2.baidu.com/it/u=1651586290,17201034&fm=3028&app=3028&f=JPEG&fmt=auto&q=100&size=f600_800',
-          linkurl: ''
-        },
-        {
-          imgurl:
-            'https://gips2.baidu.com/it/u=1651586290,17201034&fm=3028&app=3028&f=JPEG&fmt=auto&q=100&size=f600_800',
-          linkurl: ''
-        }
-      ]
+      name: '歌曲作者名字'
     };
+  },
+  created() {
+    this.musicid = this.$route.params.musicid || '1';
+    this.fetchItemDetails(1); // 加载第一页数据
   },
   methods: {
     goBack() {
@@ -96,18 +97,39 @@ export default {
     govideodetail(videoid) {
       this.$router.push(`/videodetail?type=music&videoid=${videoid}`);
     },
-    fetchItemDetails(id) {
-      getmumsic(id)
+    fetchItemDetails(page) {
+      if (this.loading || this.noMoreData) return;
+      this.loading = true;
+      getmumsic(this.musicid, page, this.pageSize)
         .then((res) => {
-          this.videobox = res.data.videoimg || [];
-          this.musicinfo = res.data.music_info || {};
+          const videos = res.data.videoimg || [];
+          const total = res.data.total || 0;
+
+          // 追加视频数据
+          this.videobox = [...this.videobox, ...videos];
+
+          // 只在第一页赋值musicinfo，避免重复赋值
+          if (page === 1) {
+            this.musicinfo = res.data.music_info || {};
+          }
+
+          // 判断是否加载完毕
+          if (this.videobox.length >= total) {
+            this.noMoreData = true;
+          }
+
+          this.page = page; // 更新当前页码
+          this.loading = false;
         })
-        .catch((error) => {
-          console.error('获取视频出错:', error);
+        .catch(() => {
+          this.loading = false;
+          this.$toast && this.$toast('获取视频出错');
         });
     },
-
-    // 点击“去使用”跳转到音乐外链
+    fetchMoreData() {
+      if (this.loading || this.noMoreData) return;
+      this.fetchItemDetails(this.page + 1);
+    },
     goToMusic() {
       if (this.musicinfo.music_link) {
         window.open(this.musicinfo.music_link, '_blank');
@@ -115,8 +137,6 @@ export default {
         this.$toast && this.$toast('该音乐暂无外链');
       }
     },
-
-    // 点击收藏按钮
     collectMusic() {
       this.$toast && this.$toast('收藏成功！');
       // 这里可以改成调用收藏接口
@@ -199,7 +219,6 @@ export default {
   margin-bottom: 10px;
 }
 
-/* 新增按钮样式 */
 .actions {
   display: flex;
   gap: 10px;
@@ -230,42 +249,5 @@ export default {
 
 .action-btn i {
   font-size: 1rem;
-}
-
-.videobody {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  padding: 10px;
-  background-color: #fff;
-}
-
-.box {
-  width: 31vw;
-  height: 160px;
-  margin-bottom: 10px;
-  border-radius: 10px;
-  overflow: hidden;
-  background-color: #f0f0f0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
-  cursor: pointer;
-}
-
-.box:hover {
-  transform: scale(1.03);
-}
-
-.box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.wanfa {
-  height: 100px;
-  background-color: rgba(0, 0, 0, 0.05);
-  margin: 10px;
-  border-radius: 10px;
 }
 </style>

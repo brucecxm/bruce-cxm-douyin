@@ -49,13 +49,6 @@ public class MusicController extends ApiController {
     @Resource
     private VideoService videoService;
 
-    /**
-     * 分页查询所有数据
-     *
-     * @param page 分页对象
-     * @param music 查询实体
-     * @return 所有数据
-     */
 
     /**
      * 通过主键查询单条数据
@@ -69,8 +62,8 @@ public class MusicController extends ApiController {
     }
 
     @GetMapping("/getmusicbefore")
-    public Map selectOnebefore(String music_id) {
-        List<Map> one = musiconedao.one(music_id);
+    public Map selectOnebefore(String musicId) {
+        List<Map> one = musiconedao.one(musicId);
         List<Map> videoArr = new ArrayList<Map>();
         for (Map a : one) {
             Map ss = new HashMap<>();
@@ -84,14 +77,15 @@ public class MusicController extends ApiController {
         return oneww;
 
     }
+
     @GetMapping("/getmusic")
     public Map<String, Object> selectOne(
-            @RequestParam String music_id,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(value = "musicId", required = true) String musicId,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
 
         // 查询music信息
-        Music music = musicService.getOne(new QueryWrapper<Music>().eq("id", music_id));
+        Music music = musicService.getOne(new QueryWrapper<Music>().eq("id", musicId));
         if (music == null) {
             throw new RuntimeException("未找到该音乐信息");
         }
@@ -120,27 +114,7 @@ public class MusicController extends ApiController {
     }
 
 
-    /**
-     * 新增数据
-     *
-     * @param music 实体对象
-     * @return 新增结果
-     */
-//    @PostMapping
-//    public R insert(@RequestBody Music music) {
-//        return success(this.musicService.save(music));
-//    }
 
-    /**
-     * 修改数据
-     *
-     * @param music 实体对象
-     * @return 修改结果
-     */
-//    @PutMapping
-//    public R update(@RequestBody Music music) {
-//        return success(this.musicService.updateById(music));
-//    }
 
     /**
      * 删除数据

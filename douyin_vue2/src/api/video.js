@@ -71,10 +71,12 @@ export const getcomment = (params) => {
   return request.get('/video/comment/getfu', { params }); // 将参数放入 { params } 中
 };
 
-export const getmumsic = (musicId) => {
+export const getmumsic = (musicId, page = 1, size = 10) => {
   return request.get('/video/music/getmusic', {
     params: {
-      musicId
+      musicId,
+      page,
+      size
     }
   });
 };

@@ -1,35 +1,41 @@
 <template>
-  <div
-    class="infinite-list-wrapper"
-    v-infinite-scroll="loadMore"
-    :infinite-scroll-disabled="loading || noMoreData"
-    :infinite-scroll-distance="10"
-  >
+  <div class="all">
     <header>
       <slot name="header"></slot>
     </header>
-    <ul
-      class="infinite-list"
-      :style="{
-        gap: gap + 'px',
-        gridTemplateColumns: `repeat(${itemsPerRow}, ${typeof boxWidth === 'number' ? boxWidth + 'px' : boxWidth})`
-      }"
+    <div
+      class="infinite-list-wrapper"
+      v-infinite-scroll="loadMore"
+      :infinite-scroll-disabled="loading || noMoreData"
+      :infinite-scroll-distance="10"
     >
-      <li
-        class="infinite-list-item"
-        v-for="item in list"
-        :key="item"
+      <ul
+        class="infinite-list"
         :style="{
-          height: typeof boxHeight === 'number' ? boxHeight + 'px' : boxHeight,
-          lineHeight:
-            typeof boxHeight === 'number' ? boxHeight + 'px' : boxHeight
+          gap: gap + 'px',
+          gridTemplateColumns: `repeat(${itemsPerRow}, ${typeof boxWidth === 'number' ? boxWidth + 'px' : boxWidth})`
         }"
       >
-        {{ item }}
-      </li>
-    </ul>
-    <div class="loading-text" v-if="loading">加载中...</div>
-    <div class="loading-text" v-if="noMoreData">没有更多数据了</div>
+        <li
+          class="infinite-list-item"
+          v-for="(item, index) in list"
+          :key="index"
+          :style="{
+            height:
+              typeof boxHeight === 'number' ? boxHeight + 'px' : boxHeight,
+            lineHeight:
+              typeof boxHeight === 'number' ? boxHeight + 'px' : boxHeight
+          }"
+        >
+          <!-- 作用域插槽，传递item和index给父组件 -->
+          <slot name="item" :item="item" :index="index">
+            {{ item }}
+          </slot>
+        </li>
+      </ul>
+      <div class="loading-text" v-if="loading">加载中...</div>
+      <div class="loading-text" v-if="noMoreData">没有更多数据了</div>
+    </div>
   </div>
 </template>
 
@@ -37,6 +43,8 @@
 export default {
   props: {
     itemInfo: {
+      // 这里你传入的数据
+      type: Array,
       required: true
     },
     itemsPerRow: {
@@ -44,72 +52,52 @@ export default {
       default: 3
     },
     boxWidth: {
-      type: [Number, String], // 支持数字或字符串（带单位）
+      type: [Number, String],
       default: 100
     },
     boxHeight: {
-      type: [Number, String], // 支持数字或字符串（带单位）
+      type: [Number, String],
       default: 100
     },
     gap: {
       type: Number,
       default: 10
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    noMoreData: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
     return {
-      list: [],
-      count: 0,
-      loading: false,
-      noMoreData: false
+      list: []
     };
   },
-  created() {
-    this.autoLoadUntilScrollable();
+  watch: {
+    itemInfo: {
+      immediate: true,
+      handler(newVal) {
+        // 追加数据，不覆盖
+        this.list = [...this.list, ...newVal];
+      }
+    }
   },
   methods: {
     loadMore() {
       if (this.loading || this.noMoreData) return;
-
-      this.loading = true;
-
-      setTimeout(() => {
-        const newItems = [];
-        for (let i = 0; i < 10; i++) {
-          this.count++;
-          newItems.push(`第 ${this.count} 个盒子`);
-        }
-
-        this.list = this.list.concat(newItems);
-
-        if (this.count >= 50) {
-          this.noMoreData = true;
-        }
-
-        this.loading = false;
-      }, 1000);
-    },
-    autoLoadUntilScrollable() {
-      const tryLoad = () => {
-        this.$nextTick(() => {
-          const container = this.$el.querySelector('.infinite-list-wrapper');
-          if (
-            container &&
-            container.scrollHeight <= container.clientHeight &&
-            !this.noMoreData
-          ) {
-            this.loadMore();
-            tryLoad(); // 继续尝试直到撑满容器
-          }
-        });
-      };
-      tryLoad();
+      // 通知父组件加载更多
+      this.$emit('loadMore');
     }
   }
 };
 </script>
 
 <style scoped>
+/* 样式保持不变 */
 .infinite-list-wrapper {
   height: 100vh;
   overflow: auto;
@@ -127,13 +115,11 @@ export default {
   background-color: #f0f0f0;
   border-radius: 6px;
   text-align: center;
-  /* 文字垂直居中 */
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 14px;
   color: #333;
-  /* 宽度由grid-template-columns控制 */
 }
 
 .loading-text {
