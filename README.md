@@ -150,6 +150,35 @@ git reset --hard origin/main
 
 
 
+前端通过https访问（这样拍摄界面才能够正确访问摄像头）
+
+1.通过mkcert生成本地密钥
+
+2.vite.config.js指定密钥
+
+```
+  const httpsOptions = {
+    key: fs.readFileSync(
+      'C:/Users/Administrator/Desktop/tools/127.0.0.1+4-key.pem'
+    ),
+    cert: fs.readFileSync(
+      'C:/Users/Administrator/Desktop/tools/127.0.0.1+4.pem'
+    )
+  }; 
+  server: {
+        host: true,
+        https: httpsOptions, // 开启 https，使用证书
+        }
+```
+
+
+
+对于无限滑动模块，最好在父组件里面把数据查出来，然后再显示，如果是在子组件里面查，容易卡顿，可能是vue的设计缺陷
+
+
+
+
+
 
 
 
