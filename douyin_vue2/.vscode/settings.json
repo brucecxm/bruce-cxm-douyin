@@ -5,7 +5,7 @@
   "editor.tabSize": 2,
   "files.autoSave": "onFocusChange",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true                     // ✅ 修复为 true，而不是 "explicit"
+    "source.fixAll.eslint": "explicit"
   },
   "eslint.validate": [
     "javascript",

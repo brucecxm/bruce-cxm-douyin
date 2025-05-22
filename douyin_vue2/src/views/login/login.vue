@@ -139,43 +139,50 @@ export default {
     validateEmail() {
       const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       if (!emailRegex.test(this.loginpojo.username)) {
-        alert('请输入有效的邮箱地址');
+        this.$message({
+          message: '请输入有效的邮箱地址',
+          type: 'warning'
+        });
       }
     },
 
     closeScreen() {
-      this.$router.go(-1); // 返回上一级
+      this.$router.go(-1);
       console.log('关闭界面');
     },
 
     clearPhoneNumber() {
-      this.loginpojo.username = ''; // 清空手机号
-      this.loginpojo.password = ''; // 清空密码
-      this.loginpojo.confirmPassword = ''; // 清空确认密码
+      this.loginpojo.username = '';
+      this.loginpojo.password = '';
+      this.loginpojo.confirmPassword = '';
     },
+
     async getVerificationCode() {
       if (!this.loginpojo.username) {
-        alert('请输入邮箱');
+        this.$message({
+          message: '请输入邮箱',
+          type: 'warning'
+        });
         return;
       }
       try {
-        // 发送请求并获取验证码图片流，确保设置了 responseType: 'blob'
         const response = await getVerificationCodeService(
           this.loginpojo.username
         );
 
-        // 判断后端返回的数据是否为成功状态
         if (response.data.code === 1) {
-          alert('获取验证码失败，请稍后再试');
+          this.$message({
+            message: '获取验证码失败，请稍后再试',
+            type: 'error'
+          });
           return;
         }
 
-        // 使用 Blob 包装数据并生成一个临时图片 URL
         const blob = new Blob([response.data], { type: 'image/png' });
         this.captchaUrl = URL.createObjectURL(blob);
-        this.isShow = true; // 显示验证码图片
+        this.isShow = true;
         this.isCodeSent = true;
-        this.countdown = 60; // 发送验证码后开始倒计时
+        this.countdown = 60;
         const timer = setInterval(() => {
           if (this.countdown === 0) {
             clearInterval(timer);
@@ -188,13 +195,20 @@ export default {
         console.error('获取验证码失败：', error);
       }
     },
+
     async verifyPhoneNumber() {
       if (!this.isAgreed) {
-        alert('请勾选用户协议以继续登录。');
+        this.$message({
+          message: '请勾选用户协议以继续登录。',
+          type: 'warning'
+        });
         return;
       }
       if (!this.verificationCode) {
-        alert('请输入验证码');
+        this.$message({
+          message: '请输入验证码',
+          type: 'warning'
+        });
         return;
       }
 
@@ -206,11 +220,13 @@ export default {
           verificationCode: this.verificationCode
         });
         if (response.data.code === 1) {
-          console.error('登录失败：', error);
+          this.$message({
+            message: response.data.msg || '登录失败',
+            type: 'error'
+          });
         } else {
-          var text = response.data.data.userInfo;
           const userInfoStore = useUserInfoStore();
-          userInfoStore.setUserInfo(text);
+          userInfoStore.setUserInfo(response.data.data.userInfo);
 
           const token = response.data.data.token;
           const usertoken = useTokenStore();
@@ -220,8 +236,13 @@ export default {
         }
       } catch (error) {
         console.error('登录失败：', error);
+        this.$message({
+          message: '登录请求失败，请检查网络或稍后重试。',
+          type: 'error'
+        });
       }
     },
+
     switchToPasswordLogin() {
       this.isPasswordLogin = true;
     },
@@ -231,19 +252,29 @@ export default {
     switchToLogin() {
       this.isRegistering = false;
     },
+
     async register() {
       if (!this.isAgreed) {
-        alert('请勾选用户协议以继续注册。');
+        this.$message({
+          message: '请勾选用户协议以继续注册。',
+          type: 'warning'
+        });
         return;
       }
 
       if (this.loginpojo.password !== this.loginpojo.confirmPassword) {
-        alert('密码和确认密码不匹配');
+        this.$message({
+          message: '密码和确认密码不匹配',
+          type: 'warning'
+        });
         return;
       }
 
       if (!this.verificationCode) {
-        alert('请输入验证码');
+        this.$message({
+          message: '请输入验证码',
+          type: 'warning'
+        });
         return;
       }
 
@@ -254,12 +285,19 @@ export default {
           verificationCode: this.verificationCode
         });
         if (response.data.code === 1) {
-          alert('注册失败，请稍后再试');
+          this.$message({
+            message: '注册失败，请稍后再试',
+            type: 'error'
+          });
         } else {
           this.verifyPhoneNumber(); // 注册成功后自动登录
         }
       } catch (error) {
         console.error('注册失败：', error);
+        this.$message({
+          message: '注册请求失败，请稍后重试。',
+          type: 'error'
+        });
       }
     }
   }

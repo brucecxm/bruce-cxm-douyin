@@ -56,11 +56,7 @@
 <script>
 import videoasideVue from './videoaside.vue';
 import videoarticleVue from './videoarticle.vue';
-import {
-  homegetVideo,
-  homegetVideomore,
-  homegetVideocontent
-} from '../api/video';
+import { homegetVideo } from '../api/video';
 
 export default {
   components: {
@@ -166,7 +162,7 @@ export default {
       this.startY = this.getEventClientY(event) - this.currentY;
     },
 
-    stopDrag(event) {
+    stopDrag() {
       this.isDragging = false;
       this.updateBoxPositionBasedOnCurrentY();
       this.updateVideoPlayback();
@@ -252,7 +248,8 @@ export default {
   display: flex;
   flex-direction: column;
   position: relative;
-  height: 100vh;
+  margin: 0;
+  height: 95vh;
 }
 
 .box {

@@ -23,19 +23,29 @@
 
 <script>
 export default {
+  name: 'UnderLineTags',
   props: {
     navItems: {
+      type: Array,
       required: true
+    },
+    activeIndex: {
+      type: Number,
+      default: 0
     }
   },
   data() {
     return {
-      activeIndex: 0,
       underlineStyle: {
         width: 0,
         left: 0
       }
     };
+  },
+  watch: {
+    activeIndex() {
+      this.updateUnderline();
+    }
   },
   mounted() {
     this.updateUnderline();
@@ -46,8 +56,9 @@ export default {
   },
   methods: {
     selectTab(index) {
-      this.activeIndex = index;
-      this.updateUnderline();
+      if (index === this.activeIndex) return;
+      this.$emit('update:activeIndex', index); // 支持 .sync
+      this.$emit('change', index); // 通知父组件
     },
     updateUnderline() {
       this.$nextTick(() => {

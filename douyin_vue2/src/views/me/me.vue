@@ -68,7 +68,7 @@ export default {
   components: {
     footerVue,
     underLineTagsVue,
-    RecommendList,
+
     InfiniteList
   },
   data() {

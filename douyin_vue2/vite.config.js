@@ -1,11 +1,20 @@
 import { defineConfig } from 'vite';
 import legacy from '@vitejs/plugin-legacy';
 import vue2 from '@vitejs/plugin-vue2';
+import fs from 'fs';
 
 const { fileURLToPath, URL } = require('url');
 
 export default defineConfig(({ mode }) => {
-  // 这里根据 mode 来加载不同的配置
+  const httpsOptions = {
+    key: fs.readFileSync(
+      'C:/Users/Administrator/Desktop/tools/127.0.0.1+4-key.pem'
+    ),
+    cert: fs.readFileSync(
+      'C:/Users/Administrator/Desktop/tools/127.0.0.1+4.pem'
+    )
+  };
+
   if (mode === 'development') {
     return {
       plugins: [
@@ -16,7 +25,7 @@ export default defineConfig(({ mode }) => {
         })
       ],
       build: {
-        outDir: 'dist' // 开发环境输出到默认的 'build' 目录
+        outDir: 'dist'
       },
       resolve: {
         alias: {
@@ -24,9 +33,11 @@ export default defineConfig(({ mode }) => {
         }
       },
       server: {
+        host: true,
+        // https: httpsOptions, // 开启 https，使用证书
         proxy: {
           '/api': {
-            target: 'http://localhost:9573',
+            target: 'http://localhost:9430',
             changeOrigin: true,
             rewrite: (path) => path.replace(/^\/api/, '')
           }
@@ -43,7 +54,7 @@ export default defineConfig(({ mode }) => {
         })
       ],
       build: {
-        outDir: '/usr/share/nginx/html/dist' // 生产环境输出到指定的 CentOS 目录
+        outDir: '/usr/share/nginx/html/dist'
       },
       resolve: {
         alias: {
@@ -51,6 +62,7 @@ export default defineConfig(({ mode }) => {
         }
       },
       server: {
+        host: true,
         proxy: {
           '/api': {
             target: 'http://localhost:5177',
@@ -59,6 +71,7 @@ export default defineConfig(({ mode }) => {
           }
         }
       }
+      // 生产环境一般由nginx等代理做HTTPS，不用在Vite里开https
     };
   }
 });

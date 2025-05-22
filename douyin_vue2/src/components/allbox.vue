@@ -40,7 +40,6 @@ export default {
     samecityVue,
     followboxVue,
     liveboxVue,
-    shopboxVue,
     experiencebox
   },
   methods: {
@@ -52,6 +51,10 @@ export default {
 </script>
 
 <style scoped>
+.allbox {
+  width: 100%;
+  height: 95vh;
+}
 .test {
   width: 200px;
   height: 200px;

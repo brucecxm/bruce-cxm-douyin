@@ -13,7 +13,7 @@
 
     <div class="home" :style="boxvideocss">
       <header-vue
-        class="header"
+        class="headercontain"
         :activeIndex="activeIndex"
         @update:index="updateActiveIndex"
         :onChildEvent="showcaidanone"
@@ -58,7 +58,6 @@ import caidan from '../components/caidan.vue';
 import AllBoxVue from '../components/allbox.vue';
 import footerVue from '../components/footer.vue';
 import headerVue from '../components/header.vue';
-import videoboxVue from '../components/videobox.vue';
 import Pinglunqu from '@/components/Pinglunqu.vue';
 
 export default {
@@ -95,7 +94,6 @@ export default {
   },
 
   components: {
-    videoboxVue,
     headerVue,
     footerVue,
     AllBoxVue,
@@ -158,7 +156,7 @@ export default {
       this.isDragging = true;
       this.startX = this.getEventClientX(event) - this.currentX;
     },
-    stopDrag(event) {
+    stopDrag() {
       // event.preventDefault(); // 阻止默认行为
       this.isDragging = false;
       this.updateBoxPositionBasedOnCurrentX();
@@ -239,6 +237,7 @@ export default {
   flex-direction: column;
   background-color: black;
   overflow: hidden;
+  margin: 0;
 }
 
 .headercontain {
