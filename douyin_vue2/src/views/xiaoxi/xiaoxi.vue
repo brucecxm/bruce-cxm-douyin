@@ -1,40 +1,35 @@
 <template>
   <div class="xiaoxi">
     <caidan :style="caidancss"></caidan>
-
-    <div class="forposition">
+    <div class="other" :style="othercss">
       <div class="header">
-        <img
-          src="../../assets/xiaoxi/header/1.png"
-          alt=""
-          @click="showcaidanone"
-        />
-        <img src="../../assets/xiaoxi/header/2.png" alt="" />
-        <img src="../../assets/xiaoxi/header/3.png" alt="" />
+        <i class="icon" @click="showcaidanone">☰</i>
+        <i class="icon">🏠</i>
+        <i class="icon">🔍</i>
       </div>
-    </div>
 
-    <div class="commentbody">
-      <div class="user-list">
-        <el-input
-          v-model="input"
-          placeholder="请输入用户名"
-          prefix-icon="el-icon-search"
-          clearable
-        >
+      <div class="commentbody">
+        <div class="user-list">
+          <el-input
+            v-model="input"
+            placeholder="请输入用户名"
+            prefix-icon="el-icon-search"
+            clearable
           >
-        </el-input>
+            >
+          </el-input>
 
-        <user-info
-          v-for="(item, index) in filteredUsers"
-          :key="index"
-          :message="item"
-        />
-        <div v-if="filteredUsers.length === 0" class="no-data">暂无数据</div>
+          <user-info
+            v-for="(item, index) in filteredUsers"
+            :key="index"
+            :message="item"
+          />
+          <div v-if="filteredUsers.length === 0" class="no-data">暂无数据</div>
+        </div>
       </div>
-    </div>
 
-    <footer-vue class="footer"></footer-vue>
+      <footer-vue class="footer"></footer-vue>
+    </div>
   </div>
 </template>
 
@@ -55,10 +50,21 @@ export default {
       input: '',
       caidancss: {
         position: 'absolute',
-        right: '100vw',
+        right: '100vw', // 初始在屏幕外
         bottom: '0px',
         transition: 'right 0.5s ease',
-        height: '100vh'
+        height: '100vh',
+        width: '80vw', // 菜单宽度设置为 80vw
+        background: '#fff', // 可选
+        zIndex: 1000
+      },
+      othercss: {
+        position: 'relative',
+        right: '0vw', // 初始正常显示
+        bottom: '0px',
+        transition: 'right 0.5s ease',
+        height: '100vh',
+        width: '100vw'
       },
       userinfos: [
         {
@@ -70,34 +76,6 @@ export default {
         },
         {
           username: 'li',
-          status: '在线',
-          avatar:
-            'http://gips0.baidu.com/it/u=3560029307,576412274&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
-          height: '60px'
-        },
-        {
-          username: 'chen',
-          status: '在线',
-          avatar:
-            'http://gips0.baidu.com/it/u=3560029307,576412274&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
-          height: '60px'
-        },
-        {
-          username: 'zhao',
-          status: '在线',
-          avatar:
-            'http://gips0.baidu.com/it/u=3560029307,576412274&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
-          height: '60px'
-        },
-        {
-          username: 'zhao',
-          status: '在线',
-          avatar:
-            'http://gips0.baidu.com/it/u=3560029307,576412274&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
-          height: '60px'
-        },
-        {
-          username: 'zhao',
           status: '在线',
           avatar:
             'http://gips0.baidu.com/it/u=3560029307,576412274&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
@@ -122,8 +100,15 @@ export default {
       this.$router.push({ path: `/xiaodetail/${id}` });
     },
     showcaidanone() {
-      this.caidancss.right =
-        this.caidancss.right === '100vw' ? '20vw' : '100vw';
+      if (this.caidancss.right === '100vw') {
+        // 菜单滑入，other也向右滑80vw
+        this.caidancss.right = '20vw';
+        this.othercss.right = '-80vw';
+      } else {
+        // 菜单滑出，other归位
+        this.caidancss.right = '100vw';
+        this.othercss.right = '0vw';
+      }
     }
   }
 };
@@ -137,7 +122,6 @@ export default {
   color: #333;
   min-height: 100vh;
 }
-
 .header {
   background-color: #fff;
   width: 100%;
@@ -145,23 +129,31 @@ export default {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  position: fixed;
   top: 0;
   left: 0;
   z-index: 10;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.header img {
-  height: 30px;
+.icon {
+  font-size: 24px;
+  color: #333;
   cursor: pointer;
 }
 
+::v-deep .jiahao {
+  background-image: url(../../assets/home/加号黑.png);
+}
+
+.touxiang img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
 .commentbody {
-  margin-top: 60px;
   overflow-y: auto;
   height: calc(100vh - 60px - 50px);
-  /* Adjust based on header and footer height */
   padding: 10px;
 }
 
@@ -181,13 +173,6 @@ export default {
   background-color: #f9f9f9;
 }
 
-.touxiang img {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
 .neirong {
   margin-left: 15px;
   flex: 1;
@@ -204,36 +189,6 @@ export default {
   color: #777;
   font-size: 14px;
   margin-top: 5px;
-}
-
-.footer {
-  background-color: #222;
-  color: #fff;
-  z-index: 10;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  padding: 10px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.footer-vue {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-footer-vue img {
-  height: 20px;
-  margin: 0 10px;
-}
-
-::v-deep .jiahao {
-  background-image: url(../../assets/home/加号黑.png);
 }
 
 /* Hide scrollbar */
