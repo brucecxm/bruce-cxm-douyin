@@ -20,9 +20,9 @@ export const homegetVideocontent = (params) => {
 };
 
 // 修改 getauthzzz 函数
-export const getauthzzz = (userid) => {
+export const getauthzzz = (userid, page = 1, size = 10) => {
   return request.get('/video/auth', {
-    params: { userid } // 将 userid 包装在 params 对象中
+    params: { userid, page, size } // 将 userid 包装在 params 对象中
   });
 };
 

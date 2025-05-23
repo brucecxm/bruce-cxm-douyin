@@ -28,13 +28,7 @@
     </div>
 
     <div class="box-containeraaa" @scroll="handleScroll">
-      <!-- <div v-for="(box, index) in boxes" :key="index" class="boxaaa">
-                {{ box }}
-            </div> -->
       <div class="meum">
-        <!-- <div class="box1" v-for="(meum, index) in meumbox" :key="index">
-                    <img :src="meum.menuImg" alt="" style="width: 100%; height: 100%;" @click="go(meum.hrefurl)">
-                </div> -->
         <scroll-nav :navItems="parentMsg"></scroll-nav>
       </div>
 
@@ -64,33 +58,11 @@
 </template>
 
 <script>
-import {
-  shoplist,
-  searchForDish,
-  liansearchForDish,
-  shoplistpage,
-  getnav
-} from '@/api/shop';
+import { shoplist, getnav } from '@/api/shop';
 import ScrollNav from '../../components/ScrollNav.vue';
-import { shopmenulist } from '@/api/menu';
 import GridDisplay from '@/components/GridDisplay.vue';
-import { shopnavlist } from '@/api/menu';
 import { useTokenStore } from '@/stores/token';
 import footerVue from '@/components/footer.vue';
-import img1 from '@/assets/shop/menunav/1.png';
-import img2 from '@/assets/shop/menunav/2.png';
-import img3 from '@/assets/shop/menunav/3.png';
-import img4 from '@/assets/shop/menunav/4.png';
-import img5 from '@/assets/shop/menunav/5.png';
-import imgn6 from '@/assets/shop/nav/2.png';
-import imgn7 from '@/assets/shop/nav/3.png';
-import imgn8 from '@/assets/shop/nav/4.png';
-import imgn9 from '@/assets/shop/nav/5.png';
-import imgn10 from '@/assets/shop/nav/6.png';
-import imgm1 from '@/assets/shop/maininfo/1.png';
-import imgm2 from '@/assets/shop/maininfo/2.png';
-import imgm3 from '@/assets/shop/maininfo/3.png';
-import imgm4 from '@/assets/shop/maininfo/4.png';
 import RecommendList from '../../components/RecommendList.vue';
 export default {
   beforeDestroy() {
@@ -163,35 +135,7 @@ export default {
       // 初始化更多的数据，使其超出视口
       boxes: Array.from({ length: 50 }, (_, index) => index + 1), // 初始数据为 50 个盒子
       loading: false, // 加载状态
-      meumbox: [
-        { name: '超d市', menuImg: img1, hrefurl: 'order' },
-        { name: '超d市', menuImg: img2, hrefurl: 'chongzhi' },
-        { name: '超d市', menuImg: img3, hrefurl: 'shopmessage' },
-        { name: '超d市', menuImg: img4, hrefurl: '' },
-        { name: '超d市', menuImg: img5, hrefurl: '' },
-        { name: '超d市', menuImg: img5, hrefurl: '' },
-        { name: '超d市', menuImg: img5, hrefurl: '' }
-      ],
-      navbox: [
-        { navname: 'ss', navImg: imgn6, navhrefurl: 'order' },
-        { navname: 'ss', navImg: imgn7, navhrefurl: 'chongzhi' },
-        { navname: 'ss', navImg: imgn8, navhrefurl: 'shopmessage' },
-        { navname: 'ss', navImg: imgn9, navhrefurl: 'order' },
-        { navname: 'ss', navImg: imgn10, navhrefurl: '' },
-        { navname: 'ss', navImg: imgn10, navhrefurl: '' },
-        { navname: 'ss', navImg: imgn10, navhrefurl: '' },
-        { navname: 'ss', navImg: imgn10, navhrefurl: '' },
-        { navname: 'ss', navImg: imgn10, navhrefurl: '' },
-        { navname: 'ss', navImg: imgn10, navhrefurl: '' }
-      ],
-      mainbox: [
-        { image: imgm1, name: '商品1', hrefurl: '/shopdetail/1', shopId: '25' },
-        { image: imgm2, name: '商品1', hrefurl: '/shopdetail/1', shopId: '55' },
-        { image: imgm3, name: '商品1', hrefurl: '/shopdetail/1', shopId: '66' },
-        { image: imgm4, name: '商品1', hrefurl: '/shopdetail/1', shopId: '55' },
-        { image: imgm4, name: '商品1', hrefurl: '/shopdetail/1', shopId: '4' },
-        { image: imgm4, name: '商品1', hrefurl: '/shopdetail/1', shopId: '5' }
-      ],
+
       pagenum: 1,
       size: 10
     };
@@ -222,57 +166,6 @@ export default {
       .catch((error) => {
         console.log('获取 shoplist 数据出错:', error);
         console.log('获取 shoplist 数据出错');
-      });
-
-    // // 自动发送请求给后端
-    getnav()
-      .then((shopArr) => {
-        console.log(shopArr);
-        if (shopArr && shopArr.data && shopArr.data.data) {
-          // 检查数据是否有效
-          this.navbox = shopArr.data.data;
-          console.log(this.navbox);
-        } else {
-          console.log('获取 shoplist 数据失败: 数据无效');
-        }
-      })
-      .catch((error) => {
-        console.log('获取 shoplist 数据出错:', error);
-        console.log('获取 shoplist 数据出错');
-      });
-
-    // 自动发送请求给后端
-    shopmenulist()
-      .then((shopArr) => {
-        console.log(shopArr);
-        if (shopArr && shopArr.data && shopArr.data.data) {
-          // 检查数据是否有效
-          this.meumbox = shopArr.data.data.records;
-          console.log(this.meumbox);
-        } else {
-          console.log('获取 shopmenulist 数据失败: 数据无效');
-        }
-      })
-      .catch((error) => {
-        console.log('获取 shopmenulist 数据出错:', error);
-        console.log('获取 shopmenulist 数据出错');
-      });
-
-    // 自动发送请求给后端
-    shopnavlist()
-      .then((shopArr) => {
-        console.log(shopArr);
-        if (shopArr && shopArr.data && shopArr.data.data) {
-          // 检查数据是否有效
-          this.navbox = shopArr.data.data.records;
-          console.log(this.navbox);
-        } else {
-          console.log('获取 shopnavlist 数据失败: 数据无效');
-        }
-      })
-      .catch((error) => {
-        console.log('获取 shopnavlist 数据出错:', error);
-        console.log('获取 shopnavlist 数据出错');
       });
   },
   methods: {

@@ -1,11 +1,15 @@
 <template>
   <div class="container">
     <InfiniteList
-      :itemInfo="userInfo"
+      :itemInfo="videobox"
       :itemsPerRow="3"
+      :append="false"
       boxWidth="33%"
       boxHeight="250px"
       :gap="3"
+      :loading="loading"
+      :noMoreData="noMoreData"
+      @loadMore="fetchMoreData"
     >
       <template v-slot:header>
         <!-- 顶部背景图 -->
@@ -49,8 +53,23 @@
             <div class="school">{{ userInfo.school || '暂无学校信息' }}</div>
           </div>
         </div>
-
-        <under-line-tags-vue :navItems="parentMessage"></under-line-tags-vue>
+        <under-line-tags-vue
+          :navItems="parentMessage"
+          :active-index.sync="activeTabIndex"
+          @change="handleTabChange"
+        ></under-line-tags-vue>
+      </template>
+      <template #item="{ item }">
+        <div
+          class="itemdetail"
+          :style="{
+            backgroundImage: `url(${item.videoImg})`,
+            width: '100%',
+            height: '100%',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center'
+          }"
+        ></div>
       </template>
     </InfiniteList>
 
@@ -61,9 +80,8 @@
 import InfiniteList from '../../components/InfiniteList.vue';
 import footerVue from '@/components/footer.vue';
 import underLineTagsVue from '../../components/underLineTags.vue';
-import RecommendList from '../../components/RecommendList.vue';
-import { userInfoService } from '@/api/user';
-
+import { getauthzzz } from '@/api/video';
+import { useUserInfoStore } from '../../stores/userInfo';
 export default {
   components: {
     footerVue,
@@ -74,80 +92,56 @@ export default {
   data() {
     return {
       parentMessage: ['视频', '评论', '点赞', '确定'],
-      userInfo: {}
+      userInfo: {},
+      loading: false,
+      noMoreData: false,
+      activeTabIndex: 0,
+      page: 0, // 当前页码
+      pageSize: 10,
+      videobox: [] // 视频列表，初始为空
     };
   },
   mounted() {
-    // this.getUserInfo();
-    this.getUserInfojia();
+    this.fetchItemDetails(1);
   },
   methods: {
-    async fetchData(page, pageSize) {
-      // 模拟延迟
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // 模拟总数据量为 50 条
-      const total = 50;
-      const start = (page - 1) * pageSize;
-      const end = Math.min(start + pageSize, total);
-
-      if (start >= total) return [];
-
-      const data = Array.from({ length: end - start }).map((_, index) => {
-        const id = start + index + 1;
-        return {
-          title: `推荐内容 #${id}`,
-          image: `https://picsum.photos/300/200?random=${id}`
-        };
-      });
-
-      return data;
+    handleTabChange(index) {
+      this.activeTabIndex = index;
     },
-    getUserInfojia() {
-      // 假数据
-      this.userInfo = {
-        id: '12345678',
-        nickname: '测试用户',
-        avatar:
-          'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
-        backImg:
-          'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
-        followers: 888,
-        following: 123,
-        likes: 9999,
-        jieshao: '这是一段个人简介。',
-        city: '西安',
-        school: '西安财经大学',
-        videoList: [
-          {
-            videoUrl:
-              'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
-            playCount: 1234
-          },
-          {
-            videoUrl:
-              'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
-            playCount: 5678
-          },
-          {
-            videoUrl:
-              'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
-            playCount: 9999
+    fetchItemDetails(page) {
+      if (this.loading || this.noMoreData) return;
+      this.loading = true;
+      const userInfoStore = useUserInfoStore();
+      this.userId = userInfoStore.userInfo.id;
+      getauthzzz(this.userId, page, this.pageSize)
+        .then((res) => {
+          debugger;
+          const videos = res.data.videobox || [];
+          const total = res.data.total || 0;
+
+          // 追加视频数据
+          this.videobox = [...this.videobox, ...videos];
+
+          // 只在第一页赋值musicinfo，避免重复赋值
+          if (page === 1) {
+            this.userInfo = res.data.auth || {};
           }
-        ]
-      };
+
+          // 判断是否加载完毕
+          if (this.videobox.length >= total) {
+            this.noMoreData = true;
+          }
+
+          this.page = page; // 更新当前页码
+          this.loading = false;
+        })
+        .catch(() => {
+          this.loading = false;
+          this.$toast && this.$toast('获取视频出错');
+        });
     },
     goEditMeInfo() {
       this.$router.push({ path: '/editMeInfo' });
-    },
-    getUserInfo() {
-      userInfoService()
-        .then((res) => {
-          this.userInfo = res.data;
-        })
-        .catch((err) => {
-          console.error(err);
-        });
     }
   }
 };

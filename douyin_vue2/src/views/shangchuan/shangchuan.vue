@@ -164,10 +164,58 @@ export default {
       activeTabIndex: 0,
       songList: {
         推荐: [
-          /*同之前*/
+          {
+            title: '@民哥创作的原声',
+            author: '民哥 · 1:30',
+            avatar: 'https://example.com/avatar1.jpg'
+          },
+          {
+            title: '车大别盼',
+            author: 'see you again x2.5 · 1:51',
+            avatar: 'https://example.com/avatar2.jpg'
+          },
+          {
+            title: '@江汐K创作的原声',
+            author: '江汐K · 0:14',
+            avatar: 'https://example.com/avatar3.jpg'
+          },
+          {
+            title: '@敬山平创作的原声',
+            author: '敬山平 · 0:15',
+            avatar: 'https://example.com/avatar4.jpg'
+          },
+          {
+            title: '美好降临',
+            author: '',
+            avatar: 'https://example.com/avatar5.jpg'
+          }
         ],
         热门: [
-          /*同之前*/
+          {
+            title: '@民哥sssss创作的原声',
+            author: '民哥 · 1:30',
+            avatar: 'https://example.com/avatar1.jpg'
+          },
+          {
+            title: '车大别盼',
+            author: 'see you again x2.5 · 1:51',
+            avatar: 'https://example.com/avatar2.jpg'
+          },
+          {
+            title: '@江汐K创作的原声',
+            author: '江汐K · 0:14',
+            avatar: 'https://example.com/avatar3.jpg'
+          },
+          {
+            title: '@敬山平创作的原声',
+            author: '敬山平 · 0:15',
+            avatar: 'https://example.com/avatar4.jpg'
+          },
+          {
+            title: '美好降临',
+            author: '',
+            avatar: 'https://example.com/avatar5.jpg'
+          }
         ],
         收藏: [],
         用过: []

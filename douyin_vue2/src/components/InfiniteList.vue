@@ -70,6 +70,10 @@ export default {
     noMoreData: {
       type: Boolean,
       default: false
+    },
+    append: {
+      type: Boolean,
+      default: true // 默认累加
     }
   },
   data() {
@@ -81,8 +85,12 @@ export default {
     itemInfo: {
       immediate: true,
       handler(newVal) {
-        // 追加数据，不覆盖
-        this.list = [...this.list, ...newVal];
+        // 根据 append 决定是否累加
+        if (this.append) {
+          this.list = [...this.list, ...newVal];
+        } else {
+          this.list = [...newVal];
+        }
       }
     }
   },

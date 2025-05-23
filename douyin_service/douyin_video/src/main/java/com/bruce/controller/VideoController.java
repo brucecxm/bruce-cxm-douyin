@@ -3,6 +3,7 @@ package com.bruce.controller;
 
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.api.ApiController;
@@ -196,6 +197,7 @@ public class VideoController extends ApiController {
                     new QueryWrapper<Likeone>().eq("like_videoid", video.getVideoId()).eq("`like`", 1)
             );
             vo.setLikeNum((long) likeCount);
+            vo.setUserId((long) user.getId());
 
             // 评论数
             int commentCount = commentService.count(
@@ -218,6 +220,7 @@ public class VideoController extends ApiController {
             // 把 VideoVO 转 Map 返回
             Map<String, Object> map = new HashMap<>();
             map.put("videoId", vo.getVideoId());
+            map.put("userId", vo.getUserId());
             map.put("videoUrl", vo.getVideoUrl());
             map.put("videoComment", vo.getVideoComment());
             map.put("username", vo.getUsername());
@@ -238,8 +241,8 @@ public class VideoController extends ApiController {
 
 
 
-    @GetMapping("/auth")
-    public Map getauth(
+    @GetMapping("/authbefore")
+    public Map authbefore(
 
             int userid) {
 
@@ -258,6 +261,32 @@ public class VideoController extends ApiController {
         result.put("auth", auth);
         return result;
     }
+
+    @GetMapping("/auth")
+    public Map getAuth(
+            @RequestParam int userid,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Map<String, Object> result = new HashMap<>();
+        LambdaQueryWrapper<User> queryWrapper=new LambdaQueryWrapper();
+        queryWrapper.eq(User::getId,userid);
+        // 获取用户信息（比如头像、昵称等）
+       User userInfo = userService.getOne(queryWrapper);
+        result.put("auth", userInfo);
+         Page<Video> page1=new Page<>();
+        LambdaQueryWrapper<Video> queryWrappertwo=new LambdaQueryWrapper();
+        queryWrappertwo.eq(Video::getAuthId,userid);
+
+        // 分页获取视频信息
+        IPage<Video> videoPage = videoService.page(page1,queryWrappertwo);
+        result.put("videobox", videoPage.getRecords());
+        result.put("total", videoPage.getTotal());
+
+        return result;
+    }
+
+
 
     @Autowired
     private RabbitTemplate rabbitTemplate;

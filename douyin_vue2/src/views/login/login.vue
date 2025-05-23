@@ -99,17 +99,13 @@
 </template>
 
 <script>
-import { isShallow } from 'vue';
 import {
   userLoginService,
-  userInfoService,
   userRegisterService,
   getVerificationCodeService
 } from '../../api/user';
 import { useTokenStore } from '../../stores/token';
 import { useUserInfoStore } from '@/stores/userInfo';
-
-import axios from 'axios';
 
 export default {
   name: 'Login',

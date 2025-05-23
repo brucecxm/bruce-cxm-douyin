@@ -1,7 +1,7 @@
 <template>
   <div class="videoaside">
     <!-- 用户头像 -->
-    <div class="touxiang avatar" @click="goauth(videoData.userid)">
+    <div class="touxiang avatar" @click="goauth(videoData.userId)">
       <img
         :src="videoData.userAvatar"
         alt="avatar"

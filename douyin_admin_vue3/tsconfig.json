@@ -1,7 +1,7 @@
 {
   "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
+    { "path": "./tsconfig.app.json" }, // 引用 app 模块的配置文件
+    { "path": "./tsconfig.node.json" } // 引用 node 模块的配置文件
   ],
-  "files": []
+  "files": [] // 当前 tsconfig.json 不包含具体文件，全部依赖引用的配置
 }

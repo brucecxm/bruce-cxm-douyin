@@ -7,6 +7,7 @@ public class VideoVO {
     private Long videoId;
     private String videoUrl;
     private String videoComment;
+    private Long userId;
 
     private String username;
     private String userAvatar;
