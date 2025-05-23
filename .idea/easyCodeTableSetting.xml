@@ -548,6 +548,40 @@
             </TableInfoDTO>
           </value>
         </entry>
+        <entry key="douyintest.permission">
+          <value>
+            <TableInfoDTO>
+              <option name="fullColumn">
+                <list>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="id" />
+                    <option name="type" value="java.lang.Integer" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="permission" />
+                    <option name="type" value="java.lang.String" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="roleId" />
+                    <option name="type" value="java.lang.Integer" />
+                  </ColumnInfoDTO>
+                </list>
+              </option>
+              <option name="name" value="Permission" />
+              <option name="preName" value="" />
+              <option name="saveModelName" value="douyin-id-service" />
+              <option name="savePackageName" value="com.bruce" />
+              <option name="savePath" value="./douyin_basic/douyin-id-service/src/main/java/com/bruce" />
+              <option name="templateGroupName" value="MybatisPlus" />
+            </TableInfoDTO>
+          </value>
+        </entry>
         <entry key="douyintest.salt">
           <value>
             <TableInfoDTO>

@@ -40,12 +40,32 @@ public class MenuController extends ApiController {
 
     @PostMapping("/list")
     public R selectAll(@RequestBody Menu menu) {
-        LambdaQueryWrapper<Menu> queryWrapper=new LambdaQueryWrapper<>();
-        queryWrapper.eq(Menu::getMenuType,menu.getMenuType());
-        queryWrapper.eq(Menu::getStatus,menu.getStatus());
-        List<Menu> menus=this.menuService.list(queryWrapper);
+        LambdaQueryWrapper<Menu> queryWrapper = new LambdaQueryWrapper<>();
+
+        // menuType 是 String
+        queryWrapper.eq(menu.getMenuType() != null && !menu.getMenuType().isEmpty(), Menu::getMenuType, menu.getMenuType());
+
+        // menuName 是 String（示例）
+        queryWrapper.eq(menu.getMenuName() != null && !menu.getMenuName().isEmpty(), Menu::getMenuName, menu.getMenuName());
+
+        // menuId 是 Integer
+        queryWrapper.eq(menu.getMenuId() != null, Menu::getMenuId, menu.getMenuId());
+
+        // menuLev 是 Integer
+        queryWrapper.eq(menu.getMenuLev() != null, Menu::getMenuLev, menu.getMenuLev());
+
+        // menuHref 是 Integer
+        queryWrapper.eq(menu.getMenuHref() != null, Menu::getMenuHref, menu.getMenuHref());
+
+        // status 是 int 基本类型，假设0表示不筛选，非0时筛选
+        if (menu.getStatus() != 0) {
+            queryWrapper.eq(Menu::getStatus, menu.getStatus());
+        }
+
+        List<Menu> menus = this.menuService.list(queryWrapper);
         return success(menus);
     }
+
 
     /**
      * 通过主键查询单条数据

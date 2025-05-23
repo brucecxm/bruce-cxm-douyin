@@ -25,7 +25,8 @@ const newVideo = ref({
 // Fetch videos on mounted
 onMounted(async () => {
   try {
-    const res = await VideoApi.getAllVideo(1, 10)
+    
+    const res = await VideoApi.getAllVideo(1, 10, 'w')
     videos.value = res || [] // Assuming response data contains an array of videos
   }
   catch (error) {

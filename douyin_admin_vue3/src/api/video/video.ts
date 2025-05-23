@@ -4,10 +4,11 @@ export default {
 
   // 登录
   // 登录
-  getAllVideo: (page, size) => api.get('/video/test', {
+  getAllVideo: (page, size, videoType) => api.get('/video/test', {
     params: {
       page,
       size,
+      videoType,
     },
   }),
 

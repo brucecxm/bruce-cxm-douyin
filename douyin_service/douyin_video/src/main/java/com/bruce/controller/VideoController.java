@@ -263,29 +263,37 @@ public class VideoController extends ApiController {
     }
 
     @GetMapping("/auth")
-    public Map getAuth(
-            @RequestParam int userid,
+    public Map<String, Object> getAuth(
+            @RequestParam(required = false) Integer userid,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        Map<String, Object> result = new HashMap<>();
-        LambdaQueryWrapper<User> queryWrapper=new LambdaQueryWrapper();
-        queryWrapper.eq(User::getId,userid);
-        // 获取用户信息（比如头像、昵称等）
-       User userInfo = userService.getOne(queryWrapper);
-        result.put("auth", userInfo);
-         Page<Video> page1=new Page<>();
-        LambdaQueryWrapper<Video> queryWrappertwo=new LambdaQueryWrapper();
-        queryWrappertwo.eq(Video::getAuthId,userid);
+        Object UserIdObj = StpUtil.getLoginId();
+        Long loginUserId = UserIdObj != null ? Long.parseLong(UserIdObj.toString()) : 0L;
 
-        // 分页获取视频信息
-        IPage<Video> videoPage = videoService.page(page1,queryWrappertwo);
+        if (userid == null) {
+            userid = loginUserId.intValue();  // 使用当前登录用户ID
+        }
+
+        Map<String, Object> result = new HashMap<>();
+
+        // 查询用户信息
+        LambdaQueryWrapper<User> userQuery = new LambdaQueryWrapper<>();
+        userQuery.eq(User::getId, userid);
+        User userInfo = userService.getOne(userQuery);
+        result.put("auth", userInfo);
+
+        // 查询视频分页数据
+        Page<Video> pageInfo = new Page<>(page, size);
+        LambdaQueryWrapper<Video> videoQuery = new LambdaQueryWrapper<>();
+        videoQuery.eq(Video::getAuthId, userid);
+        IPage<Video> videoPage = videoService.page(pageInfo, videoQuery);
+
         result.put("videobox", videoPage.getRecords());
         result.put("total", videoPage.getTotal());
 
         return result;
     }
-
 
 
     @Autowired

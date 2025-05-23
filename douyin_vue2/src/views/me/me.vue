@@ -81,7 +81,6 @@ import InfiniteList from '../../components/InfiniteList.vue';
 import footerVue from '@/components/footer.vue';
 import underLineTagsVue from '../../components/underLineTags.vue';
 import { getauthzzz } from '@/api/video';
-import { useUserInfoStore } from '../../stores/userInfo';
 export default {
   components: {
     footerVue,
@@ -111,9 +110,8 @@ export default {
     fetchItemDetails(page) {
       if (this.loading || this.noMoreData) return;
       this.loading = true;
-      const userInfoStore = useUserInfoStore();
-      this.userId = userInfoStore.userInfo.id;
-      getauthzzz(this.userId, page, this.pageSize)
+
+      getauthzzz(null, page, this.pageSize)
         .then((res) => {
           const videos = res.data.videobox || [];
           const total = res.data.total || 0;
