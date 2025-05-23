@@ -2,10 +2,10 @@ package com.bruce.controller;
 
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.entity.Menu;
 import com.bruce.service.MenuService;
 import org.springframework.web.bind.annotation.*;
@@ -29,16 +29,22 @@ public class MenuController extends ApiController {
     @Resource
     private MenuService menuService;
 
-    /**
-     * 分页查询所有数据
-     *
-     * @param page 分页对象
-     * @param menu 查询实体
-     * @return 所有数据
-     */
-    @GetMapping("/list")
-    public R selectAll(Page<Menu> page, Menu menu) {
-        return success(this.menuService.page(page, new QueryWrapper<>(menu)));
+
+
+
+
+
+
+
+
+
+    @PostMapping("/list")
+    public R selectAll(@RequestBody Menu menu) {
+        LambdaQueryWrapper<Menu> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(Menu::getMenuType,menu.getMenuType());
+        queryWrapper.eq(Menu::getStatus,menu.getStatus());
+        List<Menu> menus=this.menuService.list(queryWrapper);
+        return success(menus);
     }
 
     /**

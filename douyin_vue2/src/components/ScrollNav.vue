@@ -2,7 +2,9 @@
   <div class="navbar-wrapper">
     <div class="navbar-scroll" ref="scrollContainer">
       <div class="nav-item" v-for="(item, index) in navItems" :key="index">
-        <div class="icon">{{ item.icon }}</div>
+        <div class="icon">
+          <img :src="item.icon" alt="icon" />
+        </div>
         <div class="label">{{ item.label }}</div>
       </div>
     </div>
@@ -48,8 +50,7 @@ export default {
       const totalWidth = container.scrollWidth;
       const scrollLeft = container.scrollLeft;
 
-      // 滚动区域在居中 50% 中显示，滚动条也映射在这 50% 中
-      const trackVisibleRatio = 0.5; // 居中一半
+      const trackVisibleRatio = 0.5;
 
       this.thumbWidth = (visibleWidth / totalWidth) * 100 * trackVisibleRatio;
       this.thumbLeft =
@@ -69,8 +70,8 @@ export default {
 .navbar-scroll {
   display: flex;
   overflow-x: auto;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 .navbar-scroll::-webkit-scrollbar {
   display: none;
@@ -84,15 +85,22 @@ export default {
 }
 
 .icon {
-  font-size: 20px;
+  width: 24px;
+  height: 24px;
+  margin: 0 auto;
 }
+.icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .label {
   font-size: 12px;
   color: #555;
   margin-top: 4px;
 }
 
-/* 滚动条轨道，只占容器宽度的中间一部分 */
 .scrollbar-track {
   width: 50%;
   height: 4px;

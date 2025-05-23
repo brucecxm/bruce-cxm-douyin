@@ -42,7 +42,12 @@
       </div>
 
       <div class="main">
-        <RecommendList :columns="2" :loadData="fetchData">
+        <RecommendList
+          :columns="2"
+          :items="shopitems"
+          :loading="loading"
+          :noMore="noMore"
+        >
           <template v-slot:default="{ item }">
             <div class="recommend-item">
               <img :src="item.image" class="cover" />
@@ -58,7 +63,7 @@
 </template>
 
 <script>
-import { shoplist, getnav } from '@/api/shop';
+import { getButtonInfo } from '@/api/admin';
 import ScrollNav from '../../components/ScrollNav.vue';
 import GridDisplay from '@/components/GridDisplay.vue';
 import { useTokenStore } from '@/stores/token';
@@ -73,7 +78,6 @@ export default {
     footerVue,
     ScrollNav,
     GridDisplay,
-
     RecommendList
   },
   data() {
@@ -82,46 +86,10 @@ export default {
         {
           icon: 'https://cdn-icons-png.flaticon.com/512/616/616408.png',
           name: '图标1'
-        },
-        {
-          icon: 'https://cdn-icons-png.flaticon.com/512/616/616429.png',
-          name: '图标2'
-        },
-        {
-          icon: 'https://cdn-icons-png.flaticon.com/512/616/616490.png',
-          name: '图标3'
-        },
-        {
-          icon: 'https://cdn-icons-png.flaticon.com/512/616/616554.png',
-          name: '图标4'
-        },
-        {
-          icon: 'https://cdn-icons-png.flaticon.com/512/616/616494.png',
-          name: '图标5'
-        },
-        {
-          icon: 'https://cdn-icons-png.flaticon.com/512/616/616409.png',
-          name: '图标6'
-        },
-        {
-          icon: 'https://cdn-icons-png.flaticon.com/512/616/616426.png',
-          name: '图标7'
-        },
-        {
-          icon: 'https://cdn-icons-png.flaticon.com/512/616/616453.png',
-          name: '图标8'
         }
       ],
-      parentMsg: [
-        { icon: '🏠', label: '首页' },
-        { icon: '🔥', label: '热门' },
-        { icon: '🛍', label: '商城' },
-        { icon: '💬', label: '消息' },
-        { icon: '👤', label: '我的' },
-        { icon: '📺', label: '直播' },
-        { icon: '🎮', label: '游戏' },
-        { icon: '📷', label: '相册' }
-      ],
+
+      parentMsg: [{ icon: '🏠', label: '首页' }],
       searchText: '', // 输入框的内容
       showSuggestions: false, // 是否显示联想框
       suggestions: ['苹果', '香蕉', '橙子', '葡萄', '西瓜', '草莓', '芒果'],
@@ -135,9 +103,10 @@ export default {
       // 初始化更多的数据，使其超出视口
       boxes: Array.from({ length: 50 }, (_, index) => index + 1), // 初始数据为 50 个盒子
       loading: false, // 加载状态
-
-      pagenum: 1,
-      size: 10
+      shopitems: [],
+      page: 1,
+      pageSize: 10,
+      noMore: false
     };
   },
   computed: {
@@ -149,26 +118,71 @@ export default {
     }
   },
   mounted() {
-    // 监听点击外部区域事件
     document.addEventListener('click', this.handleOutsideClick);
-    // // 自动发送请求给后端
-    shoplist(this.pagenum, this.size)
-      .then((shopArr) => {
-        console.log(shopArr);
-        if (shopArr && shopArr.data && shopArr.data.data) {
-          // 检查数据是否有效
-          this.mainbox = shopArr.data.data.records;
-          console.log(this.mainbox);
-        } else {
-          console.log('获取 shoplist 数据失败: 数据无效');
-        }
-      })
-      .catch((error) => {
-        console.log('获取 shoplist 数据出错:', error);
-        console.log('获取 shoplist 数据出错');
-      });
+    this.InitMenu('shop_home_menu');
+    this.InitMenu('shop_home_nav');
+    this.loadMore();
   },
   methods: {
+    handleScroll(event) {
+      const container = event.target;
+      if (
+        container.scrollHeight <=
+        container.scrollTop + container.clientHeight + 200
+      ) {
+        this.loadMore();
+      }
+    },
+    async loadMore() {
+      if (this.loading || this.noMore) return;
+      this.loading = true;
+      try {
+        const newData = await this.fetchData(this.page, this.pageSize);
+        if (!newData.length) {
+          this.noMore = true;
+        } else {
+          this.shopitems.push(...newData);
+          this.page++;
+        }
+      } finally {
+        this.loading = false;
+      }
+    },
+    async fetchData(page, pageSize) {
+      // 你的请求函数或模拟数据
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const total = 50;
+      const start = (page - 1) * pageSize;
+      if (start >= total) return [];
+      const end = Math.min(start + pageSize, total);
+      return Array.from({ length: end - start }).map((_, i) => ({
+        title: `推荐内容 #${start + i + 1}`,
+        image: `https://picsum.photos/300/200?random=${start + i + 1}`
+      }));
+    },
+    InitMenu(type) {
+      const menu = {
+        menuType: type,
+        status: 1
+      };
+      getButtonInfo(menu)
+        .then((res) => {
+          if (type === 'shop_home_menu') {
+            this.parentMsg = res.data.data.map((item) => ({
+              icon: item.menuImg,
+              label: item.menuName
+            }));
+          } else {
+            this.items = res.data.data.map((item) => ({
+              icon: item.menuImg,
+              name: item.menuName
+            }));
+          }
+        })
+        .catch((error) => {
+          console.error('获取按钮信息失败:', error);
+        });
+    },
     async fetchData(page, pageSize) {
       // 模拟延迟
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -231,54 +245,7 @@ export default {
     submitlian(name) {
       this.search = name;
     },
-    // 滚动事件处理函数
-    handleScroll(event) {
-      const container = event.target;
-      const bottom =
-        container.scrollHeight <= container.scrollTop + container.clientHeight;
 
-      if (bottom && !this.loading) {
-        this.loadMoreBoxes(); // 滚动到底部时加载更多数据
-      }
-    },
-    // 请求加载更多盒子数据
-    loadMoreBoxes() {
-      this.loading = true; // 开始加载
-      // 模拟异步请求
-      setTimeout(() => {
-        shoplist(this.pagenum, this.size)
-          .then((shopArr) => {
-            console.log(shopArr); // 查看返回的数据结构
-            if (shopArr && shopArr.data && shopArr.data.data) {
-              const newData = shopArr.data.data.records;
-              if (Array.isArray(newData)) {
-                console.log('New data:', newData); // 打印新数据
-                // 确保新数据是有效的，并将其添加到 mainbox
-                this.mainbox.push(...newData);
-
-                this.pagenum++;
-                console.log(this.mainbox); // 打印更新后的 mainbox
-              } else {
-                console.log('新数据不是数组:', newData);
-              }
-            } else {
-              console.log('获取 shoplist 数据失败: 数据无效');
-            }
-          })
-          .catch((error) => {
-            console.log('获取 shoplist 数据出错:', error);
-          });
-        this.loading = false; // 加载完成
-      }, 1000);
-    },
-    go(url) {
-      // Navigation logic here
-      console.log(url);
-    },
-    goshopdetail(shopId) {
-      // Redirect to the product details page
-      console.log(shopId);
-    },
     go(hrefurl) {
       const usertoken = useTokenStore();
       const id = usertoken.getToken;
@@ -304,9 +271,7 @@ export default {
       this.$router.push({ path: `/shopdetail/${id}` });
     },
     getmenu() {},
-    getnavone() {
-      const respond = getnav();
-    },
+    getnavone() {},
     getshopinfo() {},
     getinputciyu() {
       //获得搜索输入框联想词

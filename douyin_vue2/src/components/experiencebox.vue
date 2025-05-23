@@ -46,13 +46,7 @@
 </template>
 
 <script>
-import {
-  shoplist,
-  searchForDish,
-  liansearchForDish,
-  shoplistpage,
-  getnav
-} from '@/api/shop';
+import { shoplist, searchForDish, liansearchForDish, getnav } from '@/api/shop';
 import { shopmenulist } from '@/api/menu';
 import { shopnavlist } from '@/api/menu';
 import { useTokenStore } from '@/stores/token';

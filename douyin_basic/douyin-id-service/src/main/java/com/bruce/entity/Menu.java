@@ -24,6 +24,6 @@ public class Menu extends Model<Menu> {
     private Integer menuLev;
     
     private Integer menuHref;
-
+ private  int status;
 }
 

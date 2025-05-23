@@ -22,6 +22,7 @@ export const shoplistpage = (page = 1, pageSize = 10) => {
     }
   });
 };
+
 export const getnav = (page = 1, pageSize = 10) => {
   return request.get('/shop/fileImg', {
     params: {

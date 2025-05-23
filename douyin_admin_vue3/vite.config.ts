@@ -6,8 +6,6 @@ import { defineConfig, loadEnv } from 'vite' // Vite 核心API，定义配置和
 import pkg from './package.json' // 读取 package.json 文件内容（版本号、依赖等）
 import createVitePlugins from './vite/plugins' // 自定义插件集合函数
 
-// https://vitejs.dev/config/  -- 官方配置文档地址
-
 // Vite 配置导出，支持根据不同环境(mode)和命令(command)返回不同配置
 export default defineConfig(({ mode, command }) => {
   // 读取对应模式下的环境变量文件，如 .env.development, .env.production 等
