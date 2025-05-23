@@ -115,7 +115,6 @@ export default {
       this.userId = userInfoStore.userInfo.id;
       getauthzzz(this.userId, page, this.pageSize)
         .then((res) => {
-          debugger;
           const videos = res.data.videobox || [];
           const total = res.data.total || 0;
 

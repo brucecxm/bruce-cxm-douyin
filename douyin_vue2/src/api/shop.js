@@ -2,6 +2,16 @@ import request from '@/utils/request.js';
 
 // params 处理get请求  data处理post请求
 
+export const shoplistPage = (current, size, shop) => {
+  return request.get('/shop/page', {
+    params: {
+      current,
+      size,
+      ...shop
+    }
+  });
+};
+
 export const shoplist = (current, size) => {
   return request.get(`/shop?current=${current}&size=${size}`);
 };

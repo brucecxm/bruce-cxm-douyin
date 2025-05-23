@@ -4,6 +4,7 @@ package com.bruce.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -13,7 +14,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * (Shop)表控制层
@@ -30,35 +34,37 @@ public class ShopController extends ApiController {
     @Resource
     private ShopService shopService;
 
-    /**
-     * 分页查询所有数据
-     *
-     * @param page 分页对象
-     * @param shop 查询实体
-     * @return 所有数据
-     */
-    @GetMapping
-    public R selectAll(Page<Shop> page, Shop shop) {
-        R one=success(this.shopService.page(page, new QueryWrapper<>(shop)));
-        return one;
+//    后端接口返回的 records 有值（对象属性完整），但前端拿到的是 10 个空对象，
+//    这是因为 Spring Boot 在接收 Page<Shop> page, Shop shop 参数时，
+//    Shop 实体类中有些字段前端没有传，而 Spring 会默认实例化一个空的对象，
+//    导致 QueryWrapper 条件未生效或数据反序列化异常。
+//    @GetMapping("/page")
+//    public R selectAll(Page<Shop> page, Shop shop) {
+//LambdaQueryWrapper<Shop> queryWrapper=new LambdaQueryWrapper<>();
+////queryWrapper.eq(Shop::)
+//        IPage<Shop>  shops=this.shopService.page(page);
+//        R one=success(shops);
+//        return one;
+//    }
+//todo 后面发现前面gpt就扯几把蛋呢  最后检查发现是Shop实体类没有加@Date注解  导致序列化异常
+
+
+
+    @GetMapping("/page")
+    public Map selectAll(Page<Shop> page,Shop shop) {
+
+        IPage<Shop> shopsPage = this.shopService.page(page,new QueryWrapper<>(shop));
+
+
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("shopList", shopsPage.getRecords());
+        response.put("total", shopsPage.getTotal());
+        response.put("current", shopsPage.getCurrent());
+        response.put("size", shopsPage.getSize());
+
+        return response;
     }
-
-
-
-    @GetMapping("/likeall")
-    public R likeall(Page<Shop> page, String key) {
-
-        LambdaQueryWrapper<Shop> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-// 查询 name 字段中包含 "张" 的记录
-        lambdaQueryWrapper.like(Shop::getShopName, key);
-
-        List<Shop> shop = shopService.list(lambdaQueryWrapper);
-
-        R one=success(shop);
-        return one;
-    }
-
-
 
 
     /**

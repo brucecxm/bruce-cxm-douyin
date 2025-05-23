@@ -47,11 +47,35 @@
           :items="shopitems"
           :loading="loading"
           :noMore="noMore"
+          :itemStyle="{
+            height: '300px',
+            backgroundColor: '#f8f8f8',
+            borderRadius: '10px',
+            padding: '10px'
+          }"
         >
           <template v-slot:default="{ item }">
             <div class="recommend-item">
-              <img :src="item.image" class="cover" />
-              <div class="title">{{ item.title }}</div>
+              <img
+                :src="item.image"
+                class="cover"
+                :style="{
+                  width: '100%',
+                  height: '200px',
+                  objectFit: 'cover',
+                  borderRadius: '8px'
+                }"
+              />
+              <div
+                class="title"
+                :style="{
+                  fontSize: '14px',
+                  marginTop: '5px',
+                  textAlign: 'center'
+                }"
+              >
+                {{ item.title }}
+              </div>
             </div>
           </template>
         </RecommendList>
@@ -64,6 +88,7 @@
 
 <script>
 import { getButtonInfo } from '@/api/admin';
+import { shoplistPage } from '@/api/shop';
 import ScrollNav from '../../components/ScrollNav.vue';
 import GridDisplay from '@/components/GridDisplay.vue';
 import { useTokenStore } from '@/stores/token';
@@ -104,8 +129,12 @@ export default {
       boxes: Array.from({ length: 50 }, (_, index) => index + 1), // 初始数据为 50 个盒子
       loading: false, // 加载状态
       shopitems: [],
-      page: 1,
-      pageSize: 10,
+
+      page: {
+        current: 1,
+        size: 10
+      },
+      query: {},
       noMore: false
     };
   },
@@ -135,31 +164,35 @@ export default {
     },
     async loadMore() {
       if (this.loading || this.noMore) return;
+
       this.loading = true;
+
       try {
-        const newData = await this.fetchData(this.page, this.pageSize);
-        if (!newData.length) {
+        const res = await shoplistPage(
+          this.page.current,
+          this.page.size,
+          this.query || {}
+        );
+        const records = res.data.shopList;
+
+        // 判断是否还有更多
+        if (records.length < this.page.size) {
           this.noMore = true;
-        } else {
-          this.shopitems.push(...newData);
-          this.page++;
         }
+        const mapped = records.map((item) => ({
+          image: item.shopImg,
+          title: item.shopName
+        }));
+
+        this.shopitems.push(...mapped);
+        this.page.current++;
+      } catch (error) {
+        console.error('加载失败', error);
       } finally {
         this.loading = false;
       }
     },
-    async fetchData(page, pageSize) {
-      // 你的请求函数或模拟数据
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      const total = 50;
-      const start = (page - 1) * pageSize;
-      if (start >= total) return [];
-      const end = Math.min(start + pageSize, total);
-      return Array.from({ length: end - start }).map((_, i) => ({
-        title: `推荐内容 #${start + i + 1}`,
-        image: `https://picsum.photos/300/200?random=${start + i + 1}`
-      }));
-    },
+
     InitMenu(type) {
       const menu = {
         menuType: type,
@@ -183,27 +216,7 @@ export default {
           console.error('获取按钮信息失败:', error);
         });
     },
-    async fetchData(page, pageSize) {
-      // 模拟延迟
-      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // 模拟总数据量为 50 条
-      const total = 50;
-      const start = (page - 1) * pageSize;
-      const end = Math.min(start + pageSize, total);
-
-      if (start >= total) return [];
-
-      const data = Array.from({ length: end - start }).map((_, index) => {
-        const id = start + index + 1;
-        return {
-          title: `推荐内容 #${id}`,
-          image: `https://picsum.photos/300/200?random=${id}`
-        };
-      });
-
-      return data;
-    },
     selectSuggestion(suggestion) {
       // 点击某个联想词时更新输入框的内容
       this.searchText = suggestion;

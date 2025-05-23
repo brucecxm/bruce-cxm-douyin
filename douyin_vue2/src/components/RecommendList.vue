@@ -2,7 +2,12 @@
 <template>
   <div class="recommend-list">
     <div class="masonry" :style="masonryStyle">
-      <div class="item" v-for="(item, index) in items" :key="index">
+      <div
+        class="item"
+        v-for="(item, index) in items"
+        :key="index"
+        :style="itemStyle"
+      >
         <slot :item="item" />
       </div>
     </div>
@@ -31,6 +36,10 @@ export default {
     noMore: {
       type: Boolean,
       default: false
+    },
+    itemStyle: {
+      type: Object,
+      default: () => ({})
     }
   },
   computed: {
