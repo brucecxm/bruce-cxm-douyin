@@ -59,22 +59,7 @@ const routes: RouteRecordRaw = {
             title: '配置管理',
           },
         },
-        {
-          path: 'permission_management',
-          name: 'permissionManagement',
-          component: () => import('@/views/multilevel_menu_example/level2/page.vue'),
-          meta: {
-            title: '权限管理',
-          },
-        },
-        {
-          path: 'role_management',
-          name: 'roleManagement',
-          component: () => import('@/views/multilevel_menu_example/level2/page.vue'),
-          meta: {
-            title: '角色管理',
-          },
-        },
+
       ],
     },
     // 好友管理
