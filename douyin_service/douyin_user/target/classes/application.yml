@@ -6,6 +6,8 @@ spring:
   profiles:
     active: prod  # 生产环境
 
+  mvc:
+    static-path-pattern: /files/**
 
 
 

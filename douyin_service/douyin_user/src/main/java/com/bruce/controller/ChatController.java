@@ -1,5 +1,6 @@
 package com.bruce.controller;
 
+import com.bruce.entity.ChatMessage;
 import com.bruce.pojo.AddGroupMemberRequest;
 import com.bruce.pojo.ChatMessageRequest;
 import com.bruce.pojo.ChatMessageVO;
@@ -7,6 +8,8 @@ import com.bruce.pojo.CreateGroupRequest;
 import com.bruce.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +20,15 @@ public class ChatController {
 
     @Autowired
     private ChatService chatService;
+
+    @MessageMapping("/chat") // 客户端发送的路径: /app/chat
+    @SendTo("/topic/messages") // 广播路径: /topic/messages
+    public ChatMessage sendMessage(ChatMessage message) {
+        return message;
+    }
+
+
+
 
     // 发送消息接口
     @PostMapping("/send")

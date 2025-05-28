@@ -122,11 +122,15 @@ const router = new VueRouter({
       name: 'XiaoXiVue',
       component: () => import('../views/xiaoxi/xiaoxi.vue')
     },
-
     {
-      path: '/shangchuan',
-      name: 'ShangchuanVue',
-      component: () => import('../views/shangchuan/shangchuan.vue')
+      path: '/xiaoxi',
+      name: 'XiaoXiVue',
+      component: () => import('../views/xiaoxi/xiaoxi.vue')
+    },
+    {
+      path: '/chat',
+      name: 'ChatVue',
+      component: () => import('../views/chat/beifen.vue')
     },
     {
       path: '/music/:musicid',
