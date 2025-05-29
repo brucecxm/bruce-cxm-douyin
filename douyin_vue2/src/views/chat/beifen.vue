@@ -1,3 +1,4 @@
+<!-- http://localhost:5173/chat?roomId=group123&username=%E5%B0%8F%E6%98%8E -->
 <template>
   <div class="chat-container">
     <h2 class="room-title">群聊：{{ roomId }}</h2>

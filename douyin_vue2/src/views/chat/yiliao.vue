@@ -1,3 +1,4 @@
+<!-- http://localhost:5173/chat?myUserId=123&receiverId=456 -->
 <template>
   <div class="chat-container">
     <div class="messages" ref="messages">
