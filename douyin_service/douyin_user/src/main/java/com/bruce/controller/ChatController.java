@@ -1,17 +1,17 @@
 package com.bruce.controller;
 
 import com.bruce.entity.ChatMessage;
-import com.bruce.pojo.AddGroupMemberRequest;
-import com.bruce.pojo.ChatMessageRequest;
-import com.bruce.pojo.ChatMessageVO;
-import com.bruce.pojo.CreateGroupRequest;
+import com.bruce.pojo.*;
 import com.bruce.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -20,6 +20,12 @@ public class ChatController {
 
     @Autowired
     private ChatService chatService;
+    @Autowired
+    private  SimpMessagingTemplate messagingTemplate;
+
+    public ChatController(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
 
     @MessageMapping("/chat") // 客户端发送的路径: /app/chat
     @SendTo("/topic/messages") // 广播路径: /topic/messages
@@ -27,6 +33,28 @@ public class ChatController {
         return message;
     }
 
+    @MessageMapping("/chat/{roomId}")
+    @SendTo("/topic/messages/{roomId}")
+    public ChatMessage handleChat(@DestinationVariable String roomId, ChatMessage message) {
+        return message;
+    }
+
+
+
+
+
+    // 一对一私聊消息处理
+    @MessageMapping("/private-chat")
+    public void privateChat(ChatMessageYi message, Principal principal) {
+        System.out.println("当前发消息的是：" + principal.getName());
+        System.out.println("准备发送给：" + message.getReceiver());
+        // 给指定用户发送点对点消息，接收者浏览器要订阅 /user/{receiver}/queue/messages
+        messagingTemplate.convertAndSendToUser(
+                message.getReceiver(),
+                "/queue/messages",
+                message
+        );
+    }
 
 
 

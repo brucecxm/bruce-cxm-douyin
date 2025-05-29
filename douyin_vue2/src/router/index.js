@@ -133,6 +133,11 @@ const router = new VueRouter({
       component: () => import('../views/chat/beifen.vue')
     },
     {
+      path: '/chatyi',
+      name: 'ChatyiVue',
+      component: () => import('../views/chat/yiliao.vue')
+    },
+    {
       path: '/music/:musicid',
       name: 'MusicVue',
       component: () => import('../views/music/music.vue')
