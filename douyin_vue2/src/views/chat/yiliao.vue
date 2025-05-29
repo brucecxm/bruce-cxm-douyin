@@ -76,7 +76,7 @@ export default {
         return;
       }
       const username = encodeURIComponent(this.username);
-      const socket = new SockJS(`/api/ws?username=${username}`);
+      const socket = new SockJS(`/api/user/ws?username=${username}`);
       this.stompClient = Stomp.over(socket);
       this.stompClient.connect(
         {},

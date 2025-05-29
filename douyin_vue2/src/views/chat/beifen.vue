@@ -66,7 +66,7 @@ export default {
   methods: {
     connect() {
       const socket = new SockJS(
-        `/api/ws?username=${encodeURIComponent(this.sender)}`
+        `/api/user/ws?username=${encodeURIComponent(this.sender)}`
       );
       this.stompClient = Stomp.over(socket);
       this.stompClient.connect({}, () => {

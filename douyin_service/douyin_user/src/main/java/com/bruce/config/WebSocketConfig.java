@@ -25,7 +25,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws") // 客户端连接的端点
+        registry.addEndpoint("/user/ws") // 客户端连接的端点
                 .setHandshakeHandler(new UserHandshakeHandler())   // 使用自定义 HandshakeHandler
                 .addInterceptors(new UserHandshakeInterceptor()) // 绑定用户身份
                 .setAllowedOrigins("*")
