@@ -10,6 +10,7 @@
 
       <div class="commentbody" ref="scrollContainer">
         <div class="user-list">
+          <HorizontalScrollList :users="topUsers" />
           <el-input
             v-model="input"
             placeholder="请输入用户名"
@@ -42,6 +43,8 @@
 </template>
 
 <script>
+import HorizontalScrollList from '@/components/HorizontalScrollList.vue';
+
 import UserInfo from '../../components/userInfo.vue';
 import caidan from '@/components/caidan.vue';
 import footerVue from '@/components/footer.vue';
@@ -50,10 +53,85 @@ export default {
   components: {
     footerVue,
     caidan,
-    UserInfo
+    UserInfo,
+    HorizontalScrollList
   },
   data() {
     return {
+      topUsers: [
+        {
+          name: '单曲猫咪',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280',
+          heat: 91
+        },
+        {
+          name: '阿泽',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        }
+        // ...
+      ],
       input: '',
       userinfos: [],
       page: 1,
