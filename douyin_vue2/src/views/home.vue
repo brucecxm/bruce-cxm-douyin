@@ -61,6 +61,7 @@
           v-model="danmuText"
           @keyup.enter="sendDanmu"
           placeholder="请输入弹幕"
+          v-if="showdanmu"
         />
       </div>
 
@@ -107,7 +108,7 @@ export default {
   data() {
     return {
       danmuText: '',
-      showdanmu: true,
+      showdanmu: false,
       topUsers: [
         {
           name: '单曲猫咪',
