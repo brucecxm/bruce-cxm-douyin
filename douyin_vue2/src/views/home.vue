@@ -48,6 +48,22 @@
         v-if="message"
         @send-message="handleChildMessage"
       ></pinglunqu>
+      <div class="danmubox" v-if="showdanmu">
+        <danmu
+          :width="'100%'"
+          :height="'400px'"
+          :defaultSpeed="8"
+          :maxDanmuCount="15"
+          ref="danmuComponent"
+        />
+
+        <input
+          v-model="danmuText"
+          @keyup.enter="sendDanmu"
+          placeholder="请输入弹幕"
+        />
+      </div>
+
       <!-- 统一弹窗 -->
       <SlidePopup
         v-if="sharedState.commentVisible"
@@ -77,6 +93,7 @@ import footerVue from '../components/footer.vue';
 import headerVue from '../components/header.vue';
 import Pinglunqu from '@/components/Pinglunqu.vue';
 import SlidePopup from '@/components/SlidePopup.vue';
+import Danmu from '../components/Danmu.vue';
 import Vue from 'vue';
 export default {
   provide() {
@@ -89,6 +106,8 @@ export default {
 
   data() {
     return {
+      danmuText: '',
+      showdanmu: true,
       topUsers: [
         {
           name: '单曲猫咪',
@@ -255,7 +274,8 @@ export default {
     AllBoxVue,
     caidan,
     Pinglunqu,
-    HorizontalScrollList
+    HorizontalScrollList,
+    Danmu
   },
   mounted() {
     this.boxes.forEach((_, index) => {
@@ -296,6 +316,13 @@ export default {
     closeAllPopups() {
       // 关闭所有弹窗
       this.sharedState.commentVisible = false;
+    },
+    sendDanmu() {
+      if (this.danmuText.trim()) {
+        // 触发弹幕组件中的sendDanmu方法
+        this.$refs.danmuComponent.sendDanmu(this.danmuText);
+        this.danmuText = ''; // 清空输入框
+      }
     },
     handleAside(msg) {
       // 处理来自子组件的消息
@@ -389,6 +416,12 @@ export default {
 .homecontain {
   overflow-x: hidden;
   /* 禁止水平滚动 */
+}
+.danmubox {
+  position: absolute;
+  width: 100vw;
+  left: 50%;
+  transform: translateX(-50%); /* 使元素水平居中 */
 }
 
 .home {
