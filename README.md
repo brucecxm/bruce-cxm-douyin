@@ -350,15 +350,109 @@ echo "==================== 部署脚本执行完成! ===================="
 
 
 
+# websocket
+
+本项目基于websocket实现了实时聊天、实时弹幕、实时通知
+
+## 实时聊天
+
+```
+package com.bruce.config;
+
+import com.bruce.handler.UserHandshakeHandler;
+import com.bruce.handler.UserHandshakeInterceptor;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.config.annotation.*;
+
+@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry registry) {
+        // 开启两个broker：一个是群聊用的 /topic，一个是一对一用的 /queue
+        registry.enableSimpleBroker("/topic", "/queue");
+
+        // 应用前缀，客户端发送消息的路径要以 /app 开头
+        registry.setApplicationDestinationPrefixes("/app");
+
+        // 点对点时必须配置
+        registry.setUserDestinationPrefix("/user");
+    }
+
+
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/user/ws") // 客户端连接的端点
+                .setHandshakeHandler(new UserHandshakeHandler())   // 使用自定义 HandshakeHandler
+                .addInterceptors(new UserHandshakeInterceptor()) // 绑定用户身份
+                .setAllowedOrigins("*")
+                .withSockJS();
+    }
+}
+
+```
 
 
 
+## 实时弹幕
+
+```
+package com.bruce.config;
+
+import com.bruce.handler.WebSocketHandler;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+
+// @Configuration 注解表示该类是一个配置类
+@Configuration
+// @EnableWebSocket 注解启用 WebSocket 配置
+@EnableWebSocket
+public class WebSocketConfig implements WebSocketConfigurer {
+
+    // 重写 registerWebSocketHandlers 方法来注册 WebSocket 处理器
+    @Override
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        // 将 WebSocket 请求路径设置为 "/video/ws"，以便匹配前端的 WebSocket 请求路径
+        registry.addHandler(new WebSocketHandler(), "/video/ws")
+                // setAllowedOrigins("*") 设置允许的跨域请求来源，这里设置为 "*" 表示允许所有来源
+                .setAllowedOrigins("*");
+    }
+}
+
+```
 
 
 
+## 实时通知
+
+```
+package com.bruce.config;
+
+import com.bruce.handler.WebSocketNoteHandler;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
+
+@Configuration
+@EnableWebSocket
+public class WebSocketNoteConfig implements WebSocketConfigurer {
+    @Override
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(new WebSocketNoteHandler(), "/user/wsnote")
+                .setAllowedOrigins("*");
+    }
+}
 
 
-
+```
 
 
 
