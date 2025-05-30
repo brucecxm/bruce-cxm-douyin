@@ -1,7 +1,19 @@
 <template>
   <div>
-    <div v-if="notification" class="notification">
-      <p>{{ notification }}</p>
+    <div v-if="notifications.length" class="notifications">
+      <div
+        v-for="(notification, index) in notifications"
+        :key="index"
+        class="notification"
+      >
+        <div class="notification-header">
+          <span class="notification-title">新通知</span>
+          <button class="close-btn" @click="removeNotification(index)">
+            ×
+          </button>
+        </div>
+        <p class="notification-content">{{ notification }}</p>
+      </div>
     </div>
     <button @click="openSocket">开启通知</button>
     <button @click="closeSocket">关闭通知</button>
@@ -12,7 +24,7 @@
 export default {
   data() {
     return {
-      notification: null,
+      notifications: [], // 存储多个通知
       socket: null,
       sender: '匿名用户'
     };
@@ -39,7 +51,7 @@ export default {
       this.socket.onmessage = (event) => {
         const message = event.data;
         console.log('收到服务器消息:', message);
-        this.notification = message; // 将消息存储到 data 中
+        this.notifications.push(message); // 将新通知添加到通知列表中
       };
 
       // 连接关闭时的回调
@@ -59,7 +71,12 @@ export default {
         this.socket.close();
         this.socket = null; // 清空 WebSocket 实例
       }
-      this.notification = null; // 清空通知
+      console.log('WebSocket已关闭');
+    },
+
+    removeNotification(index) {
+      // 移除指定的通知
+      this.notifications.splice(index, 1);
     }
   },
 
@@ -73,14 +90,62 @@ export default {
 </script>
 
 <style scoped>
-.notification {
-  padding: 10px;
-  background-color: #ff9800;
-  color: white;
-  margin-bottom: 20px;
-  border-radius: 5px;
+.notifications {
+  margin: 20px;
 }
+
+.notification {
+  background-color: #f8f8f8;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.notification-title {
+  font-weight: bold;
+  color: #333;
+}
+
+.close-btn {
+  border: none;
+  background: none;
+  font-size: 20px;
+  color: #999;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+  color: #ff6f61;
+}
+
+.notification-content {
+  color: #555;
+}
+
 button {
   margin: 10px;
+  padding: 10px 20px;
+  border: none;
+  background-color: #409eff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #66b1ff;
 }
 </style>
