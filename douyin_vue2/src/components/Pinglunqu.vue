@@ -1,273 +1,309 @@
 <template>
   <div class="pinglunqu">
-    <button @click="sendMessage()" class="close-button">关闭评论区</button>
+    <!-- 关闭按钮 -->
+    <button @click="sendMessage" class="close-button">×</button>
 
-    <!-- 评论内容展示 -->
-    <div
-      class="comment"
-      v-for="(ping, index) in commentsData"
-      :key="ping.userId"
-    >
-      <div class="touxiangqu">
-        <div class="touxiang" @click="goToUserProfile(ping.commentId)">
+    <!-- 评论列表 -->
+    <div class="comments-list">
+      <div
+        class="comment-item"
+        v-for="(ping, index) in commentsData"
+        :key="ping.commentId || ping.userId"
+      >
+        <div class="avatar" @click="goToUserProfile(ping.userId)">
           <img :src="ping.avatar" alt="头像" />
         </div>
-      </div>
-      <div class="xiaoxi">
-        <p class="name">{{ ping.username }}</p>
-        <p class="comment-text">{{ ping.comment }}</p>
-        <div class="actions">
-          <span class="action" @click="likeComment(index)"
-            >❤️ {{ ping.likes }}</span
-          >
-          <span class="action" @click="replyComment(index)">回复</span>
+        <div class="comment-content">
+          <div class="user-name">{{ ping.username }}</div>
+          <div class="comment-text">{{ ping.comment }}</div>
+          <div class="actions">
+            <span class="like-btn" @click="likeComment(index)">
+              <svg viewBox="0 0 24 24" class="like-icon" fill="currentColor">
+                <path
+                  d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6 3.99 4 6.5 4c1.54 0 3.04 1 3.57 2.36h1.87C14.46 5 15.96 4 17.5 4 20.01 4 22 6 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                />
+              </svg>
+              {{ ping.likes }}
+            </span>
+            <span class="reply-btn" @click="replyComment(index)">回复</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 发布评论的输入框 -->
-    <div class="comment-input">
+    <!-- 评论输入框 -->
+    <div class="comment-input-container">
       <textarea
         v-model="newComment"
-        placeholder="写下你的评论..."
-        class="input-textarea"
+        placeholder="说点什么..."
+        class="comment-input"
+        rows="1"
+        @keyup.enter="submitComment"
       ></textarea>
-      <button @click="submitComment" class="submit-button">发布</button>
+      <button
+        class="submit-btn"
+        :disabled="!newComment.trim()"
+        @click="submitComment"
+      >
+        发送
+      </button>
     </div>
   </div>
 </template>
 
 <script>
-import { getcomment, homegetVideocontent } from '@/api/video';
+import { getcomment, addcomment } from '@/api/video';
 import { videoInfoStore } from '../stores/videoInfo';
-import { addcomment } from '@/api/video.js'; // 导入 API 函数
 import { useUserInfoStore } from '@/stores/userInfo';
 
 export default {
   name: 'Pinglunqu',
   data() {
     return {
-      commentsData: [
-        // 示例评论数据
-        // 示例评论数据
-      ],
-      newComment: '', // 用于绑定输入框的评论内容
+      commentsData: [],
+      newComment: '',
       videoData: {}
     };
   },
   methods: {
     sendMessage() {
-      console.log('评论区已关闭');
       this.$emit('send-message', false);
     },
     likeComment(index) {
-      this.commentsData[index].likes++; // 增加点赞量
-      console.log(`点赞评论 ${index}`);
+      this.commentsData[index].likes++;
     },
     replyComment(index) {
       console.log(`回复评论 ${index}`);
-      // 在此处处理回复逻辑
+      // 回复逻辑你自己扩展
     },
     goToUserProfile(userId) {
       console.log(`跳转到用户 ${userId} 的主页`);
-      // 跳转到用户主页的逻辑可以是：
       // this.$router.push({ name: 'userProfile', params: { userId } });
     },
     getcommentone() {
       const videoId = this.videoData.videoid;
-      const params = { videoid: videoId }; // 获取当前视频的 videoid
-
-      getcomment(params) // 调用 API 获取评论数据
-        .then((videoArr) => {
-          this.commentsData = videoArr.data.data; // 将评论数据保存到组件的 data 中
+      const params = { videoid: videoId };
+      getcomment(params)
+        .then((res) => {
+          this.commentsData = res.data.data || [];
         })
-        .catch((error) => {
-          console.error('获取视频评论出错:', error);
+        .catch((err) => {
+          console.error('获取评论失败', err);
         });
     },
     submitComment() {
       const userInfo = useUserInfoStore();
-      var userInfoMap = {};
-      userInfoMap = userInfo.userInfo;
-      // const userInfo=userInfoStore();
-      // const userInfoMap= userInfo.getuserInfo;
-      // 确保 newComment 不为空
-      if (this.newComment.trim() !== '') {
-        const newCommentObj = {
-          commentId: Date.now(), // 使用当前时间戳作为评论 ID
-          userId: userInfoMap.id, // 使用用户 ID
-          avatar: userInfoMap.avatar, // 使用用户头像
-          username: userInfoMap.nickname,
-          comment: this.newComment,
-          likes: 0
-        };
+      const userInfoMap = userInfo.userInfo;
+      if (this.newComment.trim() === '') return;
 
-        // 确保 commentsData 是一个数组
-        if (!Array.isArray(this.commentsData)) {
-          console.log('commentsData 不是数组，初始化为空数组');
-          this.commentsData = []; // 如果不是数组，初始化为空数组
-        }
+      const newCommentObj = {
+        commentId: Date.now(),
+        userId: userInfoMap.id,
+        avatar: userInfoMap.avatar,
+        username: userInfoMap.nickname,
+        comment: this.newComment,
+        likes: 0
+      };
 
-        // 将新评论添加到评论列表的顶部
-        this.commentsData.unshift(newCommentObj);
-
-        // 清空输入框
-        this.newComment = '';
-
-        const params = {
-          videoid: parseInt(this.videoData.videoid, 10),
-          userId: newCommentObj.userId,
-          comment: newCommentObj.comment,
-          lastId: '-1'
-        };
-
-        // const params=newCommentObj
-        addcomment(params)
-          .then((res) => {
-            console.log('评论发布成功:', res);
-          })
-          .catch((error) => {
-            console.error('评论发布失败:', error);
-          });
-
-        console.log('发布评论:', newCommentObj);
-        console.log('更新后的评论数据:', this.commentsData);
-      } else {
-        console.log('评论内容不能为空');
+      if (!Array.isArray(this.commentsData)) {
+        this.commentsData = [];
       }
+      this.commentsData.unshift(newCommentObj);
+      this.newComment = '';
+
+      const params = {
+        videoid: parseInt(this.videoData.videoid, 10),
+        userId: newCommentObj.userId,
+        comment: newCommentObj.comment,
+        lastId: '-1'
+      };
+
+      addcomment(params)
+        .then((res) => {
+          console.log('评论发布成功:', res);
+        })
+        .catch((err) => {
+          console.error('评论发布失败:', err);
+        });
     }
   },
-
   mounted() {
     const videoInfo = videoInfoStore();
     this.videoData = videoInfo.getvideoInfo;
     this.getcommentone();
-  },
-  beforeDestroy() {}
+  }
 };
 </script>
+
 <style scoped>
 .pinglunqu {
+  position: fixed;
+  bottom: 0;
+  left: 0;
   width: 100vw;
   height: 60vh;
-  background-color: #f9f9f9;
-  border-radius: 10px 10px 0 0;
-  padding: 20px;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  padding: 15px 15px 70px;
   box-sizing: border-box;
   overflow-y: auto;
+  color: #121212;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+  user-select: none;
+  z-index: 10000;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* 评论区关闭按钮 */
 .close-button {
-  background-color: #f04e23;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 30px;
-  font-size: 14px;
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: transparent;
   border: none;
+  font-size: 28px;
+  color: #666;
   cursor: pointer;
-  margin-bottom: 20px;
+  line-height: 1;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+.close-button:hover {
+  color: #000;
 }
 
-/* 评论内容 */
-.comment {
+.comments-list {
+  margin-top: 40px;
+  padding-bottom: 10px;
+}
+
+.comment-item {
   display: flex;
-  margin-bottom: 20px;
-  padding: 10px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+  align-items: flex-start;
 }
 
-.touxiangqu {
-  width: 50px;
-  height: 50px;
-  margin-right: 15px;
-}
-
-.touxiang {
-  width: 50px;
-  height: 50px;
+.avatar {
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   overflow: hidden;
+  border: 1.5px solid #ddd;
   cursor: pointer;
+  flex-shrink: 0;
+  margin-right: 12px;
+  background: #f0f0f0;
 }
 
-.touxiang img {
+.avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
-.xiaoxi {
+.comment-content {
   flex: 1;
+  word-break: break-word;
 }
 
-.name {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 5px;
+.user-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #121212;
+  margin-bottom: 3px;
 }
 
 .comment-text {
   font-size: 14px;
-  line-height: 1.6;
   color: #333;
-  margin-bottom: 10px;
+  line-height: 1.4;
+  margin-bottom: 6px;
 }
 
 .actions {
   display: flex;
-  align-items: center;
+  gap: 15px;
+  font-size: 13px;
+  color: #888;
 }
 
-.action {
-  font-size: 14px;
-  margin-right: 15px;
-  color: #ff7a59;
-  cursor: pointer;
-}
-
-.action:hover {
-  text-decoration: underline;
-}
-
-/* 发布评论输入框样式 */
-.comment-input {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background-color: white;
-  padding: 15px;
-  box-sizing: border-box;
+.like-btn,
+.reply-btn {
   display: flex;
   align-items: center;
-  border-top: 1px solid #ddd;
-}
-
-.input-textarea {
-  width: 80%;
-  height: 40px;
-  padding: 10px;
-  font-size: 14px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  resize: none;
-}
-
-.submit-button {
-  width: 15%;
-  padding: 10px;
-  margin-left: 10px;
-  background-color: #f04e23;
-  color: white;
-  border-radius: 5px;
-  font-size: 14px;
-  border: none;
   cursor: pointer;
+  user-select: none;
+  transition: color 0.3s ease;
 }
 
-.submit-button:hover {
-  background-color: #e03b18;
+.like-btn:hover,
+.reply-btn:hover {
+  color: #ff2e54;
+}
+
+.like-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+  fill: currentColor;
+}
+
+/* 底部固定评论输入框 */
+.comment-input-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  background: #fafafa;
+  border-top: 1px solid #e1e1e1;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  z-index: 10001;
+}
+
+.comment-input {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  color: #121212;
+  padding: 10px 15px;
+  font-size: 14px;
+  resize: none;
+  outline: none;
+  max-height: 80px;
+  line-height: 1.4;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.comment-input::placeholder {
+  color: #bbb;
+}
+
+.submit-btn {
+  background: #ff2e54;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 18px;
+  margin-left: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+  flex-shrink: 0;
+}
+
+.submit-btn:disabled {
+  background: #d48c9b;
+  cursor: not-allowed;
+}
+
+.submit-btn:not(:disabled):hover {
+  background: #ff527b;
 }
 </style>

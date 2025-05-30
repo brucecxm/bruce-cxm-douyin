@@ -74,7 +74,7 @@ export default {
       videoDateOne: {}
     };
   },
-  inject: ['fromAside'],
+  inject: ['fromAside', 'sharedState'],
   methods: {
     send() {
       // 直接调用祖先注入的函数进行传值
@@ -119,11 +119,16 @@ export default {
           console.error('点赞出错:', error);
         });
     },
+
+    updateContentone() {
+      this.sharedState.commentVisible = true;
+    },
     toggleCollect() {
       this.isCollected = !this.isCollected; // 切换收藏状态
       this.behaviour('collect');
     },
     toggleShare() {
+      this.sharedState.commentVisible = true;
       this.isShareClicked = true; // 设置分享图标点击状态
       setTimeout(() => {
         this.isShareClicked = false; // 0.5秒后恢复状态

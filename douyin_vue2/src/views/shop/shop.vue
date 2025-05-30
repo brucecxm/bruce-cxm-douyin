@@ -14,7 +14,7 @@
       </div>
 
       <!-- 显示联想框 -->
-      <div class="lian" ref="suggestionBox">
+      <!-- <div class="lian" ref="suggestionBox">
         <ul v-if="showSuggestions && filteredSuggestions.length > 0">
           <li
             v-for="(suggestion, index) in filteredSuggestions"
@@ -24,7 +24,7 @@
             {{ suggestion }}
           </li>
         </ul>
-      </div>
+      </div> -->
     </div>
 
     <div class="box-containeraaa" @scroll="handleScroll">
@@ -109,12 +109,97 @@ export default {
     return {
       items: [
         {
-          icon: 'https://cdn-icons-png.flaticon.com/512/616/616408.png',
-          name: '图标1'
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          name: '煤气灶'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          name: '煤气灶'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          name: '煤气灶'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          name: '煤气灶'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          name: '煤气灶'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          name: '煤气灶'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          name: '煤气灶'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          name: '煤气灶'
         }
       ],
 
-      parentMsg: [{ icon: '🏠', label: '首页' }],
+      parentMsg: [
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          label: '首页'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          label: '首页'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          label: '首页'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          label: '首页'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          label: '首页'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          label: '首页'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          label: '首页'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          label: '首页'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          label: '首页'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          label: '首页'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          label: '首页'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          label: '首页'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          label: '首页'
+        },
+        {
+          icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
+          label: '首页'
+        }
+      ],
       searchText: '', // 输入框的内容
       showSuggestions: false, // 是否显示联想框
       suggestions: ['苹果', '香蕉', '橙子', '葡萄', '西瓜', '草莓', '芒果'],
@@ -128,7 +213,40 @@ export default {
       // 初始化更多的数据，使其超出视口
       boxes: Array.from({ length: 50 }, (_, index) => index + 1), // 初始数据为 50 个盒子
       loading: false, // 加载状态
-      shopitems: [],
+      shopitems: [
+        {
+          image: 'https://picsum.photos/seed/1/300/200',
+          title: '美白面膜套装'
+        },
+        {
+          image: 'https://picsum.photos/seed/2/300/200',
+          title: '玻尿酸补水精华'
+        },
+        {
+          image: 'https://picsum.photos/seed/3/300/200',
+          title: '抗皱紧致眼霜'
+        },
+        {
+          image: 'https://picsum.photos/seed/4/300/200',
+          title: '胶原蛋白饮品'
+        },
+        {
+          image: 'https://picsum.photos/seed/5/300/200',
+          title: '深层洁面泡泡'
+        },
+        {
+          image: 'https://picsum.photos/seed/6/300/200',
+          title: '焕肤修复精华液'
+        },
+        {
+          image: 'https://picsum.photos/seed/7/300/200',
+          title: '补水保湿面霜'
+        },
+        {
+          image: 'https://picsum.photos/seed/8/300/200',
+          title: '防晒隔离乳'
+        }
+      ],
 
       page: {
         current: 1,

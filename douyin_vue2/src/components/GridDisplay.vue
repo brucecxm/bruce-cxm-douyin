@@ -47,12 +47,10 @@ export default {
 }
 
 .grid-item {
-  background: #eee;
   display: flex;
   flex-direction: column; /* 上下排列 */
   justify-content: center;
   align-items: center;
-  border: 1px solid #ccc;
   box-sizing: border-box;
   padding: 8px 0;
 }

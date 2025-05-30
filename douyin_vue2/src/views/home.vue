@@ -48,27 +48,182 @@
         v-if="message"
         @send-message="handleChildMessage"
       ></pinglunqu>
-
+      <!-- 统一弹窗 -->
+      <SlidePopup
+        v-if="sharedState.commentVisible"
+        :direction="'bottom'"
+        width="100vw"
+        height="30vh"
+        :isEdge="false"
+        @close="closeAllPopups"
+      >
+        <template #default>
+          <div style="padding: 10px">
+            <p style="font-size: 0.6rem">分享给</p>
+            <HorizontalScrollList :users="topUsers" />
+            <HorizontalScrollList :users="bottomUsers" />
+          </div>
+        </template>
+      </SlidePopup>
       <footer-vue></footer-vue>
     </div>
   </div>
 </template>
 <script>
+import HorizontalScrollList from '@/components/HorizontalScrollList.vue';
 import caidan from '../components/caidan.vue';
 import AllBoxVue from '../components/allbox.vue';
 import footerVue from '../components/footer.vue';
 import headerVue from '../components/header.vue';
 import Pinglunqu from '@/components/Pinglunqu.vue';
-
+import SlidePopup from '@/components/SlidePopup.vue';
+import Vue from 'vue';
 export default {
   provide() {
     // 提供一个回调函数给后代组件调用
     return {
-      fromAside: this.handleAside
+      fromAside: this.handleAside,
+      sharedState: this.sharedState
     };
   },
+
   data() {
     return {
+      topUsers: [
+        {
+          name: '单曲猫咪',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280',
+          heat: 91
+        },
+        {
+          name: '阿泽',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '小发发',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        }
+        // ...
+      ],
+      bottomUsers: [
+        {
+          name: '推荐',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '分享到日常',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '分享到日常',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '分享到日常',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '分享到日常',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '分享到日常',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '分享到日常',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '分享到日常',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '分享到日常',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '分享到日常',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '分享到日常',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        }
+      ],
+      sharedState: Vue.observable({
+        commentVisible: false
+      }),
+      isAnyPopupVisible: false, // 是否有弹窗显示的标志
       message: false,
       isDragging: false, // 是否正在拖动的标志
       startX: 0, // 拖动的起始X位置
@@ -94,11 +249,13 @@ export default {
   },
 
   components: {
+    SlidePopup,
     headerVue,
     footerVue,
     AllBoxVue,
     caidan,
-    Pinglunqu
+    Pinglunqu,
+    HorizontalScrollList
   },
   mounted() {
     this.boxes.forEach((_, index) => {
@@ -136,6 +293,10 @@ export default {
   },
   beforeDestroy() {},
   methods: {
+    closeAllPopups() {
+      // 关闭所有弹窗
+      this.sharedState.commentVisible = false;
+    },
     handleAside(msg) {
       // 处理来自子组件的消息
       console.log('父组件收到的消息：', msg);
