@@ -3,7 +3,7 @@
     <div class="username" @click="goauth(videoData.userid)">
       {{ videoData.username }}
     </div>
-    <div div class="article">{{ videoData.video_comment }}</div>
+    <div div class="article">{{ videoData.videoContent }}</div>
   </div>
 </template>
 

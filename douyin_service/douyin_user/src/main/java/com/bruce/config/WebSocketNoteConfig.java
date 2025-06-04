@@ -1,5 +1,6 @@
 package com.bruce.config;
 
+import com.bruce.dict.WsConstant;
 import com.bruce.handler.WebSocketNoteHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.TextMessage;
@@ -14,7 +15,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 public class WebSocketNoteConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new WebSocketNoteHandler(), "/user/wsnote")
+        registry.addHandler(new WebSocketNoteHandler(), WsConstant.user+WsConstant.wsnote)
                 .setAllowedOrigins("*");
     }
 }

@@ -214,6 +214,58 @@
             </TableInfoDTO>
           </value>
         </entry>
+        <entry key="douyintest.comment">
+          <value>
+            <TableInfoDTO>
+              <option name="fullColumn">
+                <list>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="commentId" />
+                    <option name="type" value="java.lang.Long" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="comment" />
+                    <option name="type" value="java.lang.String" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="commentType" />
+                    <option name="type" value="java.lang.Long" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="userId" />
+                    <option name="type" value="java.lang.Long" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="fatherId" />
+                    <option name="type" value="java.lang.Integer" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="contentId" />
+                    <option name="type" value="java.lang.Integer" />
+                  </ColumnInfoDTO>
+                </list>
+              </option>
+              <option name="name" value="Comment" />
+              <option name="preName" value="" />
+              <option name="saveModelName" value="douyin-id-service" />
+              <option name="savePackageName" value="com.bruce" />
+              <option name="savePath" value="./douyin_basic/douyin-id-service/src/main/java/com/bruce" />
+              <option name="templateGroupName" value="MybatisPlus" />
+            </TableInfoDTO>
+          </value>
+        </entry>
         <entry key="douyintest.coupon">
           <value>
             <TableInfoDTO>
@@ -446,6 +498,40 @@
               <option name="saveModelName" value="douyin_test" />
               <option name="savePackageName" value="com.bruce" />
               <option name="savePath" value="./douyin_service/douyin_test/src/main/java/com/bruce" />
+              <option name="templateGroupName" value="MybatisPlus" />
+            </TableInfoDTO>
+          </value>
+        </entry>
+        <entry key="douyintest.like">
+          <value>
+            <TableInfoDTO>
+              <option name="fullColumn">
+                <list>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="userId" />
+                    <option name="type" value="java.lang.Integer" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="commentId" />
+                    <option name="type" value="java.lang.Integer" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="commentType" />
+                    <option name="type" value="java.lang.Integer" />
+                  </ColumnInfoDTO>
+                </list>
+              </option>
+              <option name="name" value="Like" />
+              <option name="preName" value="" />
+              <option name="saveModelName" value="douyin-id-service" />
+              <option name="savePackageName" value="com.bruce" />
+              <option name="savePath" value="./douyin_basic/douyin-id-service/src/main/java" />
               <option name="templateGroupName" value="MybatisPlus" />
             </TableInfoDTO>
           </value>
@@ -811,40 +897,66 @@
                     <option name="custom" value="false" />
                     <option name="ext" value="{}" />
                     <option name="name" value="videoId" />
-                    <option name="type" value="java.lang.Integer" />
+                    <option name="type" value="java.lang.Long" />
                   </ColumnInfoDTO>
                   <ColumnInfoDTO>
                     <option name="custom" value="false" />
                     <option name="ext" value="{}" />
-                    <option name="name" value="authId" />
-                    <option name="type" value="java.lang.Integer" />
+                    <option name="name" value="userId" />
+                    <option name="type" value="java.lang.Long" />
                   </ColumnInfoDTO>
                   <ColumnInfoDTO>
                     <option name="custom" value="false" />
                     <option name="ext" value="{}" />
                     <option name="name" value="musicId" />
+                    <option name="type" value="java.lang.Long" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="url" />
+                    <option name="type" value="java.lang.String" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="content" />
+                    <option name="type" value="java.lang.String" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="title" />
+                    <option name="type" value="java.lang.String" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="cover" />
+                    <option name="type" value="java.lang.String" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="comment" value="图文：1  视频：2" />
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="type" />
                     <option name="type" value="java.lang.Integer" />
                   </ColumnInfoDTO>
                   <ColumnInfoDTO>
+                    <option name="comment" value="审核中：0   正常状态：1   未通过审核：2 " />
                     <option name="custom" value="false" />
                     <option name="ext" value="{}" />
-                    <option name="name" value="videoUrl" />
-                    <option name="type" value="java.lang.String" />
-                  </ColumnInfoDTO>
-                  <ColumnInfoDTO>
-                    <option name="custom" value="false" />
-                    <option name="ext" value="{}" />
-                    <option name="name" value="videoComment" />
-                    <option name="type" value="java.lang.String" />
+                    <option name="name" value="status" />
+                    <option name="type" value="java.lang.Integer" />
                   </ColumnInfoDTO>
                 </list>
               </option>
               <option name="name" value="Video" />
               <option name="preName" value="" />
-              <option name="saveModelName" value="douyin_chat" />
+              <option name="saveModelName" value="douyin-id-service" />
               <option name="savePackageName" value="com.bruce" />
-              <option name="savePath" value="./douyin_service/douyin_chat/src/main/java/com/bruce" />
-              <option name="templateGroupName" value="Default" />
+              <option name="savePath" value="./douyin_basic/douyin-id-service/src/main/java/com/bruce" />
+              <option name="templateGroupName" value="MybatisPlus" />
             </TableInfoDTO>
           </value>
         </entry>

@@ -270,7 +270,6 @@ export default {
           loginType: this.loginType,
           emailVerificationCode: this.emailVerificationCode
         });
-        debugger;
         if (response.data.code === 1) {
           this.$message({
             message: response.data.msg || '登录失败',

@@ -80,7 +80,6 @@
 import InfiniteList from '../../components/InfiniteList.vue';
 import footerVue from '@/components/footer.vue';
 import underLineTagsVue from '../../components/underLineTags.vue';
-import { getauthzzz } from '@/api/video';
 import { getUserInfo } from '@/api/user';
 export default {
   components: {
@@ -114,22 +113,18 @@ export default {
 
       getUserInfo(null, page, this.pageSize)
         .then((res) => {
-          const videos = res.data.videobox || [];
+          const videos = res.data.videoPageList || [];
           const total = res.data.total || 0;
-
           // 追加视频数据
           this.videobox = [...this.videobox, ...videos];
-
           // 只在第一页赋值musicinfo，避免重复赋值
           if (page === 1) {
-            this.userInfo = res.data.auth || {};
+            this.userInfo = res.data.userInfo || {};
           }
-
           // 判断是否加载完毕
           if (this.videobox.length >= total) {
             this.noMoreData = true;
           }
-
           this.page = page; // 更新当前页码
           this.loading = false;
         })

@@ -6,7 +6,6 @@ import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
 import com.bruce.util.JwtUtil;
-import com.bruce.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,8 +18,7 @@ import org.springframework.context.annotation.Configuration;
 public class SaTokenConfigure {
     @Autowired
     private JwtUtil jwtUtil ;
-    @Autowired
-    private RedisUtil redisUtil;
+
 
     // 注册 Sa-Token全局过滤器
     @Bean

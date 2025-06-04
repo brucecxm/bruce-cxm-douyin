@@ -1,11 +1,14 @@
 package com.bruce.controller;
 
-
-
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.bruce.dict.Constant;
 import com.bruce.dto.CommentDto;
 import com.bruce.entity.Comment;
+import com.bruce.service.CommentService;
 import com.bruce.service.CommentoneService;
 import com.bruce.service.IdService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,174 +29,71 @@ import java.util.concurrent.*;
 @RestController
 @RequestMapping("/video/comment")
 public class CommentController extends ApiController {
-@Autowired
-private CommentoneService commentoneservice;
-
+    @Autowired
+    private CommentService commentService;
     @Autowired
     private RedisTemplate redisTemplate;
-
     @Autowired
     private IdService idService;
-
     // 使用线程池来异步上传图片
     private static final ExecutorService executorService = Executors.newCachedThreadPool();
 
-    @PostMapping("/add")
-    public ResponseEntity<Map<String, Object>> addComment(@RequestParam Map<String, String> params,
-                                                          @RequestParam(required = false) List<MultipartFile> images) {
-        // 获取参数
-        String commentType = params.get("comment_type");
-        String content = params.get("content");
-        // 获取 comment_id 参数值
-        String commentIdStr = params.get("comment_id");
-        Long commentId= Long.valueOf(000000000);
-// 检查 comment_id 是否为 null 或非数字
-        if (commentIdStr != null && commentIdStr.matches("\\d+")) {
-             commentId = Long.valueOf(commentIdStr); // 转换为 Long 类型
-            // 继续你的逻辑
-        } else {
-            // 处理参数无效的情况，比如抛出异常或者赋一个默认值
-            System.out.println("Invalid comment_id parameter");
-        }
-        Boolean isFollow = Boolean.valueOf(params.get("is_follow"));
-
-        // 处理文件上传
-        List<String> imageUrls = new ArrayList<>();
-        if (images != null && !images.isEmpty()) {
-            List<Future<String>> futures = new ArrayList<>();
-            // 异步上传图片
-            for (MultipartFile image : images) {
-//                futures.add(executorService.submit(() -> uploadImage(image)));
-            }
-
-            // 等待上传结果
-            for (Future<String> future : futures) {
-                try {
-                    imageUrls.add(future.get());
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        // 构建评论对象
-        Comment comment = new Comment();
-        comment.setCommentType(commentType);
-        comment.setIsFollow(isFollow);
-        comment.setCommentId(commentId);
-        comment.setContent(content);
-        comment.setImageUrls(imageUrls);
-        comment.setCreatedAt(new Date());
-        comment.setUpdatedAt(new Date());
-
-        // todo 将评论保存到数据库，简化为存储到 Redis 中模拟（实际应用中这里是存储到数据库）
-        String redisKey = "post_comments:" + commentId;
-        redisTemplate.opsForList().leftPush(redisKey, comment);
-
-        // 更新缓存：更新评论列表缓存
-        redisTemplate.expire(redisKey, 3600, TimeUnit.SECONDS);  // 设置缓存过期时间1小时
-
-        // 构建返回的 Map
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("comment", comment);
-
-        return ResponseEntity.ok(response);
-    }
-
-@GetMapping("/getfu")
-    //获得所有父评论的接口
-    public R getfu(@RequestParam Map params){
-
-    String videoid = String.valueOf(params.get("videoid"));
-int videoId = Integer.valueOf(videoid);
-    List<Map>  x=commentoneservice.getcomment(videoId);
-
-
-    return R.ok(x);
-
+    // Controller 层
+    @GetMapping("/getFatherComment")
+    public R getFatherComment(@RequestParam Map<String, Object> params) {
+        String videoId = String.valueOf(params.get("videoId"));
+        int pageNum = Integer.parseInt(String.valueOf(params.getOrDefault(Constant.page, 1)));
+        int pageSize = Integer.parseInt(String.valueOf(params.getOrDefault(Constant.limit, 10)));
+        Page<Comment> page = new Page<>(pageNum, pageSize);
+        LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Comment::getCommentId, videoId)
+                .isNull(Comment::getFatherId);
+        Page<Comment> result = commentService.page(page, queryWrapper);
+        return R.ok(result);
     }
 
 
     @PostMapping("/addVideoComment")
     public R addVideoComment(@RequestBody Map<String, Object> params) {
         // 输出接收到的参数
-        System.out.println("收到的评论数据: " + params);
-
-        Comment comment=new Comment();
-        comment.setComment((String) params.get("comment"));
-        comment.setLastId((String) params.get("lastId"));
-        long commentId=   idService.SnowflakeGen();
+        Comment comment = new Comment();
+        comment.setComment((String) params.get(Constant.comment));
+        comment.setFatherId((Integer) params.get(Constant.fatherId));
+        long commentId = idService.SnowflakeGen();
         comment.setCommentId(commentId);
-        comment.setId(commentId);
-        comment.setCommentVideoId((Integer) params.get("videoid"));
-        comment.setCommentUserId((Integer) params.get("userId"));
-       commentoneservice.save(comment);
+        comment.setContentId((Integer) params.get(Constant.videoId));
+        comment.setUserId((Long) params.get("userId"));
+        commentService.save(comment);
         // 这里可以处理评论逻辑
         return R.ok("评论成功");  // 返回成功响应
     }
 
-@GetMapping("/getzi")
-    //获得对应父评论的子评论
-    public  R  getzi(@RequestParam("fu_id") int fu_id){
-    List<CommentDto> m=commentoneservice.getcommenti(fu_id);
-
-    return R.ok(m);
-    }
-
-
-
-
-
+//    @GetMapping("/getzi")
+//    //获得对应父评论的子评论
+//    public R getzi(@RequestParam("fu_id") int fu_id) {
+//        List<CommentDto> m = commentservice.getcommenti(fu_id);
+//        return R.ok(m);
+//    }
+//
 
     @GetMapping("/likeping")
-    public R likeping(@RequestParam boolean like,int comment_id,int user_id) {
-
-        if(like==true)
-        {
+    public R likeping(@RequestParam boolean like, int comment_id, int user_id) {
+        if (like == true) {
 //            insert comment_user into (comment_id,user_id,like_or_dislike) (&{comment_id},&{user_id},&{like})
-        }else {
+        } else {
 //            insert comment_user into (comment_id,user_id,like_or_dislike) (&{comment_id},&{user_id},&{dislike})
-
         }
-
         return R.ok(null);
     }
 
-
     @GetMapping("/insertpinglun")
     public R insertpinglun(@RequestParam int lastId) {
-
-        if(lastId==-1)
-        {
+        if (lastId == -1) {
 //            分配id  并且将其父字段设置为-1
             return R.ok(null);
-
-        }else{
+        } else {
 //            分配id  父id设置为lastid
             return R.ok(null);
         }
-
     }
-
-
-
-
-
-
-    /**
-     * 服务对象
-//     */
-//    @Resource
-//    private CommentService commentService;
-//
-//    @GetMapping("/getcomment")
-//    public R getData(@RequestParam int videoId) {
-//      System.out.println(videoId);
-//        LambdaQueryWrapper<Comment> queryWrapper=new LambdaQueryWrapper();
-//        queryWrapper.eq(Comment::getCommentVideoId,videoId);
-//        return success(this.commentService.list(queryWrapper));
-//    }
-
 }
-

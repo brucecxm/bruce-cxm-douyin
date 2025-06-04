@@ -98,7 +98,7 @@ public class MusicController extends ApiController {
         List<Map<String, Object>> videoArr = new ArrayList<>();
         for (Video video : videoPage.getRecords()) {
             Map<String, Object> videoMap = new HashMap<>();
-            videoMap.put("video_img", video.getVideoImg());
+            videoMap.put("video_img", video.getCover());
             videoMap.put("link_url", video.getVideoId()); // 建议用实际视频ID
             videoArr.add(videoMap);
         }

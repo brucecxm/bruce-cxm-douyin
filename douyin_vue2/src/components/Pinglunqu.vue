@@ -2,7 +2,6 @@
   <div class="pinglunqu">
     <!-- 关闭按钮 -->
     <button @click="sendMessage" class="close-button">×</button>
-
     <!-- 评论列表 -->
     <div class="comments-list">
       <div
@@ -50,19 +49,22 @@
     </div>
   </div>
 </template>
-
 <script>
-import { getcomment, addcomment } from '@/api/video';
+import { getComment, addcomment } from '@/api/video';
 import { videoInfoStore } from '../stores/videoInfo';
 import { useUserInfoStore } from '@/stores/userInfo';
-
 export default {
   name: 'Pinglunqu',
   data() {
     return {
       commentsData: [],
+      fatherId: '',
       newComment: '',
-      videoData: {}
+      videoData: {},
+      pageNum: 1,
+      pageSize: 10,
+      finished: false, // 用于表示是否加载完了全部数据
+      loading: false // 防止重复加载
     };
   },
   methods: {
@@ -80,22 +82,42 @@ export default {
       console.log(`跳转到用户 ${userId} 的主页`);
       // this.$router.push({ name: 'userProfile', params: { userId } });
     },
-    getcommentone() {
-      const videoId = this.videoData.videoid;
-      const params = { videoid: videoId };
-      getcomment(params)
+    onScroll(e) {
+      const el = e.target;
+      if (el.scrollTop + el.clientHeight >= el.scrollHeight - 100) {
+        this.getCommentInit();
+      }
+    },
+    getCommentInit() {
+      if (this.finished || this.loading) return;
+
+      this.loading = true;
+      const params = {
+        videoId: this.videoData.videoId,
+        pageNum: this.pageNum,
+        pageSize: this.pageSize
+      };
+
+      getComment(params)
         .then((res) => {
-          this.commentsData = res.data.data || [];
+          const list = res.data.data || [];
+          if (list.length < this.pageSize) {
+            this.finished = true;
+          }
+          this.commentsData = [...this.commentsData, ...list];
+          this.pageNum++;
         })
         .catch((err) => {
           console.error('获取评论失败', err);
+        })
+        .finally(() => {
+          this.loading = false;
         });
     },
     submitComment() {
       const userInfo = useUserInfoStore();
       const userInfoMap = userInfo.userInfo;
       if (this.newComment.trim() === '') return;
-
       const newCommentObj = {
         commentId: Date.now(),
         userId: userInfoMap.id,
@@ -104,20 +126,17 @@ export default {
         comment: this.newComment,
         likes: 0
       };
-
       if (!Array.isArray(this.commentsData)) {
         this.commentsData = [];
       }
       this.commentsData.unshift(newCommentObj);
       this.newComment = '';
-
       const params = {
-        videoid: parseInt(this.videoData.videoid, 10),
+        videoId: parseInt(this.videoData.videoId, 10),
         userId: newCommentObj.userId,
         comment: newCommentObj.comment,
-        lastId: '-1'
+        fatherId: this.fatherId
       };
-
       addcomment(params)
         .then((res) => {
           console.log('评论发布成功:', res);
@@ -130,7 +149,9 @@ export default {
   mounted() {
     const videoInfo = videoInfoStore();
     this.videoData = videoInfo.getvideoInfo;
-    this.getcommentone();
+    this.getCommentInit();
+    const container = this.$el.querySelector('.pinglunqu');
+    container.addEventListener('scroll', this.onScroll);
   }
 };
 </script>

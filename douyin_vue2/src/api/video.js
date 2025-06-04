@@ -3,7 +3,7 @@ import request from '@/utils/request.js';
 // params 处理get请求  data处理post请求
 
 export const homegetVideo = (page, size, videoType) => {
-  return request.get('/video/test', {
+  return request.get('/video/getVideoPage', {
     params: {
       page,
       size,
@@ -67,8 +67,8 @@ export const getauthinfo = (params) => {
 };
 
 // 前端代码
-export const getcomment = (params) => {
-  return request.get('/video/comment/getfu', { params }); // 将参数放入 { params } 中
+export const getComment = (params) => {
+  return request.get('/video/comment/getFatherComment', { params }); // 将参数放入 { params } 中
 };
 
 export const getmumsic = (musicId, page = 1, size = 10) => {
@@ -81,10 +81,7 @@ export const getmumsic = (musicId, page = 1, size = 10) => {
   });
 };
 
-// // 前端代码
-// export const addcomment = (params) => {
-//   return request.post("/video/comment/addVideoComment", { params }); // 将参数放入 { params } 中
-// };
+
 export const addcomment = (params) => {
   return request.post('/video/comment/addVideoComment', params, {
     headers: {

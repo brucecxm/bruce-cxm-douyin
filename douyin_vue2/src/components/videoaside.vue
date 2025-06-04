@@ -107,10 +107,9 @@ export default {
       // 调用 API 或其他逻辑处理
       var params = {
         type: this.isLiked ? 'red' : 'nored',
-        content_type: 'video',
-        contentId: this.videoDateOne.videoid
+        contentType: 'video',
+        contentId: this.videoDateOne.videoId
       };
-
       like(params)
         .then((result) => {
           console.log('点赞成功:', result);

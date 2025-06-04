@@ -1,37 +1,86 @@
 package com.bruce.entity;
+
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import java.io.Serializable;
-
-import lombok.Data;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * (Comment)表实体类
  *
  * @author makejava
- * @since 2024-06-26 23:27:03
+ * @since 2025-06-04 15:45:13
  */
-@Data
 @SuppressWarnings("serial")
-public class Comment  implements Serializable{
-    private static final long serialVersionUID = 1L;
-    private Long id;
-    private String commentType;  // 评论类型：视频、商品等
-    private Boolean isFollow;  // 是否是跟评
-    private String LastId;  // 是否是跟评
-    private Long commentId;  // 被评论的对象 ID
-    private String content;  // 评论内容
-    private List<String> imageUrls;  // 图片URL列表
-    private Date createdAt;  // 创建时间
-    private Date updatedAt;  // 更新时间
-
+public class Comment extends Model<Comment> {
+    
+    private Long commentId;
+    
     private String comment;
     
-    private Integer commentVideoId;
+    private Long commentType;
     
-    private Integer commentUserId;
+    private Long userId;
+    
+    private Integer fatherId;
+    
+    private Integer contentId;
 
 
+    public Long getCommentId() {
+        return commentId;
+    }
+
+    public void setCommentId(Long commentId) {
+        this.commentId = commentId;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public Long getCommentType() {
+        return commentType;
+    }
+
+    public void setCommentType(Long commentType) {
+        this.commentType = commentType;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public Integer getFatherId() {
+        return fatherId;
+    }
+
+    public void setFatherId(Integer fatherId) {
+        this.fatherId = fatherId;
+    }
+
+    public Integer getContentId() {
+        return contentId;
+    }
+
+    public void setContentId(Integer contentId) {
+        this.contentId = contentId;
+    }
+
+    /**
+     * 获取主键值
+     *
+     * @return 主键值
+     */
+    @Override
+    protected Serializable pkVal() {
+        return this.commentId;
+    }
     }
 
