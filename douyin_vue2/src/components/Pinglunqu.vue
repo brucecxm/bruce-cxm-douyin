@@ -131,11 +131,11 @@ export default {
       }
       this.commentsData.unshift(newCommentObj);
       this.newComment = '';
+      //感觉下面这种格式没什么必要
       const params = {
-        videoId: parseInt(this.videoData.videoId, 10),
-        userId: newCommentObj.userId,
-        comment: newCommentObj.comment,
-        fatherId: this.fatherId
+        [this.Constant.videoId]: parseInt(this.videoData.videoId, 10),
+        [this.Constant.userId]: newCommentObj.userId,
+        [this.Constant.fatherId]: this.fatherId
       };
       addcomment(params)
         .then((res) => {
