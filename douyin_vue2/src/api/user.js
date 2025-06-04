@@ -10,6 +10,12 @@ export const userRegisterService = (registerData) => {
   }
   return request.post('/user/register', params);
 };
+// 修改 getauthzzz 函数
+export const getUserInfo = (userid, page = 1, size = 10) => {
+  return request.get('/user/auth', {
+    params: { userid, page, size } // 将 userid 包装在 params 对象中
+  });
+};
 
 //提供调用登录接口的函数
 export const userLoginService = (loginData) => {
@@ -71,4 +77,14 @@ export const getVerificationCodeService = (username) => {
   return request.put('/user/getVerificationCode', username, {
     responseType: 'blob' // 确保返回值是图片流
   });
+};
+
+// 获取验证码服务，确保发送正确的请求，且设置 responseType: 'blob'
+export const getEmailVerificationCodeService = (Data) => {
+  const params = new URLSearchParams();
+  for (let key in Data) {
+    params.append(key, Data[key]);
+  }
+
+  return request.post('/user/getEmailVerificationCode', params);
 };

@@ -312,7 +312,7 @@ export default {
       this.showDownload = false;
     },
     selectTab(tab) {
-      alert(`切换到 ${tab} 模块（示例，具体可实现）`);
+      console.log(`切换到 ${tab} 模块（示例，具体可实现）`);
     },
     switchCamera() {
       this.usingFrontCamera = !this.usingFrontCamera;
@@ -331,14 +331,14 @@ export default {
     },
     toggleFlash() {
       this.flashOn = !this.flashOn;
-      alert(`闪光灯已${this.flashOn ? '打开' : '关闭'}（示例）`);
+      console.log(`闪光灯已${this.flashOn ? '打开' : '关闭'}（示例）`);
       // 这里可接入闪光灯API，浏览器端通常不支持闪光灯控制
       this.closeAllPopups();
     },
     startTimer() {
       if (this.timerId) return;
       this.timerCount = 3;
-      alert(`倒计时开始：${this.timerCount}秒`);
+      console.log(`倒计时开始：${this.timerCount}秒`);
       this.timerId = setInterval(() => {
         this.timerCount--;
         console.log(`倒计时：${this.timerCount}`);
@@ -346,7 +346,7 @@ export default {
           clearInterval(this.timerId);
           this.timerId = null;
           this.takePhoto();
-          alert('拍照完成！');
+          console.log('拍照完成！');
           this.closeAllPopups();
         }
       }, 1000);

@@ -4,7 +4,10 @@ import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.entity.MeInfo;
 import com.bruce.entity.Salt;
 import com.bruce.entity.User;
@@ -27,12 +30,14 @@ import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.servlet.ServletOutputStream;
@@ -50,7 +55,7 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @RequestMapping("/user")
 @Validated
-public class UserController {
+public class UserController  extends ApiController {
     @Autowired
     private JwtUtil jwtUtil;
     @Autowired
@@ -71,7 +76,8 @@ public class UserController {
     private FriendService friendService;
 
 
-
+    @Resource
+    private VideoService videoService;  // 用于将对象转换为JSON字符串
     @RequestMapping("chashop")
     public List handleLogoutAssction() {
 
@@ -79,11 +85,6 @@ public class UserController {
 
         return null;
     }
-
-
-
-
-
 
 
 
@@ -220,9 +221,15 @@ return one;
     private systemClient systemClients;
 
 
+    @PostMapping("/doLogin")
     // 测试登录，浏览器访问： http://localhost:8081/user/doLogin?username=zhang&password=123456
-    @RequestMapping("doLogin")
-    public Result doLogin(String username, String password) throws Exception {
+    public Result doLogin(@RequestParam Map<String, String> params) {
+        String username = params.get("username");
+        String password = params.get("password");
+        String emailVerificationCode = params.get("emailVerificationCode");
+
+
+
         // 使用 QueryWrapper 构建查询条件
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);
@@ -233,15 +240,32 @@ return one;
         if (user == null) {
             return Result.error("请核对用户名是否正确");
         }
-        LambdaQueryWrapper<Salt> queryWrapperone = new LambdaQueryWrapper<>();
-        // 使用查询条件，假设Salt类有一个用户名字段叫username
-        queryWrapperone.eq(Salt::getUsername, username);
-        // 获取盐值
-        Salt salt = saltService.getOne(queryWrapperone);
-        // 加密输入的密码
-        String encryptedPassword = saltedDoubleHashPassword(password, salt.getSalt());
+
+
+        if(!emailVerificationCode.isEmpty()||emailVerificationCode!=null)
+        {
+            String code=stringRedisTemplate.opsForValue().get("email:code:" + username);
+            if(!emailVerificationCode.equals(code))
+            {
+                return Result.error("登录失败");
+            }
+        }else {
+            //todo 注销用户的时候 一定要记得注销掉用户的盐值
+            LambdaQueryWrapper<Salt> queryWrapperone = new LambdaQueryWrapper<>();
+            // 使用查询条件，假设Salt类有一个用户名字段叫username
+            queryWrapperone.eq(Salt::getUsername, username);
+            // 获取盐值
+            Salt salt = saltService.getOne(queryWrapperone);
+            // 加密输入的密码
+            String encryptedPassword = saltedDoubleHashPassword(password, salt.getSalt());
 // 判断用户名和加密后的密码是否匹配，验证通过进入登录流程
-        if (user.getUsername().equals(username) && encryptedPassword.equals(user.getPassword())) {
+            if (!(user.getUsername().equals(username) && encryptedPassword.equals(user.getPassword())))
+            {
+                return Result.error("登录失败");
+            }
+        }
+
+
 
             // 1. 默认使用 sa-token 登录方式
 //            R result = systemClients.findById(1); // 从配置中心或系统管理服务查询id为1的登录方式配置
@@ -294,10 +318,42 @@ return one;
 
             // 登录成功，返回包含 token 的成功结果给前端
             return Result.success(response);
+
+
+    }
+
+    @GetMapping("/auth")
+    public Map<String, Object> getAuth(
+            @RequestParam(required = false) Integer userid,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Object UserIdObj = StpUtil.getLoginId();
+        Long loginUserId = UserIdObj != null ? Long.parseLong(UserIdObj.toString()) : 0L;
+
+        if (userid == null) {
+            userid = loginUserId.intValue();  // 使用当前登录用户ID
         }
 
-        return Result.error("登录失败");
+        Map<String, Object> result = new HashMap<>();
+
+        // 查询用户信息
+        LambdaQueryWrapper<User> userQuery = new LambdaQueryWrapper<>();
+        userQuery.eq(User::getId, userid);
+        User userInfo = userService.getOne(userQuery);
+        result.put("auth", userInfo);
+
+        // 查询视频分页数据
+        Page<Video> pageInfo = new Page<>(page, size);
+        LambdaQueryWrapper<Video> videoQuery = new LambdaQueryWrapper<>();
+        videoQuery.eq(Video::getAuthId, userid);
+        IPage<Video> videoPage = videoService.page(pageInfo, videoQuery);
+        result.put("videobox", videoPage.getRecords());
+        result.put("total", videoPage.getTotal());
+
+        return result;
     }
+
 
     // 图片验证码接口
     @PutMapping("/getVerificationCode")
@@ -325,6 +381,32 @@ return one;
             out.flush();
         }
     }
+
+
+
+    // 图片验证码接口
+    @PostMapping("/getEmailVerificationCode")
+    @ResponseBody  // 直接返回响应体
+    public void getEmailVerificationCodeService(@RequestParam String email) throws IOException {
+        // 1. 生成验证码
+        String code = String.valueOf(new Random().nextInt(899999) + 100000);
+
+        // 2. 存入 Redis，有效期 5 分钟
+        stringRedisTemplate.opsForValue().set("email:code:" + email, code, 5, TimeUnit.MINUTES);
+
+        // 3. 构造消息
+        Map<String, String> message = new HashMap<>();
+        message.put("email", email);
+        message.put("code", code);
+
+        // 4. 发送到队列（work 模型只需一个队列）
+        rabbitTemplate.convertAndSend("email.queue", message);
+
+    }
+
+
+
+
 
 
     //短信验证码接口
@@ -394,7 +476,10 @@ return one;
 
 
         user.setUsername(username);
+        user.setAvatar("https://p3-pc.douyinpic.com/img/aweme-avatar/mosaic-legacy_3795_3047680722~c5_300x300.jpeg?from=2956013662");
         user.setPassword(encryptedPassword);
+        user.setBackImg("https://img1.baidu.com/it/u=755680603,1751569227&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1424");
+           user.setRoleId("user");
         if (u == null) {
             //没有占用
             //注册
@@ -537,8 +622,7 @@ return one;
     @Autowired
     private ObjectMapper objectMapper;  // 用于将对象转换为JSON字符串
 
-    @Autowired
-    private VideoService videoService;  // 用于将对象转换为JSON字符串
+
     @GetMapping("/userInfo")
     public MeInfo userInfo() {
         Object userId = StpUtil.getLoginId();

@@ -14,15 +14,30 @@
             type="text"
             v-model="loginpojo.username"
             @blur="validateEmail"
-            placeholder="请输入邮箱（暂支持邮箱）"
+            placeholder="请输入用户名"
           />
           <input
+            v-if="!isPasswordLogin"
             type="password"
             v-model="loginpojo.password"
             placeholder="请输入密码"
           />
         </div>
-        <div class="input-group">
+        <div class="input-group" v-if="isPasswordLogin">
+          <input
+            type="text"
+            v-model="emailVerificationCode"
+            placeholder="请输入邮箱发来的验证码"
+          />
+          <button
+            @click="getEmailVerificationCode"
+            :disabled="isCodeSent"
+            class="get-code-btn"
+          >
+            {{ countdown > 0 ? countdown + '秒' : '获取验证码' }}
+          </button>
+        </div>
+        <div class="input-group" v-if="!isPasswordLogin">
           <input
             type="text"
             v-model="verificationCode"
@@ -44,7 +59,7 @@
         </p>
         <button class="login-btn" @click="verifyPhoneNumber">验证并登录</button>
         <div class="login-options">
-          <button @click="switchToPasswordLogin">密码登录</button>
+          <button @click="switchToPasswordLogin">邮箱登录</button>
           <button @click="switchToRegister">切换到注册</button>
         </div>
       </div>
@@ -55,7 +70,7 @@
             type="text"
             v-model="loginpojo.username"
             @blur="validateEmail"
-            placeholder="请输入邮箱（暂支持邮箱）"
+            placeholder="请输入用户名"
           />
           <input
             type="password"
@@ -81,6 +96,7 @@
           >
             {{ countdown > 0 ? countdown + '秒' : '获取验证码' }}
           </button>
+          <img :src="captchaUrl" alt="验证码" v-if="isShow" />
         </div>
 
         <p class="terms">
@@ -102,6 +118,7 @@
 import {
   userLoginService,
   userRegisterService,
+  getEmailVerificationCodeService,
   getVerificationCodeService
 } from '../../api/user';
 import { useTokenStore } from '../../stores/token';
@@ -111,11 +128,13 @@ export default {
   name: 'Login',
   data() {
     return {
+      loginType: 'password', //
       loginpojo: {
         username: '',
         password: '',
         confirmPassword: '' // for registration
       },
+      emailVerificationCode: '', // 用于保存验证码
       verificationCode: '', // 用于保存验证码
       emailPattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
       isPasswordLogin: false,
@@ -152,7 +171,41 @@ export default {
       this.loginpojo.password = '';
       this.loginpojo.confirmPassword = '';
     },
+    async getEmailVerificationCode() {
+      if (!this.loginpojo.username) {
+        this.$message({
+          message: '请输入邮箱',
+          type: 'warning'
+        });
+        return;
+      }
+      try {
+        const response = await getEmailVerificationCodeService({
+          email: this.loginpojo.username
+        });
 
+        if (response.data.code === 1) {
+          this.$message({
+            message: '获取验证码失败，请稍后再试',
+            type: 'error'
+          });
+          return;
+        }
+
+        this.isCodeSent = true;
+        this.countdown = 60;
+        const timer = setInterval(() => {
+          if (this.countdown === 0) {
+            clearInterval(timer);
+            this.isCodeSent = false;
+          } else {
+            this.countdown--;
+          }
+        }, 1000);
+      } catch (error) {
+        console.error('获取验证码失败：', error);
+      }
+    },
     async getVerificationCode() {
       if (!this.loginpojo.username) {
         this.$message({
@@ -200,21 +253,24 @@ export default {
         });
         return;
       }
-      if (!this.verificationCode) {
-        this.$message({
-          message: '请输入验证码',
-          type: 'warning'
-        });
-        return;
-      }
+      // if (!this.verificationCode) {
+      //   this.$message({
+      //     message: '请输入验证码',
+      //     type: 'warning'
+      //   });
+      //   return;
+      // }
 
       console.log('验证手机号:', this.loginpojo);
 
       try {
         const response = await userLoginService({
           ...this.loginpojo,
-          verificationCode: this.verificationCode
+          verificationCode: this.verificationCode,
+          loginType: this.loginType,
+          emailVerificationCode: this.emailVerificationCode
         });
+        debugger;
         if (response.data.code === 1) {
           this.$message({
             message: response.data.msg || '登录失败',
@@ -241,6 +297,7 @@ export default {
 
     switchToPasswordLogin() {
       this.isPasswordLogin = true;
+      this.loginType = 'email';
     },
     switchToRegister() {
       this.isRegistering = true;

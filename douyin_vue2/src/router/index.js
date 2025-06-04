@@ -33,6 +33,12 @@ const router = new VueRouter({
       component: () => import('../views/shop/searchshop.vue')
     },
     {
+      path: '/shangchuan',
+      name: 'shangchuanshop',
+      component: () => import('../views/shangchuan/shangchuan.vue')
+    },
+
+    {
       path: '/coupon',
       name: 'coupon',
       component: () => import('../views/shop/coupon.vue')

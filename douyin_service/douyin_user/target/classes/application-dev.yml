@@ -36,11 +36,9 @@ spring:
     virtual-host: /  # RabbitMQ 的虚拟主机
 
   datasource:
-    druid:
-      driver-class-name: com.mysql.cj.jdbc.Driver  # 数据库驱动类名
-      url: jdbc:mysql://localhost:3306/douyintest?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true  # 数据库连接URL
-      username: root  # 数据库用户名
-      password: root  # 数据库密码
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
 
 
   security:
