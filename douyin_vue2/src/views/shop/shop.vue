@@ -29,7 +29,14 @@
 
     <div class="box-containeraaa" @scroll="handleScroll">
       <div class="meum">
-        <scroll-nav :navItems="parentMsg"></scroll-nav>
+        <scroll-nav
+          :navItems="parentMsg"
+          iconWidth="60px"
+          iconHeight="60px"
+          labelFontSize="12px"
+          navItemWidth="70px"
+          navItemPadding="10px 0"
+        />
       </div>
 
       <div class="nav" style="width: 100%">
@@ -61,7 +68,7 @@
                 class="cover"
                 :style="{
                   width: '100%',
-                  height: '200px',
+                  height: '250px',
                   objectFit: 'cover',
                   borderRadius: '8px'
                 }"
@@ -590,6 +597,9 @@ p {
 }
 
 .search {
+  border-radius: 10px;
+  margin-left: 5px;
+  margin-right: 5px;
   border: solid 2px rgb(233, 111, 111);
   overflow: hidden;
   border-radius: 10px;
@@ -628,7 +638,9 @@ p {
   /* 阻止元素缩小 */
   background-size: cover;
 }
-
+.ssss {
+  background-color: #f0f0f0;
+}
 .box2 {
   width: 18vw;
   height: 18vw;
@@ -637,6 +649,11 @@ p {
 
 .nav {
   width: 100%;
+  margin-left: 5px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  border-radius: 10px;
+  background-color: white;
   display: flex;
   flex-wrap: wrap;
   align-content: center;
@@ -645,7 +662,12 @@ p {
 }
 
 .meum {
-  margin-top: 7vh;
+  background-color: white;
+  margin-bottom: 5px;
+  margin-top: 6.5vh;
+  border-radius: 10px;
+  margin-left: 5px;
+  margin-right: 5px;
   display: flex;
   flex-direction: row;
   /* 水平方向排列子元素 */

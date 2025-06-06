@@ -161,6 +161,12 @@ const router = new VueRouter({
       component: () => import('../views/xiaoxi/xiaoxitdetail.vue')
     },
     {
+      path: '/transfer/:id',
+      name: 'transferVue',
+      component: () => import('../views/shop/transfer.vue')
+    },
+
+    {
       path: '/shopdetail/:id',
       name: 'ShopDetailVue',
       component: () => import('../views/shop/shopdetail.vue')
@@ -169,6 +175,11 @@ const router = new VueRouter({
       path: '/setting',
       name: 'SettingVue',
       component: () => import('../views/setting.vue')
+    },
+    {
+      path: '/shopSearchDetail',
+      name: 'shopSearchDetailVue',
+      component: () => import('../views/shop/shopSearchDetail.vue')
     },
     {
       path: '/friend',

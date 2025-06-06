@@ -81,7 +81,7 @@
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 import axios from 'axios';
-
+import { useUserInfoStore } from '@/stores/userInfo';
 export default {
   data() {
     return {
@@ -108,7 +108,9 @@ export default {
     };
   },
   mounted() {
-    this.fromUser = this.$route.query.fromUser || '';
+    const userInfo = useUserInfoStore();
+    const userInfoMap = userInfo.userInfo;
+    this.fromUser = userInfoMap.userId || '';
     this.toUser = this.$route.query.toUser || '';
 
     const socket = new SockJS('http://localhost:7426/ws');

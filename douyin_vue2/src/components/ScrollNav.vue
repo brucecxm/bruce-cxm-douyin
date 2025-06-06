@@ -1,15 +1,19 @@
 <template>
   <div class="navbar-wrapper">
     <div class="navbar-scroll" ref="scrollContainer">
-      <div class="nav-item" v-for="(item, index) in navItems" :key="index">
-        <div class="icon">
-          <img :src="item.icon" alt="icon" />
+      <div
+        class="nav-item"
+        v-for="(item, index) in navItems"
+        :key="index"
+        :style="navItemStyle"
+      >
+        <div class="icon" :style="iconStyle">
+          <img :src="item.icon" alt="icon" :style="imgStyle" />
         </div>
-        <div class="label">{{ item.label }}</div>
+        <div class="label" :style="labelStyle">{{ item.label }}</div>
       </div>
     </div>
 
-    <!-- 居中、窄宽滚动条轨道 -->
     <div class="scrollbar-track">
       <div
         class="scrollbar-thumb"
@@ -26,6 +30,26 @@ export default {
     navItems: {
       type: Array,
       required: true
+    },
+    iconWidth: {
+      type: [String, Number],
+      default: '24px'
+    },
+    iconHeight: {
+      type: [String, Number],
+      default: '24px'
+    },
+    labelFontSize: {
+      type: [String, Number],
+      default: '12px'
+    },
+    navItemWidth: {
+      type: [String, Number],
+      default: '60px'
+    },
+    navItemPadding: {
+      type: String,
+      default: '8px 0'
     }
   },
   data() {
@@ -33,6 +57,37 @@ export default {
       thumbWidth: 0,
       thumbLeft: 0
     };
+  },
+  computed: {
+    iconStyle() {
+      return {
+        width: this.addUnit(this.iconWidth),
+        height: this.addUnit(this.iconHeight),
+        margin: '0 auto'
+      };
+    },
+    imgStyle() {
+      return {
+        width: '100%',
+        height: '100%',
+        objectFit: 'contain'
+      };
+    },
+    labelStyle() {
+      return {
+        fontSize: this.addUnit(this.labelFontSize),
+        color: '#555',
+        marginTop: '4px'
+      };
+    },
+    navItemStyle() {
+      return {
+        flex: '0 0 auto',
+        width: this.addUnit(this.navItemWidth),
+        textAlign: 'center',
+        padding: this.navItemPadding
+      };
+    }
   },
   mounted() {
     this.updateThumb();
@@ -49,12 +104,14 @@ export default {
       const visibleWidth = container.clientWidth;
       const totalWidth = container.scrollWidth;
       const scrollLeft = container.scrollLeft;
-
       const trackVisibleRatio = 0.5;
 
       this.thumbWidth = (visibleWidth / totalWidth) * 100 * trackVisibleRatio;
       this.thumbLeft =
         (scrollLeft / (totalWidth - visibleWidth)) * (100 * trackVisibleRatio);
+    },
+    addUnit(val) {
+      return typeof val === 'number' ? `${val}px` : val;
     }
   }
 };
@@ -75,30 +132,6 @@ export default {
 }
 .navbar-scroll::-webkit-scrollbar {
   display: none;
-}
-
-.nav-item {
-  flex: 0 0 auto;
-  width: 60px;
-  text-align: center;
-  padding: 8px 0;
-}
-
-.icon {
-  width: 24px;
-  height: 24px;
-  margin: 0 auto;
-}
-.icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.label {
-  font-size: 12px;
-  color: #555;
-  margin-top: 4px;
 }
 
 .scrollbar-track {

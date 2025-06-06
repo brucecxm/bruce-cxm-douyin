@@ -45,6 +45,7 @@ public class User  {
     private String permissionId;
 
     private String roleId;
+    private String paymentPassword;
 
     }
 
