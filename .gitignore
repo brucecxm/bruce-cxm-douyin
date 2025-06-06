@@ -1,7 +1,11 @@
 
 /douyin_vue2/node_modules/
 
+**/node_modules/
+
 /douyin_admin_vue3/node_modules/
+
+/douyin_node_backend/node_modules/
 
 /.idea/
 
