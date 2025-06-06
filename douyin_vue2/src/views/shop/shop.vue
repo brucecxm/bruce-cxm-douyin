@@ -48,7 +48,12 @@
         />
       </div>
 
-      <div class="main">
+      <div class="searchresult">
+        <under-line-tags-vue
+          :navItems="parentMessage"
+          :active-index.sync="activeTabIndex"
+          @change="handleTabChange"
+        ></under-line-tags-vue>
         <RecommendList
           :columns="2"
           :items="shopitems"
@@ -101,6 +106,7 @@ import GridDisplay from '@/components/GridDisplay.vue';
 import { useTokenStore } from '@/stores/token';
 import footerVue from '@/components/footer.vue';
 import RecommendList from '../../components/RecommendList.vue';
+import underLineTagsVue from '../../components/underLineTags.vue';
 export default {
   beforeDestroy() {
     // 移除事件监听
@@ -110,7 +116,8 @@ export default {
     footerVue,
     ScrollNav,
     GridDisplay,
-    RecommendList
+    RecommendList,
+    underLineTagsVue
   },
   data() {
     return {

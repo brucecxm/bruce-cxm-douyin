@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.entity.Shop;
 import com.bruce.service.ShopService;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -51,12 +52,35 @@ public class ShopController extends ApiController {
 
 
     @GetMapping("/page")
-    public Map selectAll(Page<Shop> page,Shop shop) {
+    public Map<String, Object> selectAll(Page<Shop> page, Shop shop) {
+        LambdaQueryWrapper<Shop> queryWrapper = new LambdaQueryWrapper<>();
 
-        IPage<Shop> shopsPage = this.shopService.page(page,new QueryWrapper<>(shop));
+        // 模糊查询字段
+        if (StringUtils.hasText(shop.getShopName())) {
+            queryWrapper.like(Shop::getShopName, shop.getShopName());
+        }
+        if (StringUtils.hasText(shop.getShopDesc())) {
+            queryWrapper.like(Shop::getShopDesc, shop.getShopDesc());
+        }
+        if (StringUtils.hasText(shop.getShopInfo())) {
+            queryWrapper.like(Shop::getShopInfo, shop.getShopInfo());
+        }
+        if (StringUtils.hasText(shop.getShopType())) {
+            queryWrapper.like(Shop::getShopType, shop.getShopType());
+        }
 
+        // 精确匹配字段
+        if (shop.getShopId() != null) {
+            queryWrapper.eq(Shop::getShopId, shop.getShopId());
+        }
+        if (shop.getShopPrice() != null) {
+            queryWrapper.eq(Shop::getShopPrice, shop.getShopPrice());
+        }
 
+        // 执行分页查询
+        IPage<Shop> shopsPage = shopService.page(page, queryWrapper);
 
+        // 封装返回
         Map<String, Object> response = new HashMap<>();
         response.put("shopList", shopsPage.getRecords());
         response.put("total", shopsPage.getTotal());
@@ -65,6 +89,7 @@ public class ShopController extends ApiController {
 
         return response;
     }
+
 
 
     /**
