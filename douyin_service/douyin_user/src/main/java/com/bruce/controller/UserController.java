@@ -242,7 +242,7 @@ return one;
         }
 
 
-        if(!emailVerificationCode.isEmpty()||emailVerificationCode!=null)
+        if(!emailVerificationCode.isEmpty()&&emailVerificationCode!=null&&!emailVerificationCode.equals(""))
         {
             String code=stringRedisTemplate.opsForValue().get("email:code:" + username);
             if(!emailVerificationCode.equals(code))
@@ -327,30 +327,24 @@ return one;
             @RequestParam(required = false) Integer userid,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
-
         Object UserIdObj = StpUtil.getLoginId();
         Long loginUserId = UserIdObj != null ? Long.parseLong(UserIdObj.toString()) : 0L;
-
         if (userid == null) {
             userid = loginUserId.intValue();  // 使用当前登录用户ID
         }
-
         Map<String, Object> result = new HashMap<>();
-
         // 查询用户信息
         LambdaQueryWrapper<User> userQuery = new LambdaQueryWrapper<>();
         userQuery.eq(User::getId, userid);
         User userInfo = userService.getOne(userQuery);
-        result.put("auth", userInfo);
-
+        result.put("userInfo", userInfo);
         // 查询视频分页数据
         Page<Video> pageInfo = new Page<>(page, size);
         LambdaQueryWrapper<Video> videoQuery = new LambdaQueryWrapper<>();
-        videoQuery.eq(Video::getAuthId, userid);
+        videoQuery.eq(Video::getUserId, userid);
         IPage<Video> videoPage = videoService.page(pageInfo, videoQuery);
         result.put("videobox", videoPage.getRecords());
         result.put("total", videoPage.getTotal());
-
         return result;
     }
 
@@ -633,7 +627,7 @@ return one;
         MeInfo meInfo=new MeInfo();
        User user=   userService.getOne(queryWrapper);
         LambdaQueryWrapper<Video> queryWrapperV = new LambdaQueryWrapper<>();
-        queryWrapperV.eq(Video::getAuthId, userId);
+        queryWrapperV.eq(Video::getUserId, userId);
 List<Video> videoList=videoService.list(queryWrapperV);
 // 使用 BeanUtils 复制相同属性
         BeanUtils.copyProperties(user, meInfo);

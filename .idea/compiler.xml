@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="douyin_user" />
         <module name="douyin_admin" />
+        <module name="douyin_test" />
         <module name="douyin_file_starter" />
         <module name="douyin_model" />
         <module name="douyin_feign" />
@@ -34,7 +35,6 @@
       <module name="douyin_satoken" target="1.8" />
       <module name="douyin_schedule" target="1.8" />
       <module name="douyin_spring" target="1.8" />
-      <module name="douyin_test" target="1.8" />
       <module name="douyin_testall" target="1.8" />
       <module name="douyin_testSpringfactories" target="1.8" />
       <module name="douyin_websocket" target="1.8" />

@@ -63,7 +63,7 @@
         <div
           class="itemdetail"
           :style="{
-            backgroundImage: `url(${item.videoImg})`,
+            backgroundImage: `url(${item.cover})`,
             width: '100%',
             height: '100%',
             backgroundSize: 'cover',
@@ -113,7 +113,8 @@ export default {
 
       getUserInfo(null, page, this.pageSize)
         .then((res) => {
-          const videos = res.data.videoPageList || [];
+          debugger;
+          const videos = res.data.videobox || [];
           const total = res.data.total || 0;
           // 追加视频数据
           this.videobox = [...this.videobox, ...videos];

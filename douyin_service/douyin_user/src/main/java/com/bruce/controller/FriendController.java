@@ -83,8 +83,8 @@ private chatInfoDao chatInfoDaoone;
                     .map(video -> {
                         Video newVideo = new Video();
                         // 设置视频的 URL 和封面图
-                        newVideo.setVideoUrl(video.getVideoUrl());
-                        newVideo.setVideoImg(video.getVideoImg());
+                        newVideo.setUrl(video.getUrl());
+                        newVideo.setCover(video.getCover());
                         return newVideo; // 返回构造好的 Video 对象
                     })
                     .collect(Collectors.toList()); // 收集所有视频对象到列表中

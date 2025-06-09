@@ -12,6 +12,7 @@
     <modules>
         <module>douyin_video</module>
         <module>douyin_user</module>
+        <module>douyin_test</module>
         <module>douyin_shop</module>
         <module>douyin_sms</module>
 <!--        <module>douyin_test</module>-->
