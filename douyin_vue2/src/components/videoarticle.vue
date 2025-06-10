@@ -1,9 +1,9 @@
 <template>
   <div class="videoarticle" @click="testone">
     <div class="username" @click="goauth(videoData.userid)">
-      {{ videoData.username }}
+      {{ videoData.userName }}
     </div>
-    <div div class="article">{{ videoData.videoContent }}</div>
+    <div div class="article">{{ videoData.content }}</div>
   </div>
 </template>
 
@@ -14,20 +14,15 @@ export default {
       type: Object,
 
       default() {
-        return {
-          collectNum: '', // 收藏数量
-          commentNum: '', // 评论数量
-          likeNum: '', // 点赞数量
-          shareNum: '', // 分享数量
-          userAvatar: '',
-          userid: '', // 用户 ID
-          username: '', // 用户名
-          videoUrl: '', // 视频 URL
-          video_comment: '', // 视频评论
-          videoid: '' // 视频 ID
-        };
+        return {};
       }
     }
+  },
+  mounted() {
+    console.log(this.videoData);
+    var onea = {};
+    onea = this.videoData;
+    console.log(onea);
   },
   data() {
     return {};

@@ -52,67 +52,102 @@
     </div>
   </div>
 </template>
-
 <script>
 import videoasideVue from './videoaside.vue';
 import videoarticleVue from './videoarticle.vue';
 import { homegetVideo } from '../api/video';
 
 export default {
+  name: 'videobox-vue',
   components: {
     videoasideVue,
     videoarticleVue
   },
+  props: {
+    externalVideos: {
+      type: Array,
+      default: () => []
+    },
+    onReachEnd: {
+      type: Function,
+      default: null
+    }
+  },
   data() {
     return {
-      videoboxdata: [], // 初始的视频数据
-      isDragging: false, // 是否正在拖拽
-      startY: 0, // 拖拽起始 Y 坐标
-      currentY: 0, // 当前 Y 坐标
-      boxWidth: '100%', // 每个盒子的宽度
-      activeIndex: null, // 当前活跃的盒子索引
-      boxHeight: 950, // 每个盒子的高度
-      boxes: [], // 存储视频盒子的位置数据
-      videodatahistory: [], // 存储历史的视频数据
-      page: 1, // 当前页数
-      pageSize: 4, // 每次请求的视频数量
-      debounceTimer: null // 防抖定时器
+      videoboxdata: [], // 当前显示的视频数据
+      isDragging: false,
+      startY: 0,
+      currentY: 0,
+      boxWidth: '100%',
+      activeIndex: null,
+      boxHeight: 950,
+      boxes: [],
+      videodatahistory: [], // 存储所有视频数据（外部传入+内部加载）
+      page: 1,
+      pageSize: 4,
+      debounceTimer: null
     };
   },
 
   watch: {
-    // 当 videoboxdata 变化时，动态更新 boxes 数量
+    // 监听外部传入的视频变化
+    externalVideos(newVideos) {
+      if (newVideos && newVideos.length > 0) {
+        this.appendExternalVideos(newVideos);
+      }
+    },
+
+    // 当 videoboxdata 变化时更新盒子位置
     videoboxdata(newData) {
       this.updateBoxesBasedOnVideoData(newData);
     }
   },
 
   created() {
-    // 初始化时的视频盒子数据
-    this.updateBoxesBasedOnVideoData(this.videoboxdata);
-  },
-
-  mounted() {
-    // 初始化视频数据
-    this.loadVideos();
+    if (this.externalVideos.length > 0) {
+      this.appendExternalVideos(this.externalVideos);
+    } else {
+      this.loadVideos();
+    }
   },
 
   methods: {
-    // 请求视频数据
+    // 允许父组件调用以传入分页数据
+    appendPageData(newPageVideos) {
+      debugger;
+      if (Array.isArray(newPageVideos) && newPageVideos.length > 0) {
+        this.videodatahistory.push(...newPageVideos);
+        this.videoboxdata = [...this.videodatahistory];
+      }
+    },
+    // 加载视频数据（分页）
     loadVideos() {
-      homegetVideo(this.page, this.pageSize, 1)
-        .then((videoArr) => {
-          if (Array.isArray(videoArr.data) && videoArr.data.length > 0) {
-            this.videodatahistory.push(...videoArr.data); // 更新历史视频数据
-            this.videoboxdata = [...this.videodatahistory]; // 更新 videoboxdata 显示的视频数据
-          }
-        })
-        .catch((error) => {
-          console.error('获取视频出错:', error);
-        });
+      // homegetVideo(this.page, this.pageSize, 1)
+      //   .then((videoArr) => {
+      //     debugger;
+      //     if (Array.isArray(videoArr.data) && videoArr.data.length > 0) {
+      //       this.videodatahistory.push(...videoArr.data);
+      //       this.videoboxdata = [...this.videodatahistory];
+      //     }
+      //   })
+      //   .catch((error) => {
+      //     console.error('获取视频出错:', error);
+      //   });
     },
 
-    // 更新盒子的位置基于 videoboxdata 的长度
+    // 追加外部传入的视频数据
+    appendExternalVideos(videos) {
+      // 避免重复添加
+      const newVideos = videos.filter(
+        (v) => !this.videodatahistory.some((old) => old.id === v.id)
+      );
+      if (newVideos.length > 0) {
+        this.videodatahistory.push(...newVideos);
+        this.videoboxdata = [...this.videodatahistory];
+      }
+    },
+
     updateBoxesBasedOnVideoData(videoData) {
       this.boxes = videoData.map((_, index) => ({
         color: 'black',
@@ -121,20 +156,24 @@ export default {
       this.updateBoxesPosition();
     },
 
-    // 防抖处理
     debounceLoadVideos() {
       if (this.debounceTimer) {
-        clearTimeout(this.debounceTimer); // 清除之前的定时器
+        clearTimeout(this.debounceTimer);
       }
       this.debounceTimer = setTimeout(() => {
         if (this.isAtBottom()) {
-          this.page++; // 增加分页
-          this.loadVideos(); // 加载更多视频
+          // 触发父组件分页方法
+          if (this.onReachEnd) {
+            this.onReachEnd();
+          } else {
+            // 如果没有传入分页方法，默认内部加载
+            this.page++;
+            this.loadVideos();
+          }
         }
-      }, 300); // 延迟300ms执行
+      }, 300);
     },
 
-    // 更新视频播放状态
     updateVideoPlayback() {
       const containerHeight = this.$el.clientHeight;
       const threshold = 0.9;
@@ -156,7 +195,6 @@ export default {
       });
     },
 
-    // 拖拽事件
     startDrag(event) {
       this.isDragging = true;
       this.startY = this.getEventClientY(event) - this.currentY;
@@ -216,7 +254,6 @@ export default {
   }
 };
 </script>
-
 <style scoped>
 .videoasideone {
   display: block;

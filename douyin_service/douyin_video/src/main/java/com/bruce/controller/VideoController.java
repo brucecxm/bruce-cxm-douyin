@@ -150,7 +150,7 @@ public class VideoController extends ApiController {
             User user = userService.getById(video.getUserId());
             if (user != null) {
                 vo.setUsername(user.getNickname());
-                vo.setUserAvatar(user.getUserPic());
+                vo.setUserAvatar(user.getAvatar());
             }
             // 音乐信息
             Music music = musicService.getById(video.getMusicId());
@@ -194,8 +194,9 @@ public class VideoController extends ApiController {
             Map<String, Object> map = new HashMap<>();
             map.put(Constant.videoId, vo.getVideoId());
             map.put(Constant.userId, vo.getUserId());
-            map.put(Constant.videoUrl, vo.getVideoUrl());
-            map.put(Constant.videoContent, vo.getVideoComment());
+            map.put(Constant.content, vo.getUserId());
+            map.put(Constant.videoUrl, vo.getUrl());
+            map.put(Constant.content, vo.getContent());
             map.put(Constant.userName, vo.getUsername());
             map.put(Constant.userAvatar, vo.getUserAvatar());
             map.put(Constant.music, vo.getMusic());

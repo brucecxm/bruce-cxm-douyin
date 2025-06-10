@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class VideoVO {
     private Long videoId;
-    private String videoUrl;
-    private String videoComment;
+    private String url;
+    private String content;
     private Long userId;
 
     private String username;
@@ -20,4 +20,7 @@ public class VideoVO {
     private Long commentNum;
     private Long shareNum;
     private Long collectNum;
+    private Long type;
+    private Long status;
+    private Long title;
 }

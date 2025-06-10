@@ -26,12 +26,12 @@
             height: boxHeight + 'vh'
           }"
         >
-          <!-- <div class="videobox"><videobox-vue></videobox-vue></div> -->
           <div class="videobox">
-            <all-box-vue
-              v-if="visibleIndexes.includes(index)"
-              :boxtype="boxes[index].boxtest"
-            ></all-box-vue>
+            <videobox-vue
+              :externalVideos="videoList"
+              :onReachEnd="handleReachEnd"
+              ref="videoboxzidata"
+            ></videobox-vue>
           </div>
         </div>
       </div>
@@ -86,10 +86,11 @@
   </div>
 </template>
 <script>
+import { homegetVideo } from '@/api/video';
 import GlassSearch from '@/components/GlassSearch.vue';
 import HorizontalScrollList from '@/components/HorizontalScrollList.vue';
 import caidan from '@/components/caidan.vue';
-import AllBoxVue from '@/components/allbox.vue';
+import videoboxVue from '@/components/videobox.vue';
 import Pinglunqu from '@/components/Pinglunqu.vue';
 import SlidePopup from '@/components/SlidePopup.vue';
 import Danmu from '@/components/Danmu.vue';
@@ -105,6 +106,9 @@ export default {
 
   data() {
     return {
+      videoList: [], // 存储全部视频
+      page: 0,
+      pageSize: 4,
       danmuText: '',
       showdanmu: false,
       topUsers: [
@@ -268,7 +272,7 @@ export default {
 
   components: {
     SlidePopup,
-    AllBoxVue,
+    videoboxVue,
     caidan,
     Pinglunqu,
     HorizontalScrollList,
@@ -276,6 +280,7 @@ export default {
     GlassSearch
   },
   mounted() {
+    // 初始化加载第一页数据
     this.boxes.forEach((_, index) => {
       const el = this.$refs['box-' + index][0]; // 注意：ref 是数组
       const observer = new IntersectionObserver(
@@ -293,6 +298,10 @@ export default {
 
       if (el) observer.observe(el);
     });
+    this.$nextTick(() => {
+      // 这里可以安全访问子组件引用
+      this.handleReachEnd(); // 如果需要在挂载时调用
+    });
   },
 
   created() {
@@ -301,6 +310,45 @@ export default {
   },
   beforeDestroy() {},
   methods: {
+    handleReachEnd(retryCount = 0) {
+      // 分页查询视频数据，比如调用接口
+      homegetVideo(this.page, this.pageSize, 1)
+        .then((newVideos) => {
+          const appendData = () => {
+            debugger;
+            if (
+              this.$refs.videoboxzidata[0] &&
+              typeof this.$refs.videoboxzidata[0].appendPageData === 'function'
+            ) {
+              this.$refs.videoboxzidata[0].appendPageData(newVideos.data);
+              this.page++;
+            } else if (retryCount < 100) {
+              console.warn(`子组件未就绪，重试第 ${retryCount + 1} 次...`);
+              setTimeout(() => {
+                this.handleReachEnd(retryCount + 1); // 递归延迟重试
+              }, 500);
+            } else {
+              console.error('子组件引用不可用，超过最大重试次数');
+            }
+          };
+
+          appendData();
+        })
+        .catch((error) => {
+          console.error('获取视频出错:', error);
+        });
+    },
+    // handleLoadMore() {
+    //   debugger;
+    //   this.page++;
+    //   homegetVideo(this.page, this.pageSize, 1).then((res) => {
+    //     if (res.data && res.data.length > 0) {
+    //       // 把新数据合并到videoList，传给子组件
+    //       debugger;
+    //       this.videoList = [...this.videoList, ...res.data];
+    //     }
+    //   });
+    // },
     onSearch(keyword) {
       console.log('搜索内容：', keyword);
     },
