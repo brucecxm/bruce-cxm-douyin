@@ -100,7 +100,7 @@ export default {
   methods: {
     // 请求视频数据
     loadVideos() {
-      homegetVideo(this.page, this.pageSize, 'w')
+      homegetVideo(this.page, this.pageSize, 1)
         .then((videoArr) => {
           if (Array.isArray(videoArr.data) && videoArr.data.length > 0) {
             this.videodatahistory.push(...videoArr.data); // 更新历史视频数据

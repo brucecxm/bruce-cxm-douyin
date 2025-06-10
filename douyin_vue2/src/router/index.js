@@ -48,11 +48,7 @@ const router = new VueRouter({
       name: 'videodetail',
       component: () => import('@/views/video/videodetail.vue')
     },
-    {
-      path: '/videobox',
-      name: 'videobox',
-      component: () => import('../components/videobox.vue')
-    },
+
     {
       path: '/testmap',
       name: 'testmap',

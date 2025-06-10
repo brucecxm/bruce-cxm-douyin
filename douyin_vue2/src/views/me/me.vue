@@ -110,7 +110,6 @@ export default {
     fetchItemDetails(page) {
       if (this.loading || this.noMoreData) return;
       this.loading = true;
-
       getUserInfo(null, page, this.pageSize)
         .then((res) => {
           debugger;

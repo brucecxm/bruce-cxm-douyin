@@ -73,6 +73,8 @@ public class VideoController extends ApiController {
     private LikeService likeService;
 
     @Resource
+    private FavorService favorService;
+    @Resource
     private CommentService commentService;
     @ApiOperation(value = "上传视频的接口", notes = "将视频上传到文件服务器")
     @ApiImplicitParams({
@@ -164,10 +166,10 @@ public class VideoController extends ApiController {
                 likeCount = likenum;
             } else {
                 // LambdaQueryWrapper 用于 Like 表查询点赞数
-                LambdaQueryWrapper<Like> likeQueryWrapper = new LambdaQueryWrapper<Like>()
-                        .eq(Like::getCommentId, video.getVideoId());
+                LambdaQueryWrapper<Favor> likeQueryWrapper = new LambdaQueryWrapper<Favor>()
+                        .eq(Favor::getCommentId, video.getVideoId());
 
-                likeCount = likeService.count(likeQueryWrapper);
+                likeCount = favorService.count(likeQueryWrapper);
             }
             vo.setLikeNum((long) likeCount);
             vo.setUserId((long) user.getId());
@@ -178,15 +180,15 @@ public class VideoController extends ApiController {
             int commentCount = commentService.count(commentQueryWrapper);
             vo.setCommentNum((long) commentCount);
             // 收藏数
-            LambdaQueryWrapper<Like> collectWrapper = new LambdaQueryWrapper<Like>()
-                    .eq(Like::getCommentId, video.getVideoId());
+            LambdaQueryWrapper<Favor> collectWrapper = new LambdaQueryWrapper<Favor>()
+                    .eq(Favor::getCommentId, video.getVideoId());
 //                    .eq(Like::getCollect, 1);
-            int collectCount = likeService.count(collectWrapper);
+            int collectCount = favorService.count(collectWrapper);
             vo.setCollectNum((long) collectCount);
             // 分享数
-            LambdaQueryWrapper<Like> shareWrapper = new LambdaQueryWrapper<Like>()
-                    .eq(Like::getCommentId, video.getVideoId());
-            int shareCount = likeService.count(shareWrapper);
+            LambdaQueryWrapper<Favor> shareWrapper = new LambdaQueryWrapper<Favor>()
+                    .eq(Favor::getCommentId, video.getVideoId());
+            int shareCount = favorService.count(shareWrapper);
             vo.setShareNum((long) shareCount);
             // 组装返回数据
             Map<String, Object> map = new HashMap<>();

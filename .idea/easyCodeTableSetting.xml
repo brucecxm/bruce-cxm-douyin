@@ -335,6 +335,40 @@
             </TableInfoDTO>
           </value>
         </entry>
+        <entry key="douyintest.favor">
+          <value>
+            <TableInfoDTO>
+              <option name="fullColumn">
+                <list>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="userId" />
+                    <option name="type" value="java.lang.Integer" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="commentId" />
+                    <option name="type" value="java.lang.Integer" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="commentType" />
+                    <option name="type" value="java.lang.Integer" />
+                  </ColumnInfoDTO>
+                </list>
+              </option>
+              <option name="name" value="Favor" />
+              <option name="preName" value="" />
+              <option name="saveModelName" value="douyin-id-service" />
+              <option name="savePackageName" value="com.bruce" />
+              <option name="savePath" value="./douyin_basic/douyin-id-service/src/main/java/com/bruce" />
+              <option name="templateGroupName" value="MybatisPlus" />
+            </TableInfoDTO>
+          </value>
+        </entry>
         <entry key="douyintest.file_img">
           <value>
             <TableInfoDTO>

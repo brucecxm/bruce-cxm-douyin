@@ -2,6 +2,7 @@
   <div class="allbox">
     <!-- <div class="test" @click="allboxtest"></div> -->
     <videobox-vue v-if="boxtype === '推荐'"></videobox-vue>
+    <videobox-vue v-if="boxtype === '视频详情'"></videobox-vue>
     <shopbox-vue v-if="boxtype === '商城'"></shopbox-vue>
     <samecity-vue v-if="boxtype === '同城'"></samecity-vue>
     <followbox-vue v-if="boxtype === '关注'"></followbox-vue>
