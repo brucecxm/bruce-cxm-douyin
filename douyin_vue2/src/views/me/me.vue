@@ -9,7 +9,7 @@
       :gap="3"
       :loading="loading"
       :noMoreData="noMoreData"
-      @loadMore="fetchMoreData"
+      @loadMore="fetchItemDetails"
     >
       <template v-slot:header>
         <!-- 顶部背景图 -->
@@ -61,6 +61,7 @@
       </template>
       <template #item="{ item }">
         <div
+          @click="test(item)"
           class="itemdetail"
           :style="{
             backgroundImage: `url(${item.cover})`,
@@ -104,6 +105,9 @@ export default {
     this.fetchItemDetails(1);
   },
   methods: {
+    test(item) {
+      this.$router.push('/videoDetail/');
+    },
     handleTabChange(index) {
       this.activeTabIndex = index;
     },
@@ -112,7 +116,6 @@ export default {
       this.loading = true;
       getUserInfo(null, page, this.pageSize)
         .then((res) => {
-          debugger;
           const videos = res.data.videobox || [];
           const total = res.data.total || 0;
           // 追加视频数据

@@ -315,14 +315,13 @@ export default {
       homegetVideo(this.page, this.pageSize, 1)
         .then((newVideos) => {
           const appendData = () => {
-            debugger;
             if (
               this.$refs.videoboxzidata[0] &&
               typeof this.$refs.videoboxzidata[0].appendPageData === 'function'
             ) {
               this.$refs.videoboxzidata[0].appendPageData(newVideos.data);
               this.page++;
-            } else if (retryCount < 100) {
+            } else if (retryCount < 3) {
               console.warn(`子组件未就绪，重试第 ${retryCount + 1} 次...`);
               setTimeout(() => {
                 this.handleReachEnd(retryCount + 1); // 递归延迟重试
@@ -339,12 +338,10 @@ export default {
         });
     },
     // handleLoadMore() {
-    //   debugger;
     //   this.page++;
     //   homegetVideo(this.page, this.pageSize, 1).then((res) => {
     //     if (res.data && res.data.length > 0) {
     //       // 把新数据合并到videoList，传给子组件
-    //       debugger;
     //       this.videoList = [...this.videoList, ...res.data];
     //     }
     //   });

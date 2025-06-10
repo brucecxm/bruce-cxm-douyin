@@ -2,7 +2,7 @@
   <div class="auth">
     <div
       class="backimg"
-      :style="{ backgroundImage: 'url(' + auth.backImg + ')' }"
+      :style="{ backgroundImage: 'url(' + userInfo.backImg + ')' }"
     >
       <!-- 左侧返回按钮 -->
       <div class="fanhui" @click="onBackClick" title="返回">
@@ -57,17 +57,17 @@ r="2" fill="white" />
     </div>
 
     <div class="touxiang">
-      <img :src="auth.avatar" alt="头像" />
+      <img :src="userInfo.avatar" alt="头像" />
     </div>
     <div class="personinfo">
       <div class="authnum">
-        <span>{{ auth.like }} 获赞</span>
-        <span>{{ auth.follow }} 关注</span>
-        <span>{{ auth.fan }} 粉丝</span>
+        <span>{{ userInfo.like }} 获赞</span>
+        <span>{{ userInfo.follow }} 关注</span>
+        <span>{{ userInfo.fan }} 粉丝</span>
       </div>
       <div class="authinfo">信息介绍</div>
       <div class="city">
-        <span>IP:{{ auth.city }}</span>
+        <span>IP:{{ userInfo.city }}</span>
       </div>
       <div @click="requestFriend" class="followbutt">+ 关注</div>
     </div>
@@ -89,9 +89,10 @@ r="2" fill="white" />
     >
       <template #item="{ item }">
         <div
+          @click="govideodetail(item.videoid)"
           class="itemdetail"
           :style="{
-            backgroundImage: `url(${item.videoImg})`,
+            backgroundImage: `url(${item.cover})`,
             width: '100%',
             height: '100%',
             backgroundSize: 'cover',
@@ -104,7 +105,7 @@ r="2" fill="white" />
 </template>
 
 <script>
-import { getauthzzz } from '@/api/video';
+import { getUserInfo } from '@/api/user';
 import InfiniteList from '../../components/InfiniteList.vue';
 import underLineTagsVue from '../../components/underLineTags.vue';
 import { requestFriendApi } from '@/api/user';
@@ -116,6 +117,7 @@ export default {
   },
   data() {
     return {
+      userInfo: {},
       activeTabIndex: 0,
       page: 0, // 当前页码
       pageSize: 10,
@@ -164,6 +166,9 @@ export default {
   },
 
   methods: {
+    govideodetail(videoid) {
+      this.$router.push('/videodetail');
+    },
     fetchMoreData() {
       if (this.loading || this.noMoreData) return;
       this.fetchItemDetails(this.page + 1);
@@ -175,24 +180,20 @@ export default {
     fetchItemDetails(page) {
       if (this.loading || this.noMoreData) return;
       this.loading = true;
-      getauthzzz(this.userId, page, this.pageSize)
+      getUserInfo(null, page, this.pageSize)
         .then((res) => {
           const videos = res.data.videobox || [];
           const total = res.data.total || 0;
-
           // 追加视频数据
           this.videobox = [...this.videobox, ...videos];
-
           // 只在第一页赋值musicinfo，避免重复赋值
           if (page === 1) {
-            this.auth = res.data.auth || {};
+            this.userInfo = res.data.userInfo || {};
           }
-
           // 判断是否加载完毕
           if (this.videobox.length >= total) {
             this.noMoreData = true;
           }
-
           this.page = page; // 更新当前页码
           this.loading = false;
         })
@@ -210,9 +211,6 @@ export default {
       console.log('关注操作');
     },
 
-    govideodetail(videoid) {
-      this.$router.push(`/videodetail?type=auth&videoid=${videoid}`);
-    },
     gohome() {
       this.$router.push('/');
     },

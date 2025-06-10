@@ -28,6 +28,11 @@ const router = new VueRouter({
       component: () => import('../views/shop/shopcat.vue')
     },
     {
+      path: '/store',
+      name: 'store',
+      component: () => import('../views/shop/store.vue')
+    },
+    {
       path: '/searchshop',
       name: 'searchshop',
       component: () => import('../views/shop/searchshop.vue')

@@ -67,7 +67,7 @@
           }"
         >
           <template v-slot:default="{ item }">
-            <div class="recommend-item">
+            <div @click="goshopdetail(item)" class="recommend-item">
               <img
                 :src="item.image"
                 class="cover"
@@ -121,6 +121,8 @@ export default {
   },
   data() {
     return {
+      parentMessage: ['视频', '评论', '点赞', '确定'],
+      activeTabIndex: 0,
       items: [
         {
           icon: '//m11.360buyimg.com/babel/s135x168_jfs/t1/279467/9/27186/7197/680b3d21F5e7b0177/825fe2ad693faa42.png.webp',
@@ -235,30 +237,6 @@ export default {
         {
           image: 'https://picsum.photos/seed/2/300/200',
           title: '玻尿酸补水精华'
-        },
-        {
-          image: 'https://picsum.photos/seed/3/300/200',
-          title: '抗皱紧致眼霜'
-        },
-        {
-          image: 'https://picsum.photos/seed/4/300/200',
-          title: '胶原蛋白饮品'
-        },
-        {
-          image: 'https://picsum.photos/seed/5/300/200',
-          title: '深层洁面泡泡'
-        },
-        {
-          image: 'https://picsum.photos/seed/6/300/200',
-          title: '焕肤修复精华液'
-        },
-        {
-          image: 'https://picsum.photos/seed/7/300/200',
-          title: '补水保湿面霜'
-        },
-        {
-          image: 'https://picsum.photos/seed/8/300/200',
-          title: '防晒隔离乳'
         }
       ],
 
@@ -285,6 +263,9 @@ export default {
     this.loadMore();
   },
   methods: {
+    handleTabChange(index) {
+      this.activeTabIndex = index;
+    },
     handleScroll(event) {
       const container = event.target;
       if (
@@ -306,7 +287,6 @@ export default {
           this.query || {}
         );
         const records = res.data.shopList;
-
         // 判断是否还有更多
         if (records.length < this.page.size) {
           this.noMore = true;
@@ -315,7 +295,6 @@ export default {
           image: item.shopImg,
           title: item.shopName
         }));
-
         this.shopitems.push(...mapped);
         this.page.current++;
       } catch (error) {
@@ -412,8 +391,9 @@ export default {
     //         console.log("获取视频出错  videobox中的")
     //     });
     // },
-    goshopdetail(id) {
-      this.$router.push({ path: `/shopdetail/${id}` });
+    goshopdetail(item) {
+      console.log('点击了商品', item);
+      this.$router.push({ path: '/shopdetail/1' });
     },
     getmenu() {},
     getnavone() {},

@@ -115,7 +115,6 @@ export default {
   methods: {
     // 允许父组件调用以传入分页数据
     appendPageData(newPageVideos) {
-      debugger;
       if (Array.isArray(newPageVideos) && newPageVideos.length > 0) {
         this.videodatahistory.push(...newPageVideos);
         this.videoboxdata = [...this.videodatahistory];
@@ -123,17 +122,16 @@ export default {
     },
     // 加载视频数据（分页）
     loadVideos() {
-      // homegetVideo(this.page, this.pageSize, 1)
-      //   .then((videoArr) => {
-      //     debugger;
-      //     if (Array.isArray(videoArr.data) && videoArr.data.length > 0) {
-      //       this.videodatahistory.push(...videoArr.data);
-      //       this.videoboxdata = [...this.videodatahistory];
-      //     }
-      //   })
-      //   .catch((error) => {
-      //     console.error('获取视频出错:', error);
-      //   });
+      homegetVideo(this.page, this.pageSize, 1)
+        .then((videoArr) => {
+          if (Array.isArray(videoArr.data) && videoArr.data.length > 0) {
+            this.videodatahistory.push(...videoArr.data);
+            this.videoboxdata = [...this.videodatahistory];
+          }
+        })
+        .catch((error) => {
+          console.error('获取视频出错:', error);
+        });
     },
 
     // 追加外部传入的视频数据
