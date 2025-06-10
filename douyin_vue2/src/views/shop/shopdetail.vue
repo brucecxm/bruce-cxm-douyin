@@ -69,7 +69,12 @@
         </div>
       </div>
 
-      <button class="btn confirm-buy" @click="confirmBuy">购买</button>
+      <button v-if="showmai" class="btn confirm-buy" @click="confirmBuy">
+        购买
+      </button>
+      <button v-if="!showmai" class="btn confirm-buy" @click="confirmAddCar">
+        加入购物车
+      </button>
     </div>
     <!-- 底部操作栏 -->
     <footer>
@@ -79,8 +84,17 @@
         />
         <span class="cart-count">{{ cartCount }}</span>
       </div>
-      <button class="btn add-cart" @click="addToCart">加入购物车</button>
-      <button class="btn buy-now" @click="buyNow">立即购买</button>
+      <!-- 两个按钮中只显示一个，根据 actionType 判断 -->
+      <button
+        v-if="actionType === 'buy'"
+        class="btn confirm-buy"
+        @click="confirmBuy"
+      >
+        购买
+      </button>
+      <button v-else class="btn confirm-buy" @click="confirmAddCar">
+        加入购物车
+      </button>
     </footer>
   </div>
 </template>
@@ -89,6 +103,8 @@
 export default {
   data() {
     return {
+      showBuyPopup: false,
+      actionType: '', // 新增：buy 或 cart
       images: [
         'https://img.yzcdn.cn/vant/apple-1.jpg',
         'https://img.yzcdn.cn/vant/apple-2.jpg',
@@ -139,22 +155,31 @@ export default {
     selectOption(type, value) {
       this.selectedOptions[type] = value;
     },
-
     confirmBuy() {
       if (!this.selectedOptions.color || !this.selectedOptions.size) {
         alert('请选择颜色和尺码');
         return;
       }
+      this.showmai = true;
       this.showBuyPopup = false;
       // 模拟跳转到订单页面，携带选择参数
       this.$router.push({
-        path: '/order',
-        query: {
-          productId: 123, // 示例商品id
-          color: this.selectedOptions.color,
-          size: this.selectedOptions.size
-        }
+        path: '/order'
+        // query: {
+        //   productId: 123, // 示例商品id
+        //   color: this.selectedOptions.color,
+        //   size: this.selectedOptions.size
+        // }
       });
+    },
+    confirmAddCar() {
+      if (!this.selectedOptions.color || !this.selectedOptions.size) {
+        alert('请选择颜色和尺码');
+        return;
+      }
+      this.showmai = true;
+      this.showBuyPopup = false;
+      // 模拟跳转到订单页面，携带选择参数
     },
     goShop() {
       this.$router.push('/store');
@@ -163,7 +188,11 @@ export default {
       this.$router.push('/shopcat');
     },
     addToCart() {
-      alert('已加入购物车');
+      // 打开弹窗
+      this.showBuyPopup = true;
+      // 默认选中第一项
+      this.selectedOptions.color = this.productOptions.colors[0];
+      this.selectedOptions.size = this.productOptions.sizes[0];
       this.cartCount++;
     }
   }
@@ -184,7 +213,9 @@ export default {
 
 /* 弹窗主体 */
 .buy-popup {
+  height: 60vh;
   position: fixed;
+  font-size: 0.5rem;
   bottom: 0;
   left: 0;
   right: 0;

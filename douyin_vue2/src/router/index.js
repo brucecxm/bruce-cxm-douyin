@@ -70,7 +70,7 @@ const router = new VueRouter({
       component: () => import('../views/one.vue')
     },
     {
-      path: '/order/:userid', // 动态路由参数 :id
+      path: '/order', // 动态路由参数 :id
       name: 'order',
       component: () => import('../views/shop/order.vue')
     },

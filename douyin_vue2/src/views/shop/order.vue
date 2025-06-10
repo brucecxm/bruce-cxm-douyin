@@ -1,322 +1,660 @@
 <template>
   <div class="order-page">
-    <div class="order-header">
-      <div class="back-button" @click="goBack">
-        <i class="icon-back"></i>
-        <i class="fas fa-arrow-left"></i>
+    <!-- 收货地址 -->
+    <section class="address-section" @click="editAddress">
+      <div v-if="address">
+        <div class="name-phone">
+          <span class="name">{{ address.name }}</span>
+          <span class="phone">{{ address.phone }}</span>
+        </div>
+        <div class="address-text">{{ address.fullAddress }}</div>
       </div>
-      <div class="order-title">全部订单</div>
-      <div class="manage-auth">授权管理</div>
-    </div>
-    <div class="order-tabs">
-      <div
-        class="tab"
-        :class="{ active: currentTab === 'all' }"
-        @click="currentTab = 'all'"
-      >
-        全部
-      </div>
-      <div
-        class="tab"
-        :class="{ active: currentTab === 'unpaid' }"
-        @click="currentTab = 'unpaid'"
-      >
-        待支付
-      </div>
-      <div
-        class="tab"
-        :class="{ active: currentTab === 'unshipped' }"
-        @click="currentTab = 'unshipped'"
-      >
-        待发货
-      </div>
-      <div
-        class="tab"
-        :class="{ active: currentTab === 'shipped' }"
-        @click="currentTab = 'shipped'"
-      >
-        待收货
-      </div>
-      <div
-        class="tab"
-        :class="{ active: currentTab === 'reviewed' }"
-        @click="currentTab = 'reviewed'"
-      >
-        待评价
-      </div>
-    </div>
-    <div class="order-list">
-      <div class="order-item" v-for="order in filteredOrders" :key="order.id">
-        <div class="order-status">{{ order.status }}</div>
-        <div class="order-info">
-          <img :src="order.image" alt="Product Image" class="product-image" />
-          <div class="product-details">
-            <div class="product-name">{{ order.name }}</div>
-            <div class="order-time">{{ order.time }}</div>
-            <div class="return-policy">7天无理由退货</div>
-          </div>
-          <div class="price-info">
-            <div class="price">{{ order.price }}</div>
-            <div class="quantity">x{{ order.quantity }}</div>
+      <div v-else class="no-address">请选择收货地址</div>
+      <div class="arrow">›</div>
+    </section>
+
+    <!-- 商品列表 -->
+    <section class="goods-section">
+      <div v-for="(item, index) in cartItems" :key="index" class="goods-item">
+        <img :src="item.image" alt="商品图" />
+        <div class="info">
+          <div class="name">{{ item.name }}</div>
+          <div class="specs">{{ item.specs }}</div>
+          <div class="price-count">
+            <span class="price">¥{{ item.price.toFixed(2) }}</span>
+            <span class="count">x{{ item.quantity }}</span>
           </div>
         </div>
-        <div class="order-actions">
-          <div class="total-price">合计: {{ order.totalPrice }}</div>
-          <button class="action-button" @click="applyAfterSales(order.id)">
-            申请售后
-          </button>
-          <button class="action-button" @click="viewLogistics(order.id)">
-            查看物流
-          </button>
-          <button
-            class="action-button confirm-button"
-            @click="confirmReceipt(order.id)"
-          >
-            确认收货
-          </button>
+      </div>
+    </section>
+
+    <!-- 价格汇总 -->
+    <section class="summary-section">
+      <div class="row">
+        <span>商品总价</span>
+        <span>¥{{ totalGoodsPrice.toFixed(2) }}</span>
+      </div>
+      <div class="row">
+        <span>运费</span>
+        <span>{{
+          shippingFee === 0 ? '免运费' : '¥' + shippingFee.toFixed(2)
+        }}</span>
+      </div>
+      <div class="row">
+        <span>优惠</span>
+        <span class="discount">-¥{{ discount.toFixed(2) }}</span>
+      </div>
+      <div class="row total">
+        <span>实付款</span>
+        <span>¥{{ finalPrice.toFixed(2) }}</span>
+      </div>
+    </section>
+
+    <!-- 备注 -->
+    <section class="remark-section">
+      <textarea
+        placeholder="给卖家留言（选填）"
+        v-model="orderRemark"
+        rows="3"
+      ></textarea>
+    </section>
+
+    <!-- 密码弹窗（带动画） -->
+    <transition name="slide-up">
+      <div v-if="showPasswordModal" class="password-modal-overlay">
+        <div class="password-modal">
+          <div class="modal-header">
+            <div class="title">请输入支付密码</div>
+            <div class="subtitle">转账金额</div>
+            <div class="amount-display">
+              ￥{{ parseFloat(amount).toFixed(2) }}
+            </div>
+          </div>
+
+          <!-- 密码框 -->
+          <div class="password-box">
+            <div class="pwd-input" v-for="i in 6" :key="i">
+              <div class="dot" v-if="password.length >= i"></div>
+            </div>
+          </div>
+
+          <!-- 数字键盘 -->
+          <div class="keyboard">
+            <div
+              class="key"
+              v-for="key in keys"
+              :key="key.label"
+              @click="pressKey(key)"
+            >
+              {{ key.label }}
+            </div>
+          </div>
+
+          <div class="cancel" @click="resetPasswordModal">取消</div>
         </div>
       </div>
-    </div>
+    </transition>
+    <!-- 底部支付按钮 -->
+    <footer class="footer-pay">
+      <button :disabled="!address" @click="submitOrder" v-if="noshow">
+        提交订单
+      </button>
+    </footer>
   </div>
 </template>
 
 <script>
+import SockJS from 'sockjs-client';
+import Stomp from 'stompjs';
+import axios from 'axios';
+import { useUserInfoStore } from '@/stores/userInfo';
 export default {
   data() {
     return {
-      currentTab: 'shipped', // 默认选中“待收货”
-      orders: [
+      noshow: true,
+      fromUser: '',
+      toUser: '',
+      amount: '',
+      password: '',
+      showPasswordModal: false,
+      stomp: null,
+      keys: [
+        { label: '1' },
+        { label: '2' },
+        { label: '3' },
+        { label: '4' },
+        { label: '5' },
+        { label: '6' },
+        { label: '7' },
+        { label: '8' },
+        { label: '9' },
+        { label: '' },
+        { label: '0' },
+        { label: '删除' }
+      ],
+      address: {
+        name: '张三',
+        phone: '13800138000',
+        fullAddress: '北京市朝阳区望京街道123号望京SOHO'
+      },
+      cartItems: [
         {
-          id: 1,
-          status: '已发货',
-          image: '../../assets/op.jpg',
-          name: '物流状态 已签收',
-          time: '2021-05-30 18:06:37',
-          price: '¥ 299.00',
-          quantity: 1,
-          totalPrice: '¥ 299.00'
+          image: 'https://example.com/prod1.jpg',
+          name: '时尚连衣裙',
+          specs: '红色 / M',
+          price: 159.9,
+          quantity: 1
         },
         {
-          id: 2,
-          status: '已发货',
-          image: '../../assets/op.jpg',
-          name: '物流状态 已签收',
-          time: '2021-05-30 18:06:33',
-          price: '¥ 199.00',
-          quantity: 1,
-          totalPrice: '¥ 199.00'
+          image: 'https://example.com/prod2.jpg',
+          name: '简约手表',
+          specs: '黑色表带',
+          price: 299.0,
+          quantity: 1
         }
-        // ... more orders
-      ]
+      ],
+      shippingFee: 0,
+      discount: 20,
+      orderRemark: ''
     };
   },
   computed: {
-    filteredOrders() {
-      if (this.currentTab === 'all') return this.orders;
-      if (this.currentTab === 'shipped')
-        return this.orders.filter((order) => order.status === '已发货');
-      return [];
+    totalGoodsPrice() {
+      return this.cartItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+      );
+    },
+    finalPrice() {
+      const pay = this.totalGoodsPrice + this.shippingFee - this.discount;
+      return pay > 0 ? pay : 0;
     }
   },
   methods: {
-    goBack() {
-      this.$router.go(-1);
+    openPasswordModal() {
+      if (!this.amount || parseFloat(this.amount) <= 0) {
+        this.$message.error('请输入有效的转账金额');
+        return;
+      }
+      this.showPasswordModal = true;
     },
-    applyAfterSales(orderId) {
-      console.log('Apply after sales for order:', orderId);
+    pressKey(key) {
+      if (key.label === '删除') {
+        this.password = this.password.slice(0, -1);
+      } else if (key.label && this.password.length < 6) {
+        this.password += key.label;
+      }
+
+      if (this.password.length === 6) {
+        this.submitTransfer();
+      }
     },
-    viewLogistics(orderId) {
-      console.log('View logistics for order:', orderId);
+    submitTransfer() {
+      const { fromUser, toUser, amount, password } = this;
+      axios
+        .post('/api/shop/transfer', null, {
+          params: {
+            fromUserId: fromUser,
+            toUserId: toUser,
+            amount,
+            password
+          }
+        })
+        .then((res) => {
+          this.$message.success('转账成功' + res.data);
+          this.resetPasswordModal();
+        })
+        .catch((err) => {
+          this.$message.error(
+            '转账失败: ' + (err.response?.data || '服务器错误')
+          );
+          this.noshow = true;
+          this.resetPasswordModal();
+        });
     },
-    confirmReceipt(orderId) {
-      console.log('Confirm receipt for order:', orderId);
+    resetPasswordModal() {
+      this.password = '';
+      this.showPasswordModal = false;
+    },
+    editAddress() {
+      // 弹出地址选择页，简化用prompt模拟
+      const name = prompt('收货人姓名', this.address?.name || '');
+      if (!name) return;
+      const phone = prompt('联系电话', this.address?.phone || '');
+      if (!phone) return;
+      const fullAddress = prompt('详细地址', this.address?.fullAddress || '');
+      if (!fullAddress) return;
+      this.address = { name, phone, fullAddress };
+    },
+    submitOrder() {
+      if (!this.address) {
+        alert('请填写收货地址');
+        return;
+      }
+      this.amount = 1;
+      if (!this.amount || parseFloat(this.amount) <= 0) {
+        this.$message.error('请输入有效的转账金额');
+        return;
+      }
+      this.noshow = false;
+      this.showPasswordModal = true;
     }
+  },
+  mounted() {
+    const userInfo = useUserInfoStore();
+    const userInfoMap = userInfo.userInfo;
+    this.fromUser = userInfoMap.userId || '';
+    this.toUser = this.$route.query.toUser || '';
+
+    const socket = new SockJS('http://localhost:7426/ws');
+    this.stomp = Stomp.over(socket);
+    this.stomp.connect({}, () => {
+      this.stomp.subscribe('/topic/transfer/' + this.fromUser, (msg) => {
+        this.$message.success('转账成功: ' + msg.body);
+      });
+    });
   }
 };
 </script>
 
 <style scoped>
-/* 页面整体布局 */
 .order-page {
-  font-family: 'Arial', sans-serif;
-  background-color: #f5f5f5;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: #fff;
+  color: #333;
+  padding-bottom: 70px;
 }
 
-/* 头部 */
-.order-header {
-  background-color: #fff;
+/* 收货地址 */
+.address-section {
   display: flex;
   justify-content: space-between;
-  padding: 12px 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   align-items: center;
-}
-
-.order-title {
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
-}
-
-.manage-auth {
+  padding: 15px 15px;
+  border-bottom: 1px solid #eee;
   font-size: 14px;
-  color: #ff6a00;
   cursor: pointer;
+  background: #fff;
 }
 
-/* Tabs 样式 */
-.order-tabs {
-  display: flex;
-  border-bottom: 1px solid #ddd;
-  padding: 12px 20px;
-  background-color: #fff;
+.address-section .name-phone {
+  font-weight: 600;
+  margin-bottom: 6px;
 }
 
-.tab {
-  flex: 1;
-  text-align: center;
-  padding: 12px 0;
-  font-size: 16px;
-  color: #555;
-  cursor: pointer;
-  transition:
-    color 0.3s,
-    background-color 0.3s;
-  border-radius: 8px;
+.address-section .address-text {
+  color: #666;
+  font-size: 13px;
+  max-width: 70vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.tab.active {
-  color: #fff;
-  background-color: #ff6a00;
-  font-weight: bold;
-}
-
-/* 订单列表 */
-.order-list {
-  padding: 20px;
-  background-color: #fff;
-  flex-grow: 1;
-  overflow-y: auto;
-  border-radius: 12px;
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
-}
-
-.order-item {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 15px;
-  padding: 20px;
-  background-color: #fefefe;
-  border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease-in-out;
-}
-
-.order-item:hover {
-  transform: translateY(-5px);
-}
-
-.order-status {
-  font-size: 14px;
+.address-section .no-address {
   color: #999;
-  margin-bottom: 10px;
 }
 
-.order-info {
+.address-section .arrow {
+  font-size: 22px;
+  color: #ccc;
+  user-select: none;
+}
+
+/* 商品列表 */
+.goods-section {
+  margin-top: 10px;
+  border-top: 8px solid #f5f5f7;
+  background: #fff;
+}
+
+.goods-item {
   display: flex;
-  margin-top: 15px;
-  padding: 10px 0;
-  border-bottom: 1px solid #f5f5f5;
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
 }
 
-.product-image {
-  width: 70px;
-  height: 70px;
-  object-fit: cover;
+.goods-item img {
+  width: 80px;
+  height: 80px;
   border-radius: 8px;
+  object-fit: cover;
+  margin-right: 12px;
 }
 
-.product-details {
+.info {
   flex: 1;
-  margin-left: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.product-name {
+.name {
   font-size: 16px;
-  font-weight: bold;
-  color: #333;
+  font-weight: 600;
+  color: #222;
 }
 
-.order-time {
-  font-size: 12px;
-  color: #777;
-  margin-top: 5px;
+.specs {
+  color: #999;
+  font-size: 13px;
+  margin-top: 6px;
 }
 
-.return-policy {
-  font-size: 12px;
-  color: #ff6347;
-}
-
-.price-info {
+.price-count {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-left: 10px;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .price {
+  color: #fe2c55;
+  font-weight: 700;
   font-size: 16px;
-  color: #ff6a00;
-  font-weight: bold;
 }
 
-.quantity {
+.count {
+  color: #666;
   font-size: 14px;
-  color: #777;
 }
 
-/* 订单操作区 */
-.order-actions {
+/* 价格汇总 */
+.summary-section {
+  margin-top: 12px;
+  background: #fff;
+  padding: 10px 15px;
+  border-top: 8px solid #f5f5f7;
+  font-size: 14px;
+  color: #555;
+}
+
+.summary-section .row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-top: 15px;
+  margin: 6px 0;
 }
 
-.total-price {
+.summary-section .discount {
+  color: #fe2c55;
+}
+
+.summary-section .total {
+  font-weight: 700;
+  font-size: 18px;
+  color: #222;
+}
+
+/* 备注 */
+.remark-section {
+  margin-top: 10px;
+  padding: 10px 15px;
+  background: #fff;
+}
+
+.remark-section textarea {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  resize: none;
+  box-sizing: border-box;
+  color: #555;
+}
+
+/* 底部支付按钮 */
+.footer-pay {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid #eee;
+  padding: 10px 15px;
+  box-sizing: border-box;
+  z-index: 1000;
+}
+
+.footer-pay button {
+  width: 100%;
+  background-color: #fe2c55;
+  border: none;
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 30px;
+  padding: 12px 0;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s;
+}
+
+.footer-pay button:disabled {
+  background-color: #f8b6c0;
+  cursor: not-allowed;
+}
+
+.footer-pay button:not(:disabled):hover {
+  background-color: #d91a47;
+}
+.transfer-page {
+  padding: 20px;
+  font-family: 'PingFang SC', sans-serif;
+  background: #f2f2f2;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.back {
+  margin-right: 10px;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.title {
+  font-weight: bold;
+}
+
+.user-info {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.user {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+}
+
+.user-text {
+  margin-left: 10px;
+}
+
+.label {
+  color: #999;
+  font-size: 12px;
+}
+
+.value {
   font-size: 16px;
   font-weight: bold;
-  color: #333;
 }
 
-.action-button {
-  background-color: #eee;
-  color: #333;
+.arrow {
+  font-size: 22px;
+  margin: 0 10px;
+}
+
+.amount-input-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 30px 0;
+}
+
+.currency {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.amount-input {
   border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
+  border-bottom: 2px solid #333;
+  font-size: 30px;
+  width: 60%;
+  text-align: center;
+  margin-left: 10px;
+  background: transparent;
+  outline: none;
+}
+
+.submit-btn {
+  width: 100%;
+  background: linear-gradient(90deg, #ff416c, #ff4b2b);
+  border: none;
+  border-radius: 30px;
+  color: white;
+  padding: 14px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255, 65, 108, 0.3);
+}
+
+/* ===== 弹窗样式 ===== */
+.password-modal-overlay {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 20px 16px 40px;
+  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.modal-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.modal-header .title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.modal-header .subtitle {
+  font-size: 12px;
+  color: #888;
+}
+
+.amount-display {
+  font-size: 28px;
+  font-weight: bold;
+  color: #ff4b2b;
+  margin-top: 6px;
+}
+
+/* 密码框 */
+.password-box {
+  display: flex;
+  justify-content: space-between;
+  margin: 16px 0;
+  padding: 0 20px;
+}
+
+.pwd-input {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  position: relative;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  background: #333;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 数字键盘 */
+.keyboard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 0 10px;
+}
+
+.key {
+  background: #f0f0f0;
+  border-radius: 10px;
+  height: 48px;
+  line-height: 48px;
+  text-align: center;
+  font-size: 18px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.key:active {
+  background: #ddd;
+}
+
+.cancel {
+  margin-top: 18px;
+  text-align: center;
+  color: #999;
   font-size: 14px;
   cursor: pointer;
-  transition: background-color 0.3s;
-  width: 120px;
-  text-align: center;
 }
 
-.action-button:hover {
-  background-color: #ddd;
+/* 动画 */
+.slide-up-enter-active {
+  animation: slideUp 0.3s ease-out forwards;
 }
-
-.confirm-button {
-  background-color: #ff6a00;
-  color: white;
+.slide-up-leave-active {
+  animation: slideDown 0.3s ease-in forwards;
 }
-
-.confirm-button:hover {
-  background-color: #e65c00;
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0%);
+  }
+}
+@keyframes slideDown {
+  from {
+    transform: translateY(0%);
+  }
+  to {
+    transform: translateY(100%);
+  }
 }
 </style>

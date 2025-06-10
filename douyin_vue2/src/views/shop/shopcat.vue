@@ -85,8 +85,7 @@ export default {
       this.cartItems = this.cartItems.filter((item) => item.id !== id);
     },
     checkout() {
-      alert(`结算成功！共计¥${this.totalPrice.toFixed(2)}`);
-      // 这里可以调用结算接口或跳转支付页
+      this.$router.push('/order');
     }
   }
 };

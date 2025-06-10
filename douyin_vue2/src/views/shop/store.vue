@@ -139,7 +139,7 @@ export default {
       this.isFollowed = !this.isFollowed;
     },
     goProduct(id) {
-      alert(`跳转商品详情页，商品ID: ${id}`);
+      this.$router.push('/shopdetail/1');
     }
   }
 };
