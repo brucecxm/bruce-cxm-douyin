@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class OrderController {
 
     @Autowired
-    @Qualifier("orderServiceimpl")
+    @Qualifier("orderServiceImpl")
     private OrderService orderService;
 
     // Get mapping for test order selection

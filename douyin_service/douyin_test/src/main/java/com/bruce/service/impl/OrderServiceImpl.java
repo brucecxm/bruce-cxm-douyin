@@ -5,7 +5,7 @@ import com.bruce.service.AbstractOrderService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OrderServiceimpl extends AbstractOrderService {
+public class OrderServiceImpl extends AbstractOrderService {
 
 
 
