@@ -17,7 +17,6 @@
           class="profile-header"
           :style="{ backgroundImage: 'url(' + userInfo.backImg + ')' }"
         >
-          >
           <img class="avatar" :src="userInfo.avatar" alt="头像" />
           <div class="douyinnum" style="color: white">
             <div class="user-name">{{ userInfo.nickname }}</div>
@@ -25,7 +24,7 @@
           </div>
         </div>
         <!-- 用户统计信息 -->
-        <div class="user-stats">
+        <div class="user-stats" @click="gofriend">
           <div class="stat-item">
             <div class="num">{{ userInfo.followers || '0' }}</div>
             <div class="label">粉丝</div>
@@ -105,6 +104,9 @@ export default {
     this.fetchItemDetails(1);
   },
   methods: {
+    gofriend() {
+      this.$router.push('/friend');
+    },
     test(item) {
       this.$router.push('/videoDetail/');
     },

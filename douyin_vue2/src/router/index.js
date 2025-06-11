@@ -42,7 +42,11 @@ const router = new VueRouter({
       name: 'shangchuanshop',
       component: () => import('../views/shangchuan/shangchuan.vue')
     },
-
+    {
+      path: '/shangchuandetail/',
+      name: 'shangchuandetailVue',
+      component: () => import('../views/shangchuan/shangchuandetail.vue')
+    },
     {
       path: '/coupon',
       name: 'coupon',
@@ -186,6 +190,11 @@ const router = new VueRouter({
       path: '/friend',
       name: 'FriendVue',
       component: () => import('../views/me/friend.vue')
+    },
+    {
+      path: '/handleFriend',
+      name: 'handleFriend',
+      component: () => import('../views/me/handlefriend.vue')
     },
     {
       path: '/editMeInfo',

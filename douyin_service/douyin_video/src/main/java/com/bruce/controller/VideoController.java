@@ -24,15 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * (Video)表控制层
@@ -125,6 +123,27 @@ public class VideoController extends ApiController {
                     .body("服务器错误：" + e.getMessage());
         }
     }
+
+
+    @PostMapping("/publish")
+    public ResponseEntity<?> publish(@RequestBody Map<String, Object> req) {
+        Object userId = req.get("userId");
+        Object title = req.get("title");
+
+        if (userId == null || StringUtils.isEmpty(userId.toString())
+                || title == null || StringUtils.isEmpty(title.toString())) {
+            return ResponseEntity.badRequest().body("缺少必要字段");
+        }
+Video video=new Video();
+        video.setCover("1");
+        video.setTitle(String.valueOf(req.get("title")));
+        video.setVideoId(idService.SnowflakeGen());
+        videoService.save(video);
+        return ResponseEntity.ok(Collections.singletonMap("code", 200));
+    }
+
+
+
 
 
 

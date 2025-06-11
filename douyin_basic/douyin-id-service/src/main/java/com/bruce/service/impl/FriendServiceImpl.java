@@ -94,7 +94,7 @@ Long fromUserId= 0L;
             User fromUser = userMapper.selectById(req.getFromUserId());
             FriendRequestVO vo = new FriendRequestVO();
             vo.setRequestId(req.getId()); // 设置请求ID
-            vo.setFromUserId(fromUser.getId()); // 设置发起人ID
+            vo.setFromUserId((int) fromUser.getId()); // 设置发起人ID
             vo.setNickname(fromUser.getNickname()); // 设置发起人昵称
             vo.setAvatar(fromUser.getAvatar()); // 设置发起人头像
             vo.setVerifyMsg(req.getVerifyMsg()); // 设置验证消息
@@ -168,7 +168,7 @@ Long fromUserId= 0L;
             // 获取好友的用户信息
             User u = userMapper.selectById(f.getFriendId());
             FriendVO vo = new FriendVO();
-            vo.setUserId(u.getId()); // 设置好友ID
+            vo.setUserId((int) u.getId()); // 设置好友ID
             vo.setNickname(u.getNickname()); // 设置好友昵称
             vo.setAvatar(u.getAvatar()); // 设置好友头像
             vo.setGender(u.getGender()); // 设置好友性别

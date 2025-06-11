@@ -14,10 +14,7 @@ import com.bruce.entity.User;
 import com.bruce.entity.Video;
 import com.bruce.feign.systemClient;
 import com.bruce.pojo.Result;
-import com.bruce.service.FriendService;
-import com.bruce.service.SaltService;
-import com.bruce.service.UserService;
-import com.bruce.service.VideoService;
+import com.bruce.service.*;
 import com.bruce.utils.JwtUtil;
 import com.bruce.utils.RedisUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -444,7 +441,8 @@ return one;
         // 创建一个固定大小的线程池
         this.executorService = Executors.newFixedThreadPool(10);
     }
-
+    @Autowired
+private IdService idService;
 
     @PostMapping("/register")
     public Result register(String username, String password) throws NoSuchAlgorithmException, InvalidKeySpecException, JsonProcessingException {
@@ -477,6 +475,8 @@ return one;
         if (u == null) {
             //没有占用
             //注册
+            user.setId( idService.SnowflakeGen());
+            user.setNickname("新用户"+idService.SnowflakeGen());
             userService.save(user);
             LambdaQueryWrapper queryWrapper1=new LambdaQueryWrapper<>();
             queryWrapper.eq(User::getUsername, username); // 等价于 SQL 中的 WHERE username = ?

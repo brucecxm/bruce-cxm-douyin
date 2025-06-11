@@ -175,10 +175,10 @@ export default {
       }
     },
     onBackClick() {
-      alert('点击了返回按钮');
+      this.$router.push('/me');
     },
     onSettingsClick() {
-      alert('点击了设置按钮');
+      this.$router.push('/handleFriend');
     }
   }
 };

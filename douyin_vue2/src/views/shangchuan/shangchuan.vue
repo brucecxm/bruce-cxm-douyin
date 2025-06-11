@@ -18,7 +18,7 @@
     </div>
 
     <!-- Bottom Navigation -->
-    <div class="bottom-bar">
+    <div class="bottom-bar" v-if="bottomNav">
       <button class="nav-btn" @click="selectTab('text')">文字</button>
       <button class="nav-btn active" @click="selectTab('camera')">相机</button>
       <button class="nav-btn" @click="selectTab('template')">模板</button>
@@ -26,7 +26,7 @@
     </div>
 
     <!-- Capture Area -->
-    <div class="capture-area">
+    <div class="capture-area" v-if="bottomNav">
       <button class="feature-btn" @click="showEffects = true">✨ 特效</button>
       <button class="capture-btn" @click="takePhoto"></button>
       <button class="gallery-btn" @click="handleClick">🖼 相册</button>
@@ -47,10 +47,10 @@
       muted
       style="
         width: 100%;
-        height: auto;
+        height: 90vh;
         background: black;
         position: absolute;
-        top: 50px;
+        top: 10px;
         left: 0;
         z-index: 1;
       "
@@ -70,8 +70,7 @@
         padding: 10px;
       "
     >
-      <h3>拍照结果：</h3>
-      <img :src="photo" style="max-width: 100%" />
+      <img :src="photo" style="max-width: 100%; height: 80vh" />
     </div>
 
     <!-- 统一弹窗 -->
@@ -142,21 +141,55 @@
         <button @click="downloadPhoto" :disabled="!photo">下载当前照片</button>
       </template>
     </SlidePopup>
+    <div class="bottomButton" v-if="!bottomNav">
+      <FlexibleButtonPanel
+        :items="buttonItems"
+        :cols="2"
+        :gap="10"
+        :fontSize="15"
+        :iconSize="24"
+        @btnClick="onBtnClick"
+        @btnLongPress="onBtnLongPress"
+      >
+        <template #btn-0="{ item }">
+          <div style="display: flex; align-items: center; font-size: 0.5rem">
+            <img
+              :src="item.icon"
+              alt=""
+              style="width: 24px; height: 24px; border-radius: 12px"
+            />
+            <span style="margin-left: 4px">{{ item.text }}</span>
+          </div>
+        </template>
+      </FlexibleButtonPanel>
+    </div>
   </div>
 </template>
 
 <script>
 import SlidePopup from '@/components/SlidePopup.vue';
 import underLineTagsVue from '@/components/underLineTags.vue';
+import FlexibleButtonPanel from '@/components/FlexibleButtonPanel.vue';
 
 export default {
   name: 'CameraInterface',
   components: {
     SlidePopup,
-    underLineTagsVue
+    underLineTagsVue,
+    FlexibleButtonPanel
   },
   data() {
     return {
+      buttonItems: [
+        {
+          text: '朋友日常',
+          bgColor: '#464646',
+          icon: 'http://gips2.baidu.com/it/u=195724436,3554684702&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960'
+        },
+        // { text: '拍照', icon: '/icons/camera.svg', bgColor: '#1e1e1e' },
+        { text: '下一步', bgColor: '#ff2c55', borderRadius: 20 }
+      ],
+      bottomNav: true, // 是否显示底部导航
       stream: null,
       photo: '',
       input: '',
@@ -262,6 +295,18 @@ export default {
     }
   },
   methods: {
+    onBtnClick({ index, item }) {
+      console.log(`点击按钮 ${index}: ${item.text}`);
+      if (item.text === '下一步') {
+        this.$router.push({
+          path: '/shangchuandetail',
+          query: { photo: this.photo }
+        });
+      }
+    },
+    onBtnLongPress({ index, item }) {
+      alert(`长按按钮 ${index}: ${item.text}`);
+    },
     handleClick() {
       this.$refs.fileInput.click();
     },
@@ -287,6 +332,7 @@ export default {
       }
     },
     takePhoto() {
+      this.bottomNav = false;
       const video = this.$refs.video;
       const canvas = this.$refs.canvas;
       const ctx = canvas.getContext('2d');
@@ -505,6 +551,14 @@ export default {
   display: flex;
   align-items: center;
   margin-bottom: 8px;
+}
+.bottomButton {
+  z-index: 10;
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  width: 95%;
+  transform: translateX(-50%);
 }
 
 .avatar {

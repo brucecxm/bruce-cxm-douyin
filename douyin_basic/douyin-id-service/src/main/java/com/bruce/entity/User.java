@@ -19,7 +19,7 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 @Data
 public class User  {
-    private int id;
+    private long id;
     private String email;
     private String userPic;
     private String backImg;
