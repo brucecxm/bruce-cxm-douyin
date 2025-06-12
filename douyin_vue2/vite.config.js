@@ -6,16 +6,15 @@ import fs from 'fs';
 const { fileURLToPath, URL } = require('url');
 
 export default defineConfig(({ mode }) => {
-  const httpsOptions = {
-    key: fs.readFileSync(
-      'C:/Users/Administrator/Desktop/tools/127.0.0.1+4-key.pem'
-    ),
-    cert: fs.readFileSync(
-      'C:/Users/Administrator/Desktop/tools/127.0.0.1+4.pem'
-    )
-  };
-
   if (mode === 'development') {
+    const httpsOptions = {
+      key: fs.readFileSync(
+        'C:/Users/Administrator/Desktop/tools/127.0.0.1+4-key.pem'
+      ),
+      cert: fs.readFileSync(
+        'C:/Users/Administrator/Desktop/tools/127.0.0.1+4.pem'
+      )
+    };
     return {
       plugins: [
         vue2(),
