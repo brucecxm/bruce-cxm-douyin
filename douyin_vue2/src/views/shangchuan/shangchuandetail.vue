@@ -3,6 +3,7 @@
     <!-- 视频预览 -->
     <div class="video-preview">
       <img :src="videoThumbnail" alt="video" v-if="videoThumbnail" />
+      <video :src="videoURL" style="width: 100%; height: 100%"></video>
     </div>
 
     <!-- 标题输入框 -->
@@ -85,18 +86,20 @@
 <script>
 import axios from 'axios';
 import FlexibleButtonPanel from '@/components/FlexibleButtonPanel.vue';
-
+import { useVideoStore } from '../../stores/uploadVideo';
 export default {
   components: { FlexibleButtonPanel },
   data() {
     return {
+      videoId: '',
+      videoURL: '',
       userId: '123456', // 模拟用户 ID，真实情况从登录态获取
       videoThumbnail: '',
       title: '',
       selectedTopic: null,
       selectedLocation: null,
       selectedPrivacy: '公开',
-
+      videoData: '',
       loading: false,
 
       topicItems: [
@@ -135,7 +138,35 @@ export default {
     };
   },
   mounted() {
+    debugger;
+    // 获取路由参数中的videoId
+    this.videoId = this.$route.query.video || '';
     this.videoThumbnail = this.$route.query.photo || '';
+    if (this.videoThumbnail) {
+      console.log('视频缩略图 URL:', this.videoThumbnail);
+    } else {
+      const videoStore = useVideoStore();
+      if (this.videoId) {
+        // 使用 store 的方法获取视频
+        this.videoData = videoStore.getVideo(this.videoId);
+        if (this.videoData) {
+          // 直接使用从store获取的URL，无需重新创建
+          this.videoURL = this.videoData.url;
+          console.log('视频预览 URL:', this.videoURL);
+
+          // 可选：设置视频缩略图
+          if (this.$route.query.photo) {
+            this.videoThumbnail = this.$route.query.photo;
+          }
+        } else {
+          console.error('找不到视频数据，ID:', this.videoId);
+          // 可以在这里添加错误处理逻辑，例如显示错误消息或重定向
+        }
+      } else {
+        console.error('缺少视频ID参数');
+        // 可以在这里添加错误处理逻辑
+      }
+    }
   },
   methods: {
     onBtnClick({ index, item }) {
@@ -167,11 +198,12 @@ export default {
     async publishPost() {
       if (this.loading) return;
       if (!this.title) return alert('请输入想法内容');
-      if (!this.videoThumbnail) return alert('请上传视频');
-
+      // 正确：使用 && 表示只要有一个存在即可
+      debugger;
+      if (!this.videoThumbnail && !this.videoData) return alert('请上传视频');
       this.loading = true;
-
       const postData = {
+        videoData: this.videoData,
         userId: this.userId,
         title: this.title,
         videoThumbnail: this.videoThumbnail,

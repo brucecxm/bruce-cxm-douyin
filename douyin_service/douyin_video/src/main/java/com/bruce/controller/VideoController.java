@@ -74,6 +74,7 @@ public class VideoController extends ApiController {
     private FavorService favorService;
     @Resource
     private CommentService commentService;
+
     @ApiOperation(value = "上传视频的接口", notes = "将视频上传到文件服务器")
     @ApiImplicitParams({
             @ApiImplicitParam(name = " file,", value = "文件", required = true, dataType = "MultipartFile", paramType = "query"),
@@ -127,25 +128,27 @@ public class VideoController extends ApiController {
 
     @PostMapping("/publish")
     public ResponseEntity<?> publish(@RequestBody Map<String, Object> req) {
-        Object userId = req.get("userId");
+        Object userId = StpUtil.getLoginId();
         Object title = req.get("title");
-
+        Object musicId = req.get("musicId");
+        Object content = req.get("content");
+        Object type = req.get("type");
+        Object status = req.get("status");
         if (userId == null || StringUtils.isEmpty(userId.toString())
                 || title == null || StringUtils.isEmpty(title.toString())) {
             return ResponseEntity.badRequest().body("缺少必要字段");
         }
-Video video=new Video();
+        Video video = new Video();
         video.setCover("1");
         video.setTitle(String.valueOf(req.get("title")));
         video.setVideoId(idService.SnowflakeGen());
+        video.setMusicId((Long) musicId);
+        video.setContent((String) content);
+        video.setType((Integer) type);
+        video.setStatus((Integer) status);
         videoService.save(video);
         return ResponseEntity.ok(Collections.singletonMap("code", 200));
     }
-
-
-
-
-
 
 
     @GetMapping("/getVideoPage")
@@ -229,12 +232,6 @@ Video video=new Video();
         }
         return result;
     }
-
-
-
-
-
-
 
 
     @GetMapping("/auth")

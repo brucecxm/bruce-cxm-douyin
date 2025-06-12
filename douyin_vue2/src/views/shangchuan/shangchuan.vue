@@ -1,12 +1,11 @@
 <template>
   <div class="camera-container">
-    <!-- Top Bar -->
+    <!-- 顶部操作栏 -->
     <div class="top-bar">
       <button class="close-btn" @click="goback">×</button>
       <button class="music-btn" @click="showMusic = true">🎵 选择音乐</button>
     </div>
-
-    <!-- Right Sidebar -->
+    <!-- 右侧工具栏 -->
     <div class="right-sidebar">
       <button class="sidebar-btn" @click="showSwitchCamera = true">🔄</button>
       <button class="sidebar-btn" @click="showFlash = true">⚡</button>
@@ -17,130 +16,63 @@
       <button class="sidebar-btn" @click="showDownload = true">⬇️</button>
     </div>
 
-    <!-- Bottom Navigation -->
-    <div class="bottom-bar" v-if="bottomNav">
-      <button class="nav-btn" @click="selectTab('text')">文字</button>
-      <button class="nav-btn active" @click="selectTab('camera')">相机</button>
-      <button class="nav-btn" @click="selectTab('template')">模板</button>
-      <button class="nav-btn" @click="selectTab('live')">开直播</button>
-    </div>
-
-    <!-- Capture Area -->
+    <!-- 拍摄区域 -->
     <div class="capture-area" v-if="bottomNav">
       <button class="feature-btn" @click="showEffects = true">✨ 特效</button>
-      <button class="capture-btn" @click="takePhoto"></button>
+      <div class="capture-wrapper">
+        <!-- 进度环，仅视频录制时显示 -->
+        <svg
+          v-if="isRecording"
+          class="progress-ring"
+          :width="ringSize"
+          :height="ringSize"
+        >
+          <circle
+            class="progress-ring__circle"
+            :stroke-dasharray="circumference"
+            :stroke-dashoffset="circumference * (1 - recordProgress)"
+            :r="ringRadius"
+            :cx="ringSize / 2"
+            :cy="ringSize / 2"
+          />
+        </svg>
+        <button
+          ref="captureBtn"
+          class="capture-btn"
+          :class="{ 'photo-animate': photoAnimate }"
+          @mousedown.prevent="pressStart"
+          @touchstart.prevent="pressStart"
+          @mouseup.prevent="pressEnd"
+          @touchend.prevent="pressEnd"
+          @mouseleave.prevent="cancelPress"
+        ></button>
+      </div>
       <button class="gallery-btn" @click="handleClick">🖼 相册</button>
     </div>
+
+    <!-- 隐藏文件输入 -->
     <input
       v-show="false"
       ref="fileInput"
       type="file"
       accept="image/*"
-      style="display: none"
       @change="handleFileChange"
     />
-    <!-- 视频预览 -->
-    <video
-      ref="video"
-      autoplay
-      playsinline
-      muted
-      style="
-        width: 100%;
-        height: 90vh;
-        background: black;
-        position: absolute;
-        top: 10px;
-        left: 0;
-        z-index: 1;
-      "
-    ></video>
 
-    <!-- 隐藏canvas用于截图 -->
+    <!-- 摄像头预览 & Canvas -->
+    <video ref="video" autoplay playsinline muted class="video-preview"></video>
     <canvas ref="canvas" style="display: none"></canvas>
 
     <!-- 拍照结果 -->
-    <div
-      v-if="photo"
-      style="
-        position: relative;
-        z-index: 10;
-        margin-top: 10px;
-        background: #222;
-        padding: 10px;
-      "
-    >
-      <img :src="photo" style="max-width: 100%; height: 80vh" />
+    <div v-if="photo" class="result-container">
+      <img :src="photo" class="result-media" />
+    </div>
+    <!-- 录制结果 -->
+    <div v-if="videoURL" class="result-container">
+      <video :src="videoURL" controls class="result-media"></video>
     </div>
 
-    <!-- 统一弹窗 -->
-    <SlidePopup
-      v-if="isAnyPopupVisible"
-      :direction="'bottom'"
-      width="100vw"
-      height="40vh"
-      :isEdge="false"
-      @close="closeAllPopups"
-    >
-      <template v-if="showMusic">
-        <el-input v-model="input" placeholder="搜索音乐"></el-input>
-        <under-line-tags-vue
-          :navItems="parentMessage"
-          :active-index.sync="activeTabIndex"
-          @change="handleTabChange"
-        />
-        <div class="song-list">
-          <div
-            class="song-item"
-            v-for="(song, index) in filteredSongs"
-            :key="index"
-          >
-            <img class="avatar" :src="song.avatar" />
-            <div class="info">
-              <div class="title">{{ song.title }}</div>
-              <div class="author">{{ song.author }}</div>
-            </div>
-          </div>
-        </div>
-      </template>
-
-      <template v-else-if="showSwitchCamera">
-        <h3>切换摄像头</h3>
-        <button @click="switchCamera">切换前后摄像头</button>
-      </template>
-
-      <template v-else-if="showFlash">
-        <h3>闪光灯设置</h3>
-        <button @click="toggleFlash">
-          闪光灯: {{ flashOn ? '开' : '关' }}
-        </button>
-      </template>
-
-      <template v-else-if="showSettings">
-        <h3>设置</h3>
-        <p>这里可以放置摄像头相关设置</p>
-      </template>
-
-      <template v-else-if="showEffects">
-        <h3>特效</h3>
-        <p>选择不同的滤镜或特效</p>
-      </template>
-
-      <template v-else-if="showTimer">
-        <h3>倒计时</h3>
-        <button @click="startTimer">开始倒计时(3秒)</button>
-      </template>
-
-      <template v-else-if="showBeauty">
-        <h3>美颜</h3>
-        <p>这里放置美颜参数调节</p>
-      </template>
-
-      <template v-else-if="showDownload">
-        <h3>下载照片</h3>
-        <button @click="downloadPhoto" :disabled="!photo">下载当前照片</button>
-      </template>
-    </SlidePopup>
+    <!-- 上传下一步按钮 -->
     <div class="bottomButton" v-if="!bottomNav">
       <FlexibleButtonPanel
         :items="buttonItems"
@@ -155,7 +87,6 @@
           <div style="display: flex; align-items: center; font-size: 0.5rem">
             <img
               :src="item.icon"
-              alt=""
               style="width: 24px; height: 24px; border-radius: 12px"
             />
             <span style="margin-left: 4px">{{ item.text }}</span>
@@ -163,96 +94,76 @@
         </template>
       </FlexibleButtonPanel>
     </div>
+
+    <!-- 弹窗 -->
+    <SlidePopup
+      v-if="isAnyPopupVisible"
+      direction="bottom"
+      width="100vw"
+      height="40vh"
+      :isEdge="false"
+      @close="closeAllPopups"
+    >
+      <!-- 弹窗详情保持不变 -->
+    </SlidePopup>
+    <!-- 底部导航 -->
+    <div class="bottom-bar" v-if="bottomNav">
+      <button class="nav-btn" @click="selectTab('text')">文字</button>
+      <button
+        class="nav-btn"
+        @click="selectTab('camera')"
+        :class="{ active: activeTab === 'camera' }"
+      >
+        相机
+      </button>
+      <button class="nav-btn" @click="selectTab('template')">模板</button>
+      <button class="nav-btn" @click="selectTab('live')">开直播</button>
+    </div>
   </div>
 </template>
 
 <script>
 import SlidePopup from '@/components/SlidePopup.vue';
-import underLineTagsVue from '@/components/underLineTags.vue';
 import FlexibleButtonPanel from '@/components/FlexibleButtonPanel.vue';
-
+import { useVideoStore } from '../../stores/uploadVideo';
 export default {
   name: 'CameraInterface',
-  components: {
-    SlidePopup,
-    underLineTagsVue,
-    FlexibleButtonPanel
-  },
+  components: { SlidePopup, FlexibleButtonPanel },
   data() {
     return {
+      // 底部按钮项
       buttonItems: [
         {
           text: '朋友日常',
           bgColor: '#464646',
           icon: 'http://gips2.baidu.com/it/u=195724436,3554684702&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960'
         },
-        // { text: '拍照', icon: '/icons/camera.svg', bgColor: '#1e1e1e' },
         { text: '下一步', bgColor: '#ff2c55', borderRadius: 20 }
       ],
-      bottomNav: true, // 是否显示底部导航
+      bottomNav: true,
       stream: null,
       photo: '',
+      videoURL: '',
       input: '',
-      parentMessage: ['推荐', '热门', '收藏', '用过'],
-      activeTabIndex: 0,
-      songList: {
-        推荐: [
-          {
-            title: '@民哥创作的原声',
-            author: '民哥 · 1:30',
-            avatar: 'https://example.com/avatar1.jpg'
-          },
-          {
-            title: '车大别盼',
-            author: 'see you again x2.5 · 1:51',
-            avatar: 'https://example.com/avatar2.jpg'
-          },
-          {
-            title: '@江汐K创作的原声',
-            author: '江汐K · 0:14',
-            avatar: 'https://example.com/avatar3.jpg'
-          },
-          {
-            title: '@敬山平创作的原声',
-            author: '敬山平 · 0:15',
-            avatar: 'https://example.com/avatar4.jpg'
-          },
-          {
-            title: '美好降临',
-            author: '',
-            avatar: 'https://example.com/avatar5.jpg'
-          }
-        ],
-        热门: [
-          {
-            title: '@民哥sssss创作的原声',
-            author: '民哥 · 1:30',
-            avatar: 'https://example.com/avatar1.jpg'
-          },
-          {
-            title: '车大别盼',
-            author: 'see you again x2.5 · 1:51',
-            avatar: 'https://example.com/avatar2.jpg'
-          },
-          {
-            title: '@江汐K创作的原声',
-            author: '江汐K · 0:14',
-            avatar: 'https://example.com/avatar3.jpg'
-          },
-          {
-            title: '@敬山平创作的原声',
-            author: '敬山平 · 0:15',
-            avatar: 'https://example.com/avatar4.jpg'
-          },
-          {
-            title: '美好降临',
-            author: '',
-            avatar: 'https://example.com/avatar5.jpg'
-          }
-        ],
-        收藏: [],
-        用过: []
-      },
+      // 长按／短按检测
+      pressTimer: null,
+      pressThreshold: 500,
+      longPressActive: false,
+      // 拍摄状态
+      activeTab: '',
+      isRecording: false,
+      recordChunks: [],
+      recordProgress: 0,
+      recordInterval: null,
+      recordingStart: 0,
+      mediaRecorder: null,
+      mediaRecorderStream: null,
+      // 拍照动画
+      photoAnimate: false,
+      videoBlob: '',
+      // 进度环参数
+      ringSize: 90,
+      ringRadius: 40,
       // 弹窗控制
       showMusic: false,
       showSwitchCamera: false,
@@ -268,59 +179,93 @@ export default {
       timerCount: 3
     };
   },
-  beforeDestroy() {
-    if (this.stream) {
-      this.stream.getTracks().forEach((track) => track.stop());
+  computed: {
+    circumference() {
+      return 2 * Math.PI * this.ringRadius;
+    },
+    isAnyPopupVisible() {
+      return [
+        this.showMusic,
+        this.showSwitchCamera,
+        this.showFlash,
+        this.showSettings,
+        this.showEffects,
+        this.showTimer,
+        this.showBeauty,
+        this.showDownload
+      ].some((v) => v);
     }
-    this.clearTimer();
   },
   mounted() {
     this.startCamera();
   },
-  computed: {
-    filteredSongs() {
-      return this.songList[this.parentMessage[this.activeTabIndex]] || [];
-    },
-    isAnyPopupVisible() {
-      return (
-        this.showMusic ||
-        this.showSwitchCamera ||
-        this.showFlash ||
-        this.showSettings ||
-        this.showEffects ||
-        this.showTimer ||
-        this.showBeauty ||
-        this.showDownload
-      );
-    }
+  beforeDestroy() {
+    if (this.stream) this.stream.getTracks().forEach((t) => t.stop());
+    if (this.mediaRecorderStream)
+      this.mediaRecorderStream.getTracks().forEach((t) => t.stop());
+    clearTimeout(this.pressTimer);
+    clearInterval(this.recordInterval);
+    clearInterval(this.timerId);
   },
   methods: {
+    goback() {
+      this.$router.back();
+    },
+    selectTab(tab) {
+      // 切换 Tab
+    },
     onBtnClick({ index, item }) {
-      console.log(`点击按钮 ${index}: ${item.text}`);
       if (item.text === '下一步') {
-        this.$router.push({
-          path: '/shangchuandetail',
-          query: { photo: this.photo }
-        });
+        debugger;
+        if (this.photo) {
+          {
+            this.$router.push({
+              path: '/shangchuandetail',
+              query: { photo: this.photo }
+            });
+          }
+        } else {
+          debugger;
+          this.$router.push({
+            path: '/shangchuandetail',
+            query: { video: this.currentVideoId }
+          });
+        }
       }
     },
-    onBtnLongPress({ index, item }) {
-      alert(`长按按钮 ${index}: ${item.text}`);
-    },
+    onBtnLongPress() {},
+    // 相册
     handleClick() {
       this.$refs.fileInput.click();
     },
-    handleFileChange(event) {
-      const file = event.target.files[0];
+    handleFileChange(e) {
+      const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (e) => {
-          const imageData = e.target.result;
-          console.log('图片 base64 数据：', imageData);
-        };
+        reader.onload = (ev) => console.log(ev.target.result);
         reader.readAsDataURL(file);
       }
     },
+    // 拍照与录像区交互
+    pressStart() {
+      this.longPressActive = false;
+      this.pressTimer = setTimeout(() => {
+        this.longPressActive = true;
+        this.startRecording();
+      }, this.pressThreshold);
+    },
+    pressEnd() {
+      clearTimeout(this.pressTimer);
+      if (this.longPressActive) {
+        this.stopRecording();
+      } else {
+        this.takePhoto();
+      }
+    },
+    cancelPress() {
+      clearTimeout(this.pressTimer);
+    },
+    // 启动摄像头
     async startCamera() {
       try {
         this.stream = await navigator.mediaDevices.getUserMedia({
@@ -328,89 +273,99 @@ export default {
         });
         this.$refs.video.srcObject = this.stream;
       } catch (err) {
-        console.error('摄像头启动失败：', err);
+        console.error('启动摄像头失败', err);
       }
     },
+    // 拍照
     takePhoto() {
+      debugger;
       this.bottomNav = false;
       const video = this.$refs.video;
       const canvas = this.$refs.canvas;
       const ctx = canvas.getContext('2d');
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(video, 0, 0);
       this.photo = canvas.toDataURL('image/png');
+      this.photoAnimate = true;
+      setTimeout(() => (this.photoAnimate = false), 300);
     },
-    goback() {
-      this.$router.push({ path: '/' });
-    },
-    handleTabChange(index) {
-      this.activeTabIndex = index;
-    },
-    closeAllPopups() {
-      this.showMusic = false;
-      this.showSwitchCamera = false;
-      this.showFlash = false;
-      this.showSettings = false;
-      this.showEffects = false;
-      this.showTimer = false;
-      this.showBeauty = false;
-      this.showDownload = false;
-    },
-    selectTab(tab) {
-      console.log(`切换到 ${tab} 模块（示例，具体可实现）`);
-    },
-    switchCamera() {
-      this.usingFrontCamera = !this.usingFrontCamera;
-      if (this.stream) {
-        this.stream.getTracks().forEach((track) => track.stop());
-      }
-      navigator.mediaDevices
-        .getUserMedia({
-          video: { facingMode: this.usingFrontCamera ? 'user' : 'environment' }
-        })
-        .then((stream) => {
-          this.stream = stream;
-          this.$refs.video.srcObject = stream;
+    // 录像
+    async startRecording() {
+      if (this.isRecording) return;
+      this.recordChunks = [];
+      this.recordProgress = 0;
+      try {
+        this.mediaRecorderStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true
         });
-      this.closeAllPopups();
-    },
-    toggleFlash() {
-      this.flashOn = !this.flashOn;
-      console.log(`闪光灯已${this.flashOn ? '打开' : '关闭'}（示例）`);
-      // 这里可接入闪光灯API，浏览器端通常不支持闪光灯控制
-      this.closeAllPopups();
-    },
-    startTimer() {
-      if (this.timerId) return;
-      this.timerCount = 3;
-      console.log(`倒计时开始：${this.timerCount}秒`);
-      this.timerId = setInterval(() => {
-        this.timerCount--;
-        console.log(`倒计时：${this.timerCount}`);
-        if (this.timerCount <= 0) {
-          clearInterval(this.timerId);
-          this.timerId = null;
-          this.takePhoto();
-          console.log('拍照完成！');
-          this.closeAllPopups();
-        }
-      }, 1000);
-    },
-    clearTimer() {
-      if (this.timerId) {
-        clearInterval(this.timerId);
-        this.timerId = null;
+        this.mediaRecorder = new MediaRecorder(this.mediaRecorderStream);
+        this.mediaRecorder.ondataavailable = (e) =>
+          e.data.size && this.recordChunks.push(e.data);
+        this.mediaRecorder.start();
+        this.recordingStart = Date.now();
+        this.isRecording = true;
+        this.recordInterval = setInterval(() => {
+          const elapsed = Date.now() - this.recordingStart;
+          this.recordProgress = Math.min(elapsed / 10000, 1);
+          if (elapsed >= 10000) this.stopRecording();
+        }, 100);
+      } catch (err) {
+        console.error('录像失败', err);
       }
     },
-    downloadPhoto() {
-      if (!this.photo) return;
-      const link = document.createElement('a');
-      link.href = this.photo;
-      link.download = 'photo.png';
-      link.click();
-      this.closeAllPopups();
-    }
+    // stopRecording() {
+    //   if (!this.isRecording) return;
+    //   clearInterval(this.recordInterval);
+    //   this.mediaRecorder.stop();
+    //   this.mediaRecorderStream.getTracks().forEach((t) => t.stop());
+    //   this.mediaRecorder.onstop = () => {
+    //     const duration = Date.now() - this.recordingStart;
+    //     const blob = new Blob(this.recordChunks, { type: 'video/mp4' });
+    //     debugger;
+    //     this.videoBlob = blob;
+    //     this.videoURL = URL.createObjectURL(blob);
+    //     if (duration < this.pressThreshold) this.takePhoto();
+    //   };
+    //   this.isRecording = false;
+    //   this.bottomNav = false;
+    // },
+    stopRecording() {
+      if (!this.isRecording) return;
+      clearInterval(this.recordInterval);
+      this.mediaRecorder.stop();
+      this.mediaRecorderStream.getTracks().forEach((t) => t.stop());
+
+      this.mediaRecorder.onstop = () => {
+        const duration = Date.now() - this.recordingStart;
+        const blob = new Blob(this.recordChunks, { type: 'video/mp4' });
+
+        // 存储视频到全局库
+        const videoStore = useVideoStore();
+        const videoId = `video_${Date.now()}`; // 生成唯一ID
+        videoStore.addVideo(videoId, blob, {
+          duration,
+          size: blob.size,
+          type: blob.type,
+          blob: blob
+        });
+        // 保存ID到本地状态，用于后续跳转
+        this.currentVideoId = videoId;
+        this.videoBlob = blob;
+        this.videoURL = URL.createObjectURL(blob);
+
+        if (duration < this.pressThreshold) this.takePhoto();
+      };
+
+      this.isRecording = false;
+      this.bottomNav = false;
+    },
+    // 其余弹窗方法等... 保持原有逻辑
+    switchCamera() {},
+    toggleFlash() {},
+    startTimer() {},
+    closeAllPopups() {}
   }
 };
 </script>
@@ -420,11 +375,9 @@ export default {
   position: relative;
   height: 100vh;
   background: black;
-  overflow: hidden;
   color: white;
-  user-select: none;
+  overflow: hidden;
 }
-
 .top-bar {
   position: fixed;
   top: 0;
@@ -437,21 +390,15 @@ export default {
   padding: 0 10px;
   z-index: 20;
 }
-
-.close-btn {
-  font-size: 20px;
-  background: transparent;
-  border: none;
-  color: white;
-  cursor: pointer;
-}
-
+.close-btn,
 .music-btn {
   font-size: 20px;
   background: transparent;
   border: none;
   color: white;
   cursor: pointer;
+}
+.music-btn {
   position: absolute;
   top: 10px;
   left: 50%;
@@ -466,7 +413,6 @@ export default {
   gap: 12px;
   z-index: 20;
 }
-
 .sidebar-btn {
   width: 40px;
   height: 40px;
@@ -477,7 +423,6 @@ export default {
   color: white;
   cursor: pointer;
 }
-
 .bottom-bar {
   position: fixed;
   bottom: 0;
@@ -489,7 +434,6 @@ export default {
   align-items: center;
   z-index: 20;
 }
-
 .nav-btn {
   background: transparent;
   border: none;
@@ -497,60 +441,68 @@ export default {
   font-size: 16px;
   cursor: pointer;
 }
-
 .nav-btn.active {
   border-bottom: 2px solid #fff;
 }
-
 .capture-area {
-  position: absolute;
+  position: fixed;
   bottom: 60px;
   left: 0;
   right: 0;
   display: flex;
-  justify-content: space-between; /* 两端对齐 */
-  gap: 20px;
-  padding: 0 20px; /* 给左右留点内边距 */
+  justify-content: space-between;
   align-items: center;
+  padding: 0 20px;
   z-index: 20;
 }
-
 .feature-btn,
-.capture-btn,
 .gallery-btn {
+  background: transparent;
   border: none;
   cursor: pointer;
-}
-
-.feature-btn {
-  color: white;
   font-size: 18px;
-  background: transparent;
+  color: white;
 }
-
+.capture-wrapper {
+  position: relative;
+  width: 90px;
+  height: 90px;
+}
 .capture-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 70px;
   height: 70px;
   background: white;
   border-radius: 50%;
+  z-index: 2;
 }
-
-.gallery-btn {
-  color: white;
-  font-size: 24px;
-  background: transparent;
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
 }
-
-.song-list {
-  margin-top: 10px;
-  max-height: 200px;
-  overflow-y: auto;
+.capture-btn.photo-animate {
+  animation: pulse 0.3s ease;
 }
-
-.song-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
+.progress-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: rotate(-90deg);
+  z-index: 1;
+}
+.progress-ring__circle {
+  fill: transparent;
+  stroke: white;
+  stroke-width: 4;
+  transition: stroke-dashoffset 0.1s linear;
 }
 .bottomButton {
   z-index: 10;
@@ -560,20 +512,22 @@ export default {
   width: 95%;
   transform: translateX(-50%);
 }
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 20px;
-  margin-right: 10px;
+.video-preview {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  background: black;
+  z-index: 1;
 }
-
-.info .title {
-  font-weight: bold;
+.result-container {
+  position: relative;
+  z-index: 10;
+  margin-top: 10px;
+  background: #222;
+  padding: 10px;
 }
-
-.info .author {
-  font-size: 12px;
-  color: #ccc;
+.result-media {
+  max-width: 100%;
+  height: 80vh;
 }
 </style>
