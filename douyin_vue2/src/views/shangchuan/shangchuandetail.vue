@@ -138,7 +138,6 @@ export default {
     };
   },
   mounted() {
-    debugger;
     // 获取路由参数中的videoId
     this.videoId = this.$route.query.video || '';
     this.videoThumbnail = this.$route.query.photo || '';
@@ -173,11 +172,11 @@ export default {
       if (item.text === '发作品') {
         this.publishPost();
       } else {
-        alert(`点击按钮 ${index}: ${item.text}`);
+        console.log(`点击按钮 ${index}: ${item.text}`);
       }
     },
     onBtnLongPress({ index, item }) {
-      alert(`长按按钮 ${index}: ${item.text}`);
+      console.log(`长按按钮 ${index}: ${item.text}`);
     },
     onTopicClick({ item }) {
       this.selectedTopic = item.text;
@@ -192,33 +191,62 @@ export default {
       console.log('选择权限：', item.text);
     },
     openSettings() {
-      alert('进入高级设置');
+      console.log('进入高级设置');
     },
-
     async publishPost() {
       if (this.loading) return;
-      if (!this.title) return alert('请输入想法内容');
-      // 正确：使用 && 表示只要有一个存在即可
-      debugger;
-      if (!this.videoThumbnail && !this.videoData) return alert('请上传视频');
+      if (!this.title) return console.log('请输入想法内容');
+      if (!this.videoThumbnail && !this.videoData)
+        return console.log('请上传视频');
+
       this.loading = true;
-      const postData = {
-        videoData: this.videoData,
-        userId: this.userId,
-        title: this.title,
-        videoThumbnail: this.videoThumbnail,
-        topic: this.selectedTopic || '',
-        location: this.selectedLocation || '',
-        privacy: this.selectedPrivacy || '公开',
-        createdAt: new Date().toISOString()
-      };
 
       try {
-        const res = await axios.post('/api/video/publish', postData);
-        alert('发布成功！');
+        // 创建FormData对象
+        const formData = new FormData();
+
+        // 添加视频文件
+        if (this.videoData && this.videoData.blob) {
+          // 使用原始文件名或生成一个唯一文件名
+          const fileName = `video_${Date.now()}.mp4`;
+          formData.append('videoFile', this.videoData.blob, fileName);
+        }
+
+        // 添加视频缩略图
+        if (this.videoThumbnail) {
+          // 假设this.videoThumbnail也是一个Blob或File对象
+          formData.append('thumbnail', this.videoThumbnail);
+        }
+
+        // 添加其他表单字段
+        formData.append('userId', this.userId);
+        formData.append('title', this.title);
+        formData.append('topic', this.selectedTopic || '');
+        formData.append('location', this.selectedLocation || '');
+        formData.append('privacy', this.selectedPrivacy || '公开');
+        formData.append('createdAt', new Date().toISOString());
+
+        // 添加视频元数据
+        if (this.videoData && this.videoData.metadata) {
+          formData.append('metadata', JSON.stringify(this.videoData.metadata));
+        }
+
+        // 设置请求头，注意不要手动设置Content-Type，让浏览器自动设置
+        const config = {
+          headers: {
+            'Content-Type': 'multipart/form-data' // 实际上这里应该由浏览器自动设置
+          }
+        };
+
+        // 发送请求
+        const res = await axios.post('/api/video/publish', formData, config);
+        console.log('发布成功！');
+
+        // 重置表单或执行其他操作
+        this.resetForm();
       } catch (err) {
         console.error('发布失败', err);
-        alert('发布失败，请稍后重试');
+        console.log('发布失败，请稍后重试');
       } finally {
         this.loading = false;
       }

@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
@@ -125,8 +126,54 @@ public class VideoController extends ApiController {
         }
     }
 
-
     @PostMapping("/publish")
+    public ResponseEntity<?> publishVideo(
+            @RequestParam("videoFile") MultipartFile videoFile,
+            @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,
+            @RequestParam("title") String title,
+            @RequestParam(value = "topic", required = false) String topic,
+            @RequestParam(value = "location", required = false) String location,
+            @RequestParam(value = "privacy", defaultValue = "公开") String privacy,
+            @RequestParam(value = "metadata", required = false) String metadataJson,
+            @RequestParam("createdAt") String createdAt) throws IOException {
+
+        String fileName = videoFile.getOriginalFilename();
+        String videoId = String.valueOf(idService.SnowflakeGen());
+        InputStream in = videoFile.getInputStream();
+        String url = fileStorageService.uploadVideoFile("videostore", fileName, in);
+
+        // 获取登录用户ID
+        Object userIdObj = StpUtil.getLoginId();
+
+        // 方法1：使用安全的类型转换
+        Long userId = null;
+        if (userIdObj instanceof Long) {
+            userId = (Long) userIdObj;
+        } else if (userIdObj instanceof Integer) {
+            userId = ((Integer) userIdObj).longValue();
+        } else if (userIdObj instanceof String) {
+            userId = Long.parseLong((String) userIdObj);
+        } else {
+            // 处理其他类型或null的情况
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("code", 401));
+        }
+
+        Video video = new Video();
+        video.setVideoId(idService.SnowflakeGen());
+        video.setUrl(url);
+        video.setType(1);
+        video.setTitle(title); // 使用前端传入的标题
+        video.setContent(""); // 设置适当的内容
+        video.setUserId(userId);
+        videoService.save(video);
+
+        return ResponseEntity.ok(Collections.singletonMap("code", 200));
+    }
+
+
+
+        @PostMapping("/publishss")
     public ResponseEntity<?> publish(@RequestBody Map<String, Object> req) {
         Object userId = StpUtil.getLoginId();
         Object title = req.get("title");

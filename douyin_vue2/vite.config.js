@@ -34,7 +34,7 @@ export default defineConfig(({ mode }) => {
       },
       server: {
         host: true,
-        https: httpsOptions, // 开启 https，使用证书
+        // https: httpsOptions, // 开启 https，使用证书
         proxy: {
           '/api': {
             target: 'http://localhost:9430',

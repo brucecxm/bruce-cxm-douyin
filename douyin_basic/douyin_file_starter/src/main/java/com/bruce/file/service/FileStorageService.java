@@ -18,6 +18,15 @@ public interface FileStorageService {
     public String uploadImgFile(String prefix, String filename,InputStream inputStream);
 
     /**
+     * 上传视频文件
+     *
+     * @param prefix      文件前缀
+     * @param filename    文件名
+     * @param inputStream 视频流
+     * @return 视频在 MinIO 上的完整访问路径
+     */
+    public String uploadVideoFile(String prefix, String filename, InputStream inputStream) ;
+    /**
      *  上传html文件
      * @param prefix  文件前缀
      * @param filename   文件名

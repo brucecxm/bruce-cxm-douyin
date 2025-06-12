@@ -50,6 +50,46 @@ public class MinIOFileStorageService implements FileStorageService {
         return stringBuilder.toString();
     }
 
+
+    /**
+     * 上传视频文件
+     *
+     * @param prefix      文件前缀
+     * @param filename    文件名
+     * @param inputStream 视频流
+     * @return 视频在 MinIO 上的完整访问路径
+     */
+    @Override
+    public String uploadVideoFile(String prefix, String filename, InputStream inputStream) {
+        // 构建最终存储路径，例如 "prefix/yyyy/MM/dd/filename.mp4"
+        String filePath = builderFilePath(prefix, filename);
+        try {
+            // 准备上传参数：bucket、object 名称、内容类型、流
+            PutObjectArgs putObjectArgs = PutObjectArgs.builder()
+                    .bucket(minIOConfigProperties.getBucket())
+                    .object(filePath)
+                    //视频常用 MP4 类型；根据实际格式调整
+                    .contentType("video/mp4")
+                    // 传入流长度为 -1，并由 MinIO SDK 自动分片上传
+                    .stream(inputStream, -1, 5 * 1024 * 1024)
+                    .build();
+
+            // 执行上传
+            minioClient.putObject(putObjectArgs);
+
+            // 构造可访问 URL：baseReadPath/bucket/filePath
+            StringBuilder url = new StringBuilder(minIOConfigProperties.getReadPath());
+            url.append(separator).append(minIOConfigProperties.getBucket())
+                    .append(separator).append(filePath);
+
+            return url.toString();
+        } catch (Exception ex) {
+            log.error("minio put video error.", ex);
+            throw new RuntimeException("上传视频失败", ex);
+        }
+    }
+
+
     /**
      *  上传图片文件
      * @param prefix  文件前缀

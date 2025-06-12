@@ -60,7 +60,10 @@
     />
 
     <!-- 摄像头预览 & Canvas -->
-    <video ref="video" autoplay playsinline muted class="video-preview"></video>
+    <video
+ref="video"
+autoplay playsinline muted
+class="video-preview"></video>
     <canvas ref="canvas" style="display: none"></canvas>
 
     <!-- 拍照结果 -->
@@ -216,7 +219,6 @@ export default {
     },
     onBtnClick({ index, item }) {
       if (item.text === '下一步') {
-        debugger;
         if (this.photo) {
           {
             this.$router.push({
@@ -225,7 +227,6 @@ export default {
             });
           }
         } else {
-          debugger;
           this.$router.push({
             path: '/shangchuandetail',
             query: { video: this.currentVideoId }
@@ -278,7 +279,6 @@ export default {
     },
     // 拍照
     takePhoto() {
-      debugger;
       this.bottomNav = false;
       const video = this.$refs.video;
       const canvas = this.$refs.canvas;
@@ -323,7 +323,6 @@ export default {
     //   this.mediaRecorder.onstop = () => {
     //     const duration = Date.now() - this.recordingStart;
     //     const blob = new Blob(this.recordChunks, { type: 'video/mp4' });
-    //     debugger;
     //     this.videoBlob = blob;
     //     this.videoURL = URL.createObjectURL(blob);
     //     if (duration < this.pressThreshold) this.takePhoto();
