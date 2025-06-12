@@ -7,14 +7,14 @@ const { fileURLToPath, URL } = require('url');
 
 export default defineConfig(({ mode }) => {
   if (mode === 'development') {
-    const httpsOptions = {
-      key: fs.readFileSync(
-        'C:/Users/Administrator/Desktop/tools/127.0.0.1+4-key.pem'
-      ),
-      cert: fs.readFileSync(
-        'C:/Users/Administrator/Desktop/tools/127.0.0.1+4.pem'
-      )
-    };
+    // const httpsOptions = {
+    //   key: fs.readFileSync(
+    //     'C:/Users/Administrator/Desktop/tools/127.0.0.1+4-key.pem'
+    //   ),
+    //   cert: fs.readFileSync(
+    //     'C:/Users/Administrator/Desktop/tools/127.0.0.1+4.pem'
+    //   )
+    // };
     return {
       plugins: [
         vue2(),
@@ -45,6 +45,14 @@ export default defineConfig(({ mode }) => {
       }
     };
   } else if (mode === 'production') {
+    // const httpsOptions = {
+    //   key: fs.readFileSync(
+    //     'C:/Users/Administrator/Desktop/tools/127.0.0.1+4-key.pem'
+    //   ),
+    //   cert: fs.readFileSync(
+    //     'C:/Users/Administrator/Desktop/tools/127.0.0.1+4.pem'
+    //   )
+    // };
     return {
       plugins: [
         vue2(),
