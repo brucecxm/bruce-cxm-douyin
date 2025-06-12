@@ -67,3 +67,6 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 
 
+agora:
+  appId: your_real_agora_app_id
+  appCertificate: your_real_agora_app_certificate  # 如果你还有这个字段
