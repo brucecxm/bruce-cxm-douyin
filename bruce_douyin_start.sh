@@ -170,6 +170,8 @@ else
     exit 1
 fi
 
+cd ..
+
 # 11. **赋予主脚本执行权限**
 SCRIPT_NAME="bruce_douyin_start.sh"
 if [ -f "$SCRIPT_NAME" ]; then
