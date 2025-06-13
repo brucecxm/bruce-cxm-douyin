@@ -231,8 +231,24 @@ export default {
     },
 
     updateBoxPositionBasedOnCurrentY() {
-      const nearestIndex = Math.round(Math.abs(this.currentY) / this.boxHeight);
-      this.currentY = -nearestIndex * this.boxHeight;
+      // 计算当前滑动距离相对于盒子高度的比例
+      const ratio = Math.abs(this.currentY) / this.boxHeight;
+
+      // 获取当前索引和小数部分
+      const currentIndex = Math.floor(ratio);
+      const decimalPart = ratio - currentIndex;
+
+      // 滑动超过 30% 则切换到下一个盒子，否则回到当前盒子
+      const threshold = 0.2;
+      const nearestIndex =
+        decimalPart >= threshold ? currentIndex + 1 : currentIndex;
+
+      // 确保索引在有效范围内
+      const maxIndex = this.boxes.length - 1;
+      const clampedIndex = Math.min(Math.max(nearestIndex, 0), maxIndex);
+
+      // 更新位置
+      this.currentY = -clampedIndex * this.boxHeight;
       this.updateBoxesPosition();
     },
 
