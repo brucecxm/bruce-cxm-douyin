@@ -39,3 +39,10 @@ spring:
     username: root
     password: root
     url: jdbc:log4jdbc:mysql://localhost:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+
+minio:
+  accessKey: minio
+  secretKey: minio123
+  bucket: leadnews
+  endpoint: http://192.168.200.130:9000
+  readPath: http://192.168.200.130:9000

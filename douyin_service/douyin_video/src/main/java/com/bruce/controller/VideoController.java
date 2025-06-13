@@ -125,6 +125,8 @@ public class VideoController extends ApiController {
                     .body("服务器错误：" + e.getMessage());
         }
     }
+@Autowired
+    private  DcSystemService dcSystemService;
 
     @PostMapping("/publish")
     public ResponseEntity<?> publishVideo(
@@ -140,7 +142,18 @@ public class VideoController extends ApiController {
         String fileName = videoFile.getOriginalFilename();
         String videoId = String.valueOf(idService.SnowflakeGen());
         InputStream in = videoFile.getInputStream();
-        String url = fileStorageService.uploadVideoFile("videostore", fileName, in);
+        String osName = System.getProperty("os.name").toLowerCase();
+        System.out.println("当前操作系统: " + osName);
+        String  url = fileStorageService.uploadVideoFile("videostore", fileName, in);
+        String minio="/minio";
+        LambdaQueryWrapper<DcSystem> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(DcSystem::getName,"ngrok");
+        DcSystem ngrok=  dcSystemService.getOne(queryWrapper);
+        // 假设原URL存储在变量中
+        if(!osName.contains("windows"))
+        {
+            url=url.replace("http://192.168.200.130:9000", ngrok.getValue()+minio);
+        }
 
         // 获取登录用户ID
         Object userIdObj = StpUtil.getLoginId();

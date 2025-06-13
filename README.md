@@ -123,6 +123,20 @@ http {
             proxy_set_header X-Forwarded-Proto $scheme;
         }
 
+
+   # MinIO 反向代理（转发到 localhost:9000，去掉 /minio 前缀）
+        location /minio/ {
+            rewrite ^/minio(/.*)$ $1 break;
+            proxy_pass http://localhost:9000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+
+
+
         # WebSocket proxy if needed
         # location /websocket/ {
         #     proxy_pass http://localhost:9998/ws;  # Adjust to your WebSocket server
