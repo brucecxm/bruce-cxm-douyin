@@ -290,7 +290,7 @@ export default {
           }
         },
         {
-          threshold: 1.0 // 100% 进入才触发
+          threshold: 0.8 // 100% 进入才触发
         }
       );
 

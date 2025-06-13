@@ -1,4 +1,5 @@
-<!-- http://localhost:5173/chat?myUserId=123&receiverId=456 -->
+<!-- http://localhost:5173/chatyi?myUserId=146&receiverId=147 -->
+<!-- http://localhost:5173/chatyi?myUserId=147&receiverId=146 -->
 <template>
   <div class="chat-container">
     <div class="messages" ref="messages">
