@@ -10,7 +10,6 @@
     @touchmove="drag"
     :style="{ width: boxWidth, height: boxHeight * 0.1 + 'vh' }"
   >
-    >
     <!-- 视频盒子 -->
     <div
       v-for="(box, index) in boxes"
@@ -23,7 +22,6 @@
         height: boxHeight * 0.1 + 'vh'
       }"
     >
-      >
       <!-- 视频侧边栏组件 -->
       <div class="videoasideone">
         <videoaside-vue :video-data="videoboxdata[index]"></videoaside-vue>
@@ -52,6 +50,7 @@
     </div>
   </div>
 </template>
+
 <script>
 import videoasideVue from './videoaside.vue';
 import videoarticleVue from './videoarticle.vue';
@@ -86,7 +85,8 @@ export default {
       videodatahistory: [], // 存储所有视频数据（外部传入+内部加载）
       page: 1,
       pageSize: 4,
-      debounceTimer: null
+      debounceTimer: null,
+      dragDirection: null // 新增：记录滑动方向
     };
   },
 
@@ -176,7 +176,15 @@ export default {
       const containerHeight = this.$el.clientHeight;
       const threshold = 0.9;
 
-      this.$refs.videos.forEach((video, index) => {
+      // 确保 $refs.videos 是数组
+      if (!this.$refs.videos) return;
+      const videos = Array.isArray(this.$refs.videos)
+        ? this.$refs.videos
+        : [this.$refs.videos];
+
+      videos.forEach((video, index) => {
+        if (!video || !this.boxes[index]) return;
+
         const box = this.boxes[index];
         const boxTop = box.top;
         const boxBottom = boxTop + this.boxHeight * 0.1;
@@ -192,30 +200,89 @@ export default {
         }
       });
     },
+    updateBoxPositionBasedOnCurrentY() {
+      // 计算当前滑动距离相对于盒子高度的比例
+      const ratio = Math.abs(this.currentY) / this.boxHeight;
 
-    startDrag(event) {
-      this.isDragging = true;
-      this.startY = this.getEventClientY(event) - this.currentY;
+      // 获取当前索引和小数部分
+      const currentIndex = Math.floor(ratio);
+      const decimalPart = ratio - currentIndex;
+
+      // 快速滑动检测（新增逻辑）
+      let nearestIndex = currentIndex;
+      if (this.isFastSwipe) {
+        // 快速上滑，切换到下一个视频
+        if (
+          this.dragDirection === 'up' &&
+          currentIndex < this.boxes.length - 1
+        ) {
+          nearestIndex = currentIndex + 1;
+        }
+        // 快速下滑，切换到上一个视频
+        else if (this.dragDirection === 'down' && currentIndex > 0) {
+          nearestIndex = currentIndex - 1;
+        }
+        this.isFastSwipe = false; // 重置快速滑动标记
+      }
+      // 普通滑动，使用阈值判断
+      else {
+        // 设置统一的切换阈值
+        const threshold = 0.1;
+        nearestIndex =
+          decimalPart >= threshold ? currentIndex + 1 : currentIndex;
+      }
+      // 确保索引在有效范围内
+      const maxIndex = this.boxes.length - 1;
+      const clampedIndex = Math.min(Math.max(nearestIndex, 0), maxIndex);
+
+      // 更新位置
+      this.currentY = -clampedIndex * this.boxHeight;
+      this.updateBoxesPosition();
     },
 
-    stopDrag() {
-      this.isDragging = false;
-      this.updateBoxPositionBasedOnCurrentY();
-      this.updateVideoPlayback();
-    },
-
+    // 修改 drag 方法，添加速度检测
     drag(event) {
       if (this.isDragging) {
+        const startDragTime = this.dragStartTime || Date.now();
+        const currentTime = Date.now();
+        const dragDuration = currentTime - startDragTime;
+
         let newY = this.getEventClientY(event) - this.startY;
         newY = Math.max(
           -(this.boxHeight * (this.boxes.length - 1)),
           Math.min(newY, 0)
         );
+
+        // 计算滑动速度 (像素/毫秒)
+        const dragDistance = Math.abs(newY - this.currentY);
+        const speed = dragDuration > 0 ? dragDistance / dragDuration : 0;
+        // 检测快速滑动 (速度阈值可根据实际情况调整)
+        if (speed > 0.5) {
+          this.isFastSwipe = true;
+        }
+
+        // 记录滑动方向和开始时间
+        this.dragDirection = newY > this.currentY ? 'down' : 'up';
+        this.dragStartTime = startDragTime === 0 ? currentTime : startDragTime;
+
         this.currentY = newY;
         this.updateBoxesPosition();
         this.updateVideoPlayback();
         this.debounceLoadVideos();
       }
+    },
+
+    // 修改 startDrag 方法，添加时间记录
+    startDrag(event) {
+      this.isDragging = true;
+      this.startY = this.getEventClientY(event) - this.currentY;
+      this.dragStartTime = Date.now(); // 记录拖拽开始时间
+      this.isFastSwipe = false; // 重置快速滑动标记
+    },
+    stopDrag() {
+      this.isDragging = false;
+      this.updateBoxPositionBasedOnCurrentY();
+      this.updateVideoPlayback();
     },
 
     getEventClientY(event) {
@@ -228,28 +295,6 @@ export default {
       this.boxes.forEach((box, index) => {
         box.top = this.currentY + index * this.boxHeight;
       });
-    },
-
-    updateBoxPositionBasedOnCurrentY() {
-      // 计算当前滑动距离相对于盒子高度的比例
-      const ratio = Math.abs(this.currentY) / this.boxHeight;
-
-      // 获取当前索引和小数部分
-      const currentIndex = Math.floor(ratio);
-      const decimalPart = ratio - currentIndex;
-
-      // 滑动超过 30% 则切换到下一个盒子，否则回到当前盒子
-      const threshold = 0.2;
-      const nearestIndex =
-        decimalPart >= threshold ? currentIndex + 1 : currentIndex;
-
-      // 确保索引在有效范围内
-      const maxIndex = this.boxes.length - 1;
-      const clampedIndex = Math.min(Math.max(nearestIndex, 0), maxIndex);
-
-      // 更新位置
-      this.currentY = -clampedIndex * this.boxHeight;
-      this.updateBoxesPosition();
     },
 
     isAtBottom() {
@@ -268,6 +313,7 @@ export default {
   }
 };
 </script>
+
 <style scoped>
 .videoasideone {
   display: block;
