@@ -249,6 +249,7 @@ export default {
         console.log('发布失败，请稍后重试');
       } finally {
         this.loading = false;
+        this.$router.push('/'); // 发布成功后跳转到首页
       }
     }
   }
