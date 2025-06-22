@@ -1,108 +1,109 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import { useAdStore } from '@/stores/adStore';
 
 Vue.use(VueRouter);
-
 const router = new VueRouter({
   mode: 'history',
   base: import.meta.env.BASE_URL,
   routes: [
     {
+      path: '/ad', // 新增广告页路由
+      name: 'Ad',
+      component: () => import('../views/Ad.vue'), // 假设广告组件路径
+      meta: { isAd: true } // 标记为广告页
+    },
+    {
       path: '/wallet',
-      name: 'wallet',
+      name: 'Wallet', // 修正路由名称（原名称与广告路由冲突）
       component: () => import('../views/shop/wallet.vue')
     },
     {
       path: '/test',
-      name: 'testregister',
+      name: 'TestRegister',
       component: () => import('@/views/test/testregister.vue')
     },
     {
       path: '/testone',
-      name: 'test',
+      name: 'Test',
       component: () => import('@/views/test/testshop.vue')
     },
     {
       path: '/shopcat',
-      name: 'shopcat',
+      name: 'Shopcat',
       component: () => import('../views/shop/shopcat.vue')
     },
     {
       path: '/store',
-      name: 'store',
+      name: 'Store',
       component: () => import('../views/shop/store.vue')
     },
     {
       path: '/searchshop',
-      name: 'searchshop',
+      name: 'Searchshop',
       component: () => import('../views/shop/searchshop.vue')
     },
     {
       path: '/shangchuan',
-      name: 'shangchuanshop',
+      name: 'Shangchuanshop',
       component: () => import('../views/shangchuan/shangchuan.vue')
     },
     {
-      path: '/shangchuandetail/',
-      name: 'shangchuandetailVue',
+      path: '/shangchuandetail', // 移除末尾多余斜杠
+      name: 'ShangchuandetailVue',
       component: () => import('../views/shangchuan/shangchuandetail.vue')
     },
     {
       path: '/coupon',
-      name: 'coupon',
+      name: 'Coupon',
       component: () => import('../views/shop/coupon.vue')
     },
     {
       path: '/videodetail',
-      name: 'videodetail',
+      name: 'Videodetail',
       component: () => import('@/views/video/videodetail.vue')
     },
 
     {
       path: '/testmap',
-      name: 'testmap',
+      name: 'Testmap',
       component: () => import('../components/leftmap.vue')
     },
     {
       path: '/map',
-      name: 'map',
+      name: 'Map',
       component: () => import('../views/gaode.vue')
     },
     {
       path: '/homeone',
-      name: 'home',
+      name: 'Home',
       component: () => import('../views/one.vue')
     },
     {
-      path: '/order', // 动态路由参数 :id
-      name: 'order',
+      path: '/order',
+      name: 'Order',
       component: () => import('../views/shop/order.vue')
     },
     {
-      path: '/chongzhi/:userid', // 动态路由参数 :id
-      name: 'chongzhi',
+      path: '/chongzhi/:userid',
+      name: 'Chongzhi',
       component: () => import('../views/shop/chongzhi.vue')
     },
     {
-      path: '/shopmessage/:userid', // 动态路由参数 :id
-      name: 'shopmessage',
+      path: '/shopmessage/:userid',
+      name: 'Shopmessage',
       component: () => import('../views/shop/shopmessage.vue')
     },
     {
       path: '/',
-      name: 'homeone',
+      name: 'Homeone',
       component: () => import('../views/home.vue')
     },
     {
       path: '/authhome',
-      name: 'authhome',
+      name: 'Authhome',
       component: () => import('../views/auth/auth.vue')
     },
-    // {
-    //   path: "/freevideo",
-    //   name: "FreeVideoVue",
-    //   component: () => import("../views/home/FreeVideo.vue"),
-    // },
     {
       path: '/me',
       name: 'MeVue',
@@ -120,18 +121,13 @@ const router = new VueRouter({
     },
     {
       path: '/d',
-      name: 'dVue',
+      name: 'DVue',
       component: () => import('../views/testone/d.vue')
     },
     {
       path: '/search',
       name: 'SearchVue',
       component: () => import('../views/search/search.vue')
-    },
-    {
-      path: '/xiaoxi',
-      name: 'XiaoXiVue',
-      component: () => import('../views/xiaoxi/xiaoxi.vue')
     },
     {
       path: '/xiaoxi',
@@ -167,7 +163,7 @@ const router = new VueRouter({
     },
     {
       path: '/transfer/:id',
-      name: 'transferVue',
+      name: 'TransferVue',
       component: () => import('../views/shop/transfer.vue')
     },
 
@@ -183,7 +179,7 @@ const router = new VueRouter({
     },
     {
       path: '/shopSearchDetail',
-      name: 'shopSearchDetailVue',
+      name: 'ShopSearchDetailVue',
       component: () => import('../views/shop/shopSearchDetail.vue')
     },
     {
@@ -193,12 +189,12 @@ const router = new VueRouter({
     },
     {
       path: '/handleFriend',
-      name: 'handleFriend',
+      name: 'HandleFriend',
       component: () => import('../views/me/handlefriend.vue')
     },
     {
       path: '/editMeInfo',
-      name: 'editMeInfoVue',
+      name: 'EditMeInfoVue',
       component: () => import('../views/me/editMeInfo.vue')
     },
     {
@@ -210,14 +206,22 @@ const router = new VueRouter({
       path: '/searchdetail',
       name: 'Searchdetail',
       component: () => import('../views/search/searchdetail.vue')
+    },
+    {
+      path: '/:pathMatch(.*)*', // 新增404路由
+      name: 'NotFound',
+      component: () => import('../views/NotFound.vue')
     }
-    // Add more routes as needed
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    //   component: () => import('../views/AboutView.vue')
-    // }
   ]
+});
+// 路由守卫（在 App 启动并注册 Pinia 后才能正常使用）
+router.beforeEach((to, from, next) => {
+  const adStore = useAdStore();
+
+  if (to.meta.isAd || adStore.hasSeenAd) {
+    return next();
+  }
+  next({ name: 'Ad' });
 });
 
 export default router;
