@@ -74,7 +74,7 @@ export default {
       videoDateOne: {}
     };
   },
-  inject: ['fromAside', 'sharedState'],
+  // inject: ['fromAside', 'sharedState'],
   methods: {
     send() {
       // 直接调用祖先注入的函数进行传值
