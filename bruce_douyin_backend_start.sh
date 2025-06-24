@@ -25,10 +25,30 @@ case "$env_choice" in
     1)
         PROFILE="dev"
         JVM_OPTS="-Xms256m -Xmx512m"
+        AUTO_RESTART="no"  # 开发环境默认不自动重启
         ;;
     2)
         PROFILE="prod"
-        JVM_OPTS="-Xms1024m -Xmx2048m -XX:+UseG1GC"  # 生产环境优化JVM参数
+        JVM_OPTS="-Xms1024m -Xmx2048m -XX:+UseG1GC"
+
+        # 新增：生产环境是否启用自动拉取
+        echo "请选择生产环境自动拉取策略："
+        echo "[1] 启用自动拉取（进程退出/服务器重启后自动重启）"
+        echo "[2] 禁用自动拉取（仅手动启动）"
+        read -p "请输入策略编号 [1-2]: " auto_choice
+
+        case "$auto_choice" in
+            1)
+                AUTO_RESTART="yes"
+                ;;
+            2)
+                AUTO_RESTART="no"
+                ;;
+            *)
+                echo "❌ 无效选择，默认禁用自动拉取"
+                AUTO_RESTART="no"
+                ;;
+        esac
         ;;
     *)
         echo "❌ 无效选择"
@@ -38,6 +58,7 @@ esac
 
 echo "🚀 部署环境：$PROFILE"
 echo "⚙️ JVM 参数：$JVM_OPTS"
+echo "🔄 自动拉取：$(if [ "$AUTO_RESTART" = "yes" ]; then echo "启用"; else echo "禁用"; fi)"
 
 # 3. 安装基础模块
 echo "➡️ 安装基础模块 douyin_basic ..."
@@ -100,7 +121,17 @@ for index in "${selected_indexes[@]}"; do
             SERVICE_NAME="douyin-$jar_file"
             SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
 
-            echo "➡️ 配置 systemd 服务: $SERVICE_NAME"
+            # 根据选择配置自动拉取策略
+            RESTART_CONFIG=""
+            if [ "$AUTO_RESTART" = "yes" ]; then
+                RESTART_CONFIG="Restart=always\nRestartSec=3"
+                ENABLE_STATUS="启用"
+            else
+                RESTART_CONFIG="Restart=no"
+                ENABLE_STATUS="禁用"
+            fi
+
+            echo "➡️ 配置 systemd 服务: $SERVICE_NAME (自动拉取: $ENABLE_STATUS)"
             sudo bash -c "cat > $SERVICE_FILE <<EOF
 [Unit]
 Description=Douyin Service: $jar_file
@@ -110,8 +141,7 @@ After=network.target redis.service
 User=root
 WorkingDirectory=$(pwd)
 ExecStart=/usr/bin/java $JVM_OPTS -jar $jar_file --spring.profiles.active=$PROFILE
-Restart=always
-RestartSec=3
+$RESTART_CONFIG
 
 [Install]
 WantedBy=multi-user.target
@@ -121,7 +151,7 @@ EOF"
             sudo systemctl enable "$SERVICE_NAME"
             sudo systemctl restart "$SERVICE_NAME"
 
-            echo "✅ $jar_file 已作为 systemd 服务启动"
+            echo "✅ $jar_file 已作为 systemd 服务启动（自动拉取: $ENABLE_STATUS）"
             echo "状态检查: systemctl status $SERVICE_NAME"
         else
             # 开发环境使用 nohup 启动
