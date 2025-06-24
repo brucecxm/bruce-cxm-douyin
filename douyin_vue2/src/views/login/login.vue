@@ -121,8 +121,6 @@ import {
   getEmailVerificationCodeService,
   getVerificationCodeService
 } from '../../api/user';
-import { useTokenStore } from '../../stores/token';
-import { useUserInfoStore } from '@/stores/userInfo';
 
 export default {
   name: 'Login',
@@ -253,13 +251,6 @@ export default {
         });
         return;
       }
-      // if (!this.verificationCode) {
-      //   this.$message({
-      //     message: '请输入验证码',
-      //     type: 'warning'
-      //   });
-      //   return;
-      // }
 
       console.log('验证手机号:', this.loginpojo);
 
@@ -270,19 +261,24 @@ export default {
           loginType: this.loginType,
           emailVerificationCode: this.emailVerificationCode
         });
+
         if (response.data.code === 1) {
           this.$message({
             message: response.data.msg || '登录失败',
             type: 'error'
           });
         } else {
-          const userInfoStore = useUserInfoStore();
-          userInfoStore.setUserInfo(response.data.data.userInfo);
+          // ✅ 使用 Vuex 设置 userInfo
+          this.$store.dispatch(
+            'userInfo/setUserInfo',
+            response.data.data.userInfo
+          );
 
           const token = response.data.data.token;
-          const usertoken = useTokenStore();
-          usertoken.setToken(token);
-          localStorage.setItem('token', token);
+          // ✅ 使用 Vuex 设置 token
+          this.$store.dispatch('token/setToken', token);
+
+          localStorage.setItem('token', token); // 如不再需要，也可去掉
           this.$router.push('/');
         }
       } catch (error) {
@@ -293,7 +289,6 @@ export default {
         });
       }
     },
-
     switchToPasswordLogin() {
       this.isPasswordLogin = true;
       this.loginType = 'email';

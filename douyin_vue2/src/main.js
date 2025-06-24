@@ -5,16 +5,14 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import InfiniteScroll from 'vue-infinite-scroll';
 import '@/assets/base.css';
-import { createPinia, PiniaVuePlugin } from 'pinia';
+
+import Vuex from 'vuex'; // 引入 Vuex
+
 import { Constant } from './constants/dict';
-import VueCompositionAPI from '@vue/composition-api';
-Vue.use(VueCompositionAPI);
+
+Vue.use(Vuex);
 Vue.use(InfiniteScroll);
 Vue.use(ElementUI);
-Vue.use(PiniaVuePlugin);
-
-const pinia = createPinia();
-Vue.use(pinia); // ✅ 必须这一步
 
 Vue.prototype.Constant = Constant;
 
@@ -26,8 +24,24 @@ if ('Notification' in window) {
 
 export const eventBus = new Vue();
 
+// 创建 Vuex store（这里先空，后面你填state/mutations等）
+const store = new Vuex.Store({
+  state: {
+    // 你的全局状态
+  },
+  mutations: {
+    // 你的同步修改
+  },
+  actions: {
+    // 异步操作
+  },
+  getters: {
+    // 计算属性
+  }
+});
+
 new Vue({
   router,
-  pinia,
+  store, // 挂载 Vuex store
   render: (h) => h(App)
 }).$mount('#app');

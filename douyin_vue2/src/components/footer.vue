@@ -35,9 +35,9 @@
     </div>
   </div>
 </template>
-
 <script>
-import { useTokenStore } from '../stores/token';
+import store from '../stores';
+
 export default {
   data() {
     return {
@@ -49,70 +49,31 @@ export default {
       this.selected = option;
       this.$emit('selection-changed', option); // 向父组件传递数据
     },
+    checkLoginAndGo(path) {
+      const token = store.state.token.token || localStorage.getItem('token');
+      if (!token) {
+        this.$router.push('/login');
+      } else {
+        this.$router.push(path);
+      }
+    },
     goLogin() {
-      //先判断一下有没有登录  如果没有登录 则跳转到登录界面  如果有登录  则跳转到对应界面
-      //先判断一下有没有登录  如果没有登录 则跳转到登录界面  如果有登录  则跳转到对应界面
-      const tokenStore = useTokenStore();
-      const token = tokenStore.token;
-      if (token === null || token === undefined || token === '') {
-        this.$router.push('/login');
-      } else {
-        this.$router.push('/me');
-      }
-
-      // Navigate to '/free-video' route
+      this.checkLoginAndGo('/me');
     },
-
     gome() {
-      //先判断一下有没有登录  如果没有登录 则跳转到登录界面  如果有登录  则跳转到对应界面
-      //先判断一下有没有登录  如果没有登录 则跳转到登录界面  如果有登录  则跳转到对应界面
-      const tokenStore = useTokenStore();
-      const token = tokenStore.token;
-      if (token === null || token === undefined || token === '') {
-        this.$router.push('/login');
-      } else {
-        this.$router.push('/me');
-      }
-
-      // Navigate to '/free-video' route
-    },
-    gohome() {
-      // Navigate to '/free-video' route
-      this.$router.push('/');
+      this.checkLoginAndGo('/me');
     },
     goshop() {
-      //先判断一下有没有登录  如果没有登录 则跳转到登录界面  如果有登录  则跳转到对应界面
-      //先判断一下有没有登录  如果没有登录 则跳转到登录界面  如果有登录  则跳转到对应界面
-      const tokenStore = useTokenStore();
-      const token = tokenStore.token;
-      if (token === null || token === undefined || token === '') {
-        this.$router.push('/login');
-      } else {
-        this.$router.push('/shop');
-      }
-      // Navigate to '/free-video' route
+      this.checkLoginAndGo('/shop');
     },
     goxiaoxi() {
-      //先判断一下有没有登录  如果没有登录 则跳转到登录界面  如果有登录  则跳转到对应界面
-      //先判断一下有没有登录  如果没有登录 则跳转到登录界面  如果有登录  则跳转到对应界面
-      const tokenStore = useTokenStore();
-      const token = tokenStore.token;
-      if (token === null || token === undefined || token === '') {
-        this.$router.push('/login');
-      } else {
-        this.$router.push('/xiaoxi');
-      }
+      this.checkLoginAndGo('/xiaoxi');
     },
     goshangchuan() {
-      //先判断一下有没有登录  如果没有登录 则跳转到登录界面  如果有登录  则跳转到对应界面
-      //先判断一下有没有登录  如果没有登录 则跳转到登录界面  如果有登录  则跳转到对应界面
-      const tokenStore = useTokenStore();
-      const token = tokenStore.token;
-      if (token === null || token === undefined || token === '') {
-        this.$router.push('/login');
-      } else {
-        this.$router.push('/shangchuan');
-      }
+      this.checkLoginAndGo('/shangchuan');
+    },
+    gohome() {
+      this.$router.push('/');
     }
   }
 };

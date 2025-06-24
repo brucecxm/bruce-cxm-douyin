@@ -60,10 +60,7 @@
     />
 
     <!-- 摄像头预览 & Canvas -->
-    <video
-ref="video"
-autoplay playsinline muted
-class="video-preview"></video>
+    <video ref="video" autoplay playsinline muted class="video-preview"></video>
     <canvas ref="canvas" style="display: none"></canvas>
 
     <!-- 拍照结果 -->
@@ -128,7 +125,7 @@ class="video-preview"></video>
 <script>
 import SlidePopup from '@/components/SlidePopup.vue';
 import FlexibleButtonPanel from '@/components/FlexibleButtonPanel.vue';
-import { useVideoStore } from '../../stores/uploadVideo';
+
 export default {
   name: 'CameraInterface',
   components: { SlidePopup, FlexibleButtonPanel },
@@ -339,17 +336,19 @@ export default {
       this.mediaRecorder.onstop = () => {
         const duration = Date.now() - this.recordingStart;
         const blob = new Blob(this.recordChunks, { type: 'video/mp4' });
+        const videoId = `video_${Date.now()}`;
 
-        // 存储视频到全局库
-        const videoStore = useVideoStore();
-        const videoId = `video_${Date.now()}`; // 生成唯一ID
-        videoStore.addVideo(videoId, blob, {
-          duration,
-          size: blob.size,
-          type: blob.type,
-          blob: blob
+        // 通过 Vuex action 保存视频
+        this.$store.dispatch('video/addVideo', {
+          videoId,
+          blob,
+          metadata: {
+            duration,
+            size: blob.size,
+            type: blob.type
+          }
         });
-        // 保存ID到本地状态，用于后续跳转
+
         this.currentVideoId = videoId;
         this.videoBlob = blob;
         this.videoURL = URL.createObjectURL(blob);

@@ -1,41 +1,38 @@
-// stores/token.js
-import { defineStore } from 'pinia';
-
-export const useTokenStore = defineStore({
-  id: 'token',
-  state: () => ({
-    token: localStorage.getItem('token') || '' // 从 localStorage 加载 token
-  }),
-  actions: {
-    setToken(newToken) {
-      this.token = newToken;
-      localStorage.setItem('token', newToken); // 同步到 localStorage
-    },
-    clearToken() {
-      this.token = '';
-      localStorage.removeItem('token'); // 清除 localStorage 中的 token
-    }
-  },
-  getters: {
-    getToken(state) {
-      return state.token;
-    }
-  }
+// store/modules/token.js
+const state = () => ({
+  token: localStorage.getItem('token') || ''
 });
-//
-// export const VideoIdStore = defineStore({
-//   id: "VideoId",
-//   state: () => ({
-//     videoId: "",
-//   }),
-//   actions: {
-//     setVideoId(newVideoId) {
-//       this.videoId = newVideoId;
-//     },
-//   },
-//   getters: {
-//     getVideoId(state) {
-//       return state.videoId;
-//     },
-//   },
-// });
+
+const getters = {
+  getToken(state) {
+    return state.token;
+  }
+};
+
+const mutations = {
+  SET_TOKEN(state, newToken) {
+    state.token = newToken;
+  },
+  CLEAR_TOKEN(state) {
+    state.token = '';
+  }
+};
+
+const actions = {
+  setToken({ commit }, newToken) {
+    commit('SET_TOKEN', newToken);
+    localStorage.setItem('token', newToken);
+  },
+  clearToken({ commit }) {
+    commit('CLEAR_TOKEN');
+    localStorage.removeItem('token');
+  }
+};
+
+export default {
+  namespaced: true,
+  state,
+  getters,
+  mutations,
+  actions
+};

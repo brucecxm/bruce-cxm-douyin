@@ -81,7 +81,6 @@
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 import axios from 'axios';
-import { useUserInfoStore } from '@/stores/userInfo';
 export default {
   data() {
     return {
@@ -108,19 +107,21 @@ export default {
     };
   },
   mounted() {
-    const userInfo = useUserInfoStore();
-    const userInfoMap = userInfo.userInfo;
+    // 从 Vuex 中获取 userInfo
+    const userInfoMap = this.$store.state.userInfo.userInfo;
     this.fromUser = userInfoMap.userId || '';
     this.toUser = this.$route.query.toUser || '';
 
     const socket = new SockJS('http://localhost:7426/ws');
     this.stomp = Stomp.over(socket);
+
     this.stomp.connect({}, () => {
       this.stomp.subscribe('/topic/transfer/' + this.fromUser, (msg) => {
         this.$message.success('转账成功: ' + msg.body);
       });
     });
   },
+
   methods: {
     openPasswordModal() {
       if (!this.amount || parseFloat(this.amount) <= 0) {

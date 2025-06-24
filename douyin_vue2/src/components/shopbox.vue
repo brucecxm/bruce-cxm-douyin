@@ -67,8 +67,8 @@
 <script>
 import { shoplist, searchForDish, liansearchForDish, getnav } from '@/api/shop';
 import { shopmenulist } from '@/api/menu';
+import store from '../stores';
 import { shopnavlist } from '@/api/menu';
-import { useTokenStore } from '@/stores/token';
 import footerVue from '@/components/footer.vue';
 import img1 from '@/assets/shop/menunav/1.png';
 import img2 from '@/assets/shop/menunav/2.png';
@@ -223,9 +223,12 @@ export default {
   },
   methods: {
     go(hrefurl) {
-      const usertoken = useTokenStore();
-      const id = usertoken.getToken;
-      this.$router.push({ path: `/${hrefurl}/${id}` });
+      const id = store.state.token.token || localStorage.getItem('token');
+      if (!id) {
+        this.$router.push('/login'); // 没登录跳登录页
+      } else {
+        this.$router.push({ path: `/${hrefurl}/${id}` });
+      }
     },
     handleFocus() {
       this.isFocused = true; // 输入框获得焦点

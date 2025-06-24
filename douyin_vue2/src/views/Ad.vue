@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { useAdStore } from '@/stores/adStore';
+import store from '../stores';
 
 export default {
   name: 'Ad',
@@ -41,9 +41,7 @@ export default {
       clearInterval(this.timer);
       this.isShow = false;
 
-      // 记录广告已看
-      const adStore = useAdStore();
-      adStore.markAdAsSeen();
+      store.dispatch('ad/markAdAsSeen');
 
       // 跳转首页
       setTimeout(() => {

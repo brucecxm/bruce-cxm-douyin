@@ -1,15 +1,29 @@
-// src/stores/userInfo.js
-import { defineStore } from 'pinia';
-export const useUserInfoStore = defineStore('userInfo', {
-  state: () => ({
-    userInfo: {} // 初始化为一个空对象
-  }),
-  actions: {
-    setUserInfo(info) {
-      this.userInfo = info; // 把 info 存进去
-    },
-    clearUserInfo() {
-      this.userInfo = {}; // 清空
-    }
-  }
+// store/modules/userInfo.js
+const state = () => ({
+  userInfo: {}
 });
+
+const mutations = {
+  SET_USER_INFO(state, info) {
+    state.userInfo = info;
+  },
+  CLEAR_USER_INFO(state) {
+    state.userInfo = {};
+  }
+};
+
+const actions = {
+  setUserInfo({ commit }, info) {
+    commit('SET_USER_INFO', info);
+  },
+  clearUserInfo({ commit }) {
+    commit('CLEAR_USER_INFO');
+  }
+};
+
+export default {
+  namespaced: true,
+  state,
+  mutations,
+  actions
+};

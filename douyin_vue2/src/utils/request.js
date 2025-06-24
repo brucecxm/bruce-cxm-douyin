@@ -1,6 +1,7 @@
 // axios-instance.js
 import axios from 'axios';
-import { useTokenStore } from '../stores/token';
+import store from '../stores'; // 引入 Vuex 实例
+
 // 定义公共的 baseURL
 const baseURL = '/api'; // 根据实际情况设置你的后端 API 地址
 
@@ -12,11 +13,9 @@ const instance = axios.create({
 // 添加请求拦截器
 instance.interceptors.request.use(
   (config) => {
-    const usertoken = useTokenStore();
-    const storeToken = usertoken.getToken;
+    // 从 Vuex 中获取 token
+    const storeToken = store.state.token.token;
     const localToken = localStorage.getItem('token');
-
-    // 优先使用 Pinia 中的 token，如果没有再用 localStorage
     const token = storeToken || localToken;
 
     if (token) {

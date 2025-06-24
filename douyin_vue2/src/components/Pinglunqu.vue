@@ -51,8 +51,6 @@
 </template>
 <script>
 import { getComment, addcomment } from '@/api/video';
-import { videoInfoStore } from '../stores/videoInfo';
-import { useUserInfoStore } from '@/stores/userInfo';
 export default {
   name: 'Pinglunqu',
   data() {
@@ -115,9 +113,10 @@ export default {
         });
     },
     submitComment() {
-      const userInfo = useUserInfoStore();
-      const userInfoMap = userInfo.userInfo;
+      const userInfoMap = this.$store.state.userInfo.userInfo; // 从 Vuex 获取用户信息
+
       if (this.newComment.trim() === '') return;
+
       const newCommentObj = {
         commentId: Date.now(),
         userId: userInfoMap.id,
@@ -126,17 +125,21 @@ export default {
         comment: this.newComment,
         likes: 0
       };
+
       if (!Array.isArray(this.commentsData)) {
         this.commentsData = [];
       }
+
       this.commentsData.unshift(newCommentObj);
       this.newComment = '';
-      //感觉下面这种格式没什么必要
+
+      // 构造评论参数（你也可以不使用 this.Constant，直接写 key）
       const params = {
-        [this.Constant.videoId]: parseInt(this.videoData.videoId, 10),
-        [this.Constant.userId]: newCommentObj.userId,
-        [this.Constant.fatherId]: this.fatherId
+        videoId: parseInt(this.videoData.videoId, 10),
+        userId: newCommentObj.userId,
+        fatherId: this.fatherId
       };
+
       addcomment(params)
         .then((res) => {
           console.log('评论发布成功:', res);
@@ -147,8 +150,7 @@ export default {
     }
   },
   mounted() {
-    const videoInfo = videoInfoStore();
-    this.videoData = videoInfo.getvideoInfo;
+    this.videoData = this.$store.getters['videoInfo/getVideoInfo'];
     this.getCommentInit();
     const container = this.$el.querySelector('.pinglunqu');
     container.addEventListener('scroll', this.onScroll);
