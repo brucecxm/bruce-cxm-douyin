@@ -61,3 +61,11 @@ eureka:
   client:
     service-url:
       defaultZone: http://127.0.0.1:10086/eureka  # Eureka 服务注册中心的地址
+
+
+minio:
+  accessKey: minio
+  secretKey: minio123
+  bucket: douyin
+  endpoint: http://127.0.0.1:9000
+  readPath: http://127.0.0.1:9000

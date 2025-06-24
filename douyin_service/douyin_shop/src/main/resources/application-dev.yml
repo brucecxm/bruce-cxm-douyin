@@ -43,3 +43,10 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:10086/eureka  # Eureka服务器地址
+
+minio:
+  accessKey: minio
+  secretKey: minio123
+  bucket: leadnews
+  endpoint: http://192.168.200.130:9000
+  readPath: http://192.168.200.130:9000
