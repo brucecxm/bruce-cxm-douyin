@@ -86,7 +86,6 @@
 <script>
 import axios from 'axios';
 import FlexibleButtonPanel from '@/components/FlexibleButtonPanel.vue';
-import { useVideoStore } from '../../stores/uploadVideo';
 export default {
   components: { FlexibleButtonPanel },
   data() {
@@ -138,32 +137,32 @@ export default {
     };
   },
   mounted() {
-    // 获取路由参数中的videoId
+    // 获取路由参数中的 videoId 和 videoThumbnail
     this.videoId = this.$route.query.video || '';
     this.videoThumbnail = this.$route.query.photo || '';
+
     if (this.videoThumbnail) {
       console.log('视频缩略图 URL:', this.videoThumbnail);
     } else {
-      const videoStore = useVideoStore();
       if (this.videoId) {
-        // 使用 store 的方法获取视频
-        this.videoData = videoStore.getVideo(this.videoId);
-        if (this.videoData) {
-          // 直接使用从store获取的URL，无需重新创建
-          this.videoURL = this.videoData.url;
+        // 通过 Vuex getter 获取视频数据
+        const videoData = this.$store.getters['video/getVideo'](this.videoId);
+        if (videoData) {
+          this.videoData = videoData;
+          this.videoURL = videoData.url; // 直接使用 URL，无需重新创建
           console.log('视频预览 URL:', this.videoURL);
 
-          // 可选：设置视频缩略图
+          // 可选：设置视频缩略图（如果路由里有 photo 参数）
           if (this.$route.query.photo) {
             this.videoThumbnail = this.$route.query.photo;
           }
         } else {
           console.error('找不到视频数据，ID:', this.videoId);
-          // 可以在这里添加错误处理逻辑，例如显示错误消息或重定向
+          // 这里可以添加错误处理逻辑，例如显示提示或跳转
         }
       } else {
         console.error('缺少视频ID参数');
-        // 可以在这里添加错误处理逻辑
+        // 这里也可以添加错误处理逻辑
       }
     }
   },

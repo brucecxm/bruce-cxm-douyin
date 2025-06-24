@@ -103,10 +103,10 @@ import { getButtonInfo } from '@/api/admin';
 import { shoplistPage } from '@/api/shop';
 import ScrollNav from '../../components/ScrollNav.vue';
 import GridDisplay from '@/components/GridDisplay.vue';
-import { useTokenStore } from '@/stores/token';
 import footerVue from '@/components/footer.vue';
 import RecommendList from '../../components/RecommendList.vue';
 import underLineTagsVue from '../../components/underLineTags.vue';
+import store from '../stores';
 export default {
   beforeDestroy() {
     // 移除事件监听
@@ -371,9 +371,13 @@ export default {
     },
 
     go(hrefurl) {
-      const usertoken = useTokenStore();
-      const id = usertoken.getToken;
-      this.$router.push({ path: `/${hrefurl}/${id}` });
+      const token = store.state.token.token || localStorage.getItem('token');
+      if (!token) {
+        this.$message.error('未登录，请先登录');
+        this.$router.push('/login');
+        return;
+      }
+      this.$router.push({ path: `/${hrefurl}/${token}` });
     },
     handleFocus() {
       this.isFocused = true; // 输入框获得焦点

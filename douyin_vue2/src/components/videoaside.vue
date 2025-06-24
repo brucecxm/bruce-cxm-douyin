@@ -54,10 +54,7 @@
 </template>
 
 <script>
-import { useTokenStore } from '../stores/token';
-import { videoInfoStore } from '../stores/videoInfo';
 import { like } from '@/api/video';
-import { Result } from 'element-ui';
 
 export default {
   props: {
@@ -74,7 +71,7 @@ export default {
       videoDateOne: {}
     };
   },
-  // inject: ['fromAside', 'sharedState'],
+  inject: ['fromAside', 'sharedState'],
   methods: {
     send() {
       // 直接调用祖先注入的函数进行传值
@@ -82,8 +79,7 @@ export default {
 
     showcomment() {
       this.fromAside(true);
-      const videoInfo = videoInfoStore();
-      videoInfo.setvideoInfo(this.videoDateOne);
+      this.$store.dispatch('videoInfo/setVideoInfo', this.videoDateOne);
     },
     toggleComment() {
       this.isCommentClicked = true; // 设置评论图标点击状态

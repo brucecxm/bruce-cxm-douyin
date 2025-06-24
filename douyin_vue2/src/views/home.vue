@@ -97,14 +97,6 @@ import SlidePopup from '@/components/SlidePopup.vue';
 import Danmu from '../components/Danmu.vue';
 import Vue from 'vue';
 export default {
-  // provide() {
-  //   // 提供一个回调函数给后代组件调用
-  //   return {
-  //     fromAside: this.handleAside,
-  //     sharedState: this.sharedState
-  //   };
-  // },
-
   data() {
     return {
       danmuText: '',

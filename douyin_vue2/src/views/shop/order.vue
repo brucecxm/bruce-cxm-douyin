@@ -107,7 +107,6 @@
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 import axios from 'axios';
-import { useUserInfoStore } from '@/stores/userInfo';
 export default {
   data() {
     return {
@@ -241,8 +240,7 @@ export default {
     }
   },
   mounted() {
-    const userInfo = useUserInfoStore();
-    const userInfoMap = userInfo.userInfo;
+    const userInfoMap = this.$store.state.userInfo.userInfo; // ✅ 从 Vuex 获取用户信息
     this.fromUser = userInfoMap.userId || '';
     this.toUser = this.$route.query.toUser || '';
 

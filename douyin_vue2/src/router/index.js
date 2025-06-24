@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import { useAdStore } from '@/stores/adStore';
 
 Vue.use(VueRouter);
 const router = new VueRouter({
@@ -215,13 +214,5 @@ const router = new VueRouter({
   ]
 });
 // 路由守卫（在 App 启动并注册 Pinia 后才能正常使用）
-router.beforeEach((to, from, next) => {
-  const adStore = useAdStore();
-
-  if (to.meta.isAd || adStore.hasSeenAd) {
-    return next();
-  }
-  next({ name: 'Ad' });
-});
 
 export default router;

@@ -7,17 +7,17 @@
         全部标为已读
       </button>
     </div>
-    
+
     <div class="socket-status" :class="socketStatus">
       {{ socketStatusText }}
     </div>
-    
+
     <div class="message-list">
-      <div 
-        v-for="message in messages" 
-        :key="message.id" 
+      <div
+        v-for="message in messages"
+        :key="message.id"
         class="message-item"
-        :class="{ 'unread': !message.read }"
+        :class="{ unread: !message.read }"
       >
         <div class="message-content">
           <h4>{{ message.title || '系统通知' }}</h4>
@@ -31,7 +31,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="empty-state" v-if="messages.length === 0">
       <p>暂无消息</p>
     </div>
@@ -39,36 +39,29 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'pinia';
-import { useMessageStore } from '@/stores/messageStore';
+import { mapState, mapActions } from 'vuex';
 
 export default {
   name: 'MessageCenter',
   computed: {
-    ...mapState(useMessageStore, [
-      'messages',
-      'unreadCount',
-      'socketStatus'
-    ]),
+    ...mapState('message', ['messages', 'unreadCount', 'socketStatus']),
     socketStatusText() {
       const statusMap = {
-        'closed': '已断开',
-        'connecting': '连接中...',
-        'open': '已连接'
+        closed: '已断开',
+        connecting: '连接中...',
+        open: '已连接'
       };
       return statusMap[this.socketStatus] || this.socketStatus;
     }
   },
   methods: {
-    ...mapActions(useMessageStore, [
-      'markAllAsRead'
+    ...mapActions('message', [
+      'markAllAsRead',
+      'initWebSocket',
+      'closeWebSocket'
     ]),
     markAsRead(messageId) {
-      const message = this.messages.find(msg => msg.id === messageId);
-      if (message) {
-        message.read = true;
-        this.unreadCount--;
-      }
+      this.$store.dispatch('message/markMessageAsRead', messageId);
     },
     formatTime(timestamp) {
       const date = new Date(timestamp);
@@ -77,13 +70,11 @@ export default {
   },
   created() {
     // 初始化WebSocket连接
-    const messageStore = useMessageStore();
-    messageStore.initWebSocket();
+    this.initWebSocket();
   },
   beforeDestroy() {
     // 组件销毁前关闭WebSocket连接
-    const messageStore = useMessageStore();
-    messageStore.closeWebSocket();
+    this.closeWebSocket();
   }
 };
 </script>
@@ -95,7 +86,7 @@ export default {
   padding: 20px;
   background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .message-header {
@@ -196,3 +187,4 @@ button {
   transition: background-color 0.3s;
   font-size: 12px;
 }
+</style>
