@@ -121,8 +121,17 @@ for index in "${selected_indexes[@]}"; do
             SERVICE_NAME="douyin-$jar_file"
             SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
 
-            # 根据选择配置自动拉取策略
+            # 日志目录（确保目录存在）
+            LOG_DIR="/var/log/douyin"
+            LOG_FILE="$LOG_DIR/$jar_file.log"
+
+            # 创建日志目录（如果不存在）
+            sudo mkdir -p "$LOG_DIR"
+            sudo chmod 755 "$LOG_DIR"
+
+            # 根据选择配置自动拉取策略和日志输出
             RESTART_CONFIG=""
+            LOG_CONFIG=""
             if [ "$AUTO_RESTART" = "yes" ]; then
                 RESTART_CONFIG="Restart=always\nRestartSec=3"
                 ENABLE_STATUS="启用"
@@ -130,6 +139,9 @@ for index in "${selected_indexes[@]}"; do
                 RESTART_CONFIG="Restart=no"
                 ENABLE_STATUS="禁用"
             fi
+
+            # 同时输出到systemd和文件
+            LOG_CONFIG="StandardOutput=append:$LOG_FILE\nStandardError=append:$LOG_FILE"
 
             echo "➡️ 配置 systemd 服务: $SERVICE_NAME (自动拉取: $ENABLE_STATUS)"
             sudo bash -c "cat > $SERVICE_FILE <<EOF
@@ -142,6 +154,7 @@ User=root
 WorkingDirectory=$(pwd)
 ExecStart=/usr/bin/java $JVM_OPTS -jar $jar_file --spring.profiles.active=$PROFILE
 $RESTART_CONFIG
+$LOG_CONFIG
 
 [Install]
 WantedBy=multi-user.target
@@ -153,6 +166,7 @@ EOF"
 
             echo "✅ $jar_file 已作为 systemd 服务启动（自动拉取: $ENABLE_STATUS）"
             echo "状态检查: systemctl status $SERVICE_NAME"
+            echo "日志查看: tail -f $LOG_FILE"
         else
             # 开发环境使用 nohup 启动
             nohup java $JVM_OPTS -jar "$jar_file" --spring.profiles.active="$PROFILE" > "$jar_file.log" 2>&1 &
@@ -164,10 +178,8 @@ EOF"
     fi
 done
 
-
-echo "==================== ✅ 后端部署完成 ($PROFILE) ===================="
-# 返回上级目录
 cd ..
+echo "==================== ✅ 后端部署完成 ($PROFILE) ===================="
 
 # 7. **进入 Vue 项目目录**
 cd douyin_vue2 || { echo "无法进入 Vue 项目文件夹"; exit 1; }
