@@ -7,7 +7,8 @@ import InfiniteScroll from 'vue-infinite-scroll';
 import '@/assets/base.css';
 import { createPinia, PiniaVuePlugin } from 'pinia';
 import { Constant } from './constants/dict';
-
+import VueCompositionAPI from '@vue/composition-api';
+Vue.use(VueCompositionAPI);
 Vue.use(InfiniteScroll);
 Vue.use(ElementUI);
 Vue.use(PiniaVuePlugin);
