@@ -29,7 +29,7 @@ case "$env_choice" in
         ;;
     2)
         PROFILE="prod"
-        JVM_OPTS="-Xms1024m -Xmx2048m -XX:+UseG1GC"
+        JVM_OPTS="-Xms256m -Xmx512m -XX:+UseG1GC"
 
         # 新增：生产环境是否启用自动拉取
         echo "请选择生产环境自动拉取策略："
