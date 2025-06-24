@@ -15,19 +15,43 @@ else
     echo "❌ git 未安装，跳过拉取代码步骤"
 fi
 
-# 2. 安装基础模块
+# 2. 选择部署环境
+echo "请选择部署环境："
+echo "[1] 开发环境 (dev)"
+echo "[2] 生产环境 (prod)"
+read -p "请输入环境编号 [1-2]: " env_choice
+
+case "$env_choice" in
+    1)
+        PROFILE="dev"
+        JVM_OPTS="-Xms256m -Xmx512m"
+        ;;
+    2)
+        PROFILE="prod"
+        JVM_OPTS="-Xms1024m -Xmx2048m -XX:+UseG1GC"  # 生产环境优化JVM参数
+        ;;
+    *)
+        echo "❌ 无效选择"
+        exit 1
+        ;;
+esac
+
+echo "🚀 部署环境：$PROFILE"
+echo "⚙️ JVM 参数：$JVM_OPTS"
+
+# 3. 安装基础模块
 echo "➡️ 安装基础模块 douyin_basic ..."
 cd douyin_basic || { echo "❌ 进入 douyin_basic 失败"; exit 1; }
 mvn install || { echo "❌ douyin_basic 安装失败"; exit 1; }
 echo "✅ douyin_basic 安装成功"
 cd ..
 
-# 3. 安装整个项目
+# 4. 安装整个项目
 echo "➡️ 执行 mvn install ..."
 mvn install || { echo "❌ mvn install 执行失败"; exit 1; }
 echo "✅ mvn install 成功"
 
-# 4. 启动 Redis
+# 5. 启动 Redis
 echo "➡️ 检查 Redis 是否运行中..."
 if command -v redis-cli &> /dev/null; then
     if redis-cli ping | grep -q "PONG"; then
@@ -47,7 +71,7 @@ else
     exit 1
 fi
 
-# 5. 启动 JAR 服务
+# 6. 启动 JAR 服务
 cd jar || { echo "❌ 进入 jar 目录失败"; exit 1; }
 
 echo "➡️ 杀死已有 jar 进程..."
@@ -69,13 +93,46 @@ read -p "请输入要启动的 JAR 文件编号（空格分隔）: " -a selected
 for index in "${selected_indexes[@]}"; do
     if [[ "$index" =~ ^[0-9]+$ ]] && [ "$index" -ge 0 ] && [ "$index" -lt "${#jar_files[@]}" ]; then
         jar_file="${jar_files[$index]}"
-        echo "🚀 启动 $jar_file ..."
-        nohup java -Xms256m -Xmx512m -jar "$jar_file" --spring.profiles.active=dev > "$jar_file.log" 2>&1 &
-        echo "✅ $jar_file 启动成功"
+        echo "🚀 启动 $jar_file ($PROFILE)..."
+
+        if [ "$PROFILE" = "prod" ]; then
+            # 生产环境使用 systemd 管理服务
+            SERVICE_NAME="douyin-$jar_file"
+            SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
+
+            echo "➡️ 配置 systemd 服务: $SERVICE_NAME"
+            sudo bash -c "cat > $SERVICE_FILE <<EOF
+[Unit]
+Description=Douyin Service: $jar_file
+After=network.target redis.service
+
+[Service]
+User=root
+WorkingDirectory=$(pwd)
+ExecStart=/usr/bin/java $JVM_OPTS -jar $jar_file --spring.profiles.active=$PROFILE
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOF"
+
+            sudo systemctl daemon-reload
+            sudo systemctl enable "$SERVICE_NAME"
+            sudo systemctl restart "$SERVICE_NAME"
+
+            echo "✅ $jar_file 已作为 systemd 服务启动"
+            echo "状态检查: systemctl status $SERVICE_NAME"
+        else
+            # 开发环境使用 nohup 启动
+            nohup java $JVM_OPTS -jar "$jar_file" --spring.profiles.active="$PROFILE" > "$jar_file.log" 2>&1 &
+            echo "✅ $jar_file 启动成功"
+            echo "日志查看: tail -f $jar_file.log"
+        fi
     else
         echo "❌ 无效编号: $index"
     fi
 done
 
 cd ..
-echo "==================== ✅ 后端部署完成 ===================="
+echo "==================== ✅ 后端部署完成 ($PROFILE) ===================="
