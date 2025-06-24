@@ -1,6 +1,6 @@
 // axios-instance.js
 import axios from 'axios';
-import store from '../stores'; // 引入 Vuex 实例
+import store from '@/stores';
 
 // 定义公共的 baseURL
 const baseURL = '/api'; // 根据实际情况设置你的后端 API 地址

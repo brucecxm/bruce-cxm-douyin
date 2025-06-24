@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import store from '../stores';
+import store from '@/stores';
 
 export default {
   name: 'Ad',

@@ -106,7 +106,7 @@ import GridDisplay from '@/components/GridDisplay.vue';
 import footerVue from '@/components/footer.vue';
 import RecommendList from '../../components/RecommendList.vue';
 import underLineTagsVue from '../../components/underLineTags.vue';
-import store from '../stores';
+import store from '@/stores';
 export default {
   beforeDestroy() {
     // 移除事件监听
