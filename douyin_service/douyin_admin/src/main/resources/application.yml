@@ -2,7 +2,7 @@ server:
   port: 7422
 spring:
   profiles:
-    active: prod  # 生产环境
+    active: dev  # 生产环境
 
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml

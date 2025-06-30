@@ -22,7 +22,7 @@ spring:
         min-idle: 0
 
   rabbitmq:
-    host: 192.168.200.130  # RabbitMQ 服务器的主机地址
+    host: 127.0.0.1  # RabbitMQ 服务器的主机地址
     port: 5672  # RabbitMQ 服务器的端口号
     username: itcast  # RabbitMQ 的用户名
     password: 123321  # RabbitMQ 的密码

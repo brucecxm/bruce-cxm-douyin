@@ -107,7 +107,7 @@ http {
     keepalive_timeout  65;
 
     server {
-        listen       8011;
+        listen       80;
         server_name  localhost;
 
         # Serve static files from the dist folder
