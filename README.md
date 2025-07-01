@@ -20,6 +20,236 @@
 
 =======================================================================================================================================
 
+
+
+
+
+通过OpenSSL本地生成证书，结合Nginx，使得用户可以通过HTTPS协议访问，因为浏览器的视频拍摄只有通过https协议访问才能打开摄像头
+
+通过Nginx的配置 用户可以通过https或者http协议访问
+
+```
+#首先确保已安装 Nginx 和 OpenSSL：
+sudo yum install -y nginx openssl
+sudo systemctl start nginx
+sudo systemctl enable nginx
+```
+
+```
+#使用 OpenSSL 生成自签名证书和私钥：
+
+# 创建证书目录（如果不存在）
+sudo mkdir -p /etc/ssl/private
+sudo chmod 700 /etc/ssl/private
+
+# 创建证书配置文件
+cat > cert_config.cnf <<EOF
+[req]
+default_bits = 2048
+prompt = no
+default_md = sha256
+req_extensions = req_ext
+distinguished_name = dn
+
+[dn]
+C = CN
+ST = Shanghai
+L = Shanghai
+O = Example
+CN = localhost
+
+[req_ext]
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = localhost
+IP.1 = 0.0.0.0  # 允许所有IPv4地址访问
+IP.2 = ::        # 允许所有IPv6地址访问
+# 如需添加特定IP，可继续添加：
+# IP.3 = 192.168.1.100
+EOF
+
+# 生成自签名证书（使用配置文件）
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout /etc/ssl/private/nginx-selfsigned.key \
+    -out /etc/ssl/certs/nginx-selfsigned.crt \
+    -config cert_config.cnf
+
+# 生成DH参数（不要中断这个命令，等待完成）
+sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
+```
+
+```
+#增强 SSL 安全性：
+
+sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
+```
+
+
+
+```
+#修改nginx配置
+
+
+#nginx配置
+
+worker_processes 1;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+    keepalive_timeout  65;
+    
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+    # HTTPS服务器配置
+    server {
+        listen       443 ssl;
+        server_name  1.94.131.16;
+        
+        http2 on;
+        
+        ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+        ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+        ssl_dhparam /etc/ssl/certs/dhparam.pem;
+        
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_prefer_server_ciphers on;
+        ssl_ciphers "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384";
+        ssl_ecdh_curve secp384r1;
+        ssl_session_timeout 10m;
+        ssl_session_cache shared:SSL:10m;
+        ssl_session_tickets off;
+        
+        # 禁用OCSP stapling相关设置（自签名证书不需要）
+        # ssl_stapling on;
+        # ssl_stapling_verify on;
+        # resolver 8.8.8.8 8.8.4.4 valid=300s;
+        # resolver_timeout 5s;
+        
+        add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+        add_header X-Frame-Options DENY;
+        add_header X-Content-Type-Options nosniff;
+        add_header X-XSS-Protection "1; mode=block";
+
+        # 其他配置保持不变...
+        location / {
+            root   /usr/share/nginx/html/dist;
+            index  index.html index.htm;
+            try_files $uri $uri/ /index.html;
+        }
+
+        location /api/ {
+            rewrite ^/api/(.*)$ /$1 break;
+            proxy_pass http://localhost:9430;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /minio/ {
+            rewrite ^/minio(/.*)$ $1 break;
+            proxy_pass http://localhost:9000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";
+            chunked_transfer_encoding off;
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /usr/share/nginx/html;
+        }
+    }
+
+    # HTTP服务器配置（移除了重定向）
+    server {
+        listen       80;
+        server_name  1.94.131.16;
+
+        # 与HTTPS相同的内容配置
+        location / {
+            root   /usr/share/nginx/html/dist;
+            index  index.html index.htm;
+            try_files $uri $uri/ /index.html;
+        }
+
+        location /api/ {
+            rewrite ^/api/(.*)$ /$1 break;
+            proxy_pass http://localhost:9430;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /minio/ {
+            rewrite ^/minio(/.*)$ $1 break;
+            proxy_pass http://localhost:9000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";
+            chunked_transfer_encoding off;
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /usr/share/nginx/html;
+        }
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 一些界面（全都是本人完成）
 
 目前界面的数据来自与后台 没有整理数据 因此界面不是很好看
