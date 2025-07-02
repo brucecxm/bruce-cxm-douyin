@@ -4,7 +4,6 @@ server:
 
 spring:
   profiles:
-    active: dev  # 生产环境
 
   mvc:
     static-path-pattern: /files/**

@@ -4,7 +4,6 @@
 
 spring:
   profiles:
-    active: prod  # 生产环境
 
 
 
