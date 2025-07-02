@@ -59,7 +59,7 @@
 
       <!-- 统一弹窗 -->
       <SlidePopup
-        v-if="sharedState.commentVisible"
+        v-if="false"
         :direction="'bottom'"
         width="100vw"
         height="30vh"
@@ -94,15 +94,14 @@ import videoboxVue from '@/components/videobox.vue';
 import Pinglunqu from '@/components/Pinglunqu.vue';
 import SlidePopup from '@/components/SlidePopup.vue';
 import Danmu from '@/components/Danmu.vue';
-import Vue from 'vue';
 export default {
-  provide() {
-    // 提供一个回调函数给后代组件调用
-    return {
-      fromAside: this.handleAside,
-      sharedState: this.sharedState
-    };
-  },
+  // provide() {
+  //   // 提供一个回调函数给后代组件调用
+  //   return {
+  //     fromAside: this.handleAside,
+  //     sharedState: this.sharedState
+  //   };
+  // },
 
   data() {
     return {
@@ -242,9 +241,9 @@ export default {
             'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
         }
       ],
-      sharedState: Vue.observable({
-        commentVisible: false
-      }),
+      // sharedState: Vue.observable({
+      //   commentVisible: false
+      // }),
       isAnyPopupVisible: false, // 是否有弹窗显示的标志
       message: false,
       isDragging: false, // 是否正在拖动的标志
@@ -354,7 +353,7 @@ export default {
     },
     closeAllPopups() {
       // 关闭所有弹窗
-      this.sharedState.commentVisible = false;
+      // this.sharedState.commentVisible = false;
     },
     sendDanmu() {
       if (this.danmuText.trim()) {
@@ -363,13 +362,14 @@ export default {
         this.danmuText = ''; // 清空输入框
       }
     },
-    handleAside(msg) {
-      // 处理来自子组件的消息
-      console.log('父组件收到的消息：', msg);
-      this.message = msg;
-    },
+    // handleAside(msg) {
+    //   // 处理来自子组件的消息
+    //   console.log('父组件收到的消息：', msg);
+    //   this.message = msg;
+    // },
 
     handleChildMessage(msg) {
+      debugger;
       console.log('父组件收到的消息：', msg);
       this.message = msg;
     },

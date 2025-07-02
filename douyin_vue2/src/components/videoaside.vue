@@ -71,14 +71,16 @@ export default {
       videoDateOne: {}
     };
   },
-  inject: ['fromAside', 'sharedState'],
+  // inject: ['fromAside', 'sharedState'],
   methods: {
     send() {
       // 直接调用祖先注入的函数进行传值
     },
 
     showcomment() {
-      this.fromAside(true);
+      // this.fromAside(true);把这换成用vueX
+      // this.fromAside(true);把这换成用vueX
+      // this.fromAside(true);把这换成用vueX
       this.$store.dispatch('videoInfo/setVideoInfo', this.videoDateOne);
     },
     toggleComment() {
@@ -115,15 +117,13 @@ export default {
         });
     },
 
-    updateContentone() {
-      this.sharedState.commentVisible = true;
-    },
     toggleCollect() {
       this.isCollected = !this.isCollected; // 切换收藏状态
       this.behaviour('collect');
     },
     toggleShare() {
-      this.sharedState.commentVisible = true;
+      // this.sharedState.commentVisible = true; 把这换成vuex
+      // this.sharedState.commentVisible = true; 把这换成vuex
       this.isShareClicked = true; // 设置分享图标点击状态
       setTimeout(() => {
         this.isShareClicked = false; // 0.5秒后恢复状态
