@@ -321,13 +321,13 @@ return one;
 
     @GetMapping("/auth")
     public Map<String, Object> getAuth(
-            @RequestParam(required = false) Integer userid,
+            @RequestParam(required = false) Long userid,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
         Object UserIdObj = StpUtil.getLoginId();
         Long loginUserId = UserIdObj != null ? Long.parseLong(UserIdObj.toString()) : 0L;
         if (userid == null) {
-            userid = loginUserId.intValue();  // 使用当前登录用户ID
+            userid = loginUserId;  // 使用当前登录用户ID
         }
         Map<String, Object> result = new HashMap<>();
         // 查询用户信息

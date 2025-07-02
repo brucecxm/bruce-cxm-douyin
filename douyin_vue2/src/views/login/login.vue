@@ -261,6 +261,7 @@ export default {
           loginType: this.loginType,
           emailVerificationCode: this.emailVerificationCode
         });
+        debugger;
 
         if (response.data.code === 1) {
           this.$message({
@@ -268,15 +269,16 @@ export default {
             type: 'error'
           });
         } else {
+          debugger;
           // ✅ 使用 Vuex 设置 userInfo
-          this.$store.dispatch(
-            'userInfo/setUserInfo',
+          this.$store.commit(
+            'userInfo/SET_USER_INFO',
             response.data.data.userInfo
           );
 
           const token = response.data.data.token;
           // ✅ 使用 Vuex 设置 token
-          this.$store.dispatch('token/setToken', token);
+          this.$store.commit('token/SET_TOKEN', token);
 
           localStorage.setItem('token', token); // 如不再需要，也可去掉
           this.$router.push('/');
