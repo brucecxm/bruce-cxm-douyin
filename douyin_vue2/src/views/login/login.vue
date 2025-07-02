@@ -269,16 +269,23 @@ export default {
             type: 'error'
           });
         } else {
+          this.$store
+            .dispatch('userInfo/setUserInfo', response.data.data.userInfo)
+            .then(() => {
+              debugger;
+              console.log(
+                '存入后的 userInfo:',
+                this.$store.state.userInfo.userInfo
+              );
+            });
           debugger;
-          // ✅ 使用 Vuex 设置 userInfo
-          this.$store.commit(
-            'userInfo/SET_USER_INFO',
-            response.data.data.userInfo
+          console.log(
+            '存入后的 userInfo:',
+            this.$store.state.userInfo.userInfo
           );
-
           const token = response.data.data.token;
           // ✅ 使用 Vuex 设置 token
-          this.$store.commit('token/SET_TOKEN', token);
+          this.$store.dispatch('token/setToken', token);
 
           localStorage.setItem('token', token); // 如不再需要，也可去掉
           this.$router.push('/');

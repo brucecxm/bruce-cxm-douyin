@@ -12,8 +12,6 @@
 </template>
 
 <script>
-import store from '@/stores';
-
 export default {
   name: 'Ad',
   data() {
@@ -41,7 +39,7 @@ export default {
       clearInterval(this.timer);
       this.isShow = false;
 
-      store.dispatch('ad/markAdAsSeen');
+      this.$store.dispatch('ad/markAdAsSeen');
 
       // 跳转首页
       setTimeout(() => {
