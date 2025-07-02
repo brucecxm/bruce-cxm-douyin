@@ -1,5 +1,20 @@
 #!/bin/bash
 
+# 1. 获取最新代码
+if command -v git &> /dev/null; then
+    echo "正在获取最新代码..."
+    git reset --hard HEAD
+    git clean -fd
+    git fetch origin
+    git reset --hard origin/main
+    echo "✅ 获取代码成功"
+else
+    echo "❌ git 未安装，跳过拉取代码步骤"
+fi
+
+
+
+
 set -e
 echo "==================== 开始执行前端部署脚本 ===================="
 
