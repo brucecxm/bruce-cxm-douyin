@@ -3,19 +3,13 @@
 set -e
 echo "==================== 开始执行后端部署脚本 ===================="
 
-# 1. 获取最新代码
-if command -v git &> /dev/null; then
-    echo "正在获取最新代码..."
-    git reset --hard HEAD
-    git clean -fd
-    git fetch origin
-    git reset --hard origin/main
-    echo "✅ 获取代码成功"
-else
-    echo "❌ git 未安装，跳过拉取代码步骤"
+# 0. 检查 git 是否安装
+if ! command -v git &> /dev/null; then
+    echo "❌ git 未安装，无法拉取代码，退出"
+    exit 1
 fi
 
-# 2. 选择部署环境
+# 1. 选择部署环境
 echo "请选择部署环境："
 echo "[1] 开发环境 (dev)"
 echo "[2] 生产环境 (prod)"
@@ -24,11 +18,13 @@ read -p "请输入环境编号 [1-2]: " env_choice
 case "$env_choice" in
     1)
         PROFILE="dev"
+        BRANCH="dev"
         JVM_OPTS="-Xms256m -Xmx512m"
         AUTO_RESTART="no"  # 开发环境默认不自动重启
         ;;
     2)
         PROFILE="prod"
+        BRANCH="prod"
         JVM_OPTS="-Xms256m -Xmx512m -XX:+UseG1GC"
 
         # 新增：生产环境是否启用自动拉取
@@ -57,8 +53,17 @@ case "$env_choice" in
 esac
 
 echo "🚀 部署环境：$PROFILE"
+echo "🌿 拉取分支：$BRANCH"
 echo "⚙️ JVM 参数：$JVM_OPTS"
 echo "🔄 自动拉取：$(if [ "$AUTO_RESTART" = "yes" ]; then echo "启用"; else echo "禁用"; fi)"
+
+# 2. 拉取指定分支的最新代码
+echo "正在拉取远程分支 $BRANCH ..."
+git reset --hard HEAD
+git clean -fd
+git fetch origin
+git reset --hard "origin/$BRANCH"
+echo "✅ 拉取并切换到 $BRANCH 分支完成"
 
 # 3. 安装基础模块
 echo "➡️ 安装基础模块 douyin_basic ..."
@@ -114,24 +119,18 @@ read -p "请输入要启动的 JAR 文件编号（空格分隔）: " -a selected
 for index in "${selected_indexes[@]}"; do
     if [[ "$index" =~ ^[0-9]+$ ]] && [ "$index" -ge 0 ] && [ "$index" -lt "${#jar_files[@]}" ]; then
         jar_file="${jar_files[$index]}"
-        echo "🚀 启动 $jar_file ($PROFILE)..."
+        echo "🚀 启动 $jar_file ($PROFILE:$BRANCH)..."
 
         if [ "$PROFILE" = "prod" ]; then
-            # 生产环境使用 systemd 管理服务
             SERVICE_NAME="douyin-$jar_file"
             SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
 
-            # 日志目录（确保目录存在）
             LOG_DIR="/var/log/douyin"
             LOG_FILE="$LOG_DIR/$jar_file.log"
 
-            # 创建日志目录（如果不存在）
             sudo mkdir -p "$LOG_DIR"
             sudo chmod 755 "$LOG_DIR"
 
-            # 根据选择配置自动拉取策略和日志输出
-            RESTART_CONFIG=""
-            LOG_CONFIG=""
             if [ "$AUTO_RESTART" = "yes" ]; then
                 RESTART_CONFIG="Restart=always\nRestartSec=3"
                 ENABLE_STATUS="启用"
@@ -140,7 +139,6 @@ for index in "${selected_indexes[@]}"; do
                 ENABLE_STATUS="禁用"
             fi
 
-            # 同时输出到systemd和文件
             LOG_CONFIG="StandardOutput=append:$LOG_FILE\nStandardError=append:$LOG_FILE"
 
             echo "➡️ 配置 systemd 服务: $SERVICE_NAME (自动拉取: $ENABLE_STATUS)"
@@ -168,7 +166,6 @@ EOF"
             echo "状态检查: systemctl status $SERVICE_NAME"
             echo "日志查看: tail -f $LOG_FILE"
         else
-            # 开发环境使用 nohup 启动
             nohup java $JVM_OPTS -jar "$jar_file" --spring.profiles.active="$PROFILE" > "$jar_file.log" 2>&1 &
             echo "✅ $jar_file 启动成功"
             echo "日志查看: tail -f $jar_file.log"
@@ -179,4 +176,4 @@ EOF"
 done
 
 cd ..
-echo "==================== ✅ 后端部署完成 ($PROFILE) ===================="
+echo "==================== ✅ 后端部署完成 ($PROFILE:$BRANCH) ===================="
