@@ -97,12 +97,7 @@
 
 <script>
 import footerVue from '@/components/footer.vue';
-import {
-  userLoginService,
-  userInfoService,
-  userRegisterService,
-  getVerificationCodeService
-} from '@/api/user';
+import { userInfoService } from '@/api/user';
 
 export default {
   components: {
