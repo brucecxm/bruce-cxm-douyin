@@ -26,6 +26,7 @@ export const userLoginService = (loginData) => {
   return request.post('/user/doLogin', params);
 };
 
+//获取用户登录状态
 export const userInfoService = () => {
   return request.get('/user/userInfo');
 };

@@ -66,9 +66,6 @@ public class UserController extends ApiController {
     private SaltService saltService;
 
     @Autowired
-    private RabbitTemplate rabbitTemplate;
-
-    @Autowired
     private UserService userService;
 
     @Autowired
@@ -99,6 +96,49 @@ public class UserController extends ApiController {
     public UserController() {
         // 创建一个固定大小的线程池
         this.executorService = Executors.newFixedThreadPool(10);
+    }
+
+    @RequestMapping("logout")
+    public void handleLogoutAction(String action, Object param) {
+        if ("logout".equals(action)) {
+            // 强制指定账号注销下线，参数应为用户ID（例如：10001）
+            if (param instanceof Integer) {
+                StpUtil.logout((Integer) param);
+            }
+        } else if ("logoutByDevice".equals(action)) {
+            // 强制指定账号在指定端注销下线，参数为 Object[] 数组：[用户ID, 端]
+            if (param instanceof Object[] && ((Object[]) param).length == 2) {
+                Object[] params = (Object[]) param;
+                if (params[0] instanceof Integer && params[1] instanceof String) {
+                    StpUtil.logout((Integer) params[0], (String) params[1]);
+                }
+            }
+        } else if ("logoutByToken".equals(action)) {
+            // 强制指定 Token 注销下线，参数为 Token 字符串
+            if (param instanceof String) {
+                StpUtil.logoutByTokenValue((String) param);
+            }
+        } else if ("kickout".equals(action)) {
+            // 将指定账号踢下线，参数应为用户ID
+            if (param instanceof Integer) {
+                StpUtil.kickout((Integer) param);
+            }
+        } else if ("kickoutByDevice".equals(action)) {
+            // 将指定账号在指定端踢下线，参数为 Object[] 数组：[用户ID, 端]
+            if (param instanceof Object[] && ((Object[]) param).length == 2) {
+                Object[] params = (Object[]) param;
+                if (params[0] instanceof Integer && params[1] instanceof String) {
+                    StpUtil.kickout((Integer) params[0], (String) params[1]);
+                }
+            }
+        } else if ("kickoutByToken".equals(action)) {
+            // 将指定 Token 踢下线，参数为 Token 字符串
+            if (param instanceof String) {
+                StpUtil.kickoutByTokenValue((String) param);
+            }
+        } else {
+            System.out.println("无效的操作: " + action);
+        }
     }
 
     // 生成一个随机盐值
@@ -293,6 +333,15 @@ public class UserController extends ApiController {
         out.close();
     }
 
+
+    //*******************sa-token***********************
+
+
+
+
+
+
+
     @PostMapping("/register")
     @Transactional
     public Result register(String username, String password) throws NoSuchAlgorithmException, InvalidKeySpecException, JsonProcessingException {
@@ -320,6 +369,7 @@ public class UserController extends ApiController {
             user.setId(userid);
             user.setNickname(Constant.Chinese.NEW_USER + idService.SnowflakeGen());
             userService.save(user);
+            LambdaQueryWrapper queryWrapper1 = new LambdaQueryWrapper<>();
             queryWrapper.eq(User::getUsername, username); // 等价于 SQL 中的 WHERE username = ?
             User userResult = userService.getOne(queryWrapper);
             saltService.save(saltone);
@@ -327,6 +377,69 @@ public class UserController extends ApiController {
             ObjectMapper objectMapper = new ObjectMapper();
             userStr = objectMapper.writeValueAsString(userResult);
             return Result.success(userStr);
+    }
+
+    // 哈希密码
+    public static String hashPassword(String password) throws Exception {
+        byte[] salt = new byte[16];
+        new SecureRandom().nextBytes(salt);
+        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 10000, 256);
+        SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        byte[] hash = skf.generateSecret(spec).getEncoded();
+        return Base64.getEncoder().encodeToString(hash) + ":" + Base64.getEncoder().encodeToString(salt); // 返回盐值和哈希值
+    }
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    // 查询登录状态，浏览器访问： http://localhost:8081/user/isLogin
+    @RequestMapping("isLogin")
+    public Result isLogin() {
+        // 获取：当前账号所拥有的权限集合
+        List<String> permission = StpUtil.getPermissionList();
+        for (String permissiontemp : permission
+        ) {
+            if (permissiontemp.equals("user.get")
+            ) {
+// 判断：当前账号是否拥有指定角色, 返回 true 或 false
+                if (StpUtil.hasRole("super-admin")) {
+// 在登录时缓存 user 对象
+                    Object user1 = StpUtil.getSession().get("user");
+                    // 然后我们就可以在任意处使用这个 user 对象
+// 获取当前 Token 的 Token-Session 对象
+                    SaSession tokenSession = StpUtil.getTokenSession();
+                    String data = stringRedisTemplate.opsForValue().get("LOGIN_TYPE:PASSWORD");
+                    System.out.println("Sa-Token Data: " + data);
+                    // 封禁指定账号
+                    // 先踢下线
+                    StpUtil.kickout(10001);
+                    StpUtil.disable(10001, 86400);
+                    return Result.success("当前会话是否登录：" + StpUtil.isLogin());
+                }
+            }
+        }
+        return Result.error("无权查看");
+    }
+
+    //生成四位的验证吗
+    @GetMapping("/getYanzheng")
+    public Result<String> getYanzheng() {
+        // 生成四位随机验证码
+        String verificationCode = generateRandomCode(4);
+        // 将验证码存储到 Redis 中，设置过期时间为5分钟（可根据需求调整）
+        stringRedisTemplate.opsForValue().set("yancode", verificationCode, 5, TimeUnit.MINUTES);
+        rabbitTemplate.convertAndSend("YanZhengQueue", verificationCode);
+        // 返回验证码
+        return Result.success(verificationCode);
+    }
+
+    private String generateRandomCode(int length) {
+        Random random = new Random();
+        StringBuilder code = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            code.append(random.nextInt(10)); // 生成0-9之间的随机数字
+        }
+        return code.toString();
     }
 
     @GetMapping("/userInfo")
@@ -340,9 +453,11 @@ public class UserController extends ApiController {
         LambdaQueryWrapper<Video> queryWrapperV = new LambdaQueryWrapper<>();
         queryWrapperV.eq(Video::getUserId, userId);
         List<Video> videoList = videoService.list(queryWrapperV);
+// 使用 BeanUtils 复制相同属性
         BeanUtils.copyProperties(user, meInfo);
         meInfo.setVideoList(videoList);
         String useridStr = String.valueOf(userId);  // 将 user 对象转换为 JSON 字符串
+//        List<Video> videoList = videoService.getVideosByUserId(user.getId());
         try {
             String userJson = objectMapper.writeValueAsString(user);
             String key = useridStr + "_user_info";
@@ -352,4 +467,5 @@ public class UserController extends ApiController {
         }
         return meInfo;
     }
+
 }
