@@ -114,12 +114,10 @@ export default {
       this.activeTabIndex = index;
     },
     fetchItemDetails(page) {
-      debugger;
       if (this.loading || this.noMoreData) return;
       this.loading = true;
       getUserInfo(null, page, this.pageSize)
         .then((res) => {
-          debugger;
           const videos = res.data.videobox || [];
           const total = res.data.total || 0;
           // 追加视频数据

@@ -145,7 +145,6 @@ export default {
       console.log('视频缩略图 URL:', this.videoThumbnail);
     } else {
       if (this.videoId) {
-        debugger;
         // 通过 Vuex getter 获取视频数据
         const videoData = this.$store.getters['video/getVideo'](this.videoId);
         if (videoData) {
@@ -194,7 +193,6 @@ export default {
       console.log('进入高级设置');
     },
     async publishPost() {
-      debugger;
       if (this.loading) return;
       if (!this.title) return console.log('请输入想法内容');
       if (!this.videoThumbnail && !this.videoData)

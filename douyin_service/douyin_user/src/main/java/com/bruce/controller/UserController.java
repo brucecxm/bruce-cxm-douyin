@@ -164,56 +164,46 @@ public class UserController extends ApiController {
             // 返回Base64编码的加密密码
             return Base64.getEncoder().encodeToString(secondHash);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Hashing algorithm not found", e);
+            throw new MyCustomException(400, Constant.Error.HASH_TRANSFORM_ERROR);
         }
     }
 
     @PostMapping("/doLogin")
     // 测试登录，浏览器访问： http://localhost:8081/user/doLogin?username=zhang&password=123456
     public Result doLogin(@RequestParam Map<String, String> params) {
-        String username = params.get("username");
-        String password = params.get("password");
-        String emailVerificationCode = params.get("emailVerificationCode");
-        // 使用 QueryWrapper 构建查询条件
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("username", username);
-        System.out.println();
+        String userName = params.get(Constant.User.USER_NAME);
+        String password = params.get(Constant.User.PASSWORD);
+        String emailVerificationCode = params.get(Constant.User.EMAIL_VERIFICATION_CODE);
         // 查询符合条件的单条记录
-        User user = userService.getOne(queryWrapper);
-        if (user == null) {
-            return Result.error("请核对用户名是否正确");
-        }
+        User user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername,userName));
+        if (user == null)
+            return Result.error(Constant.Error.USER_INVALID);
         if (!emailVerificationCode.isEmpty() && emailVerificationCode != null && !emailVerificationCode.equals("")) {
-            String code = stringRedisTemplate.opsForValue().get("email:code:" + username);
-            if (!emailVerificationCode.equals(code)) {
-                return Result.error("登录失败");
-            }
+            String code = stringRedisTemplate.opsForValue().get(Constant.User.EMAIL_CODE_PREFIX + userName);
+            if (!emailVerificationCode.equals(code))
+                return Result.error(Constant.Error.LOGIN_FAILED);
         } else {
             //todo 注销用户的时候 一定要记得注销掉用户的盐值
-            LambdaQueryWrapper<Salt> queryWrapperone = new LambdaQueryWrapper<>();
-            // 使用查询条件，假设Salt类有一个用户名字段叫username
-            queryWrapperone.eq(Salt::getUserId, user.getId());
             // 获取盐值
-            Salt salt = saltService.getOne(queryWrapperone);
+            Salt salt = saltService.getOne(new LambdaQueryWrapper<Salt>().eq(Salt::getUserId,user.getId()));
             // 加密输入的密码
             String encryptedPassword = saltedDoubleHashPassword(password, salt.getSalt());
 // 判断用户名和加密后的密码是否匹配，验证通过进入登录流程
-            if (!(user.getUsername().equals(username) && encryptedPassword.equals(user.getPassword()))) {
-                return Result.error("登录失败");
+            if (!(user.getUsername().equals(userName) && encryptedPassword.equals(user.getPassword()))) {
+                return Result.error(Constant.Error.LOGIN_FAILED);
             }
         }
         // 1. 默认使用 sa-token 登录方式
-//            R result = systemClients.findById(1); // 从配置中心或系统管理服务查询id为1的登录方式配置
-        String login_token = "sa-token"; // 默认登录方式为 sa-token
-//            if (result != null) {
-//                // 获取配置项中的值（可能是 "sa-token" 或 "jwt"）
-//                HashMap resultMap = (HashMap) result.getData();
-//                login_token = String.valueOf(resultMap.get("value"));
-//            }
+            DcSystem result = dcSystemService.getOne(new LambdaQueryWrapper<DcSystem>().eq(DcSystem::getSysName,Constant.User.LOGIN_TYPE));
+            String login_type =Constant.User.SA_TOKEN; // 默认登录方式为 sa-token
+            if (result != null) {
+                // 获取配置项中的值（可能是 "sa-token" 或 "jwt"）
+                 login_type =  result.getSysValue();
+            }
         // 构建返回给前端的 token 响应数据
         Map response = new HashMap<>();
         // 如果配置的是 sa-token 方式
-        if (login_token.equals("sa-token")) {
+        if (login_type.equals(Constant.User.SA_TOKEN)) {
             // 使用 Sa-Token 登录，传入用户 ID，表示登录成功
             StpUtil.login(user.getId());
 //                stringRedisTemplate.opsForValue().set();
@@ -223,24 +213,24 @@ public class UserController extends ApiController {
             queryWrapper1.eq(User::getId, user.getId()); // 构建查询条件：username 等于传入的 username
             User user1 = userService.getOne(queryWrapper1); // 执行查询，返回满足条件的第一条 User 记录
             // 将 token 放入返回 map
-            response.put("token", token_login);
-            response.put("userInfo", user1);
+            response.put(Constant.User.TOKEN, token_login);
+            response.put(Constant.User.USER_INFO, user1);
             String loginId = StpUtil.getLoginId().toString();  // 转换为字符串
             Long userId = Long.parseLong(loginId);  // 将字符串转为 Long 类型
             String useridStr = String.valueOf(userId);  // 将 user 对象转换为 JSON 字符串
             try {
                 String userJson = objectMapper.writeValueAsString(user);
-                String key = useridStr + "_user_info";
+                String key = useridStr + Constant.User._USER_INFO;
                 stringRedisTemplate.opsForValue().set(key, userJson, 10, TimeUnit.MINUTES);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
             // 如果配置的是 jwt 方式
-        } else if (login_token.equals("jwt")) {
+        } else if (login_type.equals(Constant.User.JWT)) {
             // 使用自定义 jwt 工具类生成 token（一般以用户名作为 payload）
             String token = jwtUtil.generateToken(user.getUsername());
             // 将 token 放入返回 map
-            response.put("token", token);
+            response.put(Constant.User.TOKEN, token);
         } else {
             // 如果配置了不支持的 token 类型，可以在这里补充报错或记录日志（建议完善）
         }

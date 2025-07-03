@@ -369,7 +369,6 @@ export default {
     // },
 
     handleChildMessage(msg) {
-      debugger;
       console.log('父组件收到的消息：', msg);
       this.message = msg;
     },

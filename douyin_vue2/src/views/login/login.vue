@@ -12,8 +12,7 @@
         <div class="input-group">
           <input
             type="text"
-            v-model="loginpojo.username"
-            @blur="validateEmail"
+            v-model="loginpojo.userName"
             placeholder="请输入用户名"
           />
           <input
@@ -68,8 +67,7 @@
         <div class="input-group">
           <input
             type="text"
-            v-model="loginpojo.username"
-            @blur="validateEmail"
+            v-model="loginpojo.userName"
             placeholder="请输入用户名"
           />
           <input
@@ -128,13 +126,12 @@ export default {
     return {
       loginType: 'password', //
       loginpojo: {
-        username: '',
+        userName: '',
         password: '',
         confirmPassword: '' // for registration
       },
       emailVerificationCode: '', // 用于保存验证码
       verificationCode: '', // 用于保存验证码
-      emailPattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
       isPasswordLogin: false,
       isAgreed: false, // 协议同意状态
       isRegistering: false, // 是否处于注册页面
@@ -149,28 +146,18 @@ export default {
   mounted() {},
 
   methods: {
-    validateEmail() {
-      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      if (!emailRegex.test(this.loginpojo.username)) {
-        this.$message({
-          message: '请输入有效的邮箱地址',
-          type: 'warning'
-        });
-      }
-    },
-
     closeScreen() {
       this.$router.go(-1);
       console.log('关闭界面');
     },
 
     clearPhoneNumber() {
-      this.loginpojo.username = '';
+      this.loginpojo.userName = '';
       this.loginpojo.password = '';
       this.loginpojo.confirmPassword = '';
     },
     async getEmailVerificationCode() {
-      if (!this.loginpojo.username) {
+      if (!this.loginpojo.userName) {
         this.$message({
           message: '请输入邮箱',
           type: 'warning'
@@ -179,7 +166,7 @@ export default {
       }
       try {
         const response = await getEmailVerificationCodeService({
-          email: this.loginpojo.username
+          email: this.loginpojo.userName
         });
 
         if (response.data.code === 1) {
@@ -205,19 +192,17 @@ export default {
       }
     },
     async getVerificationCode() {
-      debugger;
-      if (!this.loginpojo.username) {
+      if (!this.loginpojo.userName) {
         this.$message({
-          message: '请输入邮箱',
+          message: '请输入用户名',
           type: 'warning'
         });
         return;
       }
       try {
         const response = await getVerificationCodeService(
-          this.loginpojo.username
+          this.loginpojo.userName
         );
-        debugger;
         const blob = new Blob([response.data], { type: 'image/png' });
         this.captchaUrl = URL.createObjectURL(blob);
         this.isShow = true;
@@ -237,14 +222,77 @@ export default {
     },
 
     async verifyPhoneNumber() {
+      // 获取环境变量控制校验开关（默认启用校验）
+      const ENABLE_VALIDATION =
+        import.meta.env.VITE_ENABLE_REGISTER_VALIDATION !== 'false';
+      if (ENABLE_VALIDATION) {
+        // 账号校验
+        if (!this.loginpojo.userName) {
+          this.$message({
+            message: '请输入账号',
+            type: 'warning'
+          });
+          return;
+        }
+        if (!/^[a-zA-Z0-9_]{4,20}$/.test(this.loginpojo.userName)) {
+          this.$message({
+            message: '账号需4-20位，包含字母、数字和下划线',
+            type: 'warning'
+          });
+          return;
+        }
+        // 密码校验
+        if (!this.loginpojo.password) {
+          this.$message({
+            message: '请输入密码',
+            type: 'warning'
+          });
+          return;
+        }
+        if (
+          !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,20}$/.test(
+            this.loginpojo.password
+          )
+        ) {
+          this.$message({
+            message: '密码需6-20位，包含大小写字母和数字',
+            type: 'warning'
+          });
+          return;
+        }
+        // 确认密码校验（已存在，优化提示）
+        if (this.loginpojo.password !== this.loginpojo.confirmPassword) {
+          this.$message({
+            message: '两次输入的密码不一致',
+            type: 'warning'
+          });
+          return;
+        }
+
+        // 验证码校验
+        if (!this.verificationCode) {
+          this.$message({
+            message: '请输入验证码',
+            type: 'warning'
+          });
+          return;
+        }
+        if (!/^\d{4,6}$/.test(this.verificationCode)) {
+          this.$message({
+            message: '验证码格式不正确',
+            type: 'warning'
+          });
+          return;
+        }
+      }
+
       if (!this.isAgreed) {
         this.$message({
-          message: '请勾选用户协议以继续登录。',
+          message: '请勾选用户协议以继续注册',
           type: 'warning'
         });
         return;
       }
-
       console.log('验证手机号:', this.loginpojo);
 
       try {
@@ -254,24 +302,22 @@ export default {
           loginType: this.loginType,
           emailVerificationCode: this.emailVerificationCode
         });
-        debugger;
 
-        if (response.data.code === 1) {
+        if (response.code === 1) {
           this.$message({
-            message: response.data.msg || '登录失败',
+            message: response.msg || '登录失败',
             type: 'error'
           });
         } else {
+          debugger;
           this.$store
             .dispatch('userInfo/setUserInfo', response.data.data.userInfo)
             .then(() => {
-              debugger;
               console.log(
                 '存入后的 userInfo:',
                 this.$store.state.userInfo.userInfo
               );
             });
-          debugger;
           console.log(
             '存入后的 userInfo:',
             this.$store.state.userInfo.userInfo
@@ -303,34 +349,86 @@ export default {
     },
 
     async register() {
+      // 获取环境变量控制校验开关（默认启用校验）
+      const ENABLE_VALIDATION =
+        import.meta.env.VITE_ENABLE_REGISTER_VALIDATION !== 'false';
+      console.log(import.meta.env.VITE_ENABLE_REGISTER_VALIDATION);
+
+      if (ENABLE_VALIDATION) {
+        // 账号校验
+        if (!this.loginpojo.username) {
+          this.$message({
+            message: '请输入账号',
+            type: 'warning'
+          });
+          return;
+        }
+        if (!/^[a-zA-Z0-9_]{4,20}$/.test(this.loginpojo.userName)) {
+          this.$message({
+            message: '账号需4-20位，包含字母、数字和下划线',
+            type: 'warning'
+          });
+          return;
+        }
+        // 密码校验
+        if (!this.loginpojo.password) {
+          this.$message({
+            message: '请输入密码',
+            type: 'warning'
+          });
+          return;
+        }
+        if (
+          !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,20}$/.test(
+            this.loginpojo.password
+          )
+        ) {
+          this.$message({
+            message: '密码需6-20位，包含大小写字母和数字',
+            type: 'warning'
+          });
+          return;
+        }
+        // 确认密码校验（已存在，优化提示）
+        if (this.loginpojo.password !== this.loginpojo.confirmPassword) {
+          this.$message({
+            message: '两次输入的密码不一致',
+            type: 'warning'
+          });
+          return;
+        }
+        // 验证码校验
+        if (!this.verificationCode) {
+          this.$message({
+            message: '请输入验证码',
+            type: 'warning'
+          });
+          return;
+        }
+        if (!/^\d{4,6}$/.test(this.verificationCode)) {
+          this.$message({
+            message: '验证码格式不正确',
+            type: 'warning'
+          });
+          return;
+        }
+      }
+
       if (!this.isAgreed) {
         this.$message({
-          message: '请勾选用户协议以继续注册。',
+          message: '请勾选用户协议以继续注册',
           type: 'warning'
         });
         return;
       }
-      if (this.loginpojo.password !== this.loginpojo.confirmPassword) {
-        this.$message({
-          message: '密码和确认密码不匹配',
-          type: 'warning'
-        });
-        return;
-      }
-      if (!this.verificationCode) {
-        this.$message({
-          message: '请输入验证码',
-          type: 'warning'
-        });
-        return;
-      }
+
       console.log('注册手机号:', this.loginpojo);
       try {
         const response = await userRegisterService({
           ...this.loginpojo,
           verificationCode: this.verificationCode
         });
-        if (response.data.code === 1) {
+        if (response.code === 1) {
           console.error('注册失败：');
         } else {
           this.verifyPhoneNumber(); // 注册成功后自动登录

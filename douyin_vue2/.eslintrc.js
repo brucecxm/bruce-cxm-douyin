@@ -53,7 +53,6 @@ module.exports = {
       }
     ],
 
-    // console 和 debugger 生产环境提示
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
   }

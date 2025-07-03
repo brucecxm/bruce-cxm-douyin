@@ -39,10 +39,18 @@ public class Constant {
      */
     public static class User {
         public static final String USER_NAME = "userName";
+        public static final String PASSWORD = "password";
+        public static final String EMAIL_VERIFICATION_CODE = "emailVerificationCode";
         public static final String USER_AVATAR = "userAvatar";
         public static final String USER_INFO = "userInfo";
         public static final String DEFAULT_USER_AVATAR = "default_user_avatar";
         public static final String DEFAULT_USER_BACK_IMG = "default_user_back_img";
+        public static final String EMAIL_CODE_PREFIX = "email:code:"; // 补全邮箱验证码前缀常量
+        public static final String SA_TOKEN = "sa-token"; // 补全 SA-Token 常量
+        public static final String LOGIN_TYPE = "login_type"; // 补全 SA-Token 常量
+        public static final String TOKEN = "token"; // 补全 SA-Token 常量
+        public static final String _USER_INFO = "_user_info"; // 补全 SA-Token 常量
+        public static final String JWT = "jwt"; // 补全 SA-Token 常量
     }
 
     /**
@@ -81,9 +89,11 @@ public class Constant {
      * 🟩 统计字段常量（点赞数、评论数等）
      */
     public static class Error {
+        public static final String HASH_TRANSFORM_ERROR = "哈希转化错误"; // 补全错误常量
         public static final String USER_REPEAT = "用户名已经被占用";
+        public static final String USER_INVALID = "请核对用户名是否正确";
+        public static final String LOGIN_FAILED = "登录失败"; // 补全最后一个错误常量
     }
-
 
 
 }
