@@ -5,8 +5,6 @@ spring:
     name: api-gateway
   # redis配置
 
-  profiles:
-    active: prod  # 生产环境
 
 
   cloud:

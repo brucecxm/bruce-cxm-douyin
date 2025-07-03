@@ -1,7 +1,7 @@
 import Vue from 'vue';
 
 const state = () => ({
-  videos: {}  // 以 videoId 作为 key，存储视频对象
+  videos: {}
 });
 
 const mutations = {
@@ -13,7 +13,7 @@ const mutations = {
     Vue.delete(state.videos, videoId);
   },
   CLEAR_ALL_VIDEOS(state) {
-    Object.values(state.videos).forEach(video => {
+    Object.values(state.videos).forEach((video) => {
       URL.revokeObjectURL(video.url);
     });
     state.videos = {};

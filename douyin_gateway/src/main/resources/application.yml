@@ -5,7 +5,7 @@ server:
 
 spring:
   profiles:
-    active: prod  # 生产环境
+    active: dev  # 生产环境
 
 ############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
 sa-token:

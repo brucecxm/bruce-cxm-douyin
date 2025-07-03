@@ -60,7 +60,8 @@
     />
 
     <!-- 摄像头预览 & Canvas -->
-    <video ref="video" autoplay playsinline muted class="video-preview"></video>
+    <video ref="video" autoplay playsinline
+muted class="video-preview"></video>
     <canvas ref="canvas" style="display: none"></canvas>
 
     <!-- 拍照结果 -->
@@ -328,16 +329,18 @@ export default {
     //   this.bottomNav = false;
     // },
     stopRecording() {
+      debugger;
       if (!this.isRecording) return;
       clearInterval(this.recordInterval);
       this.mediaRecorder.stop();
+      debugger;
       this.mediaRecorderStream.getTracks().forEach((t) => t.stop());
 
       this.mediaRecorder.onstop = () => {
         const duration = Date.now() - this.recordingStart;
         const blob = new Blob(this.recordChunks, { type: 'video/mp4' });
         const videoId = `video_${Date.now()}`;
-
+        debugger;
         // 通过 Vuex action 保存视频
         this.$store.dispatch('video/addVideo', {
           videoId,
@@ -348,6 +351,14 @@ export default {
             type: blob.type
           }
         });
+
+        debugger;
+        // 立即打印 Vuex 当前状态，检查是否写入成功
+        console.log(
+          '当前 Vuex video 模块内容:',
+          this.$store.state.video.videos
+        );
+        console.log('存入 videoId:', videoId);
 
         this.currentVideoId = videoId;
         this.videoBlob = blob;

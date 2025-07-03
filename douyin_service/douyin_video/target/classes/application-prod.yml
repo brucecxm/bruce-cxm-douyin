@@ -28,21 +28,22 @@ spring:
         min-idle: 0
 
   rabbitmq:
-    host: 192.168.200.130
+    host: 127.0.0.1
     port: 5672
     username: itcast
     password: 123321
     virtual-host: /
   application:
     name: DouyinVideoService
+
   datasource:
     username: root
-    password: root
+    password: bruce_CXM_123
     url: jdbc:mysql://localhost:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
 
 minio:
   accessKey: minio
   secretKey: minio123
-  bucket: leadnews
+  bucket: douyin
   endpoint: http://127.0.0.1:9000
   readPath: http://127.0.0.1:9000
