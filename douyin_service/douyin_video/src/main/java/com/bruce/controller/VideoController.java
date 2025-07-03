@@ -125,8 +125,9 @@ public class VideoController extends ApiController {
                     .body("服务器错误：" + e.getMessage());
         }
     }
-@Autowired
-    private  DcSystemService dcSystemService;
+
+    @Autowired
+    private DcSystemService dcSystemService;
 
     @PostMapping("/publish")
     public ResponseEntity<?> publishVideo(
@@ -144,20 +145,17 @@ public class VideoController extends ApiController {
         InputStream in = videoFile.getInputStream();
         String osName = System.getProperty("os.name").toLowerCase();
         System.out.println("当前操作系统: " + osName);
-        String  url = fileStorageService.uploadVideoFile("videostore", fileName, in);
-        String minio="/minio";
-        LambdaQueryWrapper<DcSystem> queryWrapper=new LambdaQueryWrapper<>();
-        queryWrapper.eq(DcSystem::getName,"ngrok");
-        DcSystem ngrok=  dcSystemService.getOne(queryWrapper);
+        String url = fileStorageService.uploadVideoFile("videostore", fileName, in);
+        String minio = "/minio";
+        LambdaQueryWrapper<DcSystem> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(DcSystem::getSysName, "ngrok");
+        DcSystem ngrok = dcSystemService.getOne(queryWrapper);
         // 假设原URL存储在变量中
-        if(!osName.contains("windows"))
-        {
-            url=url.replace("http://192.168.200.130:9000", ngrok.getValue()+minio);
+        if (!osName.contains("windows")) {
+            url = url.replace("http://192.168.200.130:9000", ngrok.getSysValue() + minio);
         }
-
         // 获取登录用户ID
         Object userIdObj = StpUtil.getLoginId();
-
         // 方法1：使用安全的类型转换
         Long userId = null;
         if (userIdObj instanceof Long) {
@@ -171,7 +169,6 @@ public class VideoController extends ApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Collections.singletonMap("code", 401));
         }
-
         Video video = new Video();
         video.setVideoId(idService.SnowflakeGen());
         video.setUrl(url);
@@ -180,13 +177,11 @@ public class VideoController extends ApiController {
         video.setContent(""); // 设置适当的内容
         video.setUserId(userId);
         videoService.save(video);
-
         return ResponseEntity.ok(Collections.singletonMap("code", 200));
     }
 
 
-
-        @PostMapping("/publishss")
+    @PostMapping("/publishss")
     public ResponseEntity<?> publish(@RequestBody Map<String, Object> req) {
         Object userId = StpUtil.getLoginId();
         Object title = req.get("title");
@@ -274,20 +269,19 @@ public class VideoController extends ApiController {
             vo.setShareNum((long) shareCount);
             // 组装返回数据
             Map<String, Object> map = new HashMap<>();
-            map.put(Constant.videoId, vo.getVideoId());
-            map.put(Constant.userId, vo.getUserId());
-            map.put(Constant.content, vo.getUserId());
-            map.put(Constant.videoUrl, vo.getUrl());
-            map.put(Constant.content, vo.getContent());
-            map.put(Constant.userName, vo.getUsername());
-            map.put(Constant.userAvatar, vo.getUserAvatar());
-            map.put(Constant.music, vo.getMusic());
-            map.put(Constant.musicAvatar, vo.getMusicAvatar());
-            map.put(Constant.likeNum, vo.getLikeNum());
-            map.put(Constant.commentNum, vo.getCommentNum());
-            map.put(Constant.collectNum, vo.getCollectNum());
-            map.put(Constant.shareNum, vo.getShareNum());
-            map.put(Constant.musicId, vo.getMusicId());
+            map.put(Constant.ApiParam.VIDEO_ID, vo.getVideoId());
+            map.put(Constant.ApiParam.USER_ID, vo.getUserId());
+            map.put(Constant.ApiParam.CONTENT, vo.getContent());
+            map.put(Constant.Video.VIDEO_URL, vo.getUrl());
+            map.put(Constant.User.USER_NAME, vo.getUsername());
+            map.put(Constant.User.USER_AVATAR, vo.getUserAvatar());
+            map.put(Constant.Music.MUSIC, vo.getMusic());
+            map.put(Constant.Music.MUSIC_AVATAR, vo.getMusicAvatar());
+            map.put(Constant.Stat.LIKE_NUM, vo.getLikeNum());
+            map.put(Constant.Stat.COMMENT_NUM, vo.getCommentNum());
+            map.put(Constant.Stat.COLLECT_NUM, vo.getCollectNum());
+            map.put(Constant.Stat.SHARE_NUM, vo.getShareNum());
+            map.put(Constant.ApiParam.MUSIC_ID, vo.getMusicId());
             result.add(map);
         }
         return result;
@@ -309,14 +303,14 @@ public class VideoController extends ApiController {
         LambdaQueryWrapper<User> userQuery = new LambdaQueryWrapper<>();
         userQuery.eq(User::getId, userid);
         User userInfo = userService.getOne(userQuery);
-        result.put(Constant.userInfo, userInfo);
+        result.put(Constant.User.USER_INFO, userInfo);
         // 查询视频分页数据
         Page<Video> pageInfo = new Page<>(page, size);
         LambdaQueryWrapper<Video> videoQuery = new LambdaQueryWrapper<>();
         videoQuery.eq(Video::getUserId, userid);
         IPage<Video> videoPage = videoService.page(pageInfo, videoQuery);
-        result.put(Constant.videoPageList, videoPage.getRecords());
-        result.put(Constant.total, videoPage.getTotal());
+        result.put(Constant.Video.VIDEO_PAGE_LIST, videoPage.getRecords());
+        result.put(Constant.Video.TOTAL, videoPage.getTotal());
         return result;
     }
 
@@ -335,9 +329,9 @@ public class VideoController extends ApiController {
             userId = Long.valueOf(userIdOb.toString());
         }
         // 从 Map 中获取内容 ID 和 type（表示红心的颜色）
-        Long contentId = Long.valueOf(request.get(Constant.contentId).toString());
-        String type = (String) request.get(Constant.type);  // type 值判断
-        String content_type = (String) request.get(Constant.contentType);  // type 值判断
+        Long contentId = Long.valueOf(request.get(Constant.ApiParam.CONTENT_ID).toString());
+        String type = (String) request.get(Constant.ApiParam.TYPE);  // type 值判断
+        String content_type = (String) request.get(Constant.ApiParam.CONTENT_TYPE);  // type 值判断
         // 生成 Redis 键，通常以内容 ID 和用户 ID 组成
         String redisKey = "like:content:" + content_type + contentId;
         // 如果 type 是 "red"，表示已点赞，进行取消点赞操作

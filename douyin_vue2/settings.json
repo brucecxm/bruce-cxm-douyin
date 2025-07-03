@@ -56,7 +56,7 @@
     "stash-rename:command",
     "stash-push:command"
   ],
-  "editor.fontSize": 16,
+  "editor.fontSize": 8,
   "search.exclude": {
     "**/node_modules": false
   },

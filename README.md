@@ -232,6 +232,119 @@ http {
 
 
 
+## 2️⃣ HTTP 方法与动作对应关系
+
+- `GET`：查询资源（无副作用）
+- `POST`：创建资源
+- `PUT`：更新资源（整体更新）
+- `PATCH`：更新资源（部分更新）
+- `DELETE`：删除资源
+
+**注意：**
+
+- 不滥用 `POST` 做更新或删除。
+- `GET` 请求应无副作用（只做查询）。
+
+------
+
+## 3️⃣ URL 设计规范
+
+### 资源定位
+
+- 使用 **名词表示资源**，推荐使用复数
+- 使用层级表达资源间关系
+
+### 示例
+
+```
+GET    /users              -> 获取用户列表
+GET    /users/{id}         -> 获取用户详情
+POST   /users              -> 创建用户
+PUT    /users/{id}         -> 更新用户（整体更新）
+PATCH  /users/{id}         -> 更新用户（部分更新）
+DELETE /users/{id}         -> 删除用户
+GET    /users/{id}/orders  -> 获取指定用户的订单列表
+```
+
+**注意：**
+
+- 不在 URL 中出现动词（如 /getUserList ❌）
+- 不在 URL 中携带操作含义（如 /deleteUser ❌）
+
+------
+
+## 4️⃣ 状态码使用规范
+
+- `200 OK`：成功处理请求（GET、PUT、PATCH）
+- `201 Created`：成功创建资源（POST）
+- `204 No Content`：成功处理，无返回体（DELETE）
+- `400 Bad Request`：参数错误
+- `401 Unauthorized`：未认证
+- `403 Forbidden`：无权限
+- `404 Not Found`：资源不存在
+- `500 Internal Server Error`：服务器内部错误
+
+------
+
+## 5️⃣ 请求体和响应体格式
+
+- **推荐使用 JSON** 进行请求体与响应体交互。
+- 请求体：使用 `@RequestBody` 接收 JSON。
+- 响应体：使用 `@RestController` 或 `@ResponseBody` 返回 JSON。
+
+示例：
+
+```java
+@PostMapping("/users")
+public User createUser(@RequestBody User user) { ... }
+```
+
+统一返回结构示例：
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": { ... }
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

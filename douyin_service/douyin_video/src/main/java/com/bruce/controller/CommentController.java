@@ -42,8 +42,8 @@ public class CommentController extends ApiController {
     @GetMapping("/getFatherComment")
     public R getFatherComment(@RequestParam Map<String, Object> params) {
         String videoId = String.valueOf(params.get("videoId"));
-        int pageNum = Integer.parseInt(String.valueOf(params.getOrDefault(Constant.page, 1)));
-        int pageSize = Integer.parseInt(String.valueOf(params.getOrDefault(Constant.limit, 10)));
+        int pageNum = Integer.parseInt(String.valueOf(params.getOrDefault(Constant.ApiParam.PAGE, 1)));
+        int pageSize = Integer.parseInt(String.valueOf(params.getOrDefault(Constant.ApiParam.LIMIT, 10)));
         Page<Comment> page = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Comment::getCommentId, videoId)
@@ -57,11 +57,11 @@ public class CommentController extends ApiController {
     public R addVideoComment(@RequestBody Map<String, Object> params) {
         // 输出接收到的参数
         Comment comment = new Comment();
-        comment.setComment((String) params.get(Constant.comment));
-        comment.setFatherId((Integer) params.get(Constant.fatherId));
+        comment.setComment((String) params.get(Constant.ApiParam.COMMENT));
+        comment.setFatherId((Integer) params.get(Constant.ApiParam.FATHER_ID));
         long commentId = idService.SnowflakeGen();
         comment.setCommentId(commentId);
-        comment.setContentId((Integer) params.get(Constant.videoId));
+        comment.setContentId((Integer) params.get(Constant.ApiParam.VIDEO_ID));
         comment.setUserId((Long) params.get("userId"));
         commentService.save(comment);
         // 这里可以处理评论逻辑

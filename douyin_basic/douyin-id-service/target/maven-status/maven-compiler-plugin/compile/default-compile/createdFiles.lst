@@ -1,6 +1,9 @@
-com\bruce\utils\SimpleIdGenerator.class
-com\bruce\service\impl\IdServiceImpl.class
 com\bruce\utils\SnowflakeIdGenerator.class
 com\bruce\service\IdService.class
+com\bruce\handlar\MyCustomException.class
 com\bruce\utils\IdGenerator.class
 com\bruce\config\AppConfig.class
+com\bruce\service\impl\FriendServiceImpl.class
+com\bruce\handlar\GlobalExceptionHandler.class
+com\bruce\utils\SimpleIdGenerator.class
+com\bruce\service\impl\IdServiceImpl.class

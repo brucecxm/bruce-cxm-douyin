@@ -205,6 +205,7 @@ export default {
       }
     },
     async getVerificationCode() {
+      debugger;
       if (!this.loginpojo.username) {
         this.$message({
           message: '请输入邮箱',
@@ -216,15 +217,7 @@ export default {
         const response = await getVerificationCodeService(
           this.loginpojo.username
         );
-
-        if (response.data.code === 1) {
-          this.$message({
-            message: '获取验证码失败，请稍后再试',
-            type: 'error'
-          });
-          return;
-        }
-
+        debugger;
         const blob = new Blob([response.data], { type: 'image/png' });
         this.captchaUrl = URL.createObjectURL(blob);
         this.isShow = true;
@@ -317,7 +310,6 @@ export default {
         });
         return;
       }
-
       if (this.loginpojo.password !== this.loginpojo.confirmPassword) {
         this.$message({
           message: '密码和确认密码不匹配',
@@ -325,7 +317,6 @@ export default {
         });
         return;
       }
-
       if (!this.verificationCode) {
         this.$message({
           message: '请输入验证码',
@@ -333,7 +324,6 @@ export default {
         });
         return;
       }
-
       console.log('注册手机号:', this.loginpojo);
       try {
         const response = await userRegisterService({
@@ -341,19 +331,12 @@ export default {
           verificationCode: this.verificationCode
         });
         if (response.data.code === 1) {
-          this.$message({
-            message: '注册失败，请稍后再试',
-            type: 'error'
-          });
+          console.error('注册失败：');
         } else {
           this.verifyPhoneNumber(); // 注册成功后自动登录
         }
       } catch (error) {
         console.error('注册失败：', error);
-        this.$message({
-          message: '注册请求失败，请稍后重试。',
-          type: 'error'
-        });
       }
     }
   }
@@ -404,7 +387,7 @@ export default {
 }
 
 .login-form {
-  width: 100%;
+  width: 90%;
   max-width: 400px;
   margin: 0 auto;
 }
