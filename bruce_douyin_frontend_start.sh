@@ -23,7 +23,7 @@ case "$env_choice" in
         ;;
     2)
         PROFILE="prod"
-        BRANCH="main"  # 生产环境对应main分支
+        BRANCH="prod"  # 生产环境对应main分支
         ;;
     *)
         echo "❌ 无效选择"
