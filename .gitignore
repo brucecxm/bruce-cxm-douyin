@@ -1,3 +1,5 @@
+# 忽略所有目录下的target文件夹
+**/target/
 
 /douyin_vue2/node_modules/
 
