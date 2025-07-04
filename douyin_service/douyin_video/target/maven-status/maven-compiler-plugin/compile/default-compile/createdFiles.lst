@@ -1,9 +1,0 @@
-com\bruce\controller\CommentController.class
-com\bruce\utils\ThreadLocalUtil.class
-com\bruce\controller\FileUploadController.class
-com\bruce\DouyinVideoApplication.class
-com\bruce\controller\VideoController.class
-com\bruce\feign\musicFeign.class
-com\bruce\listener\DeadLetterQueueConsumer.class
-com\bruce\controller\FileUploadController$MergeRequest.class
-com\bruce\controller\MusicController.class
