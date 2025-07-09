@@ -40,6 +40,8 @@ public class Constant {
     public static class User {
         public static final String USER_NAME = "userName";
         public static final String PASSWORD = "password";
+        public static final String ISCHECK = "isCheck";
+        public static final String VERIFICATION_CODE = "verificationCode";
         public static final String EMAIL_VERIFICATION_CODE = "emailVerificationCode";
         public static final String USER_AVATAR = "userAvatar";
         public static final String USER_INFO = "userInfo";
@@ -47,7 +49,7 @@ public class Constant {
         public static final String DEFAULT_USER_BACK_IMG = "default_user_back_img";
         public static final String EMAIL_CODE_PREFIX = "email:code:"; // 补全邮箱验证码前缀常量
         public static final String SA_TOKEN = "sa-token"; // 补全 SA-Token 常量
-        public static final String LOGIN_TYPE = "login_type"; // 补全 SA-Token 常量
+        public static final String LOGIN_TYPE = "loginType"; // 补全 SA-Token 常量
         public static final String TOKEN = "token"; // 补全 SA-Token 常量
         public static final String _USER_INFO = "_user_info"; // 补全 SA-Token 常量
         public static final String JWT = "jwt"; // 补全 SA-Token 常量

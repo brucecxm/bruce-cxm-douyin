@@ -1,20 +1,32 @@
-//导入request.js请求工具
+//这里为什么是request   因为request.js导出了一个instance（axios实例） 这里的request相当于一个变量名
+//这里为什么是request   因为request.js导出了一个instance（axios实例） 这里的request相当于一个变量名
 import request from '@/utils/request.js';
 
 //提供调用注册接口的函数
 export const userRegisterService = (registerData) => {
-  //借助于UrlSearchParams完成传递
+  // 这里为什么可以不用指定表单格式 是因为 axios 会根据请求数据的类型自动设置正确的 Content-Type
+  // 这里为什么可以不用指定表单格式 是因为 axios 会根据请求数据的类型自动设置正确的 Content-Type
+  // 这里为什么可以不用指定表单格式 是因为 axios 会根据请求数据的类型自动设置正确的 Content-Type
   const params = new URLSearchParams();
   for (let key in registerData) {
     params.append(key, registerData[key]);
   }
-  return request.post('/user/register', params);
-};
-// 修改 getauthzzz 函数
-export const getUserInfo = (userid, page = 1, size = 10) => {
-  return request.get('/user/auth', {
-    params: { userid, page, size } // 将 userid 包装在 params 对象中
+  return request.post('/user/register', params, {
+    // headers: { 'Content-Type': 'application/x-www-form-urlencoded' } // 多余！可能会覆盖默认的
+    // headers: { 'Content-Type': 'application/x-www-form-urlencoded' } // 多余！可能会覆盖默认的
+    // headers: { 'Content-Type': 'application/x-www-form-urlencoded' } // 多余！可能会覆盖默认的
   });
+};
+
+export const getUserInfo = (Data) => {
+  //对于get请求 默认用url形式传参数
+  //对于get请求 默认用url形式传参数
+  //对于get请求 默认用url形式传参数
+  const params = new URLSearchParams();
+  for (let key in Data) {
+    params.append(key, Data[key]);
+  }
+  return request.get('/user/userInfo', params);
 };
 
 //提供调用登录接口的函数
@@ -26,29 +38,6 @@ export const userLoginService = (loginData) => {
   return request.post('/user/doLogin', params);
 };
 
-//获取用户登录状态
-export const userInfoService = () => {
-  return request.get('/user/userInfo');
-};
-
-//获取用户登录状态
-export const userInfoServiceSSSS = () => {
-  return request.get('/user/getall');
-};
-
-//修改个人信息
-// export const userInfoUpdateService = (User) => {
-//   return request.put("/user/update", User);
-// };
-
-export const userInfoUpdateService = (User) => {
-  return request.put('/user/update', User, {
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
-};
-
 export const requestFriendApi = (User) => {
   return request.post('/user/friend/request', User, {
     headers: {
@@ -57,25 +46,31 @@ export const requestFriendApi = (User) => {
   });
 };
 
-//获取用户登录状态
 export const getrequestFriendApi = () => {
   return request.get('/user/friend/requests');
 };
-//获取用户登录状态
+
 export const getFriendApi = () => {
   return request.get('/user/friend/list');
 };
 
-//修改头像
-export const userAvatarUpdateService = (avatarUrl) => {
-  const params = new URLSearchParams();
-  params.append('avatarUrl', avatarUrl);
-  return request.patch('/user/updateAvatar', params);
-};
-// 获取验证码服务，确保发送正确的请求，且设置 responseType: 'blob'
-export const getVerificationCodeService = (username) => {
-  return request.put('/user/getVerificationCode', username, {
-    responseType: 'blob' // 确保返回值是图片流
+export const getVerificationCodeService = (params) => {
+  const queryParams = new URLSearchParams();
+  for (let key in params) {
+    queryParams.append(key, params[key]);
+  }
+  return request.get('/user/getVerificationCode', {
+    params: queryParams,
+    responseType: 'blob',
+    transformResponse: [
+      (data, headers) => {
+        // 直接通过属性名访问响应头
+        return {
+          data,
+          uuid: headers['uuid'] // 修正为直接访问headers对象的属性
+        };
+      }
+    ]
   });
 };
 
@@ -85,6 +80,5 @@ export const getEmailVerificationCodeService = (Data) => {
   for (let key in Data) {
     params.append(key, Data[key]);
   }
-
   return request.post('/user/getEmailVerificationCode', params);
 };

@@ -1,10 +1,11 @@
 <template>
   <div class="auth">
+    <!-- 顶部背景图 -->
     <div
       class="backimg"
-      :style="{ backgroundImage: 'url(' + userInfo.backImg + ')' }"
+      :style="{ backgroundImage: `url(${userInfo.backImg})` }"
     >
-      <!-- 左侧返回按钮 -->
+      <!-- 返回按钮 -->
       <div class="fanhui" @click="onBackClick" title="返回">
         <svg viewBox="0 0 24 24" class="icon">
           <path
@@ -17,10 +18,8 @@
           />
         </svg>
       </div>
-
       <!-- 右侧操作栏 -->
       <div class="right-buttons">
-        <!-- 放大镜图标 -->
         <div class="icon-button" @click="onSearchClick" title="搜索">
           <svg viewBox="0 0 24 24" class="icon">
             <circle
@@ -41,24 +40,22 @@
             />
           </svg>
         </div>
-
-        <!-- 更多（三个点）图标 -->
         <div class="icon-button" @click="onMoreClick" title="更多">
           <svg viewBox="0 0 24 24" class="icon">
-            <circle cx="5" cy="12"
-r="2" fill="white" />
-            <circle cx="12" cy="12"
-r="2" fill="white" />
-            <circle cx="19" cy="12"
-r="2" fill="white" />
+            <circle cx="5" cy="12" r="2" fill="white" />
+            <circle cx="12" cy="12" r="2" fill="white" />
+            <circle cx="19" cy="12" r="2" fill="white" />
           </svg>
         </div>
       </div>
     </div>
 
+    <!-- 用户头像 -->
     <div class="touxiang">
-      <img :src="userInfo.avatar" alt="头像" />
+      <img :src="userInfo.avatar" alt="用户头像" />
     </div>
+
+    <!-- 用户信息 -->
     <div class="personinfo">
       <div class="authnum">
         <span>{{ userInfo.like }} 获赞</span>
@@ -66,16 +63,18 @@ r="2" fill="white" />
         <span>{{ userInfo.fan }} 粉丝</span>
       </div>
       <div class="authinfo">信息介绍</div>
-      <div class="city">
-        <span>IP:{{ userInfo.city }}</span>
-      </div>
-      <div @click="requestFriend" class="followbutt">+ 关注</div>
+      <div class="city">IP: {{ userInfo.city }}</div>
+      <div class="followbutt" @click="requestFriend">+ 关注</div>
     </div>
+
+    <!-- 标签切换 -->
     <under-line-tags-vue
       :navItems="parentMessage"
       :active-index.sync="activeTabIndex"
       @change="handleTabChange"
     />
+
+    <!-- 视频无限加载列表 -->
     <InfiniteList
       :itemInfo="videobox"
       :itemsPerRow="3"
@@ -89,14 +88,14 @@ r="2" fill="white" />
     >
       <template #item="{ item }">
         <div
-          @click="govideodetail(item.videoid)"
           class="itemdetail"
+          @click="goVideoDetail(item.videoid)"
           :style="{
             backgroundImage: `url(${item.cover})`,
             width: '100%',
             height: '100%',
             backgroundSize: 'cover',
-            backgroundPosition: 'center center'
+            backgroundPosition: 'center'
           }"
         ></div>
       </template>
@@ -105,139 +104,104 @@ r="2" fill="white" />
 </template>
 
 <script>
-import { getUserInfo } from '@/api/user';
-import InfiniteList from '../../components/InfiniteList.vue';
-import underLineTagsVue from '../../components/underLineTags.vue';
-import { requestFriendApi } from '@/api/user';
+import { getUserInfo, requestFriendApi } from '@/api/user';
+import InfiniteList from '@/components/InfiniteList.vue';
+import underLineTagsVue from '@/components/underLineTags.vue';
+
 export default {
-  created() {
-    this.userId = this.$route.params.userId;
-    console.log(this.userId);
-    this.fetchItemDetails(1);
-  },
+  components: { InfiniteList, underLineTagsVue },
   data() {
     return {
-      userInfo: {},
-      activeTabIndex: 0,
-      page: 0, // 当前页码
-      pageSize: 10,
-      parentMessage: ['推荐', '热门', '收藏', '用过'],
-      videobox: [], // 视频列表，初始为空
-      videoboxType: {
-        推荐: [
-          {
-            videoImg:
-              'https://p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-avt-0015_c7784af3a0bd2e7c5fc92ece450f12e0~c5_168x168.jpeg?from=2956013662'
-          },
-          {
-            videoImg:
-              'https://p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-avt-0015_c7784af3a0bd2e7c5fc92ece450f12e0~c5_168x168.jpeg?from=2956013662'
-          }
-        ],
-        热门: [
-          {
-            videoImg:
-              'https://p3-pc.douyinpic.com/img/aweme-avatar/tos-cn-avt-0015_c7784af3a0bd2e7c5fc92ece450f12e0~c5_168x168.jpeg?from=2956013662'
-          }
-        ],
-        收藏: [],
-        用过: []
-      },
       userId: '',
+      userInfo: {},
+      videobox: [],
+      parentMessage: ['推荐', '热门', '收藏', '用过'],
+      activeTabIndex: 0,
+      queryData: {
+        userId: '',
+        page: 1,
+        pageSize: 10
+      },
       loading: false,
-      noMoreData: false,
-      videonum: '10000', // 修正拼写为 videonum
-      auth: {}
+      noMoreData: false
     };
   },
-  components: {
-    InfiniteList,
-    underLineTagsVue
+  created() {
+    this.userId = this.$route.params.userId;
+    this.queryData.userId = this.userId;
+    this.fetchItemDetails();
   },
-  computed: {
-    filteredSongs() {
-      return this.videoboxType[this.parentMessage[this.activeTabIndex]] || [];
-    }
-  },
-  watch: {
-    filteredSongs(newVal) {
-      console.log('filteredSongs 更新了：', newVal);
-    }
-  },
-
   methods: {
-    govideodetail(videoid) {
-      this.$router.push('/videodetail');
-    },
-    fetchMoreData() {
-      if (this.loading || this.noMoreData) return;
-      this.fetchItemDetails(this.page + 1);
-    },
-
-    handleTabChange(index) {
-      this.activeTabIndex = index;
-    },
-    fetchItemDetails(page) {
+    fetchItemDetails() {
       if (this.loading || this.noMoreData) return;
       this.loading = true;
-      getUserInfo(null, page, this.pageSize)
+
+      getUserInfo(this.queryData)
         .then((res) => {
           const videos = res.data.videobox || [];
           const total = res.data.total || 0;
-          // 追加视频数据
-          this.videobox = [...this.videobox, ...videos];
-          // 只在第一页赋值musicinfo，避免重复赋值
-          if (page === 1) {
+
+          if (this.queryData.page === 1) {
             this.userInfo = res.data.userInfo || {};
           }
-          // 判断是否加载完毕
+
+          this.videobox.push(...videos);
+
           if (this.videobox.length >= total) {
             this.noMoreData = true;
           }
-          this.page = page; // 更新当前页码
-          this.loading = false;
+
+          this.queryData.page += 1;
         })
         .catch(() => {
+          this.$toast && this.$toast('获取用户信息失败');
+        })
+        .finally(() => {
           this.loading = false;
-          this.$toast && this.$toast('获取视频出错');
         });
     },
-    requestFriend() {
-      const User = { toUserId: this.userId, verifyMsg: '请求关注' }; // 这里的 verifyMsg 可以根据需要修改
-      requestFriendApi(User).then.catch((error) => {
-        console.error('请求关注失败:', error);
-      });
-      // 处理关注操作
-      console.log('关注操作');
+    fetchMoreData() {
+      if (!this.loading && !this.noMoreData) {
+        this.fetchItemDetails();
+      }
     },
-
-    gohome() {
-      this.$router.push('/');
+    handleTabChange(index) {
+      this.activeTabIndex = index;
+      this.resetList();
+    },
+    resetList() {
+      this.queryData.page = 1;
+      this.videobox = [];
+      this.noMoreData = false;
+      this.fetchItemDetails();
+    },
+    requestFriend() {
+      const payload = { toUserId: this.userId, verifyMsg: '请求关注' };
+      requestFriendApi(payload)
+        .then(() => {
+          this.$toast && this.$toast('关注请求已发送');
+        })
+        .catch(() => {
+          this.$toast && this.$toast('关注请求失败');
+        });
+    },
+    goVideoDetail(videoid) {
+      this.$router.push(`/videodetail/${videoid}`);
     },
     onBackClick() {
       this.$router.back();
     },
-
     onSearchClick() {
       this.$router.push('/search');
     },
-
     onMoreClick() {
-      // 处理更多操作
-      console.log('更多操作');
+      this.$toast && this.$toast('更多功能待开发');
     }
   }
 };
 </script>
 
 <style scoped>
-html,
-body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
 .auth {
   display: flex;
   flex-direction: column;
@@ -250,42 +214,34 @@ body {
   width: 100%;
   height: 30vh;
   position: relative;
-  z-index: 1;
   background-size: cover;
   background-position: center;
 }
 
-.fanhui {
+.fanhui,
+.icon-button {
   position: absolute;
-  left: 5vw;
   top: 5vh;
   width: 40px;
   height: 40px;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
+}
+
+.fanhui {
+  left: 5vw;
 }
 
 .right-buttons {
-  position: absolute;
   right: 5vw;
   top: 5vh;
+  position: absolute;
   display: flex;
   gap: 10px;
-}
-
-.icon-button {
-  width: 40px;
-  height: 40px;
-  background-color: rgba(0, 0, 0, 0.5);
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
 }
 
 .icon {
@@ -294,14 +250,13 @@ body {
 }
 
 .touxiang {
-  z-index: 10;
+  position: absolute;
+  top: 7vh;
+  left: 10px;
   width: 25vw;
   height: 25vw;
   border-radius: 50%;
   overflow: hidden;
-  position: absolute;
-  top: 7vh;
-  left: 10px;
   border: 3px solid white;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
@@ -313,68 +268,46 @@ body {
 }
 
 .personinfo {
-  width: 100%;
-  height: 30%;
-  position: relative;
-  background-color: white;
+  margin-top: 20vh;
+  padding: 15px;
+  background: white;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
-  z-index: 2;
-  margin-top: -5vh;
-  padding: 15px;
-  box-sizing: border-box;
 }
 
 .authnum {
   font-size: 0.6rem;
   display: flex;
-  margin-bottom: 10px;
-}
-
-.authnum span {
+  gap: 10px;
   font-weight: bold;
-  color: #333;
-}
-
-.city {
-  font-size: 0.4rem;
-  background-color: rgba(0, 0, 0, 0.1);
-  width: 10vw;
-  padding: 5px;
-  border-radius: 2px;
-  text-align: center;
-  margin-top: 10px;
 }
 
 .authinfo {
   font-size: 0.7rem;
   color: #666;
-  margin-top: 15px;
+  margin: 10px 0;
+}
+
+.city {
+  font-size: 0.5rem;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 5px 10px;
+  border-radius: 3px;
+  display: inline-block;
 }
 
 .followbutt {
-  width: 90%;
-  height: 5vh;
-  background-color: #fe1e1e;
-  margin: 15px auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 30px;
+  margin: 15px 0;
+  background: #fe1e1e;
   color: white;
-  font-size: 0.8rem;
+  border-radius: 30px;
+  text-align: center;
+  padding: 10px 0;
   cursor: pointer;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  font-size: 0.8rem;
 }
 
-.videonum {
-  font-size: 0.5rem;
-  margin-top: 15px;
-  color: #333;
-  margin-bottom: 0;
-  position: absolute;
-  bottom: 0;
+.itemdetail {
+  cursor: pointer;
 }
-
-/* 你可以根据需要补充 InfiniteList 内部元素样式 */
 </style>

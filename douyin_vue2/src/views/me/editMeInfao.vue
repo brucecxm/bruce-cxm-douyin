@@ -2,7 +2,8 @@
   <div class="profile-page">
     <!-- 封面 -->
     <div class="cover">
-      <el-button class="change-cover-btn" type="primary" size="mini"
+      <el-button class="change-cover-btn" type="primary"
+size="mini"
         >更换封面</el-button
       >
     </div>
@@ -110,7 +111,7 @@
 </template>
 
 <script>
-import { userInfoService } from '@/api/user';
+import { getUserInfo } from '@/api/user';
 
 export default {
   data() {
@@ -130,12 +131,12 @@ export default {
     };
   },
   mounted() {
-    this.getUserInfo(); // 获取用户信息
+    this.getUserInfoInit(); // 获取用户信息
   },
   methods: {
     // 获取用户信息
-    getUserInfo() {
-      userInfoService()
+    getUserInfoInit() {
+      getUserInfo()
         .then((res) => {
           this.userInfo = res.data; // 更新用户信息
         })

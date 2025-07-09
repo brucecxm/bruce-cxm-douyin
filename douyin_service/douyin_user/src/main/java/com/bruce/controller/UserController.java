@@ -75,20 +75,17 @@ public class UserController extends ApiController {
     private VideoService videoService;  // 用于将对象转换为JSON字符串
 
     @Autowired
-    private systemClient systemClients;
-
-    @Autowired
     private DcSystemService dcSystemService;
 
     @Autowired
     private IdService idService;
 
     @Autowired
-    private AmqpTemplate amqpTemplate;
+    private RabbitTemplate rabbitTemplate;
 
     private ExecutorService executorService;
 
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private ObjectMapper objectMapper;  // 用于将对象转换为JSON字符串
@@ -169,112 +166,193 @@ public class UserController extends ApiController {
     }
 
     @PostMapping("/doLogin")
-    // 测试登录，浏览器访问： http://localhost:8081/user/doLogin?username=zhang&password=123456
+    @Transactional
     public Result doLogin(@RequestParam Map<String, String> params) {
         String userName = params.get(Constant.User.USER_NAME);
         String password = params.get(Constant.User.PASSWORD);
+        String isCheckStr = params.get(Constant.User.ISCHECK);
+        String verificationCode = params.get(Constant.User.VERIFICATION_CODE);
         String emailVerificationCode = params.get(Constant.User.EMAIL_VERIFICATION_CODE);
-        // 查询符合条件的单条记录
-        User user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername,userName));
-        if (user == null)
-            return Result.error(Constant.Error.USER_INVALID);
-        if (!emailVerificationCode.isEmpty() && emailVerificationCode != null && !emailVerificationCode.equals("")) {
-            String code = stringRedisTemplate.opsForValue().get(Constant.User.EMAIL_CODE_PREFIX + userName);
-            if (!emailVerificationCode.equals(code))
-                return Result.error(Constant.Error.LOGIN_FAILED);
-        } else {
-            //todo 注销用户的时候 一定要记得注销掉用户的盐值
-            // 获取盐值
-            Salt salt = saltService.getOne(new LambdaQueryWrapper<Salt>().eq(Salt::getUserId,user.getId()));
-            // 加密输入的密码
-            String encryptedPassword = saltedDoubleHashPassword(password, salt.getSalt());
-// 判断用户名和加密后的密码是否匹配，验证通过进入登录流程
-            if (!(user.getUsername().equals(userName) && encryptedPassword.equals(user.getPassword()))) {
-                return Result.error(Constant.Error.LOGIN_FAILED);
+        String loginType = params.get(Constant.User.LOGIN_TYPE);
+        boolean isCheck = "true".equalsIgnoreCase(isCheckStr);
+        User user;
+        try {
+            if ("email".equals(loginType)) {
+                // ===== 邮箱验证码登录 =====
+                if (emailVerificationCode == null || emailVerificationCode.isEmpty()) {
+                    return Result.error("邮箱验证码不能为空");
+                }
+                user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, userName));
+                if (user == null) {
+                    // 用户不存在则自动注册，随机8位密码可用于后续找回
+                    String randomPassword = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+                    user = registerNewUser(userName, randomPassword);
+                }
+                String code = stringRedisTemplate.opsForValue().get(Constant.User.EMAIL_CODE_PREFIX + userName);
+                if (code == null || !emailVerificationCode.equals(code)) {
+                    return Result.error(Constant.Error.LOGIN_FAILED);
+                }
+                // 登录
+                StpUtil.login(user.getId());
+            } else {
+                // ===== 用户名密码登录 =====
+                if (password == null || password.isEmpty()) {
+                    return Result.error("密码不能为空");
+                }
+                user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, userName));
+                if (user == null) {
+                    return Result.error(Constant.Error.USER_INVALID);
+                }
+
+                // 验证码可选校验
+                if (isCheck) {
+                    String code = stringRedisTemplate.opsForValue().get(Constant.User.EMAIL_CODE_PREFIX + userName);
+                    if (verificationCode == null || verificationCode.isEmpty()) {
+                        return Result.error("验证码不能为空");
+                    }
+                    if (code == null || !verificationCode.equalsIgnoreCase(code)) {
+                        return Result.error("验证码错误");
+                    }
+                }
+                Salt salt = saltService.getOne(new LambdaQueryWrapper<Salt>().eq(Salt::getUserId, user.getId()));
+                if (salt == null) {
+                    return Result.error("未获取到用户盐值，请联系管理员");
+                }
+                String encryptedPassword = saltedDoubleHashPassword(password, salt.getSalt());
+                if (!encryptedPassword.equals(user.getPassword())) {
+                    return Result.error(Constant.Error.LOGIN_FAILED);
+                }
+                // 登录
+                StpUtil.login(user.getId());
             }
+            // ===== 获取 token 和用户信息 =====
+// ===== 获取 token 和用户信息 =====
+            String token = StpUtil.getTokenValue();
+            Long userId = Long.parseLong(StpUtil.getLoginId().toString());
+            User userInfo = null;
+            String userKey = userId + Constant.User._USER_INFO;
+// 先从 Redis 中查询用户信息
+            String userJson = stringRedisTemplate.opsForValue().get(userKey);
+            if (userJson != null) {
+                // Redis 中存在，直接反序列化为对象
+                userInfo = objectMapper.readValue(userJson, User.class);
+            } else {
+                // Redis 中不存在，从数据库查询
+                userInfo = userService.getById(userId);
+                if (userInfo != null) {
+                    // 将查询到的用户信息存入 Redis (10分钟)
+                    userJson = objectMapper.writeValueAsString(userInfo);
+                    stringRedisTemplate.opsForValue().set(userKey, userJson, 10, TimeUnit.MINUTES);
+                }
+            }
+// 返回封装信息
+            Map<String, Object> response = new HashMap<>();
+            response.put(Constant.User.TOKEN, token);
+            response.put(Constant.User.USER_INFO, userInfo);
+            return Result.success(response);
+        } catch (MyCustomException e) {
+//            return Result.error(e.getCode(), e.getMessage());
+            return Result.error("登录失败，请稍后重试");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("登录失败，请稍后重试");
         }
-        // 1. 默认使用 sa-token 登录方式
-            DcSystem result = dcSystemService.getOne(new LambdaQueryWrapper<DcSystem>().eq(DcSystem::getSysName,Constant.User.LOGIN_TYPE));
-            String login_type =Constant.User.SA_TOKEN; // 默认登录方式为 sa-token
-            if (result != null) {
-                // 获取配置项中的值（可能是 "sa-token" 或 "jwt"）
-                 login_type =  result.getSysValue();
+    }
+
+
+    @GetMapping("/userInfo")
+    public Result<UserInfo> userInfo(@RequestParam Map<String, Object> params) {
+        String pageStr = String.valueOf(params.getOrDefault("page", ""));
+        String pageSizeStr = String.valueOf(params.getOrDefault("pageSize", ""));
+        String userId = String.valueOf(params.getOrDefault("userId", ""));
+
+        if (userId.isEmpty()) {
+            userId = String.valueOf(StpUtil.getLoginId());
+        }
+
+        String key = "user_info:" + userId;
+        User user = null;
+
+        try {
+            String userJson = stringRedisTemplate.opsForValue().get(key);
+            if (userJson != null) {
+                user = objectMapper.readValue(userJson, User.class);
             }
-        // 构建返回给前端的 token 响应数据
-        Map response = new HashMap<>();
-        // 如果配置的是 sa-token 方式
-        if (login_type.equals(Constant.User.SA_TOKEN)) {
-            // 使用 Sa-Token 登录，传入用户 ID，表示登录成功
-            StpUtil.login(user.getId());
-//                stringRedisTemplate.opsForValue().set();
-            // 获取生成的 token 值
-            String token_login = StpUtil.getTokenValue();
-            LambdaQueryWrapper<User> queryWrapper1 = new LambdaQueryWrapper<>();
-            queryWrapper1.eq(User::getId, user.getId()); // 构建查询条件：username 等于传入的 username
-            User user1 = userService.getOne(queryWrapper1); // 执行查询，返回满足条件的第一条 User 记录
-            // 将 token 放入返回 map
-            response.put(Constant.User.TOKEN, token_login);
-            response.put(Constant.User.USER_INFO, user1);
-            String loginId = StpUtil.getLoginId().toString();  // 转换为字符串
-            Long userId = Long.parseLong(loginId);  // 将字符串转为 Long 类型
-            String useridStr = String.valueOf(userId);  // 将 user 对象转换为 JSON 字符串
+        } catch (Exception e) {
+            // 可打印日志但不中断流程
+            log.error("Redis 用户信息反序列化失败，降级查询数据库", e);
+        }
+
+        if (user == null) {
+            user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getId, userId));
+            if (user == null) {
+                return Result.error("用户不存在");
+            }
             try {
                 String userJson = objectMapper.writeValueAsString(user);
-                String key = useridStr + Constant.User._USER_INFO;
                 stringRedisTemplate.opsForValue().set(key, userJson, 10, TimeUnit.MINUTES);
             } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
+                log.error("用户信息序列化失败", e);
             }
-            // 如果配置的是 jwt 方式
-        } else if (login_type.equals(Constant.User.JWT)) {
-            // 使用自定义 jwt 工具类生成 token（一般以用户名作为 payload）
-            String token = jwtUtil.generateToken(user.getUsername());
-            // 将 token 放入返回 map
-            response.put(Constant.User.TOKEN, token);
-        } else {
-            // 如果配置了不支持的 token 类型，可以在这里补充报错或记录日志（建议完善）
         }
-        // 登录成功，返回包含 token 的成功结果给前端
-        return Result.success(response);
+
+        UserInfo userInfo = new UserInfo();
+        BeanUtils.copyProperties(user, userInfo);
+
+        try {
+            if (pageStr.isEmpty() || pageSizeStr.isEmpty()) {
+                List<Video> videoList = videoService.list(
+                        new LambdaQueryWrapper<Video>().eq(Video::getUserId, userId)
+                );
+                userInfo.setVideoList(videoList);
+            } else {
+                long page, pageSize;
+                try {
+                    page = Long.parseLong(pageStr);
+                    pageSize = Long.parseLong(pageSizeStr);
+                } catch (NumberFormatException e) {
+                    return Result.error("分页参数格式错误");
+                }
+                Page<Video> pageQry = new Page<>(page, pageSize);
+                IPage<Video> videoPage = videoService.page(
+                        pageQry,
+                        new LambdaQueryWrapper<Video>().eq(Video::getUserId, userId)
+                );
+                userInfo.setVideoPage(videoPage);
+            }
+        } catch (Exception e) {
+            log.error("查询视频信息失败", e);
+            return Result.error("查询视频信息失败");
+        }
+
+        return Result.success(userInfo);
     }
 
-    @GetMapping("/auth")
-    public Map<String, Object> getAuth(
-            @RequestParam(required = false) Long userid,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Object UserIdObj = StpUtil.getLoginId();
-        Long loginUserId = UserIdObj != null ? Long.parseLong(UserIdObj.toString()) : 0L;
-        if (userid == null) {
-            userid = loginUserId;  // 使用当前登录用户ID
-        }
-        Map<String, Object> result = new HashMap<>();
-        // 查询用户信息
-        LambdaQueryWrapper<User> userQuery = new LambdaQueryWrapper<>();
-        userQuery.eq(User::getId, userid);
-        User userInfo = userService.getOne(userQuery);
-        result.put("userInfo", userInfo);
-        // 查询视频分页数据
-        Page<Video> pageInfo = new Page<>(page, size);
-        LambdaQueryWrapper<Video> videoQuery = new LambdaQueryWrapper<>();
-        videoQuery.eq(Video::getUserId, userid);
-        IPage<Video> videoPage = videoService.page(pageInfo, videoQuery);
-        result.put("videobox", videoPage.getRecords());
-        result.put("total", videoPage.getTotal());
-        return result;
-    }
+
 
     // 图片验证码接口
-    @PutMapping("/getVerificationCode")
-    public void getVerificationCode(HttpServletResponse response, @RequestParam(required = false) String uuid) throws IOException {
-        if (uuid == null) {
+    @GetMapping("/getVerificationCode")
+    public void getVerificationCode(HttpServletResponse response, @RequestParam Map<String, Object> params) throws IOException {
+        String uuid = params.containsKey("uuid") ?
+                String.valueOf(params.get("uuid")) :
+                "";
+        String userName = params.containsKey("userName") ?
+                String.valueOf(params.get("userName")) :
+                "";
+        if (uuid == null || uuid.isEmpty()) {
             uuid = String.valueOf(System.currentTimeMillis()); // 生成唯一标识符
         }
         // 创建验证码对象（设置图片宽高和验证码字符数）
         SpecCaptcha captcha = new SpecCaptcha(120, 40, 5); // 验证码宽度 120px, 高度 40px，5个字符
         captcha.setCharType(Captcha.TYPE_DEFAULT); // 设置验证码类型为数字字母组合
+        String intervalKey = "code:interval:" + userName;
+        if (Boolean.TRUE.equals(stringRedisTemplate.hasKey(intervalKey))) {
+            throw new RuntimeException("验证码发送过于频繁，请稍后再试");
+        }
+        stringRedisTemplate.opsForValue().set(intervalKey, "1", 60, TimeUnit.SECONDS);
+
         // 存入 Redis，过期时间 3 分钟`
-        stringRedisTemplate.opsForValue().set("CAPTCHA_" + uuid, captcha.text(), 3, TimeUnit.MINUTES);
+        stringRedisTemplate.opsForValue().set("CAPTCHA_" + uuid + userName, captcha.text(), 3, TimeUnit.MINUTES);
         // 设置响应头
         response.setContentType("image/png"); // 设置返回类型为 PNG 格式的图片
         response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate"); // 防止缓存
@@ -286,7 +364,7 @@ public class UserController extends ApiController {
         }
     }
 
-    // 图片验证码接口
+    // 邮箱验证码接口
     @PostMapping("/getEmailVerificationCode")
     public void getEmailVerificationCodeService(@RequestParam String email) throws IOException {
         // 1. 生成验证码
@@ -302,160 +380,90 @@ public class UserController extends ApiController {
     }
 
 
-    @PutMapping("/getVerificationCodeImg")
-    public void getVerificationCodeImg(HttpServletResponse response, @RequestParam(required = false) String uuid) throws IOException {
-        if (uuid == null) {
-            uuid = String.valueOf(System.currentTimeMillis()); // 生成唯一标识符
-        }
-        // 创建验证码对象（设置图片宽高和验证码字符数）
-        SpecCaptcha captcha = new SpecCaptcha(120, 40, 5);
-        captcha.setCharType(Captcha.TYPE_DEFAULT);
-        // 存入 Redis，过期时间 3 分钟
-        stringRedisTemplate.opsForValue().set("CAPTCHA_" + uuid, captcha.text(), 3, TimeUnit.MINUTES);
-        // 设置响应头
-        response.setContentType("image/png");
-        response.setHeader("Cache-Control", "no-store, no-cache");
-        response.setHeader("uuid", uuid);
-        // 使用 out() 方法生成并输出验证码图片
-        ServletOutputStream out = response.getOutputStream();
-        captcha.out(out); // 直接输出验证码到响应流
-        out.flush();
-        out.close();
-    }
-
-
-    //*******************sa-token***********************
-
-
-
-
-
-
-
+    //简单的参数类型 如果没有用参数注解  spring会默认把参数前面加上@RequestParam
+//简单的参数类型 如果没有用参数注解  spring会默认把参数前面加上@RequestParam
+//简单的参数类型 如果没有用参数注解  spring会默认把参数前面加上@RequestParam
     @PostMapping("/register")
     @Transactional
-    public Result register(String username, String password) throws NoSuchAlgorithmException, InvalidKeySpecException, JsonProcessingException {
-        // 查询用户
-        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(User::getUsername, username);
-        User u = userService.getOne(queryWrapper); // 获取用户名对应的用户
-        User user = new User();
-        long userid = idService.SnowflakeGen();
-        Salt saltone = new Salt();
-        // 生成盐值
-        String salt = generateSalt(16);
-        saltone.setUserId(userid);
-        // 加密密码
-        String encryptedPassword = saltedDoubleHashPassword(password, salt);
-        saltone.setSalt(salt);
-        user.setUsername(username);
-        user.setPassword(encryptedPassword);
-        user.setAvatar( dcSystemService.getOne(new LambdaQueryWrapper<DcSystem>().eq(DcSystem::getSysName, Constant.User.DEFAULT_USER_AVATAR)).getSysValue());
-        user.setBackImg(dcSystemService.getOne(new LambdaQueryWrapper<DcSystem>().eq(DcSystem::getSysName, Constant.User.DEFAULT_USER_BACK_IMG)).getSysValue());
-        user.setRoleId(Constant.Role.USER);
-        if (u != null)
-            throw new MyCustomException(400, Constant.Error.USER_REPEAT);
-            //注册
-            user.setId(userid);
-            user.setNickname(Constant.Chinese.NEW_USER + idService.SnowflakeGen());
-            userService.save(user);
-            LambdaQueryWrapper queryWrapper1 = new LambdaQueryWrapper<>();
-            queryWrapper.eq(User::getUsername, username); // 等价于 SQL 中的 WHERE username = ?
-            User userResult = userService.getOne(queryWrapper);
-            saltService.save(saltone);
-            String userStr;
-            ObjectMapper objectMapper = new ObjectMapper();
-            userStr = objectMapper.writeValueAsString(userResult);
-            return Result.success(userStr);
-    }
-
-    // 哈希密码
-    public static String hashPassword(String password) throws Exception {
-        byte[] salt = new byte[16];
-        new SecureRandom().nextBytes(salt);
-        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 10000, 256);
-        SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-        byte[] hash = skf.generateSecret(spec).getEncoded();
-        return Base64.getEncoder().encodeToString(hash) + ":" + Base64.getEncoder().encodeToString(salt); // 返回盐值和哈希值
-    }
-
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
-
-    // 查询登录状态，浏览器访问： http://localhost:8081/user/isLogin
-    @RequestMapping("isLogin")
-    public Result isLogin() {
-        // 获取：当前账号所拥有的权限集合
-        List<String> permission = StpUtil.getPermissionList();
-        for (String permissiontemp : permission
-        ) {
-            if (permissiontemp.equals("user.get")
-            ) {
-// 判断：当前账号是否拥有指定角色, 返回 true 或 false
-                if (StpUtil.hasRole("super-admin")) {
-// 在登录时缓存 user 对象
-                    Object user1 = StpUtil.getSession().get("user");
-                    // 然后我们就可以在任意处使用这个 user 对象
-// 获取当前 Token 的 Token-Session 对象
-                    SaSession tokenSession = StpUtil.getTokenSession();
-                    String data = stringRedisTemplate.opsForValue().get("LOGIN_TYPE:PASSWORD");
-                    System.out.println("Sa-Token Data: " + data);
-                    // 封禁指定账号
-                    // 先踢下线
-                    StpUtil.kickout(10001);
-                    StpUtil.disable(10001, 86400);
-                    return Result.success("当前会话是否登录：" + StpUtil.isLogin());
-                }
+    public Result register(@RequestParam Map<String, Object> params) {
+        // 1. 参数提取与校验
+        String userName = String.valueOf(params.getOrDefault("userName", ""));
+        String password = String.valueOf(params.getOrDefault("password", ""));
+        boolean isCheck = Boolean.parseBoolean(String.valueOf(params.getOrDefault("isCheck", "false")));
+        String verificationCode = String.valueOf(params.getOrDefault("verificationCode", ""));
+        // 基础参数校验
+        if (userName.isEmpty() || password.isEmpty()) {
+            return Result.error("用户名和密码不能为空");
+        }
+        // 2. 验证码校验（如果需要）
+        if (isCheck) {
+            if (verificationCode.isEmpty()) {
+                return Result.error("验证码不能为空");
+            }
+            String storedCode = stringRedisTemplate.opsForValue()
+                    .get(Constant.User.EMAIL_CODE_PREFIX + userName);
+            if (storedCode == null || !verificationCode.equalsIgnoreCase(storedCode)) {
+                return Result.error("验证码错误");
             }
         }
-        return Result.error("无权查看");
-    }
-
-    //生成四位的验证吗
-    @GetMapping("/getYanzheng")
-    public Result<String> getYanzheng() {
-        // 生成四位随机验证码
-        String verificationCode = generateRandomCode(4);
-        // 将验证码存储到 Redis 中，设置过期时间为5分钟（可根据需求调整）
-        stringRedisTemplate.opsForValue().set("yancode", verificationCode, 5, TimeUnit.MINUTES);
-        rabbitTemplate.convertAndSend("YanZhengQueue", verificationCode);
-        // 返回验证码
-        return Result.success(verificationCode);
-    }
-
-    private String generateRandomCode(int length) {
-        Random random = new Random();
-        StringBuilder code = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            code.append(random.nextInt(10)); // 生成0-9之间的随机数字
-        }
-        return code.toString();
-    }
-
-    @GetMapping("/userInfo")
-    public MeInfo userInfo() {
-        Object userId = StpUtil.getLoginId();
-        System.out.println("当前用户的ID: " + userId);
-        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(User::getId, userId);
-        MeInfo meInfo = new MeInfo();
-        User user = userService.getOne(queryWrapper);
-        LambdaQueryWrapper<Video> queryWrapperV = new LambdaQueryWrapper<>();
-        queryWrapperV.eq(Video::getUserId, userId);
-        List<Video> videoList = videoService.list(queryWrapperV);
-// 使用 BeanUtils 复制相同属性
-        BeanUtils.copyProperties(user, meInfo);
-        meInfo.setVideoList(videoList);
-        String useridStr = String.valueOf(userId);  // 将 user 对象转换为 JSON 字符串
-//        List<Video> videoList = videoService.getVideosByUserId(user.getId());
+        // 3. 用户注册处理
         try {
-            String userJson = objectMapper.writeValueAsString(user);
-            String key = useridStr + "_user_info";
-            stringRedisTemplate.opsForValue().set(key, userJson, 10, TimeUnit.MINUTES);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            User user = registerNewUser(userName, password);
+            return Result.success(user); // 直接返回对象，让Result类处理序列化
+        } catch (MyCustomException e) {
+            log.error("业务异常: {}", e.getMessage());
+            return Result.error(e.getMessage()); // 返回具体错误信息
+        } catch (Exception e) {
+            log.error("系统异常: {}", e.getMessage(), e);
+            return Result.error("注册失败，请稍后重试");
         }
-        return meInfo;
     }
+
+    @Transactional
+    public User registerNewUser(String username, String password) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        // 查询是否已存在
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getUsername, username);
+        User existingUser = userService.getOne(queryWrapper);
+
+        if (existingUser != null) {
+            throw new MyCustomException(400, Constant.Error.USER_REPEAT);
+        }
+
+        long userId = idService.SnowflakeGen();
+
+        // 生成盐值并保存
+        String saltStr = generateSalt(16);
+        Salt salt = new Salt();
+        salt.setUserId(userId);
+        salt.setSalt(saltStr);
+        saltService.save(salt);
+
+        // 加密密码
+        String encryptedPassword = saltedDoubleHashPassword(password, saltStr);
+
+        // 设置用户基本信息
+        User user = new User();
+        user.setId(userId);
+        user.setUsername(username);
+        user.setPassword(encryptedPassword);
+        user.setNickname(Constant.Chinese.NEW_USER + idService.SnowflakeGen());
+        user.setAvatar(
+                dcSystemService.getOne(new LambdaQueryWrapper<DcSystem>()
+                                .eq(DcSystem::getSysName, Constant.User.DEFAULT_USER_AVATAR))
+                        .getSysValue()
+        );
+        user.setBackImg(
+                dcSystemService.getOne(new LambdaQueryWrapper<DcSystem>()
+                                .eq(DcSystem::getSysName, Constant.User.DEFAULT_USER_BACK_IMG))
+                        .getSysValue()
+        );
+        user.setRoleId(Constant.Role.USER);
+
+        userService.save(user);
+
+        return user;
+    }
+
 
 }

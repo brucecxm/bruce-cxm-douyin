@@ -27,7 +27,7 @@ public class User  {
     private String userPic;
     private String backImg;
     private String city;
-    private String jieshao;
+    private String myIntro;
     private String age;
     private String school;
     private String username;

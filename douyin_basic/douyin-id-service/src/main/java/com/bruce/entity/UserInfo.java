@@ -3,6 +3,7 @@ package com.bruce.entity;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 
@@ -17,8 +18,9 @@ import java.util.List;
  */
 @SuppressWarnings("serial")
 @Data
-public class MeInfo {
+public class UserInfo {
     List<Video> videoList;
+    IPage<Video> videoPage;
     private int id;
 
     private String username;
@@ -44,7 +46,7 @@ public class MeInfo {
 
     private String city;
 
-    private String jieshao;
+    private String myIntro;
 
     private String age;
 
