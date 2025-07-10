@@ -1,109 +1,231 @@
 <template>
-  <div class="register-container">
-    <el-card class="register-card">
-      <h2 class="register-title">用户注册</h2>
-      <el-form
-        :model="form"
-        :rules="rules"
-        ref="registerForm"
-        label-width="80px"
+  <el-card class="file-download-card">
+    <div class="header">
+      <span>大文件分片下载</span>
+    </div>
+
+    <el-input
+      v-model="fileName"
+      placeholder="请输入下载文件名（如 large_file.iso）"
+      clearable
+      class="input-file-name"
+    ></el-input>
+
+    <div class="button-group">
+      <el-button
+        type="primary"
+        @click="startDownload"
+        :disabled="isDownloading"
       >
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="form.username" autocomplete="off" />
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input
-            type="password"
-            v-model="form.password"
-            autocomplete="off"
-          />
-        </el-form-item>
-        <el-form-item label="确认密码" prop="confirmPassword">
-          <el-input
-            type="password"
-            v-model="form.confirmPassword"
-            autocomplete="off"
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="register">注册</el-button>
-          <el-button @click="$router.push('/login')">返回登录</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
-  </div>
+        开始下载
+      </el-button>
+      <el-button
+        type="warning"
+        @click="pauseDownload"
+        :disabled="!isDownloading"
+      >
+        暂停下载
+      </el-button>
+      <el-button type="danger" @click="resetDownload" :disabled="isDownloading">
+        重置
+      </el-button>
+    </div>
+
+    <el-progress
+      :percentage="progress"
+      status="active"
+      :text-inside="true"
+      :stroke-width="18"
+      style="margin-top: 20px"
+    ></el-progress>
+
+    <div class="status-text">{{ status }}</div>
+  </el-card>
 </template>
 
 <script>
-import { testshan } from '@/api/test'; // 注册接口
+import axios from 'axios';
 
 export default {
+  name: 'FileDownload',
   data() {
     return {
-      form: {
-        username: '',
-        password: '',
-        confirmPassword: ''
-      },
-      rules: {
-        username: [
-          { required: true, message: '请输入用户名', trigger: 'blur' }
-        ],
-        password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-        confirmPassword: [
-          { required: true, message: '请确认密码', trigger: 'blur' },
-          {
-            validator: (rule, value, callback) => {
-              if (value !== this.form.password) {
-                callback(new Error('两次输入密码不一致'));
-              } else {
-                callback();
-              }
-            },
-            trigger: 'blur'
-          }
-        ]
-      }
+      fileName: '',
+      fileUrl: '/api/down/files',
+      fileInfoUrl: '/api/down/files',
+
+      totalSize: 0,
+      totalChunks: 0,
+      chunkSize: 50 * 1024 * 1024,
+
+      downloadedChunks: new Set(),
+      progress: 0,
+      isDownloading: false,
+      status: '等待下载',
+
+      cancelTokens: new Map(),
+      chunksData: []
     };
   },
   methods: {
-    register() {
-      this.$refs.registerForm.validate((valid) => {
-        if (valid) {
-          const user = {
-            username: this.form.username,
-            password: this.form.password
-          };
-          testshan(user)
-            .then((res) => {
-              this.$message.success('注册成功');
-              console.log(res);
-              this.$router.push('/login');
-            })
-            .catch((err) => {
-              this.$message.error('注册失败：' + (err.message || ''));
-            });
+    async initDownload() {
+      this.status = '获取文件信息...';
+      try {
+        const res = await axios.get(
+          `${this.fileInfoUrl}/${this.fileName}/info`
+        );
+        if (!res.data.exists) {
+          this.status = '文件不存在';
+          return false;
         }
-      });
+        this.totalSize = res.data.fileSize;
+        this.totalChunks = Math.ceil(this.totalSize / this.chunkSize);
+        this.restoreDownloadedChunks();
+        return true;
+      } catch (e) {
+        this.status = '获取文件信息失败';
+        return false;
+      }
+    },
+    restoreDownloadedChunks() {
+      const saved = localStorage.getItem(`downloaded_${this.fileName}`);
+      if (saved) {
+        const chunks = JSON.parse(saved);
+        this.downloadedChunks = new Set(chunks);
+      }
+    },
+    saveDownloadedChunks() {
+      localStorage.setItem(
+        `downloaded_${this.fileName}`,
+        JSON.stringify([...this.downloadedChunks])
+      );
+    },
+    async startDownload() {
+      if (!this.fileName) {
+        this.$message.warning('请输入文件名');
+        return;
+      }
+      if (!(await this.initDownload())) return;
+      this.isDownloading = true;
+      this.status = '下载中...';
+      this.chunksData = [];
+
+      const concurrency = 3;
+      let currentChunk = 0;
+      let active = 0;
+
+      const downloadNext = async () => {
+        if (currentChunk >= this.totalChunks) {
+          if (this.downloadedChunks.size === this.totalChunks) {
+            this.finishDownload();
+          }
+          return;
+        }
+        if (this.downloadedChunks.has(currentChunk)) {
+          currentChunk++;
+          downloadNext();
+          return;
+        }
+        const chunkIndex = currentChunk++;
+        active++;
+        this.downloadChunk(chunkIndex)
+          .then(() => {
+            active--;
+            if (active < concurrency && this.isDownloading) downloadNext();
+          })
+          .catch(() => {
+            active--;
+            if (this.isDownloading) downloadNext();
+          });
+        if (active < concurrency && this.isDownloading) downloadNext();
+      };
+
+      for (let i = 0; i < Math.min(concurrency, this.totalChunks); i++) {
+        downloadNext();
+      }
+    },
+    async downloadChunk(chunkIndex) {
+      const start = chunkIndex * this.chunkSize;
+      const end = Math.min(start + this.chunkSize - 1, this.totalSize - 1);
+      const source = axios.CancelToken.source();
+      this.cancelTokens.set(chunkIndex, source);
+
+      try {
+        const res = await axios.get(`${this.fileUrl}/${this.fileName}`, {
+          headers: { Range: `bytes=${start}-${end}` },
+          responseType: 'blob',
+          cancelToken: source.token
+        });
+        this.downloadedChunks.add(chunkIndex);
+        this.saveDownloadedChunks();
+        this.chunksData[chunkIndex] = res.data;
+        this.updateProgress();
+      } catch (e) {
+        if (!axios.isCancel(e)) console.error(e);
+      } finally {
+        this.cancelTokens.delete(chunkIndex);
+      }
+    },
+    updateProgress() {
+      this.progress = Math.round(
+        (this.downloadedChunks.size / this.totalChunks) * 100
+      );
+    },
+    async finishDownload() {
+      this.isDownloading = false;
+      this.status = '合并文件并下载...';
+      const blob = new Blob(this.chunksData);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = this.fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      this.status = '下载完成';
+      this.progress = 100;
+    },
+    pauseDownload() {
+      this.isDownloading = false;
+      this.status = '已暂停';
+      this.cancelTokens.forEach((source) => source.cancel('暂停下载'));
+      this.cancelTokens.clear();
+    },
+    resetDownload() {
+      this.pauseDownload();
+      this.downloadedChunks.clear();
+      localStorage.removeItem(`downloaded_${this.fileName}`);
+      this.progress = 0;
+      this.status = '已重置';
+      this.chunksData = [];
     }
   }
 };
 </script>
 
 <style scoped>
-.register-container {
+.file-download-card {
+  max-width: 400px;
+  margin: 30px auto;
+}
+.header {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+.input-file-name {
+  width: 100%;
+  margin-bottom: 15px;
+}
+.button-group {
   display: flex;
-  height: 100vh;
-  justify-content: center;
-  align-items: center;
-  background: #f5f5f5;
+  justify-content: space-between;
+  margin-bottom: 15px;
 }
-.register-card {
-  width: 400px;
-  padding: 20px;
-}
-.register-title {
+.status-text {
   text-align: center;
-  margin-bottom: 20px;
+  color: #555;
+  margin-top: 10px;
 }
 </style>

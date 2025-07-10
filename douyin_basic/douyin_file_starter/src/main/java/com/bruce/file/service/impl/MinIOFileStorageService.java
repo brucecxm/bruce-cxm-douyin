@@ -201,4 +201,51 @@ public class MinIOFileStorageService implements FileStorageService {
         }
         return byteArrayOutputStream.toByteArray();
     }
+
+    /**
+     * 通用上传文件到 MinIO 指定前缀下，可自动根据文件名推断 contentType
+     *
+     * @param prefix       MinIO 内 testfile 等前缀
+     * @param filename     文件名
+     * @param inputStream  文件流
+     * @param contentType  可为空，自动推断
+     * @return MinIO 可访问 URL
+     */
+    public String uploadFile(String prefix, String filename, InputStream inputStream, String contentType) {
+        String filePath = builderFilePath(prefix, filename);
+        try {
+            if (contentType == null || contentType.isEmpty()) {
+                if (filename.endsWith(".mp4") || filename.endsWith(".mov")) {
+                    contentType = "video/mp4";
+                } else if (filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".png")) {
+                    contentType = "image/jpeg";
+                } else if (filename.endsWith(".html")) {
+                    contentType = "text/html";
+                } else {
+                    contentType = "application/octet-stream";
+                }
+            }
+
+            PutObjectArgs putObjectArgs = PutObjectArgs.builder()
+                    .bucket(minIOConfigProperties.getBucket())
+                    .object(filePath)
+                    .contentType(contentType)
+                    .stream(inputStream, inputStream.available(), -1)
+                    .build();
+
+            minioClient.putObject(putObjectArgs);
+
+            StringBuilder urlPath = new StringBuilder(minIOConfigProperties.getReadPath());
+            urlPath.append(separator).append(minIOConfigProperties.getBucket()).append(separator).append(filePath);
+
+            return urlPath.toString();
+        } catch (Exception ex) {
+            log.error("minio put file error.", ex);
+            throw new RuntimeException("上传文件失败", ex);
+        }
+    }
+
+
+
+
 }

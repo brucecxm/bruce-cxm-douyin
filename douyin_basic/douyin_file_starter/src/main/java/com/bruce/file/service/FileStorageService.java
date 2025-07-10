@@ -49,4 +49,7 @@ public interface FileStorageService {
      */
     public byte[]  downLoadFile(String pathUrl);
 
+
+    public String uploadFile(String prefix, String filename, InputStream inputStream, String contentType) ;
+
 }
