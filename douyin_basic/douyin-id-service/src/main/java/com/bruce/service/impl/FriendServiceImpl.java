@@ -2,6 +2,7 @@ package com.bruce.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bruce.dao.FriendDao;
 import com.bruce.dao.FriendRequestDao;
@@ -17,7 +18,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * (Friend)表服务实现类
@@ -38,20 +41,48 @@ public class FriendServiceImpl extends ServiceImpl<FriendDao, Friend> implements
 
 
 
+
+
+    @Override
+    public List<User> searchMyFriends(Long userId, String keyword) {
+        // 查找该用户所有好友的 ID 列表
+        List<Long> friendIds = friendMapper.selectList(
+                        new QueryWrapper<Friend>().eq("user_id", userId)
+                ).stream()
+                .map(Friend::getFriendId)
+                .collect(Collectors.toList());
+
+        if (friendIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 在这些好友中模糊搜索
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.lambda()
+                .in(User::getId, friendIds)
+                .and(w -> w.like(User::getUsername, keyword)
+                        .or()
+                        .like(User::getEmail, keyword)
+                        .or()
+                        .like(User::getPhone, keyword)
+                        .or()
+                        .eq(User::getId, keyword));
+
+        return userMapper.selectList(wrapper);
+    }
+
     /**
      * 发送好友请求
      */
     @Override
     public void sendFriendRequest(Long toUserId, String verifyMsg) {
         Object fromUserIdObj = StpUtil.getLoginId();
-Long fromUserId= 0L;
+        Long fromUserId = 0L;
 // 判断返回值是否为 Long 类型
         if (fromUserIdObj != null) {
-             fromUserId = Long.valueOf(fromUserIdObj.toString());
+            fromUserId = Long.valueOf(fromUserIdObj.toString());
             // 现在 fromUserId 就是 Long 类型
         }
-
-
         // 判断是否已经是好友
         int count = friendMapper.selectCount(new LambdaQueryWrapper<Friend>()
                 .eq(Friend::getUserId, fromUserId)  // 查找当前用户与目标用户之间的好友关系
@@ -75,7 +106,7 @@ Long fromUserId= 0L;
     @Override
     public List<FriendRequestVO> getReceivedRequests() {
         Object myIdStr = StpUtil.getLoginId();
-        Long myId= 0L;
+        Long myId = 0L;
 // 判断返回值是否为 Long 类型
         if (myIdStr != null) {
             myId = Long.valueOf(myIdStr.toString());
@@ -111,7 +142,7 @@ Long fromUserId= 0L;
     @Override
     public void handleRequest(Long requestId, String action) {
         Object myIdStr = StpUtil.getLoginId();
-        Long myId= 0L;
+        Long myId = 0L;
 
         if (myIdStr != null) {
             myId = Long.valueOf(myIdStr.toString());
@@ -150,7 +181,7 @@ Long fromUserId= 0L;
     @Override
     public List<FriendVO> getFriendList() {
         Object myIdStr = StpUtil.getLoginId();
-        Long myId= 0L;
+        Long myId = 0L;
 
         if (myIdStr != null) {
             myId = Long.valueOf(myIdStr.toString());
@@ -212,10 +243,14 @@ Long fromUserId= 0L;
      */
     private String getStatusName(int status) {
         switch (status) {
-            case 0: return "待处理"; // 0：待处理
-            case 1: return "已同意"; // 1：已同意
-            case 2: return "已拒绝"; // 2：已拒绝
-            default: return "未知"; // 未知状态
+            case 0:
+                return "待处理"; // 0：待处理
+            case 1:
+                return "已同意"; // 1：已同意
+            case 2:
+                return "已拒绝"; // 2：已拒绝
+            default:
+                return "未知"; // 未知状态
         }
     }
 

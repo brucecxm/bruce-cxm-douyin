@@ -741,6 +741,387 @@ echo "==================== 部署脚本执行完成! ===================="
 
 
 
+
+
+
+
+# 分片上传实现
+
+
+
+首先，依据文件的实际大小与预设的分片尺寸，精确计算出所需的分片总数。随后，通过循环机制逐次向后端发起请求，将各个分片有序上传至文件服务器。待所有分片上传完毕（即循环结束），再触发合并请求，由后端负责将文件服务器上的所有分片整合为完整文件。
+
+
+
+在此过程中，后端需同步实现断网重传等保障机制：当检测到网络中断导致上传失败时，系统应自动记录已上传的分片信息；待网络恢复后，仅需重新上传未成功的分片，无需从头开始，以此大幅提升文件上传的效率与稳定性，确保大文件或网络环境不稳定情况下的上传任务能够顺利完成。
+
+
+
+
+
+```
+
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      file: null,
+      chunkSize: 6 * 1024 * 1024,
+      totalChunks: 0,
+      fileHash: '',
+      uploadedChunks: [],
+      uploading: false,
+      cancelTokenSource: null,
+      currentChunkIndex: 0,
+      progress: 0
+    };
+  },
+  mounted() {
+    // 断网恢复自动续传
+    window.addEventListener('online', () => {
+      if (
+        !this.uploading &&
+        this.file &&
+        this.uploadedChunks.length < this.totalChunks
+      ) {
+        this.resumeUpload();
+      }
+    });
+  },
+  methods: {
+    handleFileChange(e) {
+      this.file = e.target.files[0];
+      this.totalChunks = Math.ceil(this.file.size / this.chunkSize);
+      this.fileHash = this.file.name + '_' + this.file.size; // 简易hash
+    },
+
+    async startUpload() {
+      if (!this.file) return;
+
+      const res = await axios.get('api/upload/check', {
+        params: { fileHash: this.fileHash }
+      });
+      this.uploadedChunks = res.data.uploaded || [];
+
+      this.uploading = true;
+      this.currentChunkIndex = 0;
+      this.uploadChunks();
+    },
+
+    pauseUpload() {
+      if (this.cancelTokenSource) {
+        this.cancelTokenSource.cancel('用户暂停上传');
+      }
+      this.uploading = false;
+    },
+
+    resumeUpload() {
+      this.uploading = true;
+      this.uploadChunks();
+    },
+
+    async uploadChunks() {
+      while (this.currentChunkIndex < this.totalChunks) {
+        if (!this.uploading) break;
+
+        if (this.uploadedChunks.includes(this.currentChunkIndex)) {
+          this.updateProgress();
+          this.currentChunkIndex++;
+          continue;
+        }
+
+        const start = this.currentChunkIndex * this.chunkSize;
+        const end = Math.min(this.file.size, start + this.chunkSize);
+        const chunk = this.file.slice(start, end);
+
+        const formData = new FormData();
+        formData.append('file', chunk);
+        formData.append('index', this.currentChunkIndex);
+        formData.append('total', this.totalChunks);
+        formData.append('fileName', this.file.name);
+        formData.append('fileHash', this.fileHash);
+
+        this.cancelTokenSource = axios.CancelToken.source();
+
+        try {
+          await axios.post('api/upload/chunk', formData, {
+            cancelToken: this.cancelTokenSource.token,
+            onUploadProgress: (progressEvent) => {
+              const chunkProgress = progressEvent.loaded / progressEvent.total;
+              this.progress = Math.min(
+                100,
+                Math.round(
+                  ((this.currentChunkIndex + chunkProgress) /
+                    this.totalChunks) *
+                    100
+                )
+              );
+            }
+          });
+          this.uploadedChunks.push(this.currentChunkIndex);
+          this.updateProgress();
+          this.currentChunkIndex++;
+        } catch (error) {
+          if (axios.isCancel(error)) {
+            console.log('上传已暂停', error.message);
+            return;
+          } else {
+            console.error('上传失败，重试中...', error);
+            return;
+          }
+        }
+      }
+
+      if (this.uploadedChunks.length === this.totalChunks) {
+        await axios.post('api/upload/merge', {
+          fileName: this.file.name,
+          fileHash: this.fileHash,
+          total: this.totalChunks
+        });
+        this.$message.success('上传并合并完成！');
+        this.uploading = false;
+      }
+    },
+
+    updateProgress() {
+      this.progress = Math.min(
+        100,
+        Math.round((this.uploadedChunks.length / this.totalChunks) * 100)
+      );
+    },
+
+    formatFileSize(size) {
+      if (size < 1024) return size + ' B';
+      else if (size < 1024 * 1024) return (size / 1024).toFixed(2) + ' KB';
+      else if (size < 1024 * 1024 * 1024)
+        return (size / (1024 * 1024)).toFixed(2) + ' MB';
+      else return (size / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+    },
+
+    resetUpload() {
+      this.file = null;
+      this.chunkSize = 2 * 1024 * 1024;
+      this.totalChunks = 0;
+      this.fileHash = '';
+      this.uploadedChunks = [];
+      this.uploading = false;
+      this.cancelTokenSource = null;
+      this.currentChunkIndex = 0;
+      this.progress = 0;
+    }
+  }
+};
+</script>
+
+```
+
+
+
+# 分片下载实现
+
+
+
+分片下载是将一个文件分割成多个小块（分片），通过并发请求同时下载这些分片，全部下载完成后再拼接成完整文件的技术。它能利用多线程提升下载速度，且支持断点续传 —— 网络中断后无需重新下载已完成的分片，仅需续传剩余部分，在大文件下载场景中尤为实用。
+
+
+
+浏览器的下载方式主要有两种：   
+
+第一种是直接通过链接调用浏览器内置下载工具，以单线程方式获取完整文件流并保存，流程简单直接，但大文件下载时易受单连接速度限制，且中断后需从头开始。   
+
+第二种是分片下载：先将文件拆分为多个独立分片，通过多线程并发请求同时下载这些分片，全部下载完成后在本地拼接成完整文件，最后再调用浏览器下载工具触发保存。这种方式能充分利用网络带宽提升速度，且支持断点续传（中断后仅需重下未完成的分片），尤其适合大文件场景，兼顾了效率与稳定性。
+
+
+
+```
+
+<script>
+import axios from 'axios';
+
+export default {
+  name: 'FileDownload',
+  data() {
+    return {
+      fileName: '',
+      fileUrl: '/api/down/files',
+      fileInfoUrl: '/api/down/files',
+
+      totalSize: 0,
+      totalChunks: 0,
+      chunkSize: 50 * 1024 * 1024,
+
+      downloadedChunks: new Set(),
+      progress: 0,
+      isDownloading: false,
+      status: '等待下载',
+
+      cancelTokens: new Map(),
+      chunksData: []
+    };
+  },
+  methods: {
+    async initDownload() {
+      this.status = '获取文件信息...';
+      try {
+        const res = await axios.get(
+          `${this.fileInfoUrl}/${this.fileName}/info`
+        );
+        if (!res.data.exists) {
+          this.status = '文件不存在';
+          return false;
+        }
+        this.totalSize = res.data.fileSize;
+        this.totalChunks = Math.ceil(this.totalSize / this.chunkSize);
+        this.restoreDownloadedChunks();
+        return true;
+      } catch (e) {
+        this.status = '获取文件信息失败';
+        return false;
+      }
+    },
+    restoreDownloadedChunks() {
+      const saved = localStorage.getItem(`downloaded_${this.fileName}`);
+      if (saved) {
+        const chunks = JSON.parse(saved);
+        this.downloadedChunks = new Set(chunks);
+      }
+    },
+    saveDownloadedChunks() {
+      localStorage.setItem(
+        `downloaded_${this.fileName}`,
+        JSON.stringify([...this.downloadedChunks])
+      );
+    },
+    async startDownload() {
+      if (!this.fileName) {
+        this.$message.warning('请输入文件名');
+        return;
+      }
+      if (!(await this.initDownload())) return;
+      this.isDownloading = true;
+      this.status = '下载中...';
+      this.chunksData = [];
+
+      const concurrency = 3;
+      let currentChunk = 0;
+      let active = 0;
+
+      const downloadNext = async () => {
+        if (currentChunk >= this.totalChunks) {
+          if (this.downloadedChunks.size === this.totalChunks) {
+            this.finishDownload();
+          }
+          return;
+        }
+        if (this.downloadedChunks.has(currentChunk)) {
+          currentChunk++;
+          downloadNext();
+          return;
+        }
+        const chunkIndex = currentChunk++;
+        active++;
+        this.downloadChunk(chunkIndex)
+          .then(() => {
+            active--;
+            if (active < concurrency && this.isDownloading) downloadNext();
+          })
+          .catch(() => {
+            active--;
+            if (this.isDownloading) downloadNext();
+          });
+        if (active < concurrency && this.isDownloading) downloadNext();
+      };
+
+      for (let i = 0; i < Math.min(concurrency, this.totalChunks); i++) {
+        downloadNext();
+      }
+    },
+    async downloadChunk(chunkIndex) {
+      const start = chunkIndex * this.chunkSize;
+      const end = Math.min(start + this.chunkSize - 1, this.totalSize - 1);
+      const source = axios.CancelToken.source();
+      this.cancelTokens.set(chunkIndex, source);
+
+      try {
+        const res = await axios.get(`${this.fileUrl}/${this.fileName}`, {
+          headers: { Range: `bytes=${start}-${end}` },
+          responseType: 'blob',
+          cancelToken: source.token
+        });
+        this.downloadedChunks.add(chunkIndex);
+        this.saveDownloadedChunks();
+        this.chunksData[chunkIndex] = res.data;
+        this.updateProgress();
+      } catch (e) {
+        if (!axios.isCancel(e)) console.error(e);
+      } finally {
+        this.cancelTokens.delete(chunkIndex);
+      }
+    },
+    updateProgress() {
+      this.progress = Math.round(
+        (this.downloadedChunks.size / this.totalChunks) * 100
+      );
+    },
+    async finishDownload() {
+      this.isDownloading = false;
+      this.status = '合并文件并下载...';
+      const blob = new Blob(this.chunksData);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = this.fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      this.status = '下载完成';
+      this.progress = 100;
+    },
+    pauseDownload() {
+      this.isDownloading = false;
+      this.status = '已暂停';
+      this.cancelTokens.forEach((source) => source.cancel('暂停下载'));
+      this.cancelTokens.clear();
+    },
+    resetDownload() {
+      this.pauseDownload();
+      this.downloadedChunks.clear();
+      localStorage.removeItem(`downloaded_${this.fileName}`);
+      this.progress = 0;
+      this.status = '已重置';
+      this.chunksData = [];
+    }
+  }
+};
+</script>
+
+```
+
+
+
+# 视频边缓存边播放
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # websocket
 
 本项目基于websocket实现了实时聊天、实时弹幕、实时通知

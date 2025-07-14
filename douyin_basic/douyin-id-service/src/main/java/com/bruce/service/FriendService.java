@@ -1,6 +1,7 @@
 package com.bruce.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.bruce.entity.User;
 import com.bruce.pojo.FriendRequestVO;
 import com.bruce.pojo.FriendVO;
 import com.bruce.entity.Friend;
@@ -24,6 +25,6 @@ public interface FriendService extends IService<Friend> {
         List<FriendVO> getFriendList();
 
         void deleteFriend(Long friendId);
-
+        List<User> searchMyFriends(Long userId, String keyword);
 }
 

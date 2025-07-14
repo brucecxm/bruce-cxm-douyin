@@ -248,7 +248,6 @@ export default {
       }
     },
     validateRegisterInput() {
-      debugger;
       if (!this.enableValidation) return null; // 校验关闭时直接通过
 
       const { userName, password, confirmPassword } = this.registerPojo;
@@ -280,14 +279,13 @@ export default {
         this.$message({ message: errorMsg, type: 'warning' });
         return;
       }
-      debugger;
+
       try {
         const res = await userRegisterService({
           ...this.registerPojo,
           verificationCode: this.verificationCode,
           isCheck: this.enableValidation
         });
-        debugger;
         if (res.code === 1) {
           this.$message({ message: res.msg || '注册失败', type: 'error' });
         } else {

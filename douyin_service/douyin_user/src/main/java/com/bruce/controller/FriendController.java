@@ -2,11 +2,13 @@ package com.bruce.controller;
 
 
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.dao.chatInfoDao;
+import com.bruce.entity.User;
 import com.bruce.entity.Video;
 import com.bruce.pojo.FriendRequestDTO;
 import com.bruce.pojo.FriendRequestVO;
@@ -15,6 +17,7 @@ import com.bruce.pojo.HandleRequestDTO;
 import com.bruce.entity.Friend;
 import com.bruce.pojo.UserVideoDTO;
 import com.bruce.service.FriendService;
+import com.bruce.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,9 +41,21 @@ public class FriendController extends ApiController {
      */
     @Resource
     private FriendService friendService;
+
+
+
+
     @Autowired
-private chatInfoDao chatInfoDaoone;
+    private UserService userService;
+
+
+
+
+
     /**
+     *
+     *
+     *
      * 分页查询所有数据
      *
      * @param friend 查询实体
@@ -57,51 +72,6 @@ private chatInfoDao chatInfoDaoone;
 
         return success(this.friendService.page(page, new QueryWrapper<>(friend)));
     }
-
-
-
-    @Autowired
-    private chatInfoDao chatInfoDaoo;
-
-    // 后端代码
-    @GetMapping("/getauth")
-    public UserVideoDTO getauth(@RequestParam int userId) {
-        // 从数据库获取指定用户ID的视频信息列表
-        List<UserVideoDTO> userVideos = chatInfoDaoo.getUserVideosById(userId);
-
-        // 创建一个新的 UserVideoDTO 实例，用于存储最终结果
-        UserVideoDTO result = new UserVideoDTO();
-
-        // 检查获取到的视频信息列表是否为空
-        if (!userVideos.isEmpty()) {
-            // 假设用户信息是相同的，将第一个 UserVideoDTO 的用户信息设置到结果中
-            result.setUser(userVideos.get(0).getUser());
-
-            // 使用流处理将用户视频列表转换为视频对象列表
-            List<Video> videos = userVideos.stream()
-                    .flatMap(userVideo -> userVideo.getVideos().stream()) // 获取每个 UserVideoDTO 的视频列表并展平
-                    .map(video -> {
-                        Video newVideo = new Video();
-                        // 设置视频的 URL 和封面图
-                        newVideo.setUrl(video.getUrl());
-                        newVideo.setCover(video.getCover());
-                        return newVideo; // 返回构造好的 Video 对象
-                    })
-                    .collect(Collectors.toList()); // 收集所有视频对象到列表中
-
-            // 将视频列表设置到结果的 videos 属性中
-            result.setVideos(videos);
-        }
-
-        // 返回最终的 UserVideoDTO 对象
-        return result;
-    }
-
-
-
-
-
-
 
 
     /**
@@ -126,29 +96,15 @@ private chatInfoDao chatInfoDaoone;
     }
 
     /**
-     * 根据实体类属性查询所有匹配记录
-     *
-     * @param friend 实体类对象，包含查询条件
-     * @return 匹配的记录列表
+     * 搜索我的好友列表中的用户（用于我的好友列表搜索）
      */
-    @GetMapping("/search")
-    public R selectByAttributes(Friend friend) {
-        QueryWrapper<Friend> queryWrapper = new QueryWrapper<>(friend);
-        List<Friend> friends = friendService.list(queryWrapper);
-        return success(friends);
+    @GetMapping("/list/search")
+    public ResponseEntity<?> searchMyFriends(@RequestParam String keyword) {
+        Long userId = Long.valueOf(StpUtil.getLoginIdAsString());
+        List<User> users = friendService.searchMyFriends(userId, keyword);
+        return ResponseEntity.ok(users);
     }
-    /**
-     * 根据实体类属性查询所有匹配记录的数量
-     *
-     * @return 匹配的记录数量
-     */
-    @GetMapping("/queryUserInfo")
-    public void queryUserInfo(String user_id) {
 
-  List one= chatInfoDaoone.queryUserInfo(user_id);
-        System.out.println(chatInfoDaoone.queryUserInfo(user_id).get(0).toString());
-
-    }
 
     /**
      * 根据实体类属性查询所有匹配记录的数量

@@ -32,6 +32,7 @@ public class User  {
     private String school;
     private String username;
     private String gender;
+    private String phone;
     private String password;
     private String nickname;
     private String avatar;       // 发起人头像URL

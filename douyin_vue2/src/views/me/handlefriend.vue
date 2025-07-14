@@ -1,104 +1,37 @@
 <template>
   <div class="friend-container">
-    <!-- 搜索与添加 -->
-    <el-row
-      :gutter="10"
-      type="flex"
-      justify="start"
-      style="flex-wrap: wrap; margin-bottom: 15px"
-    >
-      <el-col :xs="24" style="margin-bottom: 10px">
-        <el-input
-          v-model="searchId"
-          placeholder="🔍 输入好友ID搜索"
-          clearable
-          prefix-icon="el-icon-search"
-          @keyup.enter.native="searchFriend"
-        />
-      </el-col>
-      <el-col :xs="12" style="margin-bottom: 10px">
-        <el-button
-          type="primary"
-          icon="el-icon-search"
-          @click="searchFriend"
-          class="full-button"
-        >
-          搜索
-        </el-button>
-      </el-col>
-      <el-col :xs="12" style="margin-bottom: 10px">
-        <el-button
-          type="success"
-          icon="el-icon-plus"
-          @click="openAddDialog"
-          class="full-button"
-        >
-          添加好友
-        </el-button>
-      </el-col>
-    </el-row>
+    <el-input
+      v-model="searchKeyword"
+      placeholder="输入ID/用户名/手机号/邮箱搜索好友"
+      clearable
+      @keyup.enter.native="searchFriend"
+    />
+    <el-button type="primary" @click="searchFriend">搜索好友</el-button>
 
-    <!-- 好友列表 -->
-    <el-card shadow="hover" class="card-box">
-      <div slot="header" class="card-header">👥 我的好友</div>
-      <el-table :data="friendList" size="small" border stripe>
-        <el-table-column prop="id" label="ID" width="70" />
-        <el-table-column prop="userId" label="用户ID" />
-        <el-table-column prop="friendId" label="好友ID" />
-        <el-table-column label="操作" width="100">
-          <template slot-scope="scope">
-            <el-button
-              size="mini"
-              type="danger"
-              @click="deleteFriend(scope.row.id)"
-            >删除</el-button
-            >
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
+    <el-table :data="friendList" style="width: 100%; margin-top: 20px">
+      <el-table-column prop="id" label="用户ID" width="80" />
+      <el-table-column prop="username" label="用户名" />
+      <el-table-column prop="email" label="邮箱" />
+      <el-table-column prop="phone" label="手机号" />
+      <el-table-column label="操作">
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="success"
+            @click="openAddDialog(scope.row.id)"
+          >添加好友</el-button
+          >
+        </template>
+      </el-table-column>
+    </el-table>
 
-    <!-- 添加好友弹窗 -->
-    <el-dialog title="添加好友" :visible.sync="addDialogVisible" width="90%">
-      <el-form :model="addForm" label-position="top">
-        <el-form-item label="好友ID" required>
-          <el-input v-model="addForm.toUserId" placeholder="请输入好友ID" />
-        </el-form-item>
-        <el-form-item label="验证消息">
-          <el-input v-model="addForm.verifyMsg" placeholder="验证信息 (可选)" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
+    <el-dialog :visible.sync="addDialogVisible" title="发送好友请求">
+      <el-input v-model="verifyMsg" placeholder="验证消息（可选）" />
+      <span slot="footer" class="dialog-footer">
         <el-button @click="addDialogVisible = false">取消</el-button>
         <el-button type="primary" @click="sendRequest">发送请求</el-button>
-      </div>
+      </span>
     </el-dialog>
-
-    <!-- 好友请求 -->
-    <el-card shadow="hover" class="card-box" style="margin-top: 20px">
-      <div slot="header" class="card-header">📩 收到的好友请求</div>
-      <el-table :data="requests" size="small" border stripe>
-        <el-table-column prop="fromUserId" label="来自用户ID" />
-        <el-table-column prop="verifyMsg" label="验证消息" />
-        <el-table-column label="操作" width="140">
-          <template slot-scope="scope">
-            <el-button
-              type="primary"
-              size="mini"
-              @click="handleRequest(scope.row.requestId, 'accept')"
-              style="margin-right: 5px"
-            >同意</el-button
-            >
-            <el-button
-              type="warning"
-              size="mini"
-              @click="handleRequest(scope.row.requestId, 'reject')"
-            >拒绝</el-button
-            >
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
   </div>
 </template>
 
@@ -108,71 +41,42 @@ import axios from '@/utils/request';
 export default {
   data() {
     return {
+      searchKeyword: '',
       friendList: [],
-      requests: [],
-      searchId: '',
       addDialogVisible: false,
-      addForm: {
-        toUserId: '',
-        verifyMsg: ''
-      }
+      selectedUserId: null,
+      verifyMsg: ''
     };
   },
-  mounted() {
-    this.loadFriends();
-    this.loadRequests();
-  },
   methods: {
-    loadFriends() {
-      axios.get('/user/friend/list').then((res) => {
-        this.friendList = res.data;
-      });
-    },
-    loadRequests() {
-      axios.get('/user/friend/requests').then((res) => {
-        this.requests = res.data;
-      });
-    },
     searchFriend() {
       axios
-        .get('/user/friend/search', {
-          params: { friendId: this.searchId }
+        .get('/user/friend/list/search', {
+          params: { keyword: this.searchKeyword }
         })
         .then((res) => {
-          this.friendList = res.data.data || [];
+          this.friendList = res.data;
         });
     },
-    openAddDialog() {
+    openAddDialog(userId) {
+      this.selectedUserId = userId;
+      this.verifyMsg = '';
       this.addDialogVisible = true;
     },
     sendRequest() {
-      axios.post('/user/friend/request', this.addForm).then(() => {
-        this.$message.success('请求已发送');
-        this.addDialogVisible = false;
-      });
-    },
-    deleteFriend(id) {
-      axios.delete(`/user/friend/${id}`).then(() => {
-        this.$message.success('已删除');
-        this.loadFriends();
-      });
-    },
-    handleRequest(requestId, action) {
       axios
-        .post('/user/friend/handle', {
-          requestId,
-          action
+        .post('/user/friend/request', {
+          toUserId: this.selectedUserId,
+          verifyMsg: this.verifyMsg
         })
         .then(() => {
-          this.$message.success('操作成功');
-          this.loadRequests();
-          this.loadFriends();
+          this.$message.success('好友请求已发送');
+          this.addDialogVisible = false;
         });
     }
   }
 };
 </script>
-
 <style scoped>
 .friend-container {
   padding: 15px;
