@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/down")
+@RequestMapping("/downminio")
 public class MinioFileDownloadController {
 
     @Value("${minio.endpoint}")
@@ -29,7 +29,7 @@ public class MinioFileDownloadController {
     @Value("${minio.secretKey}")
     private String minioSecretKey;
 
-    @Value("${minio.bucketName}")
+    @Value("${minio.bucket}")
     private String bucketName;
 
     private MinioClient minioClient;

@@ -46,3 +46,12 @@ minio:
   bucket: douyin
   endpoint: http://192.168.200.130:9000
   readPath: http://192.168.200.130:9000
+
+
+
+ffmpeg:
+  path: D:\\test\\ffmpeg-master-latest-win64-gpl-shared\\bin\\ffmpeg.exe  # FFmpeg安装路径（根据服务器实际情况修改）
+
+video:
+  temp:
+    dir: D:\\test\\video-temp\\  # 本地临时目录（用于存放合并后的视频和转换过程文件）tmp/video-temp/  # 本地临时目录（用于存放合并后的视频和转换过程文件）

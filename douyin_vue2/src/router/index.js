@@ -23,6 +23,11 @@ const router = new VueRouter({
       component: () => import('@/views/test/testregister.vue')
     },
     {
+      path: '/dashang',
+      name: 'dashang',
+      component: () => import('@/views/shangchuan/upload.vue')
+    },
+    {
       path: '/testone',
       name: 'Test',
       component: () => import('@/views/test/testshop.vue')

@@ -8,15 +8,18 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
+import io.minio.http.Method;
 import com.bruce.dict.Constant;
 import com.bruce.dto.LikeMessage;
 import com.bruce.entity.*;
 import com.bruce.file.service.FileStorageService;
+import com.bruce.pojo.Result;
 import com.bruce.service.*;
 //import com.bruce.MusicClient;
 //import com.bruce.UserClient;
 import com.bruce.vo.VideoVO;
+import io.minio.GetPresignedObjectUrlArgs;
+import io.minio.MinioClient;
 import io.swagger.annotations.*;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
@@ -49,6 +52,9 @@ public class VideoController extends ApiController {
 
     @Resource
     private VideoService videoService;
+
+    @Autowired
+    private VideoInfoService videoInfoService;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -366,6 +372,68 @@ public class VideoController extends ApiController {
             return ResponseEntity.ok(content_type + "点赞成功");
         }
     }
+
+
+    @Autowired
+    private MinioClient minioClient;
+
+
+    private final String BUCKET = "douyin";
+
+    // 新增：定义签名URL的有效期（单位：秒），这里设置1小时（3600秒）
+    private static final int URL_EXPIRE_SECONDS = 3600;
+
+    @GetMapping("/play/{videoId}")
+    public Result getPlayInfo(@PathVariable Long videoId) {
+        // 1. 查询数据库获取视频信息
+        VideoInfo videoInfo = videoInfoService.getById(videoId);
+        if (videoInfo == null) {
+            return Result.error("视频不存在");
+        }
+        if (videoInfo.getStatus() != 1) {
+            return Result.error("视频正在转码中，暂无法播放");
+        }
+
+        // 2. 生成带签名的.m3u8临时访问URL
+        try {
+            String presignedUrl = minioClient.getPresignedObjectUrl(
+                    GetPresignedObjectUrlArgs.builder()
+                            .bucket(BUCKET)
+                            .object(videoInfo.getM3u8MinioPath())
+                            .method(Method.GET)
+                            .expiry(URL_EXPIRE_SECONDS)
+                            .build()
+            );
+
+            // 3. 构建返回数据
+            Map<String, Object> data = new HashMap<>();
+            data.put("videoId", videoId);
+            data.put("title", videoInfo.getVideoTitle());
+            data.put("duration", videoInfo.getDuration());
+            data.put("fileSize", videoInfo.getFileSize());
+            data.put("m3u8Url", presignedUrl);
+
+            return Result.success(data);
+        } catch (Exception e) {
+            return Result.error("生成播放链接失败");
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //    @GetMapping("/one")
 //    public R getone() {

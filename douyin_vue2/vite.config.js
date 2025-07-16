@@ -36,7 +36,7 @@ export default defineConfig(({ mode }) => {
         // https: httpsOptions, // 开启 https，使用证书
         proxy: {
           '/api': {
-            target: 'http://localhost:7456',
+            target: 'http://localhost:9573',
             // target: 'https://116.196.98.171:9430',
             changeOrigin: true,
             ws: true, // ✅ 加上这行支持 WebSocket 代理

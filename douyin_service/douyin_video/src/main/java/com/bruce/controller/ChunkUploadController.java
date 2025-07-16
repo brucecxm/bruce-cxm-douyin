@@ -13,7 +13,7 @@ import java.util.*;
 import io.minio.messages.Item;
 
 @RestController
-@RequestMapping("/upload")
+@RequestMapping("/uploadbefore")
 public class ChunkUploadController {
 
     @Autowired
