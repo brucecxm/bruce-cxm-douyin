@@ -2,11 +2,11 @@
   <div class="friend-container">
     <el-input
       v-model="searchKeyword"
-      placeholder="输入ID/用户名/手机号/邮箱搜索好友"
+      placeholder="输入ID/用户名/手机号/邮箱搜索用户"
       clearable
       @keyup.enter.native="searchFriend"
     />
-    <el-button type="primary" @click="searchFriend">搜索好友</el-button>
+    <el-button type="primary" @click="searchFriend">搜索用户</el-button>
 
     <el-table :data="friendList" style="width: 100%; margin-top: 20px">
       <el-table-column prop="id" label="用户ID" width="80" />

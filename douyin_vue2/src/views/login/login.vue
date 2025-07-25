@@ -322,11 +322,15 @@ export default {
           isCheck: this.enableValidation
         });
         if (res.code === 1) {
+          debugger;
           this.$message({ message: res.msg || '登录失败', type: 'error' });
         } else {
+          debugger;
           this.$store.dispatch('userInfo/setUserInfo', res.data.userInfo);
           this.$store.dispatch('token/setToken', res.data.token);
           localStorage.setItem('token', res.data.token);
+          console.log('userInfo模块状态:', this.$store.state.userInfo);
+          console.log('token模块状态:', this.$store.state.token);
           this.$router.push('/');
         }
       } catch (error) {

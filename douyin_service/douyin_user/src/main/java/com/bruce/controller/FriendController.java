@@ -105,6 +105,15 @@ public class FriendController extends ApiController {
         return ResponseEntity.ok(users);
     }
 
+    /**
+     * 搜索我的好友列表中的用户（用于我的好友列表搜索）
+     */
+    @GetMapping("/list/search")
+    public ResponseEntity<?> searchUser(@RequestParam String keyword) {
+        Long userId = Long.valueOf(StpUtil.getLoginIdAsString());
+        List<User> users = friendService.searchMyFriends(userId, keyword);
+        return ResponseEntity.ok(users);
+    }
 
     /**
      * 根据实体类属性查询所有匹配记录的数量

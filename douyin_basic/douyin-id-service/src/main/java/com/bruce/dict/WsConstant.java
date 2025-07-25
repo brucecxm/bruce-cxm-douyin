@@ -8,4 +8,5 @@ public class WsConstant {
     public static final String ws="/ws";
     public static final String wsnote="/wsnote";
     public static final String video="/video";
+    public static final String videoChat="/videoChat";
 }
