@@ -1,88 +1,75 @@
 package com.bruce.controller;
 
-
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.bruce.dto.PermissionDTO;
 import com.bruce.entity.Permission;
 import com.bruce.service.PermissionService;
+
+import com.bruce.entity.ChatMessage;
+import com.bruce.pojo.*;
+import com.bruce.service.ChatService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import java.io.Serializable;
 import java.util.List;
 
-/**
- * (Permission)表控制层
- *
- * @author makejava
- * @since 2025-05-23 17:34:07
- */
 @RestController
-@RequestMapping("permission")
-public class PermissionController extends ApiController {
-    /**
-     * 服务对象
-     */
-    @Resource
+@RequestMapping("/user/permission")
+public class PermissionController {
+
+    @Autowired
     private PermissionService permissionService;
 
-    /**
-     * 分页查询所有数据
-     *
-     * @param page 分页对象
-     * @param permission 查询实体
-     * @return 所有数据
-     */
-    @GetMapping
-    public R selectAll(Page<Permission> page, Permission permission) {
-        return success(this.permissionService.page(page, new QueryWrapper<>(permission)));
+    @PostMapping("/create")
+    public R create(@RequestBody PermissionDTO dto) {
+        Permission permission=new Permission();
+        permission.setPermissionCode(dto.getPermissionCode());
+        permission.setPermissionName(dto.getPermissionName());
+        permission.setDescription(dto.getDescription());
+        permissionService.save(permission);
+        return R.ok("权限创建成功");
     }
 
-    /**
-     * 通过主键查询单条数据
-     *
-     * @param id 主键
-     * @return 单条数据
-     */
-    @GetMapping("{id}")
-    public R selectOne(@PathVariable Serializable id) {
-        return success(this.permissionService.getById(id));
+    @PostMapping("/update")
+    public R update(@RequestBody PermissionDTO dto) {
+        // 校验ID是否存在
+        if (dto.getId() == null) {
+            return R.failed("权限ID不能为空");
+        }
+
+        // 查询现有实体
+        Permission permission = permissionService.getById(dto.getId());
+        if (permission == null) {
+            return R.failed("权限不存在");
+        }
+
+        // 更新实体属性
+        permission.setPermissionName(dto.getPermissionName());
+        permission.setPermissionCode(dto.getPermissionCode());
+        permission.setDescription(dto.getDescription());
+
+        // 执行更新
+        boolean success = permissionService.updateById(permission);
+        if (success) {
+            return R.ok("权限修改成功");
+        } else {
+            return R.failed("权限修改失败");
+        }
     }
 
-    /**
-     * 新增数据
-     *
-     * @param permission 实体对象
-     * @return 新增结果
-     */
-    @PostMapping
-    public R insert(@RequestBody Permission permission) {
-        return success(this.permissionService.save(permission));
+    @DeleteMapping("/delete/{id}")
+    public R delete(@PathVariable Long id) {
+        permissionService.removeById(id);
+        return R.ok("权限删除成功");
     }
 
-    /**
-     * 修改数据
-     *
-     * @param permission 实体对象
-     * @return 修改结果
-     */
-    @PutMapping
-    public R update(@RequestBody Permission permission) {
-        return success(this.permissionService.updateById(permission));
-    }
-
-    /**
-     * 删除数据
-     *
-     * @param idList 主键结合
-     * @return 删除结果
-     */
-    @DeleteMapping
-    public R delete(@RequestParam("idList") List<Long> idList) {
-        return success(this.permissionService.removeByIds(idList));
+    @GetMapping("/list")
+    public R<List<Permission>> list() {
+        return R.ok(permissionService.list());
     }
 }
-

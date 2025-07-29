@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.dict.Constant;
+import com.bruce.dto.UserRoleDTO;
 import com.bruce.entity.*;
 import com.bruce.feign.systemClient;
 import com.bruce.handlar.MyCustomException;
@@ -59,6 +60,7 @@ public class UserController extends ApiController {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
+
     @Autowired
     private RedisUtil redisUtil;
 
@@ -94,6 +96,33 @@ public class UserController extends ApiController {
         // 创建一个固定大小的线程池
         this.executorService = Executors.newFixedThreadPool(10);
     }
+
+
+    @Autowired
+    private UserRoleService userRoleService;
+
+    @Autowired
+    private RoleService roleService;
+
+    @Autowired
+    private PermissionService permissionService;
+
+    @PostMapping("/assignRoles")
+    public R assignRoles(@RequestBody UserRoleDTO dto) {
+        userRoleService.assignRoles(dto.getUserId(), dto.getRoleIds());
+        return R.ok("角色分配成功");
+    }
+
+    @GetMapping("/roles/{userId}")
+    public R<List<Role>> getRoles(@PathVariable Long userId) {
+        return R.ok(roleService.getRolesByUserId(userId));
+    }
+
+    @GetMapping("/permissions/{userId}")
+    public R<List<Permission>> getPermissions(@PathVariable Long userId) {
+        return R.ok(permissionService.getPermissionsByUserId(userId));
+    }
+
 
     @RequestMapping("logout")
     public void handleLogoutAction(String action, Object param) {
@@ -194,6 +223,11 @@ public class UserController extends ApiController {
                 }
                 // 登录
                 StpUtil.login(user.getId());
+                List<String> roleList = StpUtil.getRoleList();
+                List<String> permList = StpUtil.getPermissionList();
+                List<String> roleLista = roleService.getRoleCodesByUserId(user.getId());
+                List<String> permLista = permissionService.getPermissionCodesByUserId(user.getId());
+
             } else {
                 // ===== 用户名密码登录 =====
                 if (password == null || password.isEmpty()) {
@@ -224,6 +258,10 @@ public class UserController extends ApiController {
                 }
                 // 登录
                 StpUtil.login(user.getId());
+                List<String> roleList = StpUtil.getRoleList();
+                List<String> permList = StpUtil.getPermissionList();
+                List<String> roleLista = roleService.getRoleCodesByUserId(user.getId());
+                List<String> permLista = permissionService.getPermissionCodesByUserId(user.getId());
             }
             // ===== 获取 token 和用户信息 =====
 // ===== 获取 token 和用户信息 =====

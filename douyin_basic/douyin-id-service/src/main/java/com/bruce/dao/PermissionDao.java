@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
  * (Permission)表数据库访问层
  *
  * @author makejava
- * @since 2025-05-23 17:34:08
+ * @since 2025-07-29 19:59:58
  */
 @Mapper
 public interface PermissionDao extends BaseMapper<Permission> {

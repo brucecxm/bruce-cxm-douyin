@@ -1,47 +1,28 @@
 package com.bruce.entity;
 
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import lombok.Data;
+
 import java.io.Serializable;
 
 /**
  * (Permission)表实体类
  *
  * @author makejava
- * @since 2025-05-23 17:34:08
+ * @since 2025-07-29 20:00:00
  */
 @SuppressWarnings("serial")
+@Data
 public class Permission extends Model<Permission> {
     
-    private Integer id;
+    private Long id;
+    //权限名称，如视频删除权限
+    private String permissionName;
+    //权限编码，如video:delete
+    private String permissionCode;
     
-    private String permission;
-    
-    private Integer roleId;
+    private String description;
 
 
-    public Integer getId() {
-        return id;
     }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getPermission() {
-        return permission;
-    }
-
-    public void setPermission(String permission) {
-        this.permission = permission;
-    }
-
-    public Integer getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(Integer roleId) {
-        this.roleId = roleId;
-    }
-
-}
 
