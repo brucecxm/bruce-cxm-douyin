@@ -182,15 +182,15 @@ public class UserController extends ApiController {
                 if (emailVerificationCode == null || emailVerificationCode.isEmpty()) {
                     return Result.error("邮箱验证码不能为空");
                 }
+                String code = stringRedisTemplate.opsForValue().get(Constant.User.EMAIL_CODE_PREFIX + userName);
+                if (code == null || !emailVerificationCode.equals(code)) {
+                    return Result.error(Constant.Error.CAPTCHA_ERROR);
+                }
                 user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, userName));
                 if (user == null) {
                     // 用户不存在则自动注册，随机8位密码可用于后续找回
                     String randomPassword = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
                     user = registerNewUser(userName, randomPassword);
-                }
-                String code = stringRedisTemplate.opsForValue().get(Constant.User.EMAIL_CODE_PREFIX + userName);
-                if (code == null || !emailVerificationCode.equals(code)) {
-                    return Result.error(Constant.Error.LOGIN_FAILED);
                 }
                 // 登录
                 StpUtil.login(user.getId());
@@ -220,7 +220,7 @@ public class UserController extends ApiController {
                 }
                 String encryptedPassword = saltedDoubleHashPassword(password, salt.getSalt());
                 if (!encryptedPassword.equals(user.getPassword())) {
-                    return Result.error(Constant.Error.LOGIN_FAILED);
+                    return Result.error(Constant.Error.INVALID_CREDENTIALS);
                 }
                 // 登录
                 StpUtil.login(user.getId());

@@ -95,6 +95,8 @@ public class Constant {
         public static final String USER_REPEAT = "用户名已经被占用";
         public static final String USER_INVALID = "请核对用户名是否正确";
         public static final String LOGIN_FAILED = "登录失败"; // 补全最后一个错误常量
+        public static final String CAPTCHA_ERROR = "验证码错误"; // 验证码错误常量
+        public static final String INVALID_CREDENTIALS = "用户名或密码错误"; // 用户名或密码错误常量
     }
 
 

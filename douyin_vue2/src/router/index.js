@@ -197,6 +197,11 @@ const router = new VueRouter({
       component: () => import('../views/me/handlefriend.vue')
     },
     {
+      path: '/UserRelation',
+      name: 'HandleFriend',
+      component: () => import('../views/user/UserRelation.vue')
+    },
+    {
       path: '/editMeInfo',
       name: 'EditMeInfoVue',
       component: () => import('../views/me/editMeInfo.vue')

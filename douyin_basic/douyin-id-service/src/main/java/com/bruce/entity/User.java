@@ -43,5 +43,9 @@ public class User  {
     private String permissionId;
     private String roleId;
     private String paymentPassword;
+    private Boolean isAnchor;
+    private int isPrivate ;
+
+
     }
 
