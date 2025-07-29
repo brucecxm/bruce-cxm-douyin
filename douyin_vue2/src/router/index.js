@@ -207,6 +207,11 @@ const router = new VueRouter({
       component: () => import('../views/me/editMeInfo.vue')
     },
     {
+      path: '/permissionRoleUser',
+      name: 'permissionRoleUser',
+      component: () => import('../views/user/PermissionRoleUser.vue')
+    },
+    {
       path: '/articledetail',
       name: 'Articledetail',
       component: () => import('../views/home/articledetail.vue')
