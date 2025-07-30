@@ -45,6 +45,8 @@ public class Constant {
         public static final String EMAIL_VERIFICATION_CODE = "emailVerificationCode";
         public static final String USER_AVATAR = "userAvatar";
         public static final String USER_INFO = "userInfo";
+        public static final String ROLE_LIST = "roleList";
+        public static final String PERMISSION_LIST = "permissionList";
         public static final String DEFAULT_USER_AVATAR = "default_user_avatar";
         public static final String DEFAULT_USER_BACK_IMG = "default_user_back_img";
         public static final String EMAIL_CODE_PREFIX = "email:code:"; // 补全邮箱验证码前缀常量

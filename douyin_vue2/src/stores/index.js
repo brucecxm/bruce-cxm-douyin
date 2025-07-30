@@ -8,12 +8,14 @@ import token from './token';
 import videoStore from './uploadVideo';
 import userInfo from './userInfo';
 import videoInfo from './videoInfo';
+import auth from './auth';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   modules: {
     ad,
+    auth,
     message,
     token,
     videoStore,

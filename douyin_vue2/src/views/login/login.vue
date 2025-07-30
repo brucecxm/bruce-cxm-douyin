@@ -328,6 +328,15 @@ export default {
           debugger;
           this.$store.dispatch('userInfo/setUserInfo', res.data.userInfo);
           this.$store.dispatch('token/setToken', res.data.token);
+          // 登录成功后获取用户权限数据
+          // 存储角色和权限
+          this.$store.dispatch('auth/loginSetRoles', res.data.roleList);
+          this.$store.dispatch(
+            'auth/loginSetPermissions',
+            res.data.permissionList
+          );
+          console.log(this.$store.getters['auth/getRoles']);
+          console.log(this.$store.getters['auth/getPermissions']);
           localStorage.setItem('token', res.data.token);
           console.log('userInfo模块状态:', this.$store.state.userInfo);
           console.log('token模块状态:', this.$store.state.token);

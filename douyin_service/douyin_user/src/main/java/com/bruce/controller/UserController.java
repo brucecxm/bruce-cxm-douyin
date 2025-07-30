@@ -223,10 +223,6 @@ public class UserController extends ApiController {
                 }
                 // 登录
                 StpUtil.login(user.getId());
-                List<String> roleList = StpUtil.getRoleList();
-                List<String> permList = StpUtil.getPermissionList();
-                List<String> roleLista = roleService.getRoleCodesByUserId(user.getId());
-                List<String> permLista = permissionService.getPermissionCodesByUserId(user.getId());
 
             } else {
                 // ===== 用户名密码登录 =====
@@ -258,18 +254,20 @@ public class UserController extends ApiController {
                 }
                 // 登录
                 StpUtil.login(user.getId());
-                List<String> roleList = StpUtil.getRoleList();
-                List<String> permList = StpUtil.getPermissionList();
-                List<String> roleLista = roleService.getRoleCodesByUserId(user.getId());
-                List<String> permLista = permissionService.getPermissionCodesByUserId(user.getId());
+
             }
+            //Sa-Token 的权限管理本质上是基于会话的，但权限数据的来源需要你自己实现
+            // 因此登录之后 要自己从数据库获取其权限角色设置  后面登录状态下能快速获取
+            //一般都是通过一个接口查询  sa-token暴露出了获取权限和角色的接口
+            //请查看StpInterfaceImpl  这里是获取权限和角色的逻辑
+            List<String> roleList = StpUtil.getRoleList();
+            List<String> permissionList = StpUtil.getPermissionList();
             // ===== 获取 token 和用户信息 =====
-// ===== 获取 token 和用户信息 =====
             String token = StpUtil.getTokenValue();
             Long userId = Long.parseLong(StpUtil.getLoginId().toString());
             User userInfo = null;
             String userKey = userId + Constant.User._USER_INFO;
-// 先从 Redis 中查询用户信息
+            // 先从 Redis 中查询用户信息
             String userJson = stringRedisTemplate.opsForValue().get(userKey);
             if (userJson != null) {
                 // Redis 中存在，直接反序列化为对象
@@ -283,13 +281,12 @@ public class UserController extends ApiController {
                     stringRedisTemplate.opsForValue().set(userKey, userJson, 10, TimeUnit.MINUTES);
                 }
             }
-// 返回封装信息
             Map<String, Object> response = new HashMap<>();
             response.put(Constant.User.TOKEN, token);
-            response.put(Constant.User.USER_INFO, userInfo);
+            response.put(Constant.User.ROLE_LIST, roleList);
+            response.put(Constant.User.PERMISSION_LIST, permissionList);
             return Result.success(response);
         } catch (MyCustomException e) {
-//            return Result.error(e.getCode(), e.getMessage());
             return Result.error("登录失败，请稍后重试");
         } catch (Exception e) {
             e.printStackTrace();
@@ -365,7 +362,6 @@ public class UserController extends ApiController {
 
         return Result.success(userInfo);
     }
-
 
 
     // 图片验证码接口
