@@ -1,15 +1,15 @@
 <template>
-  <div :style="message" class="userinfo">
+  <div :style="computedMessageStyle" class="userinfo">
     <!-- 包裹头像和在线指示点 -->
     <div
       class="avatar-wrapper"
-      :style="{ width: message.height, height: message.height }"
+      :style="{ width: computedHeight, height: computedHeight }"
     >
       <div
         class="avatar"
         :style="{
-          width: message.height,
-          height: message.height,
+          width: computedHeight,
+          height: computedHeight,
           backgroundImage: 'url(' + avatar + ')',
           backgroundSize: 'cover',
           backgroundPosition: 'center'
@@ -20,7 +20,7 @@
     </div>
 
     <!-- 用户名与状态 -->
-    <div class="UserAndStatus" :style="{ height: message.height }">
+    <div class="UserAndStatus" :style="{ height: computedHeight }">
       <div class="username">{{ message.username }}</div>
       <div class="status">{{ message.status }}</div>
     </div>
@@ -38,15 +38,32 @@ export default {
   data() {
     return {
       avatar:
-        'http://gips0.baidu.com/it/u=3560029307,576412274&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280'
+        'http://gips0.baidu.com/it/u=3560029307,576412274&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
+      // 默认宽高值
+      defaultWidth: '100vw',
+      defaultHeight: '60px'
     };
+  },
+  computed: {
+    // 计算高度，优先使用message中的值，否则使用默认值
+    computedHeight() {
+      return this.message.height || this.defaultHeight;
+    },
+    // 计算整体样式，处理宽度默认值
+    computedMessageStyle() {
+      return {
+        width: this.message.width || this.defaultWidth
+      };
+    }
+  },
+  created() {
+    console.log(this.message);
   }
 };
 </script>
 
 <style scoped>
 .userinfo {
-  width: 100vw;
   display: flex;
   flex-direction: row;
   padding: 0px;

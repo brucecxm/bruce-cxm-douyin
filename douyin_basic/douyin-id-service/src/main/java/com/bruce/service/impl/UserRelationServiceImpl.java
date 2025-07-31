@@ -4,13 +4,17 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bruce.dao.UserBlacklistDao;
 import com.bruce.dao.UserRelationDao;
+import com.bruce.entity.User;
 import com.bruce.entity.UserBlacklist;
 import com.bruce.entity.UserRelation;
 import com.bruce.service.UserRelationService;
+import com.bruce.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 用户关系表(UserRelation)表服务实现类
@@ -24,6 +28,9 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
 
     @Autowired
     private UserBlacklistDao blacklistMapper;
+
+    @Autowired
+    private UserService userService;
 
     @Override
     public void follow(Long userId, Long targetUserId) {
@@ -171,6 +178,33 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
                 .in(UserRelation::getRelationType, 1, 2, 3, 4));
     }
 
+
+    /**
+     * 获取指定用户关注的所有用户信息
+     * @param userId 当前用户ID
+     * @return 关注的用户列表
+     */
+    public List<User> getFollowUserDetails(Long userId) {
+        // 1. 先查询当前用户的所有关注关系
+        List<UserRelation> relations = list(new LambdaQueryWrapper<UserRelation>()
+                .eq(UserRelation::getUserId, userId)
+                .in(UserRelation::getRelationType, 1, 2, 3, 4));
+
+        // 2. 提取所有被关注用户的ID
+        List<Long> targetUserIds = relations.stream()
+                .map(UserRelation::getTargetUserId)
+                .distinct() // 去重，避免重复关注的情况
+                .collect(Collectors.toList());
+
+        if (targetUserIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 3. 根据目标用户ID列表查询用户详情
+        return userService.list(new LambdaQueryWrapper<User>()
+                .in(User::getId, targetUserIds));
+    }
+
     @Override
     public List<UserRelation> getFansList(Long userId) {
         return list(new LambdaQueryWrapper<UserRelation>()
@@ -179,11 +213,56 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
     }
 
     @Override
+    public List<User> getFansUserDetails(Long userId) {
+        // 1. 先查询当前用户的所有关注关系
+        List<UserRelation> relations =  list(new LambdaQueryWrapper<UserRelation>()
+                .eq(UserRelation::getTargetUserId, userId)
+                .in(UserRelation::getRelationType, 1, 2, 3, 4));
+        // 2. 提取所有被关注用户的ID
+        List<Long> targetUserIds = relations.stream()
+                .map(UserRelation::getTargetUserId)
+                .distinct() // 去重，避免重复关注的情况
+                .collect(Collectors.toList());
+
+        if (targetUserIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 3. 根据目标用户ID列表查询用户详情
+        return userService.list(new LambdaQueryWrapper<User>()
+                .in(User::getId, targetUserIds));
+    }
+
+    @Override
     public List<UserRelation> getMutualFollowList(Long userId) {
         List<UserRelation> myFollows = list(new LambdaQueryWrapper<UserRelation>()
                 .eq(UserRelation::getUserId, userId)
                 .eq(UserRelation::getRelationType, 2));
         return myFollows;
+    }
+
+    @Override
+    public List<User> getMutualFollowUserDetails(Long userId) {
+
+
+        // 1. 先查询当前用户的所有关注关系
+        List<UserRelation> relations = list(new LambdaQueryWrapper<UserRelation>()
+                .eq(UserRelation::getUserId, userId)
+                .eq(UserRelation::getRelationType, 2));
+        // 2. 提取所有被关注用户的ID
+        List<Long> targetUserIds = relations.stream()
+                .map(UserRelation::getTargetUserId)
+                .distinct() // 去重，避免重复关注的情况
+                .collect(Collectors.toList());
+
+        if (targetUserIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 3. 根据目标用户ID列表查询用户详情
+        return userService.list(new LambdaQueryWrapper<User>()
+                .in(User::getId, targetUserIds));
+
     }
 
     @Override

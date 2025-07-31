@@ -1,6 +1,7 @@
 package com.bruce.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.bruce.entity.User;
 import com.bruce.entity.UserBlacklist;
 import com.bruce.entity.UserRelation;
 
@@ -27,9 +28,15 @@ public interface UserRelationService extends IService<UserRelation> {
 
     List<UserRelation> getFollowList(Long userId);
 
+    List<User> getFollowUserDetails(Long userId);
+
     List<UserRelation> getFansList(Long userId);
 
+    List<User> getFansUserDetails(Long userId);
+
     List<UserRelation> getMutualFollowList(Long userId);
+
+    List<User> getMutualFollowUserDetails(Long userId);
 
     List<UserRelation> getBestFriends(Long userId);
 

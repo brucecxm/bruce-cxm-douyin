@@ -1,34 +1,53 @@
-// store/modules/auth/index.js
 const state = () => ({
-  // 存储用户角色列表，从本地存储获取或初始化为空数组
-  roles: JSON.parse(localStorage.getItem('roles')) || [],
-  // 存储用户权限列表，从本地存储获取或初始化为空数组
-  permissions: JSON.parse(localStorage.getItem('permissions')) || []
+  // 安全初始化角色列表，处理可能的JSON解析错误
+  roles: (() => {
+    try {
+      const storedRoles = localStorage.getItem('roles');
+      // 确保解析后的数据是数组
+      return storedRoles ? JSON.parse(storedRoles) : [];
+    } catch (error) {
+      console.error('Failed to parse roles from localStorage:', error);
+      // 解析失败时清空无效数据并返回空数组
+      localStorage.removeItem('roles');
+      return [];
+    }
+  })(),
+
+  // 安全初始化权限列表
+  permissions: (() => {
+    try {
+      const storedPermissions = localStorage.getItem('permissions');
+      return storedPermissions ? JSON.parse(storedPermissions) : [];
+    } catch (error) {
+      console.error('Failed to parse permissions from localStorage:', error);
+      localStorage.removeItem('permissions');
+      return [];
+    }
+  })()
 });
 
-// 获取器：用于获取状态数据
 const getters = {
-  // 获取角色列表
   getRoles: (state) => state.roles,
-  // 获取权限列表
-  getPermissions: (state) => state.permissions
+  getPermissions: (state) => state.permissions,
+  // 新增：检查是否有某个角色
+  hasRole: (state) => (role) => state.roles.includes(role),
+  // 新增：检查是否有某个权限
+  hasPermission: (state) => (permission) =>
+    state.permissions.includes(permission)
 };
 
-// 变更：用于同步修改状态
 const mutations = {
-  // 设置角色列表并保存到本地存储
   SET_ROLES(state, roles) {
-    state.roles = roles;
-    localStorage.setItem('roles', JSON.stringify(roles));
+    // 确保存储的是数组
+    state.roles = Array.isArray(roles) ? roles : [];
+    localStorage.setItem('roles', JSON.stringify(state.roles));
   },
 
-  // 设置权限列表并保存到本地存储
   SET_PERMISSIONS(state, permissions) {
-    state.permissions = permissions;
-    localStorage.setItem('permissions', JSON.stringify(permissions));
+    state.permissions = Array.isArray(permissions) ? permissions : [];
+    localStorage.setItem('permissions', JSON.stringify(state.permissions));
   },
 
-  // 清除角色和权限数据
   CLEAR_AUTH(state) {
     state.roles = [];
     state.permissions = [];
@@ -37,21 +56,33 @@ const mutations = {
   }
 };
 
-// 动作：用于异步操作和提交变更
 const actions = {
-  // 登录时调用，设置用户角色
   loginSetRoles({ commit }, roles) {
     commit('SET_ROLES', roles);
   },
 
-  // 登录时调用，设置用户权限
   loginSetPermissions({ commit }, permissions) {
     commit('SET_PERMISSIONS', permissions);
   },
 
-  // 登出时调用，清除用户权限数据
   logoutClearAuth({ commit }) {
     commit('CLEAR_AUTH');
+  },
+
+  // 新增：动态添加角色
+  addRole({ commit, state }, role) {
+    if (!state.roles.includes(role)) {
+      const newRoles = [...state.roles, role];
+      commit('SET_ROLES', newRoles);
+    }
+  },
+
+  // 新增：动态添加权限
+  addPermission({ commit, state }, permission) {
+    if (!state.permissions.includes(permission)) {
+      const newPermissions = [...state.permissions, permission];
+      commit('SET_PERMISSIONS', newPermissions);
+    }
   }
 };
 

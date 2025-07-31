@@ -77,12 +77,17 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 import UserInfo from '../../components/userInfo.vue';
 import { getrequestFriendApi, getFriendApi } from '@/api/user'; // 假设你有一个API来获取用户数据
 export default {
   components: { UserInfo },
   data() {
     return {
+      userId: '', // 模拟登录用户ID
+      targetUserId: '',
+      resultList: [],
       input: '',
       transitionName: 'slide-left',
       tags: ['互关', '关注', '粉丝', '朋友'],
@@ -103,6 +108,14 @@ export default {
     this.fetchUsersByTag(this.activeName);
   },
   methods: {
+    getHeaders() {
+      return {
+        headers: {
+          // 模拟登录，前提是你登录后会写入token
+          satoken: localStorage.getItem('token') || ''
+        }
+      };
+    },
     changeTab(tag) {
       const newIndex = this.tags.indexOf(tag);
       const oldIndex = this.previousIndex;
@@ -130,40 +143,12 @@ export default {
           break;
         case '关注':
           this.userList = [];
-          getrequestFriendApi()
-            .then((result) => {
-              this.userList = result.data
-                .filter((item) => item.status === '待处理') // 只保留 status 为 "待处理" 的
-                .map((item) => ({
-                  username: item.nickname,
-                  status: '在线',
-                  userId: item.fromUserId,
-                  avatar: item.avatar,
-                  height: '60px'
-                }));
-            })
-            .catch((err) => {
-              console.error('请求失败', err);
-            });
-
-          break;
+          this.loadFollowList();
+        break;
         case '粉丝':
           this.userList = [];
-          getrequestFriendApi()
-            .then((result) => {
-              this.userList = result.data.map((item) => ({
-                username: item.nickname,
-                status: '在线',
-                userId: item.fromUserId,
-                avatar: item.avatar,
-                height: '60px'
-              }));
-            })
-            .catch((err) => {});
+        this.loadFansList();
 
-          // this.userList = [
-          //   { username: 'david', status: '在线', avatar: 'https://example.com/d.jpg', height: '60px' },
-          // ];
           break;
         case '朋友':
           this.userList = [];
@@ -189,6 +174,22 @@ export default {
     },
     onSettingsClick() {
       this.$router.push('/handleFriend');
+    },
+    async loadFollowList() {
+      const res = await axios.get(
+        '/api/user/relation/myFollowUserList',
+        this.getHeaders()
+      );
+      this.resultList = res.data.data;
+      this.userList = this.resultList;
+    },
+    async loadFansList() {
+      const res = await axios.get(
+        '/api/user/relation/myFansUserList',
+        this.getHeaders()
+      );
+      this.resultList = res.data.data;
+      this.userList = this.resultList;
     }
   }
 };
