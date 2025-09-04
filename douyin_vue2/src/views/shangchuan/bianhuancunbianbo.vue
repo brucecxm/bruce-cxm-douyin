@@ -26,7 +26,7 @@ export default {
   setup() {
     // 视频链接（替换为你的 m3u8 地址）
     const videoUrl = ref(
-      'http://192.168.200.130:9000/douyin/testfile/hls/20230726_054720.mp4_427071097/index.m3u8?Content-Disposition=attachment%3B%20filename%3D%22testfile%2Fhls%2F20230726_054720.mp4_427071097%2Findex.m3u8%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minio%2F20250716%2F%2Fs3%2Faws4_request&X-Amz-Date=20250716T010410Z&X-Amz-Expires=432000&X-Amz-SignedHeaders=host&X-Amz-Signature=74f918f930695f00828c276269b09a0704cd7664921706afda785e3bd4b3cc00'
+      'http://192.168.200.130:9000/douyin/testfile/hls/20230720_094443.mp4_924056991/index.m3u8'
     );
     let player = null;
 

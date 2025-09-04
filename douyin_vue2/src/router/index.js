@@ -222,6 +222,11 @@ const routes = [
     component: () => import('../views/me/editMeInfo.vue')
   },
   {
+    path: '/newVideo',
+    name: 'NewVideo',
+    component: () => import('../views/shangchuan/bianhuancunbianbo.vue')
+  },
+  {
     path: '/permissionRoleUser',
     name: 'permissionRoleUser',
     component: () => import('../views/user/PermissionRoleUser.vue')
