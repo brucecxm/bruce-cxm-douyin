@@ -6,7 +6,6 @@ import com.bruce.dao.PermissionDao;
 import com.bruce.dao.RoleDao;
 import com.bruce.dao.RolePermissionDao;
 import com.bruce.dao.UserRoleDao;
-import com.bruce.dto.PermissionDTO;
 import com.bruce.dto.RoleDTO;
 import com.bruce.entity.Permission;
 import com.bruce.entity.Role;

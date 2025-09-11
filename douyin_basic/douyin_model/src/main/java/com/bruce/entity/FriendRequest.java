@@ -1,11 +1,9 @@
 package com.bruce.entity;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
-
-import java.io.Serializable;
 
 /**
  * 好友请求表(FriendRequest)表实体类

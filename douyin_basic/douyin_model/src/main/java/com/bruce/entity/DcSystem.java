@@ -4,8 +4,6 @@ import java.util.Date;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 
-import java.io.Serializable;
-
 /**
  * (DcSystem)表实体类
  *
@@ -15,15 +13,15 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 @Data
 public class DcSystem extends Model<DcSystem> {
-    
+
     private String sysName;
-    
+
     private String sysValue;
-    
+
     private Long id;
-    
+
     private Date createTime;
-    
+
     private Date updateTime;
 
     }

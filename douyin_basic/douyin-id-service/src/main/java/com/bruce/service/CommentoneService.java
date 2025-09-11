@@ -3,7 +3,6 @@ package com.bruce.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.bruce.dto.CommentDto;
 import com.bruce.entity.Comment;
-import com.bruce.entity.Friend;
 
 import java.util.List;
 import java.util.Map;

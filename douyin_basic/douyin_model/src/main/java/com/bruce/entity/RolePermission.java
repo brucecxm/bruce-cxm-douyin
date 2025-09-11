@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import java.io.Serializable;
 @Data
 @NoArgsConstructor // 生成无参构造方法
 @RequiredArgsConstructor // 生成必需参数的构造方法

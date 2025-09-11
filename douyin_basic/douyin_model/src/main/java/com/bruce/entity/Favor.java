@@ -1,7 +1,6 @@
 package com.bruce.entity;
 
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-import java.io.Serializable;
 
 /**
  * (Favor)表实体类
@@ -11,11 +10,11 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 public class Favor extends Model<Favor> {
-    
+
     private Integer userId;
-    
+
     private Integer commentId;
-    
+
     private Integer commentType;
 
 

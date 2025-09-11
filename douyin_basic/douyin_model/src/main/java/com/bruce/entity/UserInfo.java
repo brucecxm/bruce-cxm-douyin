@@ -2,12 +2,9 @@ package com.bruce.entity;
 
 import java.util.Date;
 
-import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**

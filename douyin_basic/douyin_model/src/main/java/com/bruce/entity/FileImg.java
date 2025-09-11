@@ -1,7 +1,6 @@
 package com.bruce.entity;
 
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-import java.io.Serializable;
 
 /**
  * (FileImg)表实体类
@@ -11,15 +10,15 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 public class FileImg extends Model<FileImg> {
-    
+
     private Long userId;
-    
+
     private String imgUrl;
-    
+
     private String hrefUrl;
-    
+
     private String fileUrl;
-    
+
     private String type;
 
 

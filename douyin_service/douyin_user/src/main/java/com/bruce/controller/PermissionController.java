@@ -5,15 +5,7 @@ import com.bruce.dto.PermissionDTO;
 import com.bruce.entity.Permission;
 import com.bruce.service.PermissionService;
 
-import com.bruce.entity.ChatMessage;
-import com.bruce.pojo.*;
-import com.bruce.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

@@ -2,7 +2,6 @@ package com.bruce.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.bruce.entity.Comment;
-import org.apache.ibatis.annotations.Mapper;
 
 /**
  * (Comment)表服务接口

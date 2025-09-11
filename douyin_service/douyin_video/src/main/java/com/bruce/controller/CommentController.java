@@ -1,21 +1,16 @@
 package com.bruce.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.dict.Constant;
-import com.bruce.dto.CommentDto;
 import com.bruce.entity.Comment;
 import com.bruce.service.CommentService;
-import com.bruce.service.CommentoneService;
 import com.bruce.service.IdService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.concurrent.*;
