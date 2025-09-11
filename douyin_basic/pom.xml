@@ -13,7 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>douyin_file_starter</module>
-        <module>douyin-id-service</module>
+        <module>douyin-dao-service</module>
         <module>douyin_model</module>
     </modules>
 

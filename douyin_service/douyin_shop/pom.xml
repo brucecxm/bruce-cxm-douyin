@@ -95,7 +95,7 @@
         </dependency>
         <dependency>
             <groupId>org.example</groupId>
-            <artifactId>douyin-id-service</artifactId>
+            <artifactId>douyin-dao-service</artifactId>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>org.example</groupId>-->
