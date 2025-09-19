@@ -104,19 +104,17 @@
 </template>
 
 <script>
-import SockJS from 'sockjs-client';
-import Stomp from 'stompjs';
-import axios from 'axios';
+import request from '@/utils/request.js';
+import { toast } from 'vant';
+
 export default {
   data() {
     return {
       noshow: true,
-      fromUser: '',
-      toUser: '',
+      userId: '',
       amount: '',
       password: '',
       showPasswordModal: false,
-      stomp: null,
       keys: [
         { label: '1' },
         { label: '2' },
@@ -131,30 +129,12 @@ export default {
         { label: '0' },
         { label: '删除' }
       ],
-      address: {
-        name: '张三',
-        phone: '13800138000',
-        fullAddress: '北京市朝阳区望京街道123号望京SOHO'
-      },
-      cartItems: [
-        {
-          image: 'https://example.com/prod1.jpg',
-          name: '时尚连衣裙',
-          specs: '红色 / M',
-          price: 159.9,
-          quantity: 1
-        },
-        {
-          image: 'https://example.com/prod2.jpg',
-          name: '简约手表',
-          specs: '黑色表带',
-          price: 299.0,
-          quantity: 1
-        }
-      ],
+      address: null,
+      cartItems: [],
       shippingFee: 0,
-      discount: 20,
-      orderRemark: ''
+      discount: 0,
+      orderRemark: '',
+      orderData: null
     };
   },
   computed: {
@@ -169,14 +149,95 @@ export default {
       return pay > 0 ? pay : 0;
     }
   },
+  created() {
+    this.loadOrderData();
+    this.loadUserInfo();
+    this.loadUserAddress();
+  },
   methods: {
+    // 加载订单数据
+    loadOrderData() {
+      try {
+        // 从localStorage获取购物车数据
+        const orderData = localStorage.getItem('orderData');
+        if (orderData) {
+          this.orderData = JSON.parse(orderData);
+          // 处理购物车数据
+          this.cartItems = this.orderData.cartItems.map(item => ({
+            image: item.image || 'https://img.yzcdn.cn/vant/apple-1.jpg',
+            name: item.title || '商品名称',
+            specs: item.dishFlavor || '标准规格',
+            price: item.price || item.amount || 0,
+            quantity: item.quantity || item.number || 1
+          }));
+        }
+      } catch (error) {
+        console.error('加载订单数据失败:', error);
+        // 如果加载失败，使用默认数据
+        this.setDefaultOrderData();
+      }
+    },
+    
+    // 设置默认订单数据
+    setDefaultOrderData() {
+      this.cartItems = [
+        {
+          image: 'https://img.yzcdn.cn/vant/apple-1.jpg',
+          name: '时尚连衣裙',
+          specs: '红色 / M',
+          price: 159.9,
+          quantity: 1
+        },
+        {
+          image: 'https://img.yzcdn.cn/vant/apple-2.jpg',
+          name: '简约T恤',
+          specs: '白色',
+          price: 89.9,
+          quantity: 2
+        }
+      ];
+    },
+    
+    // 加载用户信息
+    loadUserInfo() {
+      try {
+        // 从Vuex获取用户信息
+        const userInfoMap = this.$store.state.userInfo.userInfo;
+        this.userId = userInfoMap?.userId || '';
+      } catch (error) {
+        console.error('加载用户信息失败:', error);
+      }
+    },
+    
+    // 加载用户地址
+    async loadUserAddress() {
+      try {
+        const res = await request.get('/shop/address/list');
+        if (res.code === 200 && res.data && res.data.length > 0) {
+          // 默认选择第一个地址
+          this.address = res.data[0];
+        }
+      } catch (error) {
+        console.error('加载用户地址失败:', error);
+        // 如果加载失败，使用默认地址
+        this.address = {
+          name: '张三',
+          phone: '13800138000',
+          fullAddress: '北京市朝阳区望京街道123号望京SOHO'
+        };
+      }
+    },
+    
+    // 打开密码弹窗
     openPasswordModal() {
       if (!this.amount || parseFloat(this.amount) <= 0) {
-        this.$message.error('请输入有效的转账金额');
+        toast('请输入有效的支付金额');
         return;
       }
       this.showPasswordModal = true;
     },
+    
+    // 处理数字键盘输入
     pressKey(key) {
       if (key.label === '删除') {
         this.password = this.password.slice(0, -1);
@@ -185,38 +246,65 @@ export default {
       }
 
       if (this.password.length === 6) {
-        this.submitTransfer();
+        this.submitOrderWithPayment();
       }
     },
-    submitTransfer() {
-      const { fromUser, toUser, amount, password } = this;
-      axios
-        .post('/api/shop/transfer', null, {
-          params: {
-            fromUserId: fromUser,
-            toUserId: toUser,
-            amount,
-            password
-          }
-        })
-        .then((res) => {
-          this.$message.success('转账成功' + res.data);
+    
+    // 提交订单并支付
+    async submitOrderWithPayment() {
+      try {
+        // 构建订单数据，确保与后端Orders实体类字段匹配
+        const orderSubmitData = {
+          userId: this.userId,
+          addressBookId: this.address?.id || 1, // 后端字段名为addressBookId
+          amount: this.finalPrice, // 后端字段名为amount
+          payMethod: 1, // 1微信，2支付宝（这里默认使用微信支付）
+          remark: this.orderRemark,
+          // 订单详情信息，实际项目中可能需要单独提交
+          orderDetails: this.cartItems.map(item => ({
+            name: item.name, // 后端字段名为name
+            dishId: item.dishId || 0,
+            dishFlavor: item.specs,
+            number: item.quantity,
+            amount: item.price
+          }))
+        };
+        
+        // 提交订单
+        const res = await request.post('/shop/order/submit', orderSubmitData);
+        
+        if (res.code === 200) {
+          toast('订单提交成功！');
           this.resetPasswordModal();
-        })
-        .catch((err) => {
-          this.$message.error(
-            '转账失败: ' + (err.response?.data || '服务器错误')
-          );
-          this.noshow = true;
+          
+          // 清空购物车数据
+          localStorage.removeItem('orderData');
+          
+          // 跳转到订单列表或订单详情页面
+          setTimeout(() => {
+            this.$router.push('/shop/orderlist');
+          }, 1500);
+        } else {
+          toast('订单提交失败：' + (res.msg || '未知错误'));
           this.resetPasswordModal();
-        });
+        }
+      } catch (error) {
+        console.error('提交订单失败:', error);
+        toast('订单提交失败，请重试');
+        this.resetPasswordModal();
+      }
     },
+    
+    // 重置密码弹窗
     resetPasswordModal() {
       this.password = '';
       this.showPasswordModal = false;
     },
+    
+    // 编辑地址
     editAddress() {
-      // 弹出地址选择页，简化用prompt模拟
+      // 这里应该跳转到地址选择页面
+      // 简化用prompt模拟
       const name = prompt('收货人姓名', this.address?.name || '');
       if (!name) return;
       const phone = prompt('联系电话', this.address?.phone || '');
@@ -225,32 +313,18 @@ export default {
       if (!fullAddress) return;
       this.address = { name, phone, fullAddress };
     },
+    
+    // 提交订单
     submitOrder() {
       if (!this.address) {
-        alert('请填写收货地址');
+        toast('请填写收货地址');
         return;
       }
-      this.amount = 1;
-      if (!this.amount || parseFloat(this.amount) <= 0) {
-        this.$message.error('请输入有效的转账金额');
-        return;
-      }
+      
+      this.amount = this.finalPrice.toString();
       this.noshow = false;
       this.showPasswordModal = true;
     }
-  },
-  mounted() {
-    const userInfoMap = this.$store.state.userInfo.userInfo; // ✅ 从 Vuex 获取用户信息
-    this.fromUser = userInfoMap.userId || '';
-    this.toUser = this.$route.query.toUser || '';
-
-    const socket = new SockJS('http://localhost:7426/ws');
-    this.stomp = Stomp.over(socket);
-    this.stomp.connect({}, () => {
-      this.stomp.subscribe('/topic/transfer/' + this.fromUser, (msg) => {
-        this.$message.success('转账成功: ' + msg.body);
-      });
-    });
   }
 };
 </script>

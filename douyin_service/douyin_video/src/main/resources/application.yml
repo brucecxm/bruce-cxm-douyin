@@ -33,6 +33,9 @@ eureka:
   client:
     service-url:
       defaultZone: http://127.0.0.1:10086/eureka
+    registerWithEureka: false
+    fetchRegistry: false
+    enabled: false
 
 
 mybatis:

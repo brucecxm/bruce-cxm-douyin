@@ -133,5 +133,45 @@ public class ShopController extends ApiController {
     public R delete(@RequestParam("idList") List<Long> idList) {
         return success(this.shopService.removeByIds(idList));
     }
+    
+    /**
+     * 分页查询所有店铺数据（简化版）
+     * 
+     * @param current 当前页码
+     * @param size 每页条数
+     * @return 分页数据
+     */
+    @GetMapping
+    public R<Page<Shop>> shoplist(@RequestParam Integer current, @RequestParam Integer size) {
+        // 创建分页对象
+        Page<Shop> page = new Page<>(current, size);
+        // 执行分页查询
+        Page<Shop> shopPage = shopService.page(page);
+        return success(shopPage);
+    }
+    
+    /**
+     * 根据关键字模糊查询店铺
+     * 
+     * @param key 搜索关键字
+     * @param current 当前页码
+     * @param size 每页条数
+     * @return 分页数据
+     */
+    @GetMapping("/likeall")
+    public R<Page<Shop>> getlikeall(@RequestParam String key, @RequestParam Integer current, @RequestParam Integer size) {
+        // 创建分页对象
+        Page<Shop> page = new Page<>(current, size);
+        // 创建查询条件
+        LambdaQueryWrapper<Shop> queryWrapper = new LambdaQueryWrapper<>();
+        // 模糊查询店铺名称、描述、信息或类型中包含关键字的记录
+        queryWrapper.like(Shop::getShopName, key)
+                   .or().like(Shop::getShopDesc, key)
+                   .or().like(Shop::getShopInfo, key)
+                   .or().like(Shop::getShopType, key);
+        // 执行分页查询
+        Page<Shop> shopPage = shopService.page(page, queryWrapper);
+        return success(shopPage);
+    }
 }
 

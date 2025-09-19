@@ -49,6 +49,7 @@
             <version>1.40.0</version>
         </dependency>
 
+
         <!-- Sa-Token 整合 Redis （使用 jackson 序列化方式） -->
         <dependency>
             <groupId>cn.dev33</groupId>

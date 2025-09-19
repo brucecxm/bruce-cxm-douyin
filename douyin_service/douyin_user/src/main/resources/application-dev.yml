@@ -74,11 +74,42 @@ spring:
             token-uri: https://graph.qq.com/oauth2.0/token  # QQ的令牌URI
             user-info-uri: https://graph.qq.com/user/get_user_info  # QQ的用户信息URI
 
+  # Eureka容错配置，允许服务在Eureka不可用时继续运行
+  cloud:
+    discovery:
+      client:
+        simple:
+          instances:
+            douyin_user:
+              - uri: http://localhost:8080
+                metadata:
+                  instanceId: douyin_user:8080
+                  secureVipAddress: douyin_user
+                  vipAddress: douyin_user
+                  homePageUrl: http://localhost:8080
+                  healthCheckUrl: http://localhost:8080/actuator/health
+                  statusPageUrl: http://localhost:8080/actuator/info
+
 
 eureka:
   client:
     service-url:
       defaultZone: http://127.0.0.1:10086/eureka  # Eureka 服务注册中心的地址
+    registerWithEureka: false
+    fetchRegistry: false
+    enabled: false
+    healthcheck:
+      enabled: false
+  instance:
+    preferIpAddress: true
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+  server:
+    enableSelfPreservation: true
+    evictionIntervalTimerInMs: 5000
+
+
 
 
 minio:

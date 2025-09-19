@@ -41,6 +41,10 @@
             <div class="num">{{ userInfo.likes || '0' }}</div>
             <div class="label">获赞</div>
           </div>
+          <div class="stat-item" @click="goToOrderList">
+            <div class="num">🛒</div>
+            <div class="label">订单</div>
+          </div>
           <el-button @click="goEditMeInfo">编辑主页</el-button>
         </div>
         <div class="userinfo">
@@ -140,6 +144,9 @@ export default {
     },
     goEditMeInfo() {
       this.$router.push({ path: '/editMeInfo' });
+    },
+    goToOrderList() {
+      this.$router.push({ path: '/shop/orderlist' });
     }
   }
 };

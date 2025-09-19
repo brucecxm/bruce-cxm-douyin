@@ -5,7 +5,6 @@ import cn.dev33.satoken.reactor.filter.SaReactorFilter;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
-import com.bruce.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,9 +15,6 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class SaTokenConfigure {
-    @Autowired
-    private JwtUtil jwtUtil ;
-
 
     // 注册 Sa-Token全局过滤器
     @Bean
@@ -27,29 +23,17 @@ public class SaTokenConfigure {
                 // 拦截地址
                 .addInclude("/**")    /* 拦截全部path */
                 // 开放地址
-                .addExclude("/favicon.ico")
+                .addExclude("/favicon.ico", "/user/doLogin", "/user/getVerificationCode", "/user/register")
                 // 鉴权方法：每次访问进入
                 .setAuth(obj -> {
-
-
-
-
-
-                    // 登录校验 -- 拦截所有路由，并排除/user/doLogin 用于开放登录
-                    SaRouter.match("/**", "/user/doLogin",
-                            r -> {
-
-                                System.out.println("这里要从redis获取登录的token");
-                                System.out.println( StpUtil.isLogin());
-
-                                System.out.println("这里要从redis获取登录的token");
-
-                            }
-
-
-                            );
-
-
+                    // 登录校验 -- 拦截所有路由，但排除了开放地址
+                    SaRouter.match("/**", r -> {
+                        // 检查用户是否已登录
+                        StpUtil.checkLogin();
+                        // 登录状态下可以进行更细粒度的权限校验
+                        // 例如: StpUtil.checkRole("admin"); // 检查是否具有admin角色
+                        // 例如: StpUtil.checkPermission("user:view"); // 检查是否具有user:view权限
+                    });
                 })
 
                 // 异常处理方法：每次setAuth函数出现异常时进入
@@ -58,11 +42,4 @@ public class SaTokenConfigure {
                 })
                 ;
     }
-
-
-
-
-
-
-
 }

@@ -89,6 +89,54 @@ public class ShoppingCartController {
     }
 
     /**
+     * 更新购物车商品数量
+     * @param shoppingCart 购物车信息
+     * @return 更新后的购物车商品
+     */
+    @PostMapping("/updateNumber")
+    public R<ShoppingCart> updateNumber(@RequestBody ShoppingCart shoppingCart){
+        log.info("更新购物车商品数量: {}", shoppingCart);
+        
+        String loginId = StpUtil.getLoginId().toString();  // 转换为字符串
+        Long userId = Long.parseLong(loginId);  // 将字符串转为 Long 类型
+        
+        // 验证购物车项是否属于当前用户
+        ShoppingCart existingItem = shoppingCartService.getById(shoppingCart.getId());
+        if (existingItem == null || !existingItem.getUserId().equals(userId)) {
+            return R.error("无权操作该购物车项");
+        }
+        
+        // 更新数量
+        existingItem.setNumber(shoppingCart.getNumber());
+        shoppingCartService.updateById(existingItem);
+        
+        return R.success(existingItem);
+    }
+    
+    /**
+     * 删除单个购物车商品
+     * @param id 购物车项ID
+     * @return 操作结果
+     */
+    @DeleteMapping("/delete/{id}")
+    public R<String> delete(@PathVariable Long id){
+        log.info("删除购物车商品, id: {}", id);
+        
+        String loginId = StpUtil.getLoginId().toString();  // 转换为字符串
+        Long userId = Long.parseLong(loginId);  // 将字符串转为 Long 类型
+        
+        // 验证购物车项是否属于当前用户
+        ShoppingCart existingItem = shoppingCartService.getById(id);
+        if (existingItem == null || !existingItem.getUserId().equals(userId)) {
+            return R.error("无权操作该购物车项");
+        }
+        
+        shoppingCartService.removeById(id);
+        
+        return R.success("删除成功");
+    }
+    
+    /**
      * 清空购物车
      * @return
      */

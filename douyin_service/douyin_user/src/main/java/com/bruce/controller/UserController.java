@@ -12,6 +12,7 @@ import com.bruce.entity.*;
 import com.bruce.handlar.MyCustomException;
 import com.bruce.pojo.Result;
 import com.bruce.service.*;
+import com.bruce.utils.AuthUtils;
 import com.bruce.utils.JwtUtil;
 import com.bruce.utils.RedisUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -221,39 +222,24 @@ public class UserController extends ApiController {
                 if (password == null || password.isEmpty()) {
                     return Result.error("密码不能为空");
                 }
-                user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, userName));
-                if (user == null) {
-                    return Result.error(Constant.Error.USER_INVALID);
-                }
-
-                // 验证码可选校验
-                if (isCheck) {
-                    String code = stringRedisTemplate.opsForValue().get(Constant.User.EMAIL_CODE_PREFIX + userName);
-                    if (verificationCode == null || verificationCode.isEmpty()) {
-                        return Result.error("验证码不能为空");
-                    }
-                    if (code == null || !verificationCode.equalsIgnoreCase(code)) {
-                        return Result.error("验证码错误");
-                    }
-                }
-                Salt salt = saltService.getOne(new LambdaQueryWrapper<Salt>().eq(Salt::getUserId, user.getId()));
-                if (salt == null) {
-                    return Result.error("未获取到用户盐值，请联系管理员");
-                }
-                String encryptedPassword = saltedDoubleHashPassword(password, salt.getSalt());
-                if (!encryptedPassword.equals(user.getPassword())) {
+                // 使用优化后的用户服务验证密码
+                if (!userService.verifyPassword(userName, password)) {
                     return Result.error(Constant.Error.INVALID_CREDENTIALS);
                 }
+                user = userService.getUserByUsername(userName);
                 // 登录
                 StpUtil.login(user.getId());
-
             }
-            //Sa-Token 的权限管理本质上是基于会话的，但权限数据的来源需要你自己实现
-            // 因此登录之后 要自己从数据库获取其权限角色设置  后面登录状态下能快速获取
-            //一般都是通过一个接口查询  sa-token暴露出了获取权限和角色的接口
-            //请查看StpInterfaceImpl  这里是获取权限和角色的逻辑
-            List<String> roleList = StpUtil.getRoleList();
-            List<String> permissionList = StpUtil.getPermissionList();
+            // 更新用户最后登录时间
+            userService.updateLastLoginTime(user.getId());
+            
+            // 清除旧的权限缓存，确保获取最新权限
+            AuthUtils.clearPermissionCache(user.getId());
+            
+            // 使用AuthUtils获取权限和角色列表
+            List<String> roleList = AuthUtils.getRoleList(user.getId());
+            List<String> permissionList = AuthUtils.getPermissionList(user.getId());
+            
             // ===== 获取 token 和用户信息 =====
             String token = StpUtil.getTokenValue();
             Long userId = Long.parseLong(StpUtil.getLoginId().toString());

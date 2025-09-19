@@ -55,6 +55,12 @@ public class Constant {
         public static final String TOKEN = "token"; // 补全 SA-Token 常量
         public static final String _USER_INFO = "_user_info"; // 补全 SA-Token 常量
         public static final String JWT = "jwt"; // 补全 SA-Token 常量
+        // Redis缓存键前缀
+        public static final String USER_ROLES_PREFIX = "user:roles:"; // 用户角色缓存前缀
+        public static final String USER_PERMISSIONS_PREFIX = "user:permissions:"; // 用户权限缓存前缀
+        // 会话中角色和权限的存储键
+        public static final String SESSION_ROLES_KEY = "session_roles"; // 会话中角色存储键
+        public static final String SESSION_PERMISSIONS_KEY = "session_permissions"; // 会话中权限存储键
     }
 
     /**

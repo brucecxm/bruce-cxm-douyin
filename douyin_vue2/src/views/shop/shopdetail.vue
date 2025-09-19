@@ -100,17 +100,98 @@
 </template>
 
 <script>
+import request from '@/utils/request.js';
+import { searchForDish } from '@/api/shop.js';
+
 export default {
   data() {
     return {
       showBuyPopup: false,
-      actionType: '', // 新增：buy 或 cart
-      images: [
-        'https://img.yzcdn.cn/vant/apple-1.jpg',
-        'https://img.yzcdn.cn/vant/apple-2.jpg',
-        'https://img.yzcdn.cn/vant/apple-3.jpg'
-      ],
+      actionType: 'cart', // 默认显示加入购物车按钮
+      images: [],
       product: {
+        priceDiscount: 0,
+        priceOriginal: 0,
+        title: '',
+        tags: [],
+        detailHtml: ''
+      },
+      shop: {
+        avatar: '',
+        name: '',
+        description: ''
+      },
+      cartCount: 0,
+      productOptions: {
+        colors: [],
+        sizes: []
+      },
+      selectedOptions: {
+        color: null,
+        size: null
+      },
+      productId: 0
+    };
+  },
+  created() {
+    // 从路由参数中获取商品ID
+    this.productId = this.$route.params.id || 1;
+    this.loadProductData();
+    this.loadCartCount();
+  },
+  methods: {
+    // 加载商品详情数据
+    async loadProductData() {
+      try {
+        // 获取商品详情（使用searchForDish接口，因为这是现有可用的接口）
+        // 这里假设商品名称和ID相关联，可以根据实际情况调整
+        const res = await searchForDish(this.productId.toString());
+        
+        if (res.code === 200 && res.data) {
+          const productData = res.data;
+          // 映射商品数据
+          this.product = {
+            priceDiscount: productData.price || 0,
+            priceOriginal: productData.price || 0, // 可以根据实际情况设置原价
+            title: productData.name || '商品名称',
+            tags: ['包邮', '48小时内发货', '退货保障'], // 这里可以从后端获取标签
+            detailHtml: `
+              <h3>产品详情</h3>
+              <p>${productData.description || '这是一款优质商品，品质保证。'}</p>
+              ${productData.image ? `<img src="${productData.image}" style="width:100%;margin-top:10px;" />` : ''}
+              <p>更多详细信息请咨询客服。</p>
+            `
+          };
+          
+          // 设置商品图片
+          this.images = productData.image ? [productData.image] : ['https://img.yzcdn.cn/vant/apple-1.jpg'];
+          
+          // 设置店铺信息
+          this.shop = {
+            avatar: productData.shopImg || 'https://img.yzcdn.cn/vant/cat.jpeg',
+            name: productData.shopName || '店铺名称',
+            description: '品质保证，7天无理由退换货'
+          };
+        } else {
+          // 如果接口调用失败，使用默认数据
+          this.setDefaultProductData();
+        }
+        
+        // 设置商品选项（这里应该从后端获取，暂时使用静态数据）
+        this.productOptions = {
+          colors: ['红色', '蓝色', '绿色'],
+          sizes: ['S', 'M', 'L', 'XL']
+        };
+        
+      } catch (error) {
+        console.error('加载商品数据失败:', error);
+        this.setDefaultProductData();
+      }
+    },
+    
+    // 设置默认商品数据
+    setDefaultProductData() {
+      this.product = {
         priceDiscount: 26,
         priceOriginal: 28,
         title: '时尚复古碎花连衣裙',
@@ -121,79 +202,127 @@ export default {
           <img src="https://img.yzcdn.cn/vant/apple-1.jpg" style="width:100%;margin-top:10px;" />
           <p>优雅的剪裁，舒适的穿着感，是您的最佳选择！</p>
         `
-      },
-      shop: {
+      };
+      this.images = [
+        'https://img.yzcdn.cn/vant/apple-1.jpg',
+        'https://img.yzcdn.cn/vant/apple-2.jpg',
+        'https://img.yzcdn.cn/vant/apple-3.jpg'
+      ];
+      this.shop = {
         avatar: 'https://img.yzcdn.cn/vant/cat.jpeg',
         name: '美丽衣坊旗舰店',
         description: '品质保证，7天无理由退换货'
-      },
-      cartCount: 3,
-      showBuyPopup: false, // 控制弹窗显示
-      productOptions: {
-        colors: ['红色', '蓝色', '绿色'],
-        sizes: ['S', 'M', 'L', 'XL']
-      },
-      selectedOptions: {
-        color: null,
-        size: null
+      };
+    },
+    
+    // 加载购物车数量
+    async loadCartCount() {
+      try {
+        // 这里应该调用获取购物车数量的接口
+        // 暂时使用模拟数据
+        this.cartCount = 0;
+      } catch (error) {
+        console.error('加载购物车数量失败:', error);
       }
-    };
-  },
-  methods: {
-    buyNow() {
-      // 打开弹窗
+    },
+    
+    // 打开弹窗选择规格
+    openOptionPopup(actionType) {
+      this.actionType = actionType;
       this.showBuyPopup = true;
       // 默认选中第一项
-      this.selectedOptions.color = this.productOptions.colors[0];
-      this.selectedOptions.size = this.productOptions.sizes[0];
+      if (this.productOptions.colors.length > 0) {
+        this.selectedOptions.color = this.productOptions.colors[0];
+      }
+      if (this.productOptions.sizes.length > 0) {
+        this.selectedOptions.size = this.productOptions.sizes[0];
+      }
+    },
+    
+    // 购买按钮点击
+    buyNow() {
+      this.openOptionPopup('buy');
+    },
+    
+    // 加入购物车按钮点击
+    addToCart() {
+      this.openOptionPopup('cart');
     },
 
+    // 关闭弹窗
     closeBuyPopup() {
       this.showBuyPopup = false;
     },
 
+    // 选择商品规格
     selectOption(type, value) {
       this.selectedOptions[type] = value;
     },
+    
+    // 确认购买
     confirmBuy() {
       if (!this.selectedOptions.color || !this.selectedOptions.size) {
-        alert('请选择颜色和尺码');
+        this.$toast('请选择颜色和尺码');
         return;
       }
-      this.showmai = true;
+      
       this.showBuyPopup = false;
-      // 模拟跳转到订单页面，携带选择参数
+      
+      // 跳转到订单页面，携带选择参数
       this.$router.push({
-        path: '/order'
-        // query: {
-        //   productId: 123, // 示例商品id
-        //   color: this.selectedOptions.color,
-        //   size: this.selectedOptions.size
-        // }
+        path: '/order',
+        query: {
+          productId: this.productId,
+          color: this.selectedOptions.color,
+          size: this.selectedOptions.size,
+          price: this.product.priceDiscount,
+          name: this.product.title
+        }
       });
     },
-    confirmAddCar() {
+    
+    // 确认加入购物车
+    async confirmAddCar() {
       if (!this.selectedOptions.color || !this.selectedOptions.size) {
-        alert('请选择颜色和尺码');
+        this.$toast('请选择颜色和尺码');
         return;
       }
-      this.showmai = true;
-      this.showBuyPopup = false;
-      // 模拟跳转到订单页面，携带选择参数
+      
+      try {
+        // 构建购物车数据
+        const cartData = {
+          dishId: this.productId, // 这里假设商品ID就是dishId
+          name: this.product.title,
+          image: this.images[0] || '',
+          dishFlavor: `${this.selectedOptions.color},${this.selectedOptions.size}`,
+          number: 1,
+          amount: this.product.priceDiscount
+        };
+        
+        // 调用添加到购物车的接口
+        const res = await request.post('/shop/shoppingCart/add', cartData);
+        
+        if (res.code === 200) {
+          this.showBuyPopup = false;
+          this.cartCount++;
+          this.$toast('加入购物车成功');
+        } else {
+          this.$toast('加入购物车失败，请重试');
+        }
+      } catch (error) {
+        console.error('加入购物车失败:', error);
+        this.$toast('加入购物车失败，请重试');
+      }
     },
+    
+    // 跳转到店铺页面
     goShop() {
       this.$router.push('/store');
     },
+    
+    // 跳转到购物车页面
     goCart() {
       this.$router.push('/shopcat');
-    },
-    addToCart() {
-      // 打开弹窗
-      this.showBuyPopup = true;
-      // 默认选中第一项
-      this.selectedOptions.color = this.productOptions.colors[0];
-      this.selectedOptions.size = this.productOptions.sizes[0];
-      this.cartCount++;
     }
   }
 };

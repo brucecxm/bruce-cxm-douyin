@@ -22,7 +22,7 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 @Data
 public class User  {
-    private long id;
+    private Long id;
     private String email;
     private String userPic;
     private String backImg;
@@ -44,8 +44,9 @@ public class User  {
     private String roleId;
     private String paymentPassword;
     private Boolean isAnchor;
-    private int isPrivate ;
-
+    private int isPrivate;
+    // 最后登录时间
+    private LocalDateTime lastLoginTime;
 
     }
 

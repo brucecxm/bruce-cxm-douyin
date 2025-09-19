@@ -76,70 +76,129 @@
 </template>
 
 <script>
+import { shoplist } from '@/api/shop.js';
+import request from '@/utils/request.js';
+
 export default {
   data() {
     return {
       activeTab: 'products',
       isFollowed: false,
       shop: {
-        cover: 'https://img.yzcdn.cn/vant/cat.jpeg',
-        avatar: 'https://img.yzcdn.cn/vant/cat.jpeg',
-        name: '时尚美妆旗舰店',
-        description: '优质产品，正品保证，售后无忧',
-        fans: 12500,
-        following: 120
+        cover: '',
+        avatar: '',
+        name: '',
+        description: '',
+        fans: 0,
+        following: 0
       },
-      products: [
-        {
-          id: 1,
-          image: 'https://img.yzcdn.cn/vant/apple-1.jpg',
-          title: '复古碎花连衣裙',
-          price: 68
-        },
-        {
-          id: 2,
-          image: 'https://img.yzcdn.cn/vant/apple-2.jpg',
-          title: '夏季透气T恤',
-          price: 38
-        },
-        {
-          id: 3,
-          image: 'https://img.yzcdn.cn/vant/apple-3.jpg',
-          title: '百搭牛仔裤',
-          price: 88
-        },
-        {
-          id: 4,
-          image: 'https://img.yzcdn.cn/vant/apple-1.jpg',
-          title: '时尚运动鞋',
-          price: 158
-        }
-      ],
-      dynamics: [
-        {
-          id: 1,
-          content: '新品上架，欢迎选购！',
-          image: 'https://img.yzcdn.cn/vant/apple-2.jpg'
-        },
-        {
-          id: 2,
-          content: '夏日搭配推荐，清爽又时尚。',
-          image: ''
-        },
-        {
-          id: 3,
-          content: '感谢大家的支持，粉丝破万啦！',
-          image: 'https://img.yzcdn.cn/vant/apple-3.jpg'
-        }
-      ]
+      products: [],
+      dynamics: []
     };
   },
+  created() {
+    this.loadShopData();
+  },
   methods: {
-    toggleFollow() {
-      this.isFollowed = !this.isFollowed;
+    // 加载店铺数据
+    async loadShopData() {
+      try {
+        // 假设从URL参数获取店铺ID，这里使用默认值1
+        const shopId = this.$route.query.id || 1;
+        
+        // 获取店铺详情
+        const shopRes = await request.get(`/shop/${shopId}`);
+        if (shopRes.code === 200) {
+          const shopData = shopRes.data;
+          // 映射数据结构
+          this.shop = {
+            cover: shopData.shopImg || 'https://img.yzcdn.cn/vant/cat.jpeg',
+            avatar: shopData.shopImg || 'https://img.yzcdn.cn/vant/cat.jpeg',
+            name: shopData.shopName || '店铺名称',
+            description: shopData.shopDesc || '店铺描述',
+            fans: 12500, // 这里应该从后端获取，暂时使用静态数据
+            following: 120 // 这里应该从后端获取，暂时使用静态数据
+          };
+        }
+        
+        // 获取店铺商品列表（使用shoplist接口）
+        const productsRes = await shoplist(1, 10);
+        if (productsRes.code === 200) {
+          // 映射商品数据结构
+          this.products = productsRes.data.records.map(item => ({
+            id: item.shopId,
+            image: item.shopImg || 'https://img.yzcdn.cn/vant/apple-1.jpg',
+            title: item.shopName || '商品名称',
+            price: item.shopPrice || 0
+          }));
+        }
+        
+        // 获取店铺动态（这里应该有专门的接口，暂时使用静态数据）
+        this.dynamics = [
+          {
+            id: 1,
+            content: '新品上架，欢迎选购！',
+            image: 'https://img.yzcdn.cn/vant/apple-2.jpg'
+          },
+          {
+            id: 2,
+            content: '夏日搭配推荐，清爽又时尚。',
+            image: ''
+          },
+          {
+            id: 3,
+            content: '感谢大家的支持，粉丝破万啦！',
+            image: 'https://img.yzcdn.cn/vant/apple-3.jpg'
+          }
+        ];
+        
+        // 检查用户是否已关注该店铺
+        this.checkFollowStatus();
+        
+      } catch (error) {
+        console.error('加载店铺数据失败:', error);
+      }
     },
+    
+    // 检查关注状态
+    async checkFollowStatus() {
+      try {
+        // 这里应该调用检查关注状态的接口
+        // 暂时使用模拟数据
+        this.isFollowed = false;
+      } catch (error) {
+        console.error('检查关注状态失败:', error);
+      }
+    },
+    
+    // 切换关注状态
+    async toggleFollow() {
+      try {
+        // 这里应该调用关注/取消关注的接口
+        // 模拟调用
+        this.isFollowed = !this.isFollowed;
+        
+        // 模拟更新粉丝数
+        if (this.isFollowed) {
+          this.shop.fans += 1;
+        } else {
+          this.shop.fans -= 1;
+        }
+        
+        // 显示提示信息
+        this.$toast({
+          message: this.isFollowed ? '关注成功' : '已取消关注',
+          duration: 1500
+        });
+      } catch (error) {
+        console.error('关注操作失败:', error);
+        this.isFollowed = !this.isFollowed; // 失败时回滚状态
+      }
+    },
+    
+    // 跳转到商品详情页
     goProduct(id) {
-      this.$router.push('/shopdetail/1');
+      this.$router.push(`/shopdetail/${id}`);
     }
   }
 };

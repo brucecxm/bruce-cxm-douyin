@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bruce.dao.UserDao;
 import com.bruce.entity.User;
 import com.bruce.service.UserService;
+import com.bruce.utils.Md5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -33,6 +35,42 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 .or()
                 .eq(User::getId, keyword);
         return userDao.selectList(wrapper);
+    }
+
+    @Override
+    public User getUserByUsername(String username) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.lambda().eq(User::getUsername, username);
+        return userDao.selectOne(wrapper);
+    }
+
+    @Override
+    public boolean verifyPassword(String username, String password) {
+        User user = getUserByUsername(username);
+        if (user == null) {
+            return false;
+        }
+        // 验证密码是否正确
+        return Md5Util.getMD5String(password).equals(user.getPassword());
+    }
+
+    @Override
+    public void updateLastLoginTime(Long userId) {
+        User user = new User();
+        user.setId(userId);
+        user.setLastLoginTime(LocalDateTime.now());
+        userDao.updateById(user);
+    }
+
+    @Override
+    public boolean resetPassword(Long userId, String newPassword) {
+        User user = getById(userId);
+        if (user == null) {
+            return false;
+        }
+        // 加密新密码并更新
+        user.setPassword(Md5Util.getMD5String(newPassword));
+        return updateById(user);
     }
 }
 

@@ -15,7 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -69,5 +71,54 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionDao, Permission
         return permissionMapper.selectBatchIds(permissionIds);
     }
 
+    @Override
+    public boolean hasPermission(Long userId, String permissionCode) {
+        if (userId == null || permissionCode == null || permissionCode.isEmpty()) {
+            return false;
+        }
+        
+        List<String> permissionCodes = getPermissionCodesByUserId(userId);
+        return permissionCodes != null && permissionCodes.contains(permissionCode);
+    }
+
+    @Override
+    public boolean hasAnyPermission(Long userId, String[] permissionCodes) {
+        if (userId == null || permissionCodes == null || permissionCodes.length == 0) {
+            return false;
+        }
+        
+        List<String> userPermissions = getPermissionCodesByUserId(userId);
+        if (userPermissions == null || userPermissions.isEmpty()) {
+            return false;
+        }
+        
+        Set<String> permissionSet = new HashSet<>(userPermissions);
+        for (String code : permissionCodes) {
+            if (permissionSet.contains(code)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hasAllPermissions(Long userId, String[] permissionCodes) {
+        if (userId == null || permissionCodes == null || permissionCodes.length == 0) {
+            return false;
+        }
+        
+        List<String> userPermissions = getPermissionCodesByUserId(userId);
+        if (userPermissions == null || userPermissions.isEmpty()) {
+            return false;
+        }
+        
+        Set<String> permissionSet = new HashSet<>(userPermissions);
+        for (String code : permissionCodes) {
+            if (!permissionSet.contains(code)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 

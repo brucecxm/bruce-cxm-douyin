@@ -1,6 +1,6 @@
-// src/router/router.js
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import store from '@/stores'; // 引入store，用于在全局守卫中获取角色/权限
 import { authGuard, roleGuard, permissionGuard } from './guards';
 
 Vue.use(VueRouter);
@@ -9,17 +9,17 @@ const routes = [
   {
     path: '/ad', // 新增广告页路由
     name: 'Ad',
-    component: () => import('../views/Ad.vue'), // 假设广告组件路径
-    meta: { isAd: true } // 标记为广告页
+    component: () => import('../views/Ad.vue'),
+    meta: { isAd: true }
   },
   {
     path: '/wallet',
-    name: 'Wallet', // 修正路由名称（原名称与广告路由冲突）
+    name: 'Wallet',
     component: () => import('../views/shop/wallet.vue'),
     meta: {
-      requiresAuth: true, // 需要登录
-      roles: ['admin', 'user'], // 需要的角色（满足任意一个即可）
-      permissions: ['home:view'] // 需要的权限（满足任意一个即可）
+      requiresAuth: true, // 必须加这行，才会触发登录检查
+      roles: ['admin', 'user'], // 需要的角色
+      permissions: ['home:view'] // 需要的权限
     }
   },
   {
@@ -27,9 +27,9 @@ const routes = [
     name: 'TestRegister',
     component: () => import('@/views/test/testregister.vue'),
     meta: {
-      requiresAuth: true, // 需要登录
-      roles: ['admin', 'user'], // 需要的角色（满足任意一个即可）
-      permissions: ['home:view'] // 需要的权限（满足任意一个即可）
+      requiresAuth: true,
+      roles: ['admin', 'user'],
+      permissions: ['home:view']
     }
   },
   {
@@ -63,7 +63,7 @@ const routes = [
     component: () => import('../views/shangchuan/shangchuan.vue')
   },
   {
-    path: '/shangchuandetail', // 移除末尾多余斜杠
+    path: '/shangchuandetail',
     name: 'ShangchuandetailVue',
     component: () => import('../views/shangchuan/shangchuandetail.vue')
   },
@@ -72,9 +72,9 @@ const routes = [
     name: 'Coupon',
     component: () => import('../views/shop/coupon.vue'),
     meta: {
-      requiresAuth: true, // 需要登录
-      roles: ['admin', 'user'], // 需要的角色（满足任意一个即可）
-      permissions: ['home:view'] // 需要的权限（满足任意一个即可）
+      requiresAuth: true,
+      roles: ['admin', 'user'],
+      permissions: ['home:view']
     }
   },
   {
@@ -82,7 +82,6 @@ const routes = [
     name: 'Videodetail',
     component: () => import('@/views/video/videodetail.vue')
   },
-
   {
     path: '/testmap',
     name: 'Testmap',
@@ -99,9 +98,31 @@ const routes = [
     component: () => import('../views/one.vue')
   },
   {
-    path: '/order',
+    path: '/shop/order',
     name: 'Order',
-    component: () => import('../views/shop/order.vue')
+    component: () => import('../views/shop/order.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: ['admin', 'user']
+    }
+  },
+  {
+    path: '/shop/orderlist',
+    name: 'OrderList',
+    component: () => import('../views/shop/orderlist.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: ['admin', 'user']
+    }
+  },
+  {
+    path: '/shop/payment',
+    name: 'Payment',
+    component: () => import('../views/shop/payment.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: ['admin', 'user']
+    }
   },
   {
     path: '/chongzhi/:userid',
@@ -168,13 +189,11 @@ const routes = [
     name: 'MusicVue',
     component: () => import('../views/music/music.vue')
   },
-
   {
     path: '/auth/:userId',
     name: 'AuthVue',
     component: () => import('../views/auth/auth.vue')
   },
-
   {
     path: '/xiaodetail/:id',
     name: 'XiaoDetailVue',
@@ -185,7 +204,6 @@ const routes = [
     name: 'TransferVue',
     component: () => import('../views/shop/transfer.vue')
   },
-
   {
     path: '/shopdetail/:id',
     name: 'ShopDetailVue',
@@ -213,18 +231,13 @@ const routes = [
   },
   {
     path: '/UserRelation',
-    name: 'HandleFriend',
+    name: 'UserRelation',
     component: () => import('../views/user/UserRelation.vue')
   },
   {
     path: '/editMeInfo',
     name: 'EditMeInfoVue',
     component: () => import('../views/me/editMeInfo.vue')
-  },
-  {
-    path: '/newVideo',
-    name: 'NewVideo',
-    component: () => import('../views/shangchuan/bianhuancunbianbo.vue')
   },
   {
     path: '/permissionRoleUser',
@@ -242,37 +255,70 @@ const routes = [
     component: () => import('../views/search/searchdetail.vue')
   },
   {
-    path: '/:pathMatch(.*)*', // 新增404路由
+    path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('../views/NotFound.vue')
   }
 ];
 
 const router = new VueRouter({
-  mode: 'history',
+  mode: 'hash',
+  base: import.meta.env.BASE_URL,
   routes
 });
 
+// 修复：全局前置守卫（只注册1个，动态判断逻辑）
 router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth) {
-    const authResult = authGuard(to, from, next);
-    if (authResult !== true) return;
-
-    if (to.meta.roles) {
-      const roleResult = roleGuard(to.meta.roles)(to, from, next);
-      if (roleResult !== true) return;
-    }
-
-    if (to.meta.permissions) {
-      const permissionResult = permissionGuard(to.meta.permissions)(
-        to,
-        from,
-        next
-      );
-      if (permissionResult !== true) return;
-    }
+  // 1. 先处理「不需要认证」的路由（如登录页、广告页）
+  if (to.path === '/login' || to.meta.isAd) {
+    next(); // 直接放行
+    return;
   }
-  next();
+
+  // 2. 对「需要认证」的路由（meta.requiresAuth: true），执行登录检查
+  if (to.meta.requiresAuth) {
+    const roles = store.getters['auth/getRoles'];
+    // 2.1 未登录：跳转到登录页（带重定向参数）
+    if (!roles || roles.length === 0) {
+      next({ path: '/login', query: { redirect: to.fullPath } });
+      return;
+    }
+
+    // 2.2 已登录：检查角色（如果路由有meta.roles）
+    if (to.meta.roles && to.meta.roles.length > 0) {
+      // 调用roleGuard，传入路由meta中的roles，执行角色检查
+      const checkRole = roleGuard(to.meta.roles);
+      // 执行角色守卫逻辑（这里需要手动传to/from/next，因为roleGuard返回的是守卫函数）
+      checkRole(to, from, (roleNext) => {
+        // 角色守卫返回403时，直接跳转；否则继续检查权限
+        if (roleNext.path === '/403') {
+          next(roleNext);
+        } else {
+          // 2.3 检查权限（如果路由有meta.permissions）
+          if (to.meta.permissions && to.meta.permissions.length > 0) {
+            const checkPerm = permissionGuard(to.meta.permissions);
+            checkPerm(to, from, next); // 执行权限守卫，直接用全局的next
+          } else {
+            next(); // 没有权限要求，直接放行
+          }
+        }
+      });
+      return;
+    }
+
+    // 2.4 已登录，但路由没有角色要求：直接检查权限（如果有）
+    if (to.meta.permissions && to.meta.permissions.length > 0) {
+      const checkPerm = permissionGuard(to.meta.permissions);
+      checkPerm(to, from, next);
+      return;
+    }
+
+    // 2.5 已登录，且没有角色/权限要求：直接放行
+    next();
+  } else {
+    // 3. 不需要认证的路由（没有meta.requiresAuth）：直接放行
+    next();
+  }
 });
 
 export default router;
