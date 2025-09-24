@@ -95,19 +95,19 @@ eureka:
   client:
     service-url:
       defaultZone: http://127.0.0.1:10086/eureka  # Eureka 服务注册中心的地址
-    registerWithEureka: false
-    fetchRegistry: false
-    enabled: false
-    healthcheck:
-      enabled: false
-  instance:
-    preferIpAddress: true
-    lease-renewal-interval-in-seconds: 30
-    lease-expiration-duration-in-seconds: 90
-    instance-id: ${spring.cloud.client.ip-address}:${server.port}
-  server:
-    enableSelfPreservation: true
-    evictionIntervalTimerInMs: 5000
+#    registerWithEureka: false
+#    fetchRegistry: false
+#    enabled: false
+#    healthcheck:
+#      enabled: false
+#  instance:
+#    preferIpAddress: true
+#    lease-renewal-interval-in-seconds: 30
+#    lease-expiration-duration-in-seconds: 90
+#    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+#  server:
+#    enableSelfPreservation: true
+#    evictionIntervalTimerInMs: 5000
 
 
 
