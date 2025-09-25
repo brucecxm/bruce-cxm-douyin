@@ -26,14 +26,9 @@ public class SaTokenConfigure {
                 .addExclude("/favicon.ico", "/user/doLogin", "/user/getVerificationCode", "/user/register")
                 // 鉴权方法：每次访问进入
                 .setAuth(obj -> {
+//                    SaRouter.match("/**", "/user/doLogin", r -> StpUtil.checkLogin());
                     // 登录校验 -- 拦截所有路由，但排除了开放地址
-                    SaRouter.match("/**", r -> {
-                        // 检查用户是否已登录
-                        StpUtil.checkLogin();
-                        // 登录状态下可以进行更细粒度的权限校验
-                        // 例如: StpUtil.checkRole("admin"); // 检查是否具有admin角色
-                        // 例如: StpUtil.checkPermission("user:view"); // 检查是否具有user:view权限
-                    });
+
                 })
 
                 // 异常处理方法：每次setAuth函数出现异常时进入

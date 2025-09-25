@@ -146,6 +146,9 @@ public class VideoController extends ApiController {
             @RequestParam("createdAt") String createdAt) throws IOException {
 
         String fileName = videoFile.getOriginalFilename();
+        Object userIdObj = StpUtil.getLoginId();
+        System.out.println(StpUtil.isLogin());
+
         String videoId = String.valueOf(idService.SnowflakeGen());
         InputStream in = videoFile.getInputStream();
         String osName = System.getProperty("os.name").toLowerCase();
@@ -160,8 +163,7 @@ public class VideoController extends ApiController {
             url = url.replace("http://192.168.200.130:9000", ngrok.getSysValue() + minio);
         }
         // 获取登录用户ID
-        Object userIdObj = StpUtil.getLoginId();
-        // 方法1：使用安全的类型转换
+        // 方法1：使用安全的类型转换F
         Long userId = null;
         if (userIdObj instanceof Long) {
             userId = (Long) userIdObj;
