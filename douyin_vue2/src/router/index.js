@@ -24,12 +24,12 @@ const routes = [
   },
   {
     path: '/test',
-    name: 'TestRegister',
-    component: () => import('@/views/test/testregister.vue'),
+    name: 'Test',
+    component: () => import('@/views/test/test.vue'),
     meta: {
-      requiresAuth: true,
-      roles: ['admin', 'user'],
-      permissions: ['home:view']
+      // requiresAuth: true,
+      // roles: ['admin', 'user'],
+      // permissions: ['home:view']
     }
   },
   {

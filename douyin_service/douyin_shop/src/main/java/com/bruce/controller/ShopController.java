@@ -33,24 +33,26 @@ public class ShopController extends ApiController {
     @Resource
     private ShopService shopService;
 
-//    后端接口返回的 records 有值（对象属性完整），但前端拿到的是 10 个空对象，
-//    这是因为 Spring Boot 在接收 Page<Shop> page, Shop shop 参数时，
-//    Shop 实体类中有些字段前端没有传，而 Spring 会默认实例化一个空的对象，
-//    导致 QueryWrapper 条件未生效或数据反序列化异常。
-//    @GetMapping("/page")
-//    public R selectAll(Page<Shop> page, Shop shop) {
-//LambdaQueryWrapper<Shop> queryWrapper=new LambdaQueryWrapper<>();
-////queryWrapper.eq(Shop::)
-//        IPage<Shop>  shops=this.shopService.page(page);
-//        R one=success(shops);
-//        return one;
-//    }
-//todo 后面发现前面gpt就扯几把蛋呢  最后检查发现是Shop实体类没有加@Date注解  导致序列化异常
-
-
-
+    /**
+     * 分页查询店铺数据，支持多条件搜索和排序
+     * 
+     * @param page 当前页码
+     * @param size 每页条数
+     * @param shop 店铺查询条件
+     * @param sort 排序字段
+     * @param order 排序方向（asc/desc）
+     * @return 分页结果
+     */
     @GetMapping("/page")
-    public Map<String, Object> selectAll(Page<Shop> page, Shop shop) {
+    public Map<String, Object> selectAll(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            Shop shop,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false, defaultValue = "desc") String order) {
+        
+        // 创建分页对象
+        Page<Shop> pageObject = new Page<>(page, size);
         LambdaQueryWrapper<Shop> queryWrapper = new LambdaQueryWrapper<>();
 
         // 模糊查询字段
@@ -75,8 +77,33 @@ public class ShopController extends ApiController {
             queryWrapper.eq(Shop::getShopPrice, shop.getShopPrice());
         }
 
+        // 添加排序功能
+        if (StringUtils.hasText(sort)) {
+            switch (sort.toLowerCase()) {
+                case "shopprice":
+                    queryWrapper.orderBy(true, "asc".equalsIgnoreCase(order), Shop::getShopPrice);
+                    break;
+                case "sales":
+                    // 如果有销量字段，可以添加销量排序
+                    // queryWrapper.orderBy(true, "asc".equalsIgnoreCase(order), Shop::getSales);
+                    // 目前没有销量字段，默认按价格排序
+                    queryWrapper.orderBy(true, "asc".equalsIgnoreCase(order), Shop::getShopPrice);
+                    break;
+                case "shopid":
+                    queryWrapper.orderBy(true, "asc".equalsIgnoreCase(order), Shop::getShopId);
+                    break;
+                default:
+                    // 默认排序
+                    queryWrapper.orderByDesc(Shop::getShopId);
+                    break;
+            }
+        } else {
+            // 默认按店铺ID降序排序
+            queryWrapper.orderByDesc(Shop::getShopId);
+        }
+
         // 执行分页查询
-        IPage<Shop> shopsPage = shopService.page(page, queryWrapper);
+        IPage<Shop> shopsPage = shopService.page(pageObject, queryWrapper);
 
         // 封装返回
         Map<String, Object> response = new HashMap<>();
@@ -84,6 +111,7 @@ public class ShopController extends ApiController {
         response.put("total", shopsPage.getTotal());
         response.put("current", shopsPage.getCurrent());
         response.put("size", shopsPage.getSize());
+        response.put("pages", shopsPage.getPages());
 
         return response;
     }
@@ -92,7 +120,7 @@ public class ShopController extends ApiController {
 
     /**
      * 通过主键查询单条数据
-     *role
+     *
      * @param id 主键
      * @return 单条数据
      */
@@ -169,9 +197,24 @@ public class ShopController extends ApiController {
                    .or().like(Shop::getShopDesc, key)
                    .or().like(Shop::getShopInfo, key)
                    .or().like(Shop::getShopType, key);
+        
+        // 按店铺ID降序排序
+        queryWrapper.orderByDesc(Shop::getShopId);
+        
         // 执行分页查询
         Page<Shop> shopPage = shopService.page(page, queryWrapper);
         return success(shopPage);
+    }
+    
+    /**
+     * 获取店铺分类列表
+     * 
+     * @return 分类列表
+     */
+    @GetMapping("/categories")
+    public R<List<String>> getCategories() {
+        List<String> categories = shopService.getDistinctCategories();
+        return success(categories);
     }
 }
 

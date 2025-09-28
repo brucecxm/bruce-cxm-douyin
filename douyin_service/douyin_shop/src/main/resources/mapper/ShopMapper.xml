@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bruce.mapper.ShopMapper">
+
+    <resultMap type="com.bruce.entity.Shop" id="ShopMap">
+        <id property="shopId" column="shop_id" jdbcType="BIGINT"/>
+        <result property="shopName" column="shop_name" jdbcType="VARCHAR"/>
+        <result property="shopPrice" column="shop_price" jdbcType="INTEGER"/>
+        <result property="shopDesc" column="shop_desc" jdbcType="VARCHAR"/>
+        <result property="shopImg" column="shop_img" jdbcType="VARCHAR"/>
+        <result property="shopInfo" column="shop_info" jdbcType="VARCHAR"/>
+        <result property="shopType" column="shop_type" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 获取不重复的店铺分类列表 -->
+    <select id="selectDistinctCategories" resultType="java.lang.String">
+        SELECT DISTINCT shop_type FROM shop WHERE shop_type IS NOT NULL AND shop_type != ''
+    </select>
+
+</mapper>

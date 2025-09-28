@@ -5,9 +5,9 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import InfiniteScroll from 'vue-infinite-scroll';
 import '@/assets/base.css';
-
+import './assets/css/theme.css';
 import { Constant } from './constants/dict';
-
+Vue.config.productionTip = false;
 Vue.use(InfiniteScroll);
 Vue.use(ElementUI);
 

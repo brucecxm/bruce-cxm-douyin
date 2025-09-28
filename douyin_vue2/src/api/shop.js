@@ -1,58 +1,71 @@
 import request from '@/utils/request.js';
 
-// params 处理get请求  data处理post请求
-
-export const shoplistPage = (current, size, shop) => {
+// 获取店铺列表（分页）
+export const shoplistPage = (params) => {
   return request.get('/shop/page', {
     params: {
-      current,
-      size,
-      ...shop
+      current: params.current || 1,
+      size: params.size || 10,
+      ...params.shop,
+      sort: params.sort,
+      order: params.order
     }
   });
 };
 
+// 简化版获取店铺列表
 export const shoplist = (current, size) => {
   return request.get(`/shop?current=${current}&size=${size}`);
 };
 
-export const searchForDish = (name) => {
-  return request.get(`/shop/dish/sear/${name}`);
-};
-export const liansearchForDish = (name) => {
-  return request.get(`/shop/dish/liansear/${name}`);
+// 获取店铺分类列表
+export const getCategories = () => {
+  return request.get('/shop/categories');
 };
 
-export const shoplistpage = (page = 1, pageSize = 10) => {
-  return request.get('/shop/dish/page', {
+// 根据关键字搜索店铺
+export const getlikeall = (key, current, size) => {
+  return request.get('/shop/likeall', {
     params: {
-      page: page, // 当前页码
-      pageSize: pageSize, // 每页条数
-      name: '' // 你可以在这里根据需要传递查询的名称（如果需要的话）
+      key,
+      current,
+      size
     }
   });
 };
 
+// 搜索菜品相关
+export const searchForDish = (name) => {
+  return request.get(`/shop/dish/sear/${name}`);
+};
+
+export const liansearchForDish = (name) => {
+  return request.get(`/shop/dish/liansear/${name}`);
+};
+
+// 获取菜品分页列表
+export const shoplistpage = (page = 1, pageSize = 10) => {
+  return request.get('/shop/dish/page', {
+    params: {
+      page: page,
+      pageSize: pageSize,
+      name: ''
+    }
+  });
+};
+
+// 获取导航菜单
 export const getnav = (page = 1, pageSize = 10) => {
   return request.get('/shop/fileImg', {
     params: {
-      page: page, // 当前页码
-      pageSize: pageSize, // 每页条数
+      page: page,
+      pageSize: pageSize,
       type: 'shop_menu'
     }
   });
 };
 
+// 获取钱包信息
 export const getwallet = (name) => {
   return request.get(`/shop/dish/sear/${name}`);
-};
-
-export const getlikeall = (key, current, size) => {
-  return request.get('/shop/likeall', {
-    params: {
-      key, // 作为查询参数传递 key
-      current, // 分页参数
-      size // 分页参数
-    }
-  });
 };

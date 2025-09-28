@@ -1,20 +1,10 @@
 <template>
-  <div
-    class="infinite-list-wrapper"
-    v-infinite-scroll="loadMore"
-    :infinite-scroll-disabled="loading || noMoreData"
-    :infinite-scroll-distance="10"
-  >
-    <header>
-      <slot name="header">默认头部</slot>
-    </header>
-    <ul class="infinite-list">
-      <li class="infinite-list-item" v-for="item in list" :key="item">
-        {{ item }}
-      </li>
-    </ul>
-    <div class="loading-text" v-if="loading">加载中...</div>
-    <div class="loading-text" v-if="noMoreData">没有更多数据了</div>
+  <div class="app-container">
+    <h1>主题切换示例</h1>
+    <p>
+      当前主题：{{ currentTheme === 'theme-light' ? '白天模式' : '夜间模式' }}
+    </p>
+    <button class="theme-btn" @click="toggleTheme">切换主题</button>
   </div>
 </template>
 
@@ -22,78 +12,30 @@
 export default {
   data() {
     return {
-      list: [],
-      count: 0,
-      loading: false,
-      noMoreData: false
+      currentTheme: 'theme-light' // 默认白天主题
     };
   },
-  created() {
-    this.autoLoadUntilScrollable();
+  mounted() {
+    // 初始化时从localStorage读取主题（如果有）
+    const savedTheme = localStorage.getItem('appTheme');
+    if (savedTheme) {
+      this.currentTheme = savedTheme;
+      document.documentElement.className = savedTheme; // 应用主题类名到html根元素
+    } else {
+      // 没有保存的主题，默认应用白天模式
+      document.documentElement.className = this.currentTheme;
+    }
   },
   methods: {
-    loadMore() {
-      if (this.loading || this.noMoreData) return;
-
-      this.loading = true;
-
-      setTimeout(() => {
-        const newItems = [];
-        for (let i = 0; i < 10; i++) {
-          this.count++;
-          newItems.push(`第 ${this.count} 条数据`);
-        }
-
-        this.list = this.list.concat(newItems);
-
-        if (this.count >= 50) {
-          this.noMoreData = true;
-        }
-
-        this.loading = false;
-      }, 1000);
-    },
-    autoLoadUntilScrollable() {
-      const tryLoad = () => {
-        this.$nextTick(() => {
-          const container = this.$el.querySelector('.infinite-list-wrapper');
-          if (
-            container &&
-            container.scrollHeight <= container.clientHeight &&
-            !this.noMoreData
-          ) {
-            this.loadMore();
-            tryLoad(); // 继续尝试直到撑满容器
-          }
-        });
-      };
-      tryLoad();
+    toggleTheme() {
+      // 切换主题（白天↔夜间）
+      this.currentTheme =
+        this.currentTheme === 'theme-light' ? 'theme-dark' : 'theme-light';
+      // 应用主题到html根元素（影响全局CSS变量）
+      document.documentElement.className = this.currentTheme;
+      // 保存主题到localStorage，刷新后保持状态
+      localStorage.setItem('appTheme', this.currentTheme);
     }
   }
 };
 </script>
-
-<style scoped>
-.infinite-list-wrapper {
-  height: 100vh;
-  overflow: auto;
-  border: 1px solid #ccc;
-}
-
-.infinite-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.infinite-list-item {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-}
-
-.loading-text {
-  text-align: center;
-  padding: 10px;
-  color: #888;
-}
-</style>
