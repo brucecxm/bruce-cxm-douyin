@@ -1,0 +1,198 @@
+<template>
+	<!-- 根容器视图 -->
+	<view class="uni-container">
+		<!-- 仅在没有左侧窗口时显示头部Logo -->
+		<view v-if="!hasLeftWin" class="uni-header-logo">
+			<image class="uni-header-image" src="/static/componentIndex.png"></image>
+		</view>
+		<!-- 仅在没有左侧窗口时显示欢迎文本和文档链接 -->
+		<view v-if="!hasLeftWin" class="uni-hello-text">
+			<text class="hello-text">uni-app内置组件，展示样式仅供参考，文档详见：</text>
+			<u-link class="hello-link" :href="'https://uniapp.dcloud.io/component/'" :text="'https://uniapp.dcloud.io/component/'"
+			 :inWhiteList="true"></u-link>
+		</view>
+		<!-- 动态渲染组件分类列表 -->
+		<view class="uni-panel" v-for="(item, index) in list" :key="item.id">
+			<!-- 面板头部，点击可折叠/展开 -->
+			<view class="uni-panel-h" :class="item.open ? 'uni-panel-h-on' : ''" @click="triggerCollapse(index, item.id)">
+				<text class="uni-panel-text">{{item.name}}</text>
+				<!-- 根据面板状态显示不同的图标 -->
+				<text class="uni-panel-icon uni-icon" :class="item.open ? 'uni-panel-icon-on' : ''">{{item.pages ? '&#xe581;' : '&#xe470;'}}</text>
+			</view>
+			<!-- 面板内容，仅在open为true时显示 -->
+			<view class="uni-panel-c" v-if="item.open">
+				<!-- 渲染组件列表 -->
+				<view :class="{'left-win-active': leftWinActive === (item2.url ? item2.url.split('/')[3] : item2) && hasLeftWin}"
+				 class="uni-navigate-item" v-for="(item2,key) in item.pages" :key="key" @click="goDetailPage(item.id, item2)">
+					<text class="uni-navigate-text">{{item2.name ? item2.name : item2}}</text>
+					<text class="uni-navigate-icon uni-icon">&#xe470;</text>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+<script>
+	// TODO 修复Android v3 加载过慢问题
+	// #ifdef APP-PLUS - 条件编译：仅在App平台执行
+	// 引入weex的dom模块，用于添加字体规则
+	var domModule = weex.requireModule('dom');
+	domModule.addRule('fontFace', {
+		'fontFamily': "uniicons", // 设置字体名称
+		'src': "url('/static/uni.ttf')" // 字体文件路径
+	});
+	// #endif
+	export default {
+		// 组件接收的属性
+		props: {
+			// 是否存在左侧窗口
+			hasLeftWin: {
+				type: Boolean
+			},
+			// 当前左侧窗口激活项
+			leftWinActive: {
+				type: String
+			}
+		},
+		// 组件数据
+		data() {
+			return {
+				// 组件分类列表数据
+				list: [{
+						id: 'view',
+						name: '视图容器', // 组件分类名称
+						open: false, // 是否展开
+						pages: [ // 该分类下的组件列表
+							'view',
+							'scroll-view',
+							'swiper'
+							// #ifndef MP-TOUTIAO || MP-LARK - 条件编译：在头条小程序和飞书小程序中不包含
+							,
+							'movable-view',
+							// #ifndef MP-HARMONY - 条件编译：在鸿蒙小程序中不包含
+							'cover-view'
+							// #endif
+							// #endif
+						]
+					}, {
+						id: 'content',
+						name: '基础内容',
+						open: false,
+						pages: ['text', 'rich-text', 'progress']
+					}, {
+						id: 'form',
+						name: '表单组件',
+						open: false,
+						pages: ['button', 'checkbox', 'form', 'input', 'label', 'picker', 'picker-view', 'radio',
+							'slider',
+							'switch', 'textarea',
+							// #ifdef APP-PLUS || MP-WEIXIN || H5 || MP-BAIDU - 条件编译：仅在这些平台包含
+							'editor',
+							// #endif
+						]
+					}, { // 更多组件分类...
+						id: 'nav',
+						name: '导航',
+						open: false,
+						pages: ['navigator']
+					}, { // 其他组件分类定义...
+						id: 'media',
+						name: '媒体组件',
+						open: false,
+						pages: [
+							'image',
+							'video'
+						],
+					},
+					// 多个条件编译的组件分类...
+				]
+			}
+		},
+		// 页面分享配置
+		onShareAppMessage() {
+			return {
+				title: '欢迎体验uni-app',
+				path: '/pages/tabBar/component/component'
+			}
+		},
+		// 导航栏按钮点击事件
+		onNavigationBarButtonTap(e) {
+			uni.navigateTo({
+				url: '/pages/about/about'
+			});
+		},
+		// #ifdef H5 - 条件编译：仅在H5平台执行
+		// 监听路由变化
+		watch: {
+			$route: {
+				immediate: true, // 立即执行一次
+				handler(newRoute) {
+					if (newRoute.matched.length) {
+						let path = newRoute.path.split('/')[3]
+						// 根据当前路由自动展开对应的组件分类
+						for (const item of this.list) {
+							if (Array.isArray(item.pages)) {
+								for (const page of item.pages) {
+									if (page === path || page.url && page.url === newRoute.path) {
+										item.open = true
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		// #endif
+		// 组件方法
+		methods: {
+			// 处理面板折叠/展开
+			triggerCollapse(e, id) {
+				// 如果没有子页面，则直接跳转
+				if (!this.list[e].pages) {
+					this.goDetailPage('', this.list[e].url);
+					return;
+				}
+				// 切换当前面板状态，关闭其他面板
+				for (var i = 0; i < this.list.length; ++i) {
+					if (e === i) {
+						this.list[i].open = !this.list[i].open;
+					} else {
+						this.list[i].open = false;
+					}
+				}
+			},
+			// 跳转到组件详情页
+			goDetailPage(panel, e) {
+				if (typeof e === 'string') {
+					const url = '/pages/component/' + e + '/' + e
+					// 根据是否有左侧窗口选择不同的跳转方式
+					if (this.hasLeftWin) {
+						uni.reLaunch({ // 关闭所有页面，打开新页面
+							url: url
+						})
+					} else {
+						uni.navigateTo({ // 保留当前页面，跳转到新页面
+							url: url
+						})
+					}
+				} else {
+					// 处理对象形式的页面配置
+					if (this.hasLeftWin) {
+						uni.reLaunch({
+							url: e.url
+						})
+					} else {
+						uni.navigateTo({
+							url: e.url
+						})
+					}
+				}
+			}
+		}
+	}
+</script>
+
+<style>
+	/* 引入nvue样式文件 */
+	@import '../../../common/uni-nvue.css';
+</style>

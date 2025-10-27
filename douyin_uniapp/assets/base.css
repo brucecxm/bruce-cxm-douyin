@@ -1,0 +1,17 @@
+html {
+  font-size: 30px;
+}
+
+/* 当视口宽度大于 1000px 且小于 2000px时，字体大小为 30px */
+@media (min-width: 600px) and (max-width: 1000px) {
+  html {
+    font-size: 35px;
+  }
+}
+
+/* 当视口宽度大于 2000px时，字体大小为 60px */
+@media (min-width: 1001px) {
+  html {
+    font-size: 45px;
+  }
+}
