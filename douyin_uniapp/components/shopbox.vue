@@ -481,6 +481,6 @@ p {
 }
 
 .jiahao {
-  background-image: url(../assets/home/加号黑.png);
+  background-image: url(../assets/home/plus_black.png);
 }
 </style>

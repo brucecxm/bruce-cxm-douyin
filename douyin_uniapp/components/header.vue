@@ -18,10 +18,10 @@
 </template>
 
 <script>
-import heicaidan from '@/assets/home/黑菜单.png';
-import heifangdajing from '@/assets/home/黑放大镜.png';
-import caidan from '@/assets/home/菜单.png';
-import fangdajing from '@/assets/home/放大镜.png';
+import menu_black from '@/assets/home/menu_black.png';
+import search_black from '@/assets/home/search_black.png';
+import menu from '@/assets/home/menu.png';
+import search from '@/assets/home/search.png';
 export default {
   props: {
     activeIndex: {
@@ -51,11 +51,11 @@ export default {
       isBlack: false, // 控制是否将所有文字变成黑色
       menuStyle: {
         // 默认的菜单图标样式
-        backgroundImage: `url(${caidan})`
+        backgroundImage: `url(${menu})`
       },
       searchStyle: {
         // 默认的搜索图标样式
-        backgroundImage: `url(${fangdajing})`
+        backgroundImage: `url(${search})`
       }
     };
   },
@@ -82,18 +82,18 @@ export default {
       ) {
         this.isBlack = true;
         this.menuStyle = {
-          backgroundImage: `url(${heicaidan})`
+          backgroundImage: `url(${menu_black})`
         };
         this.searchStyle = {
-          backgroundImage: `url(${heifangdajing})`
+          backgroundImage: `url(${search_black})`
         };
       } else {
         this.isBlack = false;
         this.menuStyle = {
-          backgroundImage: `url(${caidan})`
+          backgroundImage: `url(${menu})`
         };
         this.searchStyle = {
-          backgroundImage: `url(${fangdajing})`
+          backgroundImage: `url(${search})`
         };
       }
     },

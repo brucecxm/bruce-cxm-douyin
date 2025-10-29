@@ -188,14 +188,14 @@ export default {
 
 /* 点赞图标 */
 .like {
-  background-image: url(../assets/home/点赞.png);
+  background-image: url(../assets/home/like.png);
   background-size: 1rem 1rem;
   transition: transform 0.3s;
   /* 添加过渡效果 */
 }
 
 .like.liked {
-  background-image: url(../assets/home/红心.png);
+  background-image: url(../assets/home/heart.png);
   /* 替换为红心图标 */
   transform: scale(1.2);
   /* 放大效果 */
@@ -203,7 +203,7 @@ export default {
 
 /* 收藏图标 */
 .collect {
-  background-image: url(../assets/home/收藏.png);
+  background-image: url(../assets/home/favorite.png);
   background-size: 1rem 1rem;
   transition:
     transform 0.3s,
@@ -212,7 +212,7 @@ export default {
 }
 
 .collect.collected {
-  background-image: url(../assets/home/黄星.png);
+  background-image: url(../assets/home/star_yellow.png);
   /* 替换为黄星图标 */
   transform: scale(1.2);
   /* 放大效果 */
@@ -220,7 +220,7 @@ export default {
 
 /* 评论图标 */
 .comment {
-  background-image: url(../assets/home/评论.png);
+  background-image: url(../assets/home/comment.png);
   background-size: 1rem 1rem;
   transition: transform 0.3s;
   /* 添加过渡效果 */
@@ -233,7 +233,7 @@ export default {
 
 /* 分享图标 */
 .share {
-  background-image: url(../assets/home/转发.png);
+  background-image: url(../assets/home/share.png);
   background-size: 1rem 1rem;
   transition: transform 0.3s;
   /* 添加过渡效果 */

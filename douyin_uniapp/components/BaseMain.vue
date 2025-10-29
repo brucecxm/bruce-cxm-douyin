@@ -266,7 +266,7 @@ export default {
 
 
 .caidan {
-    background-image: url(../assets/home/菜单.png);
+    background-image: url(../assets/home/menu.png);
     width: 31px;
     height: 25px;
     background-size: cover;
@@ -274,7 +274,7 @@ export default {
 }
 
 .fangdajing {
-    background-image: url(../assets/home/放大镜.png);
+    background-image: url(../assets/home/search.png);
     width: 31px;
     height: 25px;
     background-size: cover;
@@ -292,7 +292,7 @@ export default {
 }
 
 .zhuanfa {
-    background-image: url(../assets/home/转发.png);
+    background-image: url(../assets/home/share.png);
     width: 31px;
     height: 25px;
     background-size: cover;
@@ -300,7 +300,7 @@ export default {
 }
 
 .shoucang {
-    background-image: url(../assets/home/收藏.png);
+    background-image: url(../assets/home/favorite.png);
     width: 31px;
     height: 30px;
     background-size: cover;
@@ -308,7 +308,7 @@ export default {
 }
 
 .pinglun {
-    background-image: url(../assets/home/评论.png);
+    background-image: url(../assets/home/comment.png);
     width: 31px;
     height: 30px;
     background-size: cover;
@@ -316,7 +316,7 @@ export default {
 }
 
 .dianzan {
-    background-image: url(../assets/home/点赞.png);
+    background-image: url(../assets/home/like.png);
     width: 33px;
     height: 30px;
     background-size: cover;

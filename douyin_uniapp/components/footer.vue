@@ -63,7 +63,7 @@ export default {
 .add {
   width: 1rem;
   height: 0.8rem;
-  background-image: url(../assets/home/加号.png);
+  background-image: url(../assets/home/plus.png);
   background-size: 1rem, 0.8rem;
 }
 

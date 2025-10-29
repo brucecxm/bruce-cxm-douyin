@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="index">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/unpackage/cache/uts_standard_android/app-android/uts/uni_modules/uts-progressNotification/index.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

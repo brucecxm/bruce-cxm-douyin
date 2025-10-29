@@ -79,7 +79,7 @@ export default {
 
 <style scoped>
 .jiahao {
-  background-image: url(../assets/home/加号.png);
+  background-image: url(../assets/home/plus.png);
   width: 31px;
   height: 25px;
   background-size: cover;

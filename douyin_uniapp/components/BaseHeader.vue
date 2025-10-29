@@ -93,7 +93,7 @@ export default {
 <style scoped>
 .fangdajing {
     float: right;
-    background-image: url(../assets/home/放大镜.png);
+    background-image: url(../assets/home/search.png);
     width: 30px;
     height: 30px;
     background-size: cover;
@@ -102,7 +102,7 @@ export default {
 }
 
 .caidan {
-    background-image: url(../assets/home/菜单.png);
+    background-image: url(../assets/home/menu.png);
     width: 25px;
     height: 20px;
     background-size: cover;
