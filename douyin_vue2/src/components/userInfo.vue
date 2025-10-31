@@ -1,28 +1,31 @@
 <template>
-  <div :style="computedMessageStyle" class="userinfo">
+  <div :style="[computedMessageStyle, containerStyle]" class="userinfo">
     <!-- 包裹头像和在线指示点 -->
     <div
       class="avatar-wrapper"
-      :style="{ width: computedHeight, height: computedHeight }"
+      :style="[avatarWrapperStyle, { width: computedHeight, height: computedHeight }]"
     >
       <div
         class="avatar"
-        :style="{
-          width: computedHeight,
-          height: computedHeight,
-          backgroundImage: 'url(' + avatar + ')',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }"
+        :style="[
+          avatarInnerStyle,
+          {
+            width: computedHeight,
+            height: computedHeight,
+            backgroundImage: 'url(' + avatar + ')',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }
+        ]"
       ></div>
       <!-- 仅当状态为“在线”时显示绿色指示点 -->
-      <div v-if="message.status === '在线'" class="online-dot"></div>
+      <div v-if="message.status === '在线'" class="online-dot" :style="onlineDotStyle"></div>
     </div>
 
     <!-- 用户名与状态 -->
-    <div class="UserAndStatus" :style="{ height: computedHeight }">
-      <div class="username">{{ message.username }}</div>
-      <div class="status">{{ message.status }}</div>
+    <div class="UserAndStatus" :style="[userAndStatusStyle, { height: computedHeight }]">
+      <div class="username" :style="usernameStyle">{{ message.username }}</div>
+      <div class="status" :style="statusStyle">{{ message.status }}</div>
     </div>
   </div>
 </template>
@@ -33,6 +36,34 @@ export default {
     message: {
       type: Object,
       required: true
+    },
+    containerStyle: {
+      type: Object,
+      default: () => ({})
+    },
+    avatarWrapperStyle: {
+      type: Object,
+      default: () => ({})
+    },
+    avatarInnerStyle: {
+      type: Object,
+      default: () => ({})
+    },
+    onlineDotStyle: {
+      type: Object,
+      default: () => ({})
+    },
+    userAndStatusStyle: {
+      type: Object,
+      default: () => ({})
+    },
+    usernameStyle: {
+      type: Object,
+      default: () => ({})
+    },
+    statusStyle: {
+      type: Object,
+      default: () => ({})
     }
   },
   data() {

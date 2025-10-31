@@ -45,7 +45,63 @@
             prefix-icon="el-icon-search"
             clearable
           ></el-input> -->
+          <!-- <user-info
+            :containerStyle="{
+              backgroundColor: '#f0f0f0',
+              padding: '10px',
+              borderRadius: '8px',
+              margin: '10px 0'
+            }"
+            :avatarInnerStyle="{
+              borderRadius: '0', // 方形头像
+              border: '3px solid #1890ff',
+              boxShadow: '0 0 8px rgba(24, 144, 255, 0.5)'
+            }"
+            :usernameStyle="{
+              fontSize: '18px',
+              fontWeight: 'bold',
+              color: '#1890ff',
+              marginBottom: '5px'
+            }"
+            :statusStyle="{
+              fontSize: '14px',
+              color: '#52c41a',
+              fontStyle: 'italic'
+            }"
+            :onlineDotStyle="{
+              width: '15px',
+              height: '15px',
+              backgroundColor: '#ff4d4f', // 红色
+              borderWidth: '3px',
+              borderColor: '#fff2f0'
+            }"
+            v-for="(item, index) in filteredUsers"
+            :key="index"
+            :message="item"
+          /> -->
           <user-info
+            :avatarInnerStyle="{
+              border: '3px solid #1890ff',
+              boxShadow: '0 0 8px rgba(24, 144, 255, 0.5)'
+            }"
+            :usernameStyle="{
+              fontSize: '18px',
+              fontWeight: 'bold',
+              color: '#1890ff',
+              marginBottom: '5px'
+            }"
+            :statusStyle="{
+              fontSize: '14px',
+              color: '#52c41a',
+              fontStyle: 'italic'
+            }"
+            :onlineDotStyle="{
+              width: '15px',
+              height: '15px',
+              backgroundColor: '#ff4d4f', // 红色
+              borderWidth: '3px',
+              borderColor: '#fff2f0'
+            }"
             v-for="(item, index) in filteredUsers"
             :key="index"
             :message="item"
