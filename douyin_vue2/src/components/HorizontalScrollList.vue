@@ -1,10 +1,10 @@
 <template>
-  <div class="scroll-container">
-    <div class="scroll-content">
-      <div class="user-item" v-for="(user, index) in users" :key="index">
-        <img :src="user.avatar" class="avatar" />
-        <div class="name">{{ user.name }}</div>
-        <div v-if="user.heat" class="heat">🔥 {{ user.heat }}</div>
+  <div class="scroll-container" :style="containerStyle">
+    <div class="scroll-content" :style="contentStyle">
+      <div class="user-item" v-for="(user, index) in users" :key="index" :style="getUserItemStyle(user, index)">
+        <img :src="user.avatar" class="avatar" :style="avatarStyle" />
+        <div class="name" :style="nameStyle">{{ user.name }}</div>
+        <div v-if="user.heat" class="heat" :style="heatStyle">🔥 {{ user.heat }}</div>
       </div>
     </div>
   </div>
@@ -17,6 +17,38 @@ export default {
     users: {
       type: Array,
       required: true
+    },
+    containerStyle: {
+      type: Object,
+      default: () => ({})
+    },
+    contentStyle: {
+      type: Object,
+      default: () => ({})
+    },
+    userItemStyle: {
+      type: [Object, Function],
+      default: () => ({})
+    },
+    avatarStyle: {
+      type: Object,
+      default: () => ({})
+    },
+    nameStyle: {
+      type: Object,
+      default: () => ({})
+    },
+    heatStyle: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  methods: {
+    getUserItemStyle(user, index) {
+      if (typeof this.userItemStyle === 'function') {
+        return this.userItemStyle(user, index);
+      }
+      return this.userItemStyle;
     }
   }
 };

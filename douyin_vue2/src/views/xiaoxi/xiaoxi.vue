@@ -15,7 +15,7 @@
         <div class="icon left-icon-2" id="icon-left-2"></div>
 
         <!-- 中间消息文本 -->
-        <div class="message-content">通知消息</div>
+        <div class="message-content">消息</div>
         <!-- 右侧第一个图标 -->
         <div class="icon right-icon-1" id="icon-right-1"></div>
 
@@ -24,7 +24,21 @@
       </div>
       <div class="commentbody" ref="scrollContainer">
         <div class="user-list">
-          <HorizontalScrollList :users="topUsers" />
+          <HorizontalScrollList
+            :nameStyle="{
+              fontSize: '14px',
+              fontWeight: 'bold',
+              color: '#333',
+              marginTop: '8px'
+            }"
+            :users="topUsers"
+            :avatarStyle="{
+              width: '60px',
+              height: '60px',
+              border: '2px solid #1890ff',
+              borderRadius: '30px' // 改为方形
+            }"
+          />
           <!-- <el-input
             v-model="input"
             placeholder="请输入用户名"
@@ -413,8 +427,8 @@ export default {
 }
 
 .icon {
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
