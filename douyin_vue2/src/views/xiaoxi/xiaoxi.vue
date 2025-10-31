@@ -2,22 +2,35 @@
   <div class="xiaoxi">
     <caidan :style="caidancss"></caidan>
     <div class="other" :style="othercss">
-      <div class="header">
+      <!-- <div class="header">
         <i class="icon" @click="showcaidanone">☰</i>
         <i class="icon">🏠</i>
         <i class="icon">🔍</i>
-      </div>
+      </div> -->
+      <div class="icon-message-container">
+        <!-- 左侧第一个图标 -->
+        <div class="icon left-icon-1" id="icon-left-1"></div>
 
+        <!-- 左侧第二个图标 -->
+        <div class="icon left-icon-2" id="icon-left-2"></div>
+
+        <!-- 中间消息文本 -->
+        <div class="message-content">通知消息</div>
+        <!-- 右侧第一个图标 -->
+        <div class="icon right-icon-1" id="icon-right-1"></div>
+
+        <!-- 右侧第二个图标 -->
+        <div class="icon right-icon-2" id="icon-right-2"></div>
+      </div>
       <div class="commentbody" ref="scrollContainer">
         <div class="user-list">
           <HorizontalScrollList :users="topUsers" />
-          <el-input
+          <!-- <el-input
             v-model="input"
             placeholder="请输入用户名"
             prefix-icon="el-icon-search"
             clearable
-          ></el-input>
-
+          ></el-input> -->
           <user-info
             v-for="(item, index) in filteredUsers"
             :key="index"
@@ -58,6 +71,31 @@ export default {
   },
   data() {
     return {
+      // 可以在这里定义图标路径，方便后续修改
+      iconPaths: {
+        // 使用本地图片路径
+        left1: '@/assets/xiaoxi/header/xiaoxi_add.png',
+        left2: '@/assets/xiaoxi/header/xiaoxi_hongbao.png',
+        right1: '@/assets/xiaoxi/header/xiaoxi_menu.png',
+        right2: '@/assets/xiaoxi/header/xiaoxi_search.png'
+      },
+      // 增加默认用户数据，确保初始页面不会空白
+      userinfos: [
+        {
+          username: '初始用户1',
+          status: '在线',
+          avatar:
+            'http://gips0.baidu.com/it/u=3560029307,576412274&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
+          height: '60px'
+        },
+        {
+          username: '初始用户2',
+          status: '离线',
+          avatar:
+            'http://gips0.baidu.com/it/u=3560029307,576412275&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
+          height: '60px'
+        }
+      ],
       topUsers: [
         {
           name: '单曲猫咪',
@@ -69,10 +107,34 @@ export default {
           name: '阿泽',
           avatar:
             'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '阿泽',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '阿泽',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '阿泽',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '阿泽',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        },
+        {
+          name: '阿泽',
+          avatar:
+            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
         }
       ],
       input: '',
-      userinfos: [],
       page: 1,
       pageSize: 5,
       hasMore: true,
@@ -84,7 +146,7 @@ export default {
         transition: 'right 0.5s ease',
         height: '100vh',
         width: '80vw',
-        background: '#fff',
+        background: 'white',
         zIndex: 1000
       },
       othercss: {
@@ -122,61 +184,131 @@ export default {
     async fetchUserInfos() {
       if (this.loading || !this.hasMore) return;
       this.loading = true;
+      console.log('开始加载第', this.page, '页数据');
 
       // 模拟异步请求延迟
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
-      // 模拟总数据，30条
-      const totalData = [
-        {
-          username: 'wang',
-          status: '在线',
-          avatar:
-            'http://gips0.baidu.com/it/u=3560029307,576412274&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
+      // 模拟总数据，30条 - 增加更多数据并确保用户名列有变化，便于观察
+      const totalData = [];
+      // 生成30条不同的用户数据
+      for (let i = 1; i <= 30; i++) {
+        totalData.push({
+          username: i <= 20 ? `用户${i}` : `访客${i - 20}`,
+          status: i % 3 === 0 ? '离线' : '在线',
+          avatar: `http://gips0.baidu.com/it/u=3560029307,${576412274 + i}&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280`,
           height: '60px'
-        },
-        {
-          username: 'li',
-          status: '在线',
-          avatar:
-            'http://gips0.baidu.com/it/u=3560029307,576412274&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
-          height: '60px'
-        }
-      ];
+        });
+      }
 
       const start = (this.page - 1) * this.pageSize;
       const end = this.page * this.pageSize;
       const pageData = totalData.slice(start, end);
 
+      console.log(
+        `加载数据范围: ${start}-${end}，加载数量: ${pageData.length}`
+      );
+
       if (pageData.length < this.pageSize) {
         this.hasMore = false;
+        console.log('已加载全部数据');
       }
 
+      // 确保数据正确添加到列表
       this.userinfos.push(...pageData);
+      console.log('当前用户列表长度:', this.userinfos.length);
+
       this.page += 1;
       this.loading = false;
     },
 
     handleScroll(e) {
       const container = e.target;
+      // 调试信息，帮助确认滚动事件触发和计算值
+      console.log('滚动事件触发');
+      console.log(
+        `scrollTop: ${container.scrollTop}, clientHeight: ${container.clientHeight}, scrollHeight: ${container.scrollHeight}`
+      );
+
+      // 优化滚动加载条件，增加容错范围
       if (
         container.scrollTop + container.clientHeight >=
-        container.scrollHeight - 10
+        container.scrollHeight - 50 // 增加触发距离，更容易触发加载
       ) {
+        console.log('触发加载更多');
         this.fetchUserInfos();
       }
     }
   },
 
   mounted() {
+    // 直接使用ref来定位具体的图标元素，避免样式冲突问题
+    this.$nextTick(() => {
+      try {
+        // 为每个图标添加ID以便更精确地选择
+        const iconElements = [
+          {
+            selector: '.left-icon-1',
+            path: '/src/assets/xiaoxi/header/xiaoxi_add.png'
+          },
+          {
+            selector: '.left-icon-2',
+            path: '/src/assets/xiaoxi/header/xiaoxi_hongbao.png'
+          },
+          {
+            selector: '.right-icon-1',
+            path: '/src/assets/xiaoxi/header/xiaoxi_menu.png'
+          },
+          {
+            selector: '.right-icon-2',
+            path: '/src/assets/xiaoxi/header/xiaoxi_search.png'
+          }
+        ];
+
+        iconElements.forEach((icon) => {
+          const element = document.querySelector(icon.selector);
+          if (element) {
+            // 在Vite中，使用相对路径来加载本地图片
+            // 由于在开发环境中，Vite会正确处理这些路径
+            element.style.backgroundImage = `url(${icon.path})`;
+            // 确保背景图片正确显示
+            element.style.backgroundSize = 'contain';
+            element.style.backgroundRepeat = 'no-repeat';
+            element.style.backgroundPosition = 'center';
+          }
+        });
+
+        // 额外添加全局样式来防止页面横向滚动
+        document.body.style.overflowX = 'hidden';
+        document.documentElement.style.overflowX = 'hidden';
+      } catch (error) {
+        console.error('设置图标时出错:', error);
+      }
+    });
+
     this.fetchUserInfos();
 
-    const container = this.$refs.scrollContainer;
-    container.addEventListener('scroll', this.handleScroll);
+    // 确保容器存在再添加事件监听
+    this.$nextTick(() => {
+      const container = this.$refs.scrollContainer;
+      if (container) {
+        // 先移除可能存在的监听器，避免重复
+        container.removeEventListener('scroll', this.handleScroll);
+        // 添加滚动事件监听
+        container.addEventListener('scroll', this.handleScroll);
+        console.log('滚动事件监听器已添加');
+      } else {
+        console.error('滚动容器未找到');
+      }
+    });
   },
   beforeDestroy() {
     const container = this.$refs.scrollContainer;
     container.removeEventListener('scroll', this.handleScroll);
+
+    // 清理添加的全局样式
+    document.body.style.overflowX = '';
+    document.documentElement.style.overflowX = '';
   }
 };
 </script>
@@ -184,11 +316,23 @@ export default {
 <style scoped>
 .xiaoxi {
   overflow: hidden;
+  overflow-x: hidden; /* 明确禁止横向滚动 */
   font-family: 'Arial', sans-serif;
-  background-color: #f4f6f9;
+  background-color: #ffffff; /* 修改为白色背景 */
   color: #333;
   min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
 }
+.other {
+  position: relative;
+  width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  height: 100vh;
+}
+
 .header {
   background-color: #fff;
   width: 100%;
@@ -202,22 +346,44 @@ export default {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.icon {
+/* 注释掉这个可能导致冲突的.icon样式定义 */
+/* .icon {
   font-size: 24px;
   color: #333;
   cursor: pointer;
-}
+} */
 
 .commentbody {
   overflow-y: auto;
-  height: calc(100vh - 60px - 50px);
+  overflow-x: hidden; /* 禁止横向滚动 */
+  height: calc(100vh - 120px); /* 调整高度计算，确保占满剩余空间 */
   padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative; /* 确保相对定位以便正确计算滚动 */
 }
 
 .user-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* 确保子组件不会导致横向滚动 */
+:deep(.HorizontalScrollList) {
+  width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* 确保el-input不会超出容器 */
+:deep(.el-input) {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .no-data {
@@ -229,5 +395,56 @@ export default {
 /* Hide scrollbar */
 .commentbody::-webkit-scrollbar {
   display: none;
+}
+
+.icon-message-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 100%; /* 修改为100%以适应屏幕宽度 */
+  padding: 10px 20px;
+  background-color: #ffffff; /* 修改为白色背景 */
+  min-height: 60px;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  border: none;
+  outline: none;
+}
+
+.icon {
+  width: 40px;
+  height: 40px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  display: inline-block;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+}
+
+.icon:hover {
+  transform: scale(1.05);
+}
+
+.message-content {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+  padding: 0 20px;
+  flex: 1;
+  text-align: center;
+}
+
+/* 可以根据需要调整左右图标的间距 */
+.left-icon-1 {
+  margin-right: 15px;
+}
+
+.right-icon-1 {
+  margin-right: 15px;
 }
 </style>

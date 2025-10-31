@@ -76,7 +76,6 @@ export default {
     changeIndex(index) {
       this.$emit('update:index', index);
       this.updateUnderline(); // 更新下划线位置
-
       // 如果选择了商城、团购或经验，将所有文字变成黑色，并修改图标
       if (
         this.navItems[index] === '商城' ||
