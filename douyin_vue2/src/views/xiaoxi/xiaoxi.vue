@@ -119,7 +119,8 @@
           </div>
         </div>
       </div>
-
+    </div>
+    <div class="footerbox">
       <footer-vue class="footer"></footer-vue>
     </div>
   </div>
@@ -516,5 +517,11 @@ export default {
 
 .right-icon-1 {
   margin-right: 15px;
+}
+
+.footerbox {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
 }
 </style>
