@@ -1,38 +1,79 @@
 <template>
-  <div class="homecontain" @mousedown="startDrag" @mouseup="stopDrag" @mousemove="drag" @mouseleave="stopDrag"
-    @touchstart="startDrag" @touchend="stopDrag" @touchmove="drag">
+  <div
+    class="homecontain"
+    @mousedown="startDrag"
+    @mouseup="stopDrag"
+    @mousemove="drag"
+    @mouseleave="stopDrag"
+    @touchstart="startDrag"
+    @touchend="stopDrag"
+    @touchmove="drag"
+  >
     <caidan :style="caidancss"></caidan>
 
     <div class="home" :style="boxvideocss">
-      <header-vue class="headercontain" :activeIndex="activeIndex" @update:index="updateActiveIndex"
-        :onChildEvent="showcaidanone"></header-vue>
+      <header-vue
+        class="headercontain"
+        :activeIndex="activeIndex"
+        @update:index="updateActiveIndex"
+        :onChildEvent="showcaidanone"
+      ></header-vue>
 
       <!-- 容器div，包含鼠标和触摸事件监听 -->
       <div class="videomain">
         <!-- 循环渲染每个box，设置样式 -->
-        <div v-for="(box, index) in boxes" :key="index" class="box" :ref="'box-' + index" :style="{
-          left: box.left * 0.1 + 'vw',
-          backgroundColor: box.color,
-          width: boxWidth * 0.1 + 'vw',
-          height: boxHeight + 'vh'
-        }">
+        <div
+          v-for="(box, index) in boxes"
+          :key="index"
+          class="box"
+          :ref="'box-' + index"
+          :style="{
+            left: box.left * 0.1 + 'vw',
+            backgroundColor: box.color,
+            width: boxWidth * 0.1 + 'vw',
+            height: boxHeight + 'vh'
+          }"
+        >
           <!-- <div class="videobox"><videobox-vue></videobox-vue></div> -->
           <div class="videobox">
-            <!-- <all-box-vue v-if="visibleIndexes.includes(index)" :boxtype="boxes[index].boxtest"></all-box-vue> -->
-            <div>测试内容 {{ boxes[index].boxtest }}</div>
+            <!-- <all-box-vue
+              v-if="visibleIndexes.includes(index)"
+              :boxtype="boxes[index].boxtest"
+            ></all-box-vue> -->
           </div>
         </div>
       </div>
-      <!-- <pinglunqu class="lpinglunqu" v-if="message" @send-message="handleChildMessage"></pinglunqu> -->
+      <!-- <pinglunqu
+        class="lpinglunqu"
+        v-if="message"
+        @send-message="handleChildMessage"
+      ></pinglunqu> -->
       <div class="danmubox" v-if="showdanmu">
-        <danmu :width="'100%'" :height="'400px'" :defaultSpeed="8" :maxDanmuCount="15" ref="danmuComponent" />
+        <danmu
+          :width="'100%'"
+          :height="'400px'"
+          :defaultSpeed="8"
+          :maxDanmuCount="15"
+          ref="danmuComponent"
+        />
 
-        <input v-model="danmuText" @keyup.enter="sendDanmu" placeholder="请输入弹幕" v-if="showdanmu" />
+        <input
+          v-model="danmuText"
+          @keyup.enter="sendDanmu"
+          placeholder="请输入弹幕"
+          v-if="showdanmu"
+        />
       </div>
 
       <!-- 统一弹窗 -->
-      <SlidePopup v-if="sharedState.commentVisible" :direction="'bottom'" width="100vw" height="30vh" :isEdge="false"
-        @close="closeAllPopups">
+      <SlidePopup
+        v-if="sharedState.commentVisible"
+        :direction="'bottom'"
+        width="100vw"
+        height="30vh"
+        :isEdge="false"
+        @close="closeAllPopups"
+      >
         <template #default>
           <div style="padding: 10px">
             <p style="font-size: 0.6rem">分享给</p>
@@ -40,7 +81,7 @@
             <HorizontalScrollList :users="bottomUsers" />
           </div>
         </template>
-</SlidePopup>
+      </SlidePopup>
       <footer-vue></footer-vue>
     </div>
   </div>
@@ -229,20 +270,29 @@ export default {
     HorizontalScrollList,
     Danmu
   },
-  mounted() {
-    this.boxes.forEach((_, index) => {
-      const refs = this.$refs['box-' + index];
-      if (refs && refs.length > 0) {
-        const el = refs[0];
-        // 此处可留空，或添加你需要的其他box操作（如设置样式、绑定事件等）
-        // 示例：若需要给box加默认样式，可加在这里
-        // if (el) el.style.opacity = '1';
-      }
-    });
-
-    // 其他原有逻辑（如请求数据、初始化其他功能）保留不变
-  },
-
+onReady() { // UniApp 中推荐使用 onReady 替代 mounted（组件就绪时机）
+  this.boxes.forEach((_, index) => {
+    // 获取元素（UniApp 中 ref 是字符串时，$refs 直接返回对应元素，无需 [0]）
+    const el = this.$refs[`box-${index}`];
+    
+    if (el) {
+      // 使用 UniApp 提供的交叉观察器
+      const observer = uni.createIntersectionObserver(this, {
+        thresholds: [0.8], // 对应 threshold: 0.8
+        observeAll: false // 只观察单个元素
+      });
+      
+      observer.relativeToViewport().observe(el, (res) => {
+        // res.intersectionRatio 表示可见比例
+        if (res.intersectionRatio >= 0.8 && !this.visibleIndexes.includes(index)) {
+          this.visibleIndexes.push(index);
+          // 触发后可以停止观察（可选）
+          observer.disconnect();
+        }
+      });
+    }
+  });
+},
   created() {
     // 初始化 boxes 的数据，包括颜色和左边距
     this.boxes = [
@@ -257,7 +307,7 @@ export default {
       // { color: "pink", left: 8 * this.boxWidth, boxtest: "热点" },
     ];
   },
-  beforeDestroy() { },
+  beforeDestroy() {},
   methods: {
     closeAllPopups() {
       // 关闭所有弹窗
@@ -266,9 +316,7 @@ export default {
     sendDanmu() {
       if (this.danmuText.trim()) {
         // 触发弹幕组件中的sendDanmu方法
-        if (this.$refs.danmuComponent && this.$refs.danmuComponent.sendDanmu) {
-          this.$refs.danmuComponent.sendDanmu(this.danmuText);
-        }
+        this.$refs.danmuComponent.sendDanmu(this.danmuText);
         this.danmuText = ''; // 清空输入框
       }
     },
@@ -365,13 +413,11 @@ export default {
   overflow-x: hidden;
   /* 禁止水平滚动 */
 }
-
 .danmubox {
   position: absolute;
   width: 100vw;
   left: 50%;
-  transform: translateX(-50%);
-  /* 使元素水平居中 */
+  transform: translateX(-50%); /* 使元素水平居中 */
 }
 
 .home {

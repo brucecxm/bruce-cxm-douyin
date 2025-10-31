@@ -88,9 +88,9 @@
 /******/ ({
 
 /***/ 1:
-/*!********************************************************!*\
-  !*** F:/Android/uni-app/d/main.js?{"type":"appStyle"} ***!
-  \********************************************************/
+/*!****************************************************************************!*\
+  !*** F:/GitHub/bruce-cxm-douyin/douyin_uniapp/main.js?{"type":"appStyle"} ***!
+  \****************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -99,29 +99,35 @@ eval("Vue.prototype.__$appStyle__ = {}\nVue.prototype.__merge_style && Vue.proto
 /***/ }),
 
 /***/ 146:
-/*!**********************************************************************************!*\
-  !*** F:/Android/uni-app/d/node_modules/@babel/runtime/helpers/defineProperty.js ***!
-  \**********************************************************************************/
+/*!***************************************************************!*\
+  !*** ./node_modules/@babel/runtime/helpers/defineProperty.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 var toPropertyKey = __webpack_require__(/*! ./toPropertyKey.js */ 147);
-function _defineProperty(e, r, t) {
-  return (r = toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
-    value: t,
-    enumerable: !0,
-    configurable: !0,
-    writable: !0
-  }) : e[r] = t, e;
+function _defineProperty(obj, key, value) {
+  key = toPropertyKey(key);
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+  return obj;
 }
 module.exports = _defineProperty, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
 /***/ }),
 
 /***/ 147:
-/*!*********************************************************************************!*\
-  !*** F:/Android/uni-app/d/node_modules/@babel/runtime/helpers/toPropertyKey.js ***!
-  \*********************************************************************************/
+/*!**************************************************************!*\
+  !*** ./node_modules/@babel/runtime/helpers/toPropertyKey.js ***!
+  \**************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -136,29 +142,29 @@ module.exports = toPropertyKey, module.exports.__esModule = true, module.exports
 /***/ }),
 
 /***/ 148:
-/*!**************************************************************************!*\
-  !*** F:/Android/uni-app/d/node_modules/@babel/runtime/helpers/typeof.js ***!
-  \**************************************************************************/
+/*!*******************************************************!*\
+  !*** ./node_modules/@babel/runtime/helpers/typeof.js ***!
+  \*******************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
 function _typeof(o) {
   "@babel/helpers - typeof";
 
-  return module.exports = _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
+  return (module.exports = _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
     return typeof o;
   } : function (o) {
     return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
-  }, module.exports.__esModule = true, module.exports["default"] = module.exports, _typeof(o);
+  }, module.exports.__esModule = true, module.exports["default"] = module.exports), _typeof(o);
 }
 module.exports = _typeof, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
 /***/ }),
 
 /***/ 149:
-/*!*******************************************************************************!*\
-  !*** F:/Android/uni-app/d/node_modules/@babel/runtime/helpers/toPrimitive.js ***!
-  \*******************************************************************************/
+/*!************************************************************!*\
+  !*** ./node_modules/@babel/runtime/helpers/toPrimitive.js ***!
+  \************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -310,14 +316,14 @@ function normalizeComponent (
 /***/ }),
 
 /***/ 150:
-/*!***************************************************************!*\
-  !*** F:/Android/uni-app/d/node_modules/vuex/dist/vuex.esm.js ***!
-  \***************************************************************/
+/*!********************************************!*\
+  !*** ./node_modules/vuex/dist/vuex.esm.js ***!
+  \********************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(__f__) {
+
 
 var _interopRequireDefault = __webpack_require__(/*! @babel/runtime/helpers/interopRequireDefault */ 24);
 Object.defineProperty(exports, "__esModule", {
@@ -571,7 +577,7 @@ ModuleCollection.prototype.unregister = function unregister(path) {
   var child = parent.getChild(key);
   if (!child) {
     if (true) {
-      __f__("warn", "[vuex] trying to unregister module '" + key + "', which is " + "not registered", " at node_modules/vuex/dist/vuex.esm.js:270");
+      console.warn("[vuex] trying to unregister module '" + key + "', which is " + "not registered");
     }
     return;
   }
@@ -601,7 +607,7 @@ function update(path, targetModule, newModule) {
     for (var key in newModule.modules) {
       if (!targetModule.getChild(key)) {
         if (true) {
-          __f__("warn", "[vuex] trying to add a new module '" + key + "' on hot reloading, " + 'manual reload is needed', " at node_modules/vuex/dist/vuex.esm.js:309");
+          console.warn("[vuex] trying to add a new module '" + key + "' on hot reloading, " + 'manual reload is needed');
         }
         return;
       }
@@ -742,7 +748,7 @@ Store.prototype.commit = function commit(_type, _payload, _options) {
   var entry = this._mutations[type];
   if (!entry) {
     if (true) {
-      __f__("error", "[vuex] unknown mutation type: " + type, " at node_modules/vuex/dist/vuex.esm.js:460");
+      console.error("[vuex] unknown mutation type: " + type);
     }
     return;
   }
@@ -756,7 +762,7 @@ Store.prototype.commit = function commit(_type, _payload, _options) {
     return sub(mutation, this$1.state);
   });
   if ( true && options && options.silent) {
-    __f__("warn", "[vuex] mutation type: " + type + ". Silent option has been removed. " + 'Use the filter functionality in the vue-devtools', " at node_modules/vuex/dist/vuex.esm.js:478");
+    console.warn("[vuex] mutation type: " + type + ". Silent option has been removed. " + 'Use the filter functionality in the vue-devtools');
   }
 };
 Store.prototype.dispatch = function dispatch(_type, _payload) {
@@ -773,7 +779,7 @@ Store.prototype.dispatch = function dispatch(_type, _payload) {
   var entry = this._actions[type];
   if (!entry) {
     if (true) {
-      __f__("error", "[vuex] unknown action type: " + type, " at node_modules/vuex/dist/vuex.esm.js:497");
+      console.error("[vuex] unknown action type: " + type);
     }
     return;
   }
@@ -786,8 +792,8 @@ Store.prototype.dispatch = function dispatch(_type, _payload) {
     });
   } catch (e) {
     if (true) {
-      __f__("warn", "[vuex] error in before action subscribers: ", " at node_modules/vuex/dist/vuex.esm.js:509");
-      __f__("error", e, " at node_modules/vuex/dist/vuex.esm.js:510");
+      console.warn("[vuex] error in before action subscribers: ");
+      console.error(e);
     }
   }
   var result = entry.length > 1 ? Promise.all(entry.map(function (handler) {
@@ -803,8 +809,8 @@ Store.prototype.dispatch = function dispatch(_type, _payload) {
         });
       } catch (e) {
         if (true) {
-          __f__("warn", "[vuex] error in after action subscribers: ", " at node_modules/vuex/dist/vuex.esm.js:526");
-          __f__("error", e, " at node_modules/vuex/dist/vuex.esm.js:527");
+          console.warn("[vuex] error in after action subscribers: ");
+          console.error(e);
         }
       }
       resolve(res);
@@ -817,8 +823,8 @@ Store.prototype.dispatch = function dispatch(_type, _payload) {
         });
       } catch (e) {
         if (true) {
-          __f__("warn", "[vuex] error in error action subscribers: ", " at node_modules/vuex/dist/vuex.esm.js:538");
-          __f__("error", e, " at node_modules/vuex/dist/vuex.esm.js:539");
+          console.warn("[vuex] error in error action subscribers: ");
+          console.error(e);
         }
       }
       reject(error);
@@ -979,7 +985,7 @@ function installModule(store, rootState, path, module, hot) {
   // register in namespace map
   if (module.namespaced) {
     if (store._modulesNamespaceMap[namespace] && "development" !== 'production') {
-      __f__("error", "[vuex] duplicate namespace " + namespace + " for the namespaced module " + path.join('/'), " at node_modules/vuex/dist/vuex.esm.js:713");
+      console.error("[vuex] duplicate namespace " + namespace + " for the namespaced module " + path.join('/'));
     }
     store._modulesNamespaceMap[namespace] = module;
   }
@@ -991,7 +997,7 @@ function installModule(store, rootState, path, module, hot) {
     store._withCommit(function () {
       if (true) {
         if (moduleName in parentState) {
-          __f__("warn", "[vuex] state field \"" + moduleName + "\" was overridden by a module with the same name at \"" + path.join('.') + "\"", " at node_modules/vuex/dist/vuex.esm.js:725");
+          console.warn("[vuex] state field \"" + moduleName + "\" was overridden by a module with the same name at \"" + path.join('.') + "\"");
         }
       }
       Vue.set(parentState, moduleName, module.state);
@@ -1031,7 +1037,7 @@ function makeLocalContext(store, namespace, path) {
       if (!options || !options.root) {
         type = namespace + type;
         if ( true && !store._actions[type]) {
-          __f__("error", "[vuex] unknown local action type: " + args.type + ", global type: " + type, " at node_modules/vuex/dist/vuex.esm.js:774");
+          console.error("[vuex] unknown local action type: " + args.type + ", global type: " + type);
           return;
         }
       }
@@ -1045,7 +1051,7 @@ function makeLocalContext(store, namespace, path) {
       if (!options || !options.root) {
         type = namespace + type;
         if ( true && !store._mutations[type]) {
-          __f__("error", "[vuex] unknown local mutation type: " + args.type + ", global type: " + type, " at node_modules/vuex/dist/vuex.esm.js:791");
+          console.error("[vuex] unknown local mutation type: " + args.type + ", global type: " + type);
           return;
         }
       }
@@ -1131,7 +1137,7 @@ function registerAction(store, type, handler, local) {
 function registerGetter(store, type, rawGetter, local) {
   if (store._wrappedGetters[type]) {
     if (true) {
-      __f__("error", "[vuex] duplicate getter key: " + type, " at node_modules/vuex/dist/vuex.esm.js:876");
+      console.error("[vuex] duplicate getter key: " + type);
     }
     return;
   }
@@ -1182,7 +1188,7 @@ function unifyObjectStyle(type, payload, options) {
 function install(_Vue) {
   if (Vue && _Vue === Vue) {
     if (true) {
-      __f__("error", '[vuex] already installed. Vue.use(Vuex) should be called only once.', " at node_modules/vuex/dist/vuex.esm.js:919");
+      console.error('[vuex] already installed. Vue.use(Vuex) should be called only once.');
     }
     return;
   }
@@ -1199,7 +1205,7 @@ function install(_Vue) {
 var mapState = normalizeNamespace(function (namespace, states) {
   var res = {};
   if ( true && !isValidMap(states)) {
-    __f__("error", '[vuex] mapState: mapper parameter must be either an Array or an Object', " at node_modules/vuex/dist/vuex.esm.js:938");
+    console.error('[vuex] mapState: mapper parameter must be either an Array or an Object');
   }
   normalizeMap(states).forEach(function (ref) {
     var key = ref.key;
@@ -1233,7 +1239,7 @@ exports.mapState = mapState;
 var mapMutations = normalizeNamespace(function (namespace, mutations) {
   var res = {};
   if ( true && !isValidMap(mutations)) {
-    __f__("error", '[vuex] mapMutations: mapper parameter must be either an Array or an Object', " at node_modules/vuex/dist/vuex.esm.js:974");
+    console.error('[vuex] mapMutations: mapper parameter must be either an Array or an Object');
   }
   normalizeMap(mutations).forEach(function (ref) {
     var key = ref.key;
@@ -1270,7 +1276,7 @@ exports.mapMutations = mapMutations;
 var mapGetters = normalizeNamespace(function (namespace, getters) {
   var res = {};
   if ( true && !isValidMap(getters)) {
-    __f__("error", '[vuex] mapGetters: mapper parameter must be either an Array or an Object', " at node_modules/vuex/dist/vuex.esm.js:1010");
+    console.error('[vuex] mapGetters: mapper parameter must be either an Array or an Object');
   }
   normalizeMap(getters).forEach(function (ref) {
     var key = ref.key;
@@ -1283,7 +1289,7 @@ var mapGetters = normalizeNamespace(function (namespace, getters) {
         return;
       }
       if ( true && !(val in this.$store.getters)) {
-        __f__("error", "[vuex] unknown getter: " + val, " at node_modules/vuex/dist/vuex.esm.js:1023");
+        console.error("[vuex] unknown getter: " + val);
         return;
       }
       return this.$store.getters[val];
@@ -1304,7 +1310,7 @@ exports.mapGetters = mapGetters;
 var mapActions = normalizeNamespace(function (namespace, actions) {
   var res = {};
   if ( true && !isValidMap(actions)) {
-    __f__("error", '[vuex] mapActions: mapper parameter must be either an Array or an Object', " at node_modules/vuex/dist/vuex.esm.js:1043");
+    console.error('[vuex] mapActions: mapper parameter must be either an Array or an Object');
   }
   normalizeMap(actions).forEach(function (ref) {
     var key = ref.key;
@@ -1407,7 +1413,7 @@ function normalizeNamespace(fn) {
 function getModuleByNamespace(store, helper, namespace) {
   var module = store._modulesNamespaceMap[namespace];
   if ( true && !module) {
-    __f__("error", "[vuex] module namespace not found in " + helper + "(): " + namespace, " at node_modules/vuex/dist/vuex.esm.js:1134");
+    console.error("[vuex] module namespace not found in " + helper + "(): " + namespace);
   }
   return module;
 }
@@ -1519,14 +1525,13 @@ var index = {
 };
 var _default = index;
 exports.default = _default;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/vue-cli-plugin-uni/lib/format-log.js */ 56)["default"]))
 
 /***/ }),
 
 /***/ 153:
-/*!****************************************************************************************************!*\
-  !*** F:/Android/uni-app/d/main.js?{"page":"pages%2FAPI%2Fnavigator%2Fnew-page%2Fnew-nvue-page-1"} ***!
-  \****************************************************************************************************/
+/*!************************************************************************************************************************!*\
+  !*** F:/GitHub/bruce-cxm-douyin/douyin_uniapp/main.js?{"page":"pages%2FAPI%2Fnavigator%2Fnew-page%2Fnew-nvue-page-1"} ***!
+  \************************************************************************************************************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -1536,21 +1541,21 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var uni_
 /***/ }),
 
 /***/ 154:
-/*!******************************************************************************************!*\
-  !*** F:/Android/uni-app/d/pages/API/navigator/new-page/new-nvue-page-1.nvue?mpType=page ***!
-  \******************************************************************************************/
+/*!**************************************************************************************************************!*\
+  !*** F:/GitHub/bruce-cxm-douyin/douyin_uniapp/pages/API/navigator/new-page/new-nvue-page-1.nvue?mpType=page ***!
+  \**************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _new_nvue_page_1_nvue_vue_type_template_id_4f9552c0_mpType_page__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./new-nvue-page-1.nvue?vue&type=template&id=4f9552c0&mpType=page */ 155);\n/* harmony import */ var _new_nvue_page_1_nvue_vue_type_script_lang_js_mpType_page__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./new-nvue-page-1.nvue?vue&type=script&lang=js&mpType=page */ 157);\n/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _new_nvue_page_1_nvue_vue_type_script_lang_js_mpType_page__WEBPACK_IMPORTED_MODULE_1__) if([\"default\"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _new_nvue_page_1_nvue_vue_type_script_lang_js_mpType_page__WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));\n/* harmony import */ var _C_Program_Files_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./node_modules/@dcloudio/vue-cli-plugin-uni/packages/vue-loader/lib/runtime/componentNormalizer.js */ 15);\n\nvar renderjs\n\n\nfunction injectStyles (context) {\n  \n  if(!this.options.style){\n          this.options.style = {}\n      }\n      if(Vue.prototype.__merge_style && Vue.prototype.__$appStyle__){\n        Vue.prototype.__merge_style(Vue.prototype.__$appStyle__, this.options.style)\n      }\n      if(Vue.prototype.__merge_style){\n                Vue.prototype.__merge_style(__webpack_require__(/*! ./new-nvue-page-1.nvue?vue&type=style&index=0&lang=css&mpType=page */ 159).default, this.options.style)\n            }else{\n                Object.assign(this.options.style,__webpack_require__(/*! ./new-nvue-page-1.nvue?vue&type=style&index=0&lang=css&mpType=page */ 159).default)\n            }\n\n}\n\n/* normalize component */\n\nvar component = Object(_C_Program_Files_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__[\"default\"])(\n  _new_nvue_page_1_nvue_vue_type_script_lang_js_mpType_page__WEBPACK_IMPORTED_MODULE_1__[\"default\"],\n  _new_nvue_page_1_nvue_vue_type_template_id_4f9552c0_mpType_page__WEBPACK_IMPORTED_MODULE_0__[\"render\"],\n  _new_nvue_page_1_nvue_vue_type_template_id_4f9552c0_mpType_page__WEBPACK_IMPORTED_MODULE_0__[\"staticRenderFns\"],\n  false,\n  null,\n  null,\n  \"2211242e\",\n  false,\n  _new_nvue_page_1_nvue_vue_type_template_id_4f9552c0_mpType_page__WEBPACK_IMPORTED_MODULE_0__[\"components\"],\n  renderjs\n)\n\ninjectStyles.call(component)\ncomponent.options.__file = \"pages/API/navigator/new-page/new-nvue-page-1.nvue\"\n/* harmony default export */ __webpack_exports__[\"default\"] = (component.exports);//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbbnVsbF0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBd0k7QUFDeEk7QUFDK0U7QUFDTDtBQUMxRTs7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLDRDQUE0QyxtQkFBTyxDQUFDLDZFQUFvRTtBQUN4SCxhQUFhO0FBQ2IsaURBQWlELG1CQUFPLENBQUMsNkVBQW9FO0FBQzdIOztBQUVBOztBQUVBO0FBQ29MO0FBQ3BMLGdCQUFnQiw2TEFBVTtBQUMxQixFQUFFLGlHQUFNO0FBQ1IsRUFBRSxzR0FBTTtBQUNSLEVBQUUsK0dBQWU7QUFDakI7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLEVBQUUsMEdBQVU7QUFDWjtBQUNBOztBQUVBO0FBQ0E7QUFDZSxnRiIsImZpbGUiOiIxNTQuanMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyByZW5kZXIsIHN0YXRpY1JlbmRlckZucywgcmVjeWNsYWJsZVJlbmRlciwgY29tcG9uZW50cyB9IGZyb20gXCIuL25ldy1udnVlLXBhZ2UtMS5udnVlP3Z1ZSZ0eXBlPXRlbXBsYXRlJmlkPTRmOTU1MmMwJm1wVHlwZT1wYWdlXCJcbnZhciByZW5kZXJqc1xuaW1wb3J0IHNjcmlwdCBmcm9tIFwiLi9uZXctbnZ1ZS1wYWdlLTEubnZ1ZT92dWUmdHlwZT1zY3JpcHQmbGFuZz1qcyZtcFR5cGU9cGFnZVwiXG5leHBvcnQgKiBmcm9tIFwiLi9uZXctbnZ1ZS1wYWdlLTEubnZ1ZT92dWUmdHlwZT1zY3JpcHQmbGFuZz1qcyZtcFR5cGU9cGFnZVwiXG5mdW5jdGlvbiBpbmplY3RTdHlsZXMgKGNvbnRleHQpIHtcbiAgXG4gIGlmKCF0aGlzLm9wdGlvbnMuc3R5bGUpe1xuICAgICAgICAgIHRoaXMub3B0aW9ucy5zdHlsZSA9IHt9XG4gICAgICB9XG4gICAgICBpZihWdWUucHJvdG90eXBlLl9fbWVyZ2Vfc3R5bGUgJiYgVnVlLnByb3RvdHlwZS5fXyRhcHBTdHlsZV9fKXtcbiAgICAgICAgVnVlLnByb3RvdHlwZS5fX21lcmdlX3N0eWxlKFZ1ZS5wcm90b3R5cGUuX18kYXBwU3R5bGVfXywgdGhpcy5vcHRpb25zLnN0eWxlKVxuICAgICAgfVxuICAgICAgaWYoVnVlLnByb3RvdHlwZS5fX21lcmdlX3N0eWxlKXtcbiAgICAgICAgICAgICAgICBWdWUucHJvdG90eXBlLl9fbWVyZ2Vfc3R5bGUocmVxdWlyZShcIi4vbmV3LW52dWUtcGFnZS0xLm52dWU/dnVlJnR5cGU9c3R5bGUmaW5kZXg9MCZsYW5nPWNzcyZtcFR5cGU9cGFnZVwiKS5kZWZhdWx0LCB0aGlzLm9wdGlvbnMuc3R5bGUpXG4gICAgICAgICAgICB9ZWxzZXtcbiAgICAgICAgICAgICAgICBPYmplY3QuYXNzaWduKHRoaXMub3B0aW9ucy5zdHlsZSxyZXF1aXJlKFwiLi9uZXctbnZ1ZS1wYWdlLTEubnZ1ZT92dWUmdHlwZT1zdHlsZSZpbmRleD0wJmxhbmc9Y3NzJm1wVHlwZT1wYWdlXCIpLmRlZmF1bHQpXG4gICAgICAgICAgICB9XG5cbn1cblxuLyogbm9ybWFsaXplIGNvbXBvbmVudCAqL1xuaW1wb3J0IG5vcm1hbGl6ZXIgZnJvbSBcIiFDOlxcXFxQcm9ncmFtIEZpbGVzXFxcXEhCdWlsZGVyWFxcXFxwbHVnaW5zXFxcXHVuaWFwcC1jbGlcXFxcbm9kZV9tb2R1bGVzXFxcXEBkY2xvdWRpb1xcXFx2dWUtY2xpLXBsdWdpbi11bmlcXFxccGFja2FnZXNcXFxcdnVlLWxvYWRlclxcXFxsaWJcXFxccnVudGltZVxcXFxjb21wb25lbnROb3JtYWxpemVyLmpzXCJcbnZhciBjb21wb25lbnQgPSBub3JtYWxpemVyKFxuICBzY3JpcHQsXG4gIHJlbmRlcixcbiAgc3RhdGljUmVuZGVyRm5zLFxuICBmYWxzZSxcbiAgbnVsbCxcbiAgbnVsbCxcbiAgXCIyMjExMjQyZVwiLFxuICBmYWxzZSxcbiAgY29tcG9uZW50cyxcbiAgcmVuZGVyanNcbilcblxuaW5qZWN0U3R5bGVzLmNhbGwoY29tcG9uZW50KVxuY29tcG9uZW50Lm9wdGlvbnMuX19maWxlID0gXCJwYWdlcy9BUEkvbmF2aWdhdG9yL25ldy1wYWdlL25ldy1udnVlLXBhZ2UtMS5udnVlXCJcbmV4cG9ydCBkZWZhdWx0IGNvbXBvbmVudC5leHBvcnRzIl0sInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///154\n");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _new_nvue_page_1_nvue_vue_type_template_id_4f9552c0_mpType_page__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./new-nvue-page-1.nvue?vue&type=template&id=4f9552c0&mpType=page */ 155);\n/* harmony import */ var _new_nvue_page_1_nvue_vue_type_script_lang_js_mpType_page__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./new-nvue-page-1.nvue?vue&type=script&lang=js&mpType=page */ 157);\n/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _new_nvue_page_1_nvue_vue_type_script_lang_js_mpType_page__WEBPACK_IMPORTED_MODULE_1__) if([\"default\"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _new_nvue_page_1_nvue_vue_type_script_lang_js_mpType_page__WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));\n/* harmony import */ var _C_Program_Files_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./node_modules/@dcloudio/vue-cli-plugin-uni/packages/vue-loader/lib/runtime/componentNormalizer.js */ 15);\n\nvar renderjs\n\n\nfunction injectStyles (context) {\n  \n  if(!this.options.style){\n          this.options.style = {}\n      }\n      if(Vue.prototype.__merge_style && Vue.prototype.__$appStyle__){\n        Vue.prototype.__merge_style(Vue.prototype.__$appStyle__, this.options.style)\n      }\n      if(Vue.prototype.__merge_style){\n                Vue.prototype.__merge_style(__webpack_require__(/*! ./new-nvue-page-1.nvue?vue&type=style&index=0&lang=css&mpType=page */ 159).default, this.options.style)\n            }else{\n                Object.assign(this.options.style,__webpack_require__(/*! ./new-nvue-page-1.nvue?vue&type=style&index=0&lang=css&mpType=page */ 159).default)\n            }\n\n}\n\n/* normalize component */\n\nvar component = Object(_C_Program_Files_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__[\"default\"])(\n  _new_nvue_page_1_nvue_vue_type_script_lang_js_mpType_page__WEBPACK_IMPORTED_MODULE_1__[\"default\"],\n  _new_nvue_page_1_nvue_vue_type_template_id_4f9552c0_mpType_page__WEBPACK_IMPORTED_MODULE_0__[\"render\"],\n  _new_nvue_page_1_nvue_vue_type_template_id_4f9552c0_mpType_page__WEBPACK_IMPORTED_MODULE_0__[\"staticRenderFns\"],\n  false,\n  null,\n  null,\n  \"73a1f8d7\",\n  false,\n  _new_nvue_page_1_nvue_vue_type_template_id_4f9552c0_mpType_page__WEBPACK_IMPORTED_MODULE_0__[\"components\"],\n  renderjs\n)\n\ninjectStyles.call(component)\ncomponent.options.__file = \"pages/API/navigator/new-page/new-nvue-page-1.nvue\"\n/* harmony default export */ __webpack_exports__[\"default\"] = (component.exports);//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbbnVsbF0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBd0k7QUFDeEk7QUFDK0U7QUFDTDtBQUMxRTs7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLDRDQUE0QyxtQkFBTyxDQUFDLDZFQUFvRTtBQUN4SCxhQUFhO0FBQ2IsaURBQWlELG1CQUFPLENBQUMsNkVBQW9FO0FBQzdIOztBQUVBOztBQUVBO0FBQ29MO0FBQ3BMLGdCQUFnQiw2TEFBVTtBQUMxQixFQUFFLGlHQUFNO0FBQ1IsRUFBRSxzR0FBTTtBQUNSLEVBQUUsK0dBQWU7QUFDakI7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLEVBQUUsMEdBQVU7QUFDWjtBQUNBOztBQUVBO0FBQ0E7QUFDZSxnRiIsImZpbGUiOiIxNTQuanMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyByZW5kZXIsIHN0YXRpY1JlbmRlckZucywgcmVjeWNsYWJsZVJlbmRlciwgY29tcG9uZW50cyB9IGZyb20gXCIuL25ldy1udnVlLXBhZ2UtMS5udnVlP3Z1ZSZ0eXBlPXRlbXBsYXRlJmlkPTRmOTU1MmMwJm1wVHlwZT1wYWdlXCJcbnZhciByZW5kZXJqc1xuaW1wb3J0IHNjcmlwdCBmcm9tIFwiLi9uZXctbnZ1ZS1wYWdlLTEubnZ1ZT92dWUmdHlwZT1zY3JpcHQmbGFuZz1qcyZtcFR5cGU9cGFnZVwiXG5leHBvcnQgKiBmcm9tIFwiLi9uZXctbnZ1ZS1wYWdlLTEubnZ1ZT92dWUmdHlwZT1zY3JpcHQmbGFuZz1qcyZtcFR5cGU9cGFnZVwiXG5mdW5jdGlvbiBpbmplY3RTdHlsZXMgKGNvbnRleHQpIHtcbiAgXG4gIGlmKCF0aGlzLm9wdGlvbnMuc3R5bGUpe1xuICAgICAgICAgIHRoaXMub3B0aW9ucy5zdHlsZSA9IHt9XG4gICAgICB9XG4gICAgICBpZihWdWUucHJvdG90eXBlLl9fbWVyZ2Vfc3R5bGUgJiYgVnVlLnByb3RvdHlwZS5fXyRhcHBTdHlsZV9fKXtcbiAgICAgICAgVnVlLnByb3RvdHlwZS5fX21lcmdlX3N0eWxlKFZ1ZS5wcm90b3R5cGUuX18kYXBwU3R5bGVfXywgdGhpcy5vcHRpb25zLnN0eWxlKVxuICAgICAgfVxuICAgICAgaWYoVnVlLnByb3RvdHlwZS5fX21lcmdlX3N0eWxlKXtcbiAgICAgICAgICAgICAgICBWdWUucHJvdG90eXBlLl9fbWVyZ2Vfc3R5bGUocmVxdWlyZShcIi4vbmV3LW52dWUtcGFnZS0xLm52dWU/dnVlJnR5cGU9c3R5bGUmaW5kZXg9MCZsYW5nPWNzcyZtcFR5cGU9cGFnZVwiKS5kZWZhdWx0LCB0aGlzLm9wdGlvbnMuc3R5bGUpXG4gICAgICAgICAgICB9ZWxzZXtcbiAgICAgICAgICAgICAgICBPYmplY3QuYXNzaWduKHRoaXMub3B0aW9ucy5zdHlsZSxyZXF1aXJlKFwiLi9uZXctbnZ1ZS1wYWdlLTEubnZ1ZT92dWUmdHlwZT1zdHlsZSZpbmRleD0wJmxhbmc9Y3NzJm1wVHlwZT1wYWdlXCIpLmRlZmF1bHQpXG4gICAgICAgICAgICB9XG5cbn1cblxuLyogbm9ybWFsaXplIGNvbXBvbmVudCAqL1xuaW1wb3J0IG5vcm1hbGl6ZXIgZnJvbSBcIiFDOlxcXFxQcm9ncmFtIEZpbGVzXFxcXEhCdWlsZGVyWFxcXFxwbHVnaW5zXFxcXHVuaWFwcC1jbGlcXFxcbm9kZV9tb2R1bGVzXFxcXEBkY2xvdWRpb1xcXFx2dWUtY2xpLXBsdWdpbi11bmlcXFxccGFja2FnZXNcXFxcdnVlLWxvYWRlclxcXFxsaWJcXFxccnVudGltZVxcXFxjb21wb25lbnROb3JtYWxpemVyLmpzXCJcbnZhciBjb21wb25lbnQgPSBub3JtYWxpemVyKFxuICBzY3JpcHQsXG4gIHJlbmRlcixcbiAgc3RhdGljUmVuZGVyRm5zLFxuICBmYWxzZSxcbiAgbnVsbCxcbiAgbnVsbCxcbiAgXCI3M2ExZjhkN1wiLFxuICBmYWxzZSxcbiAgY29tcG9uZW50cyxcbiAgcmVuZGVyanNcbilcblxuaW5qZWN0U3R5bGVzLmNhbGwoY29tcG9uZW50KVxuY29tcG9uZW50Lm9wdGlvbnMuX19maWxlID0gXCJwYWdlcy9BUEkvbmF2aWdhdG9yL25ldy1wYWdlL25ldy1udnVlLXBhZ2UtMS5udnVlXCJcbmV4cG9ydCBkZWZhdWx0IGNvbXBvbmVudC5leHBvcnRzIl0sInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///154\n");
 
 /***/ }),
 
 /***/ 155:
-/*!************************************************************************************************************************!*\
-  !*** F:/Android/uni-app/d/pages/API/navigator/new-page/new-nvue-page-1.nvue?vue&type=template&id=4f9552c0&mpType=page ***!
-  \************************************************************************************************************************/
+/*!********************************************************************************************************************************************!*\
+  !*** F:/GitHub/bruce-cxm-douyin/douyin_uniapp/pages/API/navigator/new-page/new-nvue-page-1.nvue?vue&type=template&id=4f9552c0&mpType=page ***!
+  \********************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns, recyclableRender, components */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -1570,9 +1575,9 @@ __webpack_require__.r(__webpack_exports__);
 /***/ }),
 
 /***/ 156:
-/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/@dcloudio/vue-cli-plugin-uni/packages/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/@dcloudio/vue-cli-plugin-hbuilderx/packages/webpack-uni-nvue-loader/lib/template.js!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-uni-app-loader/page-meta.js!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader??ref--8-0!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/vue-loader/lib??vue-loader-options!F:/Android/uni-app/d/pages/API/navigator/new-page/new-nvue-page-1.nvue?vue&type=template&id=4f9552c0&mpType=page ***!
-  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/@dcloudio/vue-cli-plugin-uni/packages/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/@dcloudio/vue-cli-plugin-hbuilderx/packages/webpack-uni-nvue-loader/lib/template.js!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-uni-app-loader/page-meta.js!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader??ref--8-0!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/vue-loader/lib??vue-loader-options!F:/GitHub/bruce-cxm-douyin/douyin_uniapp/pages/API/navigator/new-page/new-nvue-page-1.nvue?vue&type=template&id=4f9552c0&mpType=page ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns, recyclableRender, components */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -1672,9 +1677,9 @@ render._withStripped = true
 /***/ }),
 
 /***/ 157:
-/*!******************************************************************************************************************!*\
-  !*** F:/Android/uni-app/d/pages/API/navigator/new-page/new-nvue-page-1.nvue?vue&type=script&lang=js&mpType=page ***!
-  \******************************************************************************************************************/
+/*!**************************************************************************************************************************************!*\
+  !*** F:/GitHub/bruce-cxm-douyin/douyin_uniapp/pages/API/navigator/new-page/new-nvue-page-1.nvue?vue&type=script&lang=js&mpType=page ***!
+  \**************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -1684,9 +1689,9 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _C_P
 /***/ }),
 
 /***/ 158:
-/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--5-0!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader??ref--5-1!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/vue-loader/lib??vue-loader-options!F:/Android/uni-app/d/pages/API/navigator/new-page/new-nvue-page-1.nvue?vue&type=script&lang=js&mpType=page ***!
-  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--5-0!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader??ref--5-1!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/vue-loader/lib??vue-loader-options!F:/GitHub/bruce-cxm-douyin/douyin_uniapp/pages/API/navigator/new-page/new-nvue-page-1.nvue?vue&type=script&lang=js&mpType=page ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1696,9 +1701,9 @@ eval("\n\nvar _interopRequireDefault = __webpack_require__(/*! @babel/runtime/he
 /***/ }),
 
 /***/ 159:
-/*!**************************************************************************************************************************!*\
-  !*** F:/Android/uni-app/d/pages/API/navigator/new-page/new-nvue-page-1.nvue?vue&type=style&index=0&lang=css&mpType=page ***!
-  \**************************************************************************************************************************/
+/*!**********************************************************************************************************************************************!*\
+  !*** F:/GitHub/bruce-cxm-douyin/douyin_uniapp/pages/API/navigator/new-page/new-nvue-page-1.nvue?vue&type=style&index=0&lang=css&mpType=page ***!
+  \**********************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -1712,9 +1717,9 @@ __webpack_require__.r(__webpack_exports__);
 /***/ }),
 
 /***/ 160:
-/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/@dcloudio/vue-cli-plugin-hbuilderx/packages/webpack-uni-nvue-loader/lib/style.js!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader??ref--10-oneOf-0-1!./node_modules/postcss-loader/src??ref--10-oneOf-0-2!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader??ref--10-oneOf-0-3!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/vue-loader/lib??vue-loader-options!F:/Android/uni-app/d/pages/API/navigator/new-page/new-nvue-page-1.nvue?vue&type=style&index=0&lang=css&mpType=page ***!
-  \***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/@dcloudio/vue-cli-plugin-hbuilderx/packages/webpack-uni-nvue-loader/lib/style.js!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader??ref--10-oneOf-0-1!./node_modules/postcss-loader/src??ref--10-oneOf-0-2!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader??ref--10-oneOf-0-3!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/vue-loader/lib??vue-loader-options!F:/GitHub/bruce-cxm-douyin/douyin_uniapp/pages/API/navigator/new-page/new-nvue-page-1.nvue?vue&type=style&index=0&lang=css&mpType=page ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -1885,9 +1890,9 @@ module.exports = {
 /***/ }),
 
 /***/ 2:
-/*!*********************************************************************!*\
-  !*** F:/Android/uni-app/d/App.vue?vue&type=style&index=0&lang=scss ***!
-  \*********************************************************************/
+/*!*****************************************************************************************!*\
+  !*** F:/GitHub/bruce-cxm-douyin/douyin_uniapp/App.vue?vue&type=style&index=0&lang=scss ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -1901,15 +1906,15 @@ __webpack_require__.r(__webpack_exports__);
 /***/ }),
 
 /***/ 24:
-/*!*****************************************************************************************!*\
-  !*** F:/Android/uni-app/d/node_modules/@babel/runtime/helpers/interopRequireDefault.js ***!
-  \*****************************************************************************************/
+/*!**********************************************************************!*\
+  !*** ./node_modules/@babel/runtime/helpers/interopRequireDefault.js ***!
+  \**********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-function _interopRequireDefault(e) {
-  return e && e.__esModule ? e : {
-    "default": e
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : {
+    "default": obj
   };
 }
 module.exports = _interopRequireDefault, module.exports.__esModule = true, module.exports["default"] = module.exports;
@@ -1917,9 +1922,9 @@ module.exports = _interopRequireDefault, module.exports.__esModule = true, modul
 /***/ }),
 
 /***/ 3:
-/*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/@dcloudio/vue-cli-plugin-hbuilderx/packages/webpack-uni-nvue-loader/lib/style.js!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader??ref--11-oneOf-0-1!./node_modules/postcss-loader/src??ref--11-oneOf-0-2!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/sass-loader/dist/cjs.js??ref--11-oneOf-0-3!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader??ref--11-oneOf-0-4!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/vue-loader/lib??vue-loader-options!F:/Android/uni-app/d/App.vue?vue&type=style&index=0&lang=scss ***!
-  \**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/@dcloudio/vue-cli-plugin-hbuilderx/packages/webpack-uni-nvue-loader/lib/style.js!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader??ref--11-oneOf-0-1!./node_modules/postcss-loader/src??ref--11-oneOf-0-2!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/sass-loader/dist/cjs.js??ref--11-oneOf-0-3!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader??ref--11-oneOf-0-4!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/vue-loader/lib??vue-loader-options!F:/GitHub/bruce-cxm-douyin/douyin_uniapp/App.vue?vue&type=style&index=0&lang=scss ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -10248,93 +10253,6 @@ if (typeof uni !== 'undefined' && uni && uni.requireGlobal) {
   Float64Array = global.Float64Array;
   BigInt64Array = global.BigInt64Array;
   BigUint64Array = global.BigUint64Array;
-}
-
-/***/ }),
-
-/***/ 56:
-/*!*********************************************************************!*\
-  !*** ./node_modules/@dcloudio/vue-cli-plugin-uni/lib/format-log.js ***!
-  \*********************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = formatLog;
-exports.log = log;
-function typof(v) {
-  var s = Object.prototype.toString.call(v);
-  return s.substring(8, s.length - 1);
-}
-function isDebugMode() {
-  /* eslint-disable no-undef */
-  return typeof __channelId__ === 'string' && __channelId__;
-}
-function jsonStringifyReplacer(k, p) {
-  switch (typof(p)) {
-    case 'Function':
-      return 'function() { [native code] }';
-    default:
-      return p;
-  }
-}
-function log(type) {
-  for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    args[_key - 1] = arguments[_key];
-  }
-  console[type].apply(console, args);
-}
-function formatLog() {
-  for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
-  }
-  var type = args.shift();
-  if (isDebugMode()) {
-    args.push(args.pop().replace('at ', 'uni-app:///'));
-    return console[type].apply(console, args);
-  }
-  var msgs = args.map(function (v) {
-    var type = Object.prototype.toString.call(v).toLowerCase();
-    if (type === '[object object]' || type === '[object array]') {
-      try {
-        v = '---BEGIN:JSON---' + JSON.stringify(v, jsonStringifyReplacer) + '---END:JSON---';
-      } catch (e) {
-        v = type;
-      }
-    } else {
-      if (v === null) {
-        v = '---NULL---';
-      } else if (v === undefined) {
-        v = '---UNDEFINED---';
-      } else {
-        var vType = typof(v).toUpperCase();
-        if (vType === 'NUMBER' || vType === 'BOOLEAN') {
-          v = '---BEGIN:' + vType + '---' + v + '---END:' + vType + '---';
-        } else {
-          v = String(v);
-        }
-      }
-    }
-    return v;
-  });
-  var msg = '';
-  if (msgs.length > 1) {
-    var lastMsg = msgs.pop();
-    msg = msgs.join('---COMMA---');
-    if (lastMsg.indexOf(' at ') === 0) {
-      msg += lastMsg;
-    } else {
-      msg += '---COMMA---' + lastMsg;
-    }
-  } else {
-    msg = msgs[0];
-  }
-  console[type](msg);
 }
 
 /***/ })
