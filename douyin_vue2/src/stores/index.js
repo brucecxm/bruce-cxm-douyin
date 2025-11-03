@@ -9,6 +9,7 @@ import videoStore from './uploadVideo';
 import userInfo from './userInfo';
 import videoInfo from './videoInfo';
 import auth from './auth';
+import testDataMap from './testDataMap'; // 新增引入
 
 Vue.use(Vuex);
 
@@ -20,6 +21,7 @@ export default new Vuex.Store({
     token,
     videoStore,
     userInfo,
-    videoInfo
+    videoInfo,
+    testDataMap // 新增模块
   }
 });
