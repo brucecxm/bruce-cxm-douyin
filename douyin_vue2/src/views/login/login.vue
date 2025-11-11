@@ -344,11 +344,7 @@ export default {
             'auth/loginSetPermissions',
             res.data.permissionList
           );
-          console.log(this.$store.getters['auth/getRoles']);
-          console.log(this.$store.getters['auth/getPermissions']);
           localStorage.setItem('token', res.data.token);
-          console.log('userInfo模块状态:', this.$store.state.userInfo);
-          console.log('token模块状态:', this.$store.state.token);
           this.$router.push('/');
         }
       } catch (error) {
