@@ -6,7 +6,7 @@ spring:
     # Redis数据库索引（默认为0）
     database: 12
     # Redis服务器地址
-    host: 127.0.0.1
+    host: 1.94.131.16
     # Redis服务器连接端口
     port: 6379
     # Redis服务器连接密码（默认为空）
@@ -29,7 +29,7 @@ spring:
     name: DouyinUserService  # 设置应用名称为 DouyinUserService
 
   rabbitmq:
-    host: 192.168.200.130  # RabbitMQ 服务器的主机地址
+    host: 1.94.131.16  # RabbitMQ 服务器的主机地址
     port: 5672  # RabbitMQ 服务器的端口号
     username: itcast  # RabbitMQ 的用户名
     password: 123321  # RabbitMQ 的密码
@@ -122,6 +122,6 @@ minio:
   accessKey: minio
   secretKey: minio123
   bucket: douyin
-  endpoint: http://192.168.200.130:9000
-  readPath: http://192.168.200.130:9000
+  endpoint: http://1.94.131.16:9000
+  readPath: http://1.94.131.16:9000
 
