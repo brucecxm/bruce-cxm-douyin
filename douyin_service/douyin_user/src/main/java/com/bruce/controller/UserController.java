@@ -232,14 +232,14 @@ public class UserController extends ApiController {
             }
             // 更新用户最后登录时间
             userService.updateLastLoginTime(user.getId());
-            
+
             // 清除旧的权限缓存，确保获取最新权限
             AuthUtils.clearPermissionCache(user.getId());
-            
+
             // 使用AuthUtils获取权限和角色列表
             List<String> roleList = AuthUtils.getRoleList(user.getId());
             List<String> permissionList = AuthUtils.getPermissionList(user.getId());
-            
+
             // ===== 获取 token 和用户信息 =====
             String token = StpUtil.getTokenValue();
             Long userId = Long.parseLong(StpUtil.getLoginId().toString());
@@ -261,6 +261,7 @@ public class UserController extends ApiController {
             }
             Map<String, Object> response = new HashMap<>();
             response.put(Constant.User.TOKEN, token);
+            response.put(Constant.User.USER_INFO, userInfo);
             response.put(Constant.User.ROLE_LIST, roleList);
             response.put(Constant.User.PERMISSION_LIST, permissionList);
             return Result.success(response);

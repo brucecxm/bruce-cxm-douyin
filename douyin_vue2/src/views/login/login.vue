@@ -137,7 +137,9 @@ import {
   getEmailVerificationCodeService,
   getVerificationCodeService
 } from '../../api/user';
+import { mapState } from 'vuex';
 
+import { mapActions } from 'vuex';
 export default {
   name: 'Login',
   data() {
@@ -172,9 +174,11 @@ export default {
       return flag;
       // flag 为 true 时跳过校验，返回 false
       // flag 为 false 时启用校验，返回 true
-    }
+    },
+    ...mapState('userInfo', ['userInfo'])
   },
   methods: {
+    ...mapActions('userInfo', ['setUserInfo', 'clearUserInfo']),
     closeScreen() {
       this.$router.go(-1);
     },
@@ -326,7 +330,12 @@ export default {
           this.$message({ message: res.msg || '登录失败', type: 'error' });
         } else {
           debugger;
-          this.$store.dispatch('userInfo/setUserInfo', res.data.userInfo);
+          // this.$store.dispatch('userInfo/setUserInfo', res.data.userInfo);
+          this.setUserInfo(res.data.userInfo); // 调用 action 存值
+          console.log('登录成功，用户信息:', this.userInfo);
+
+          debugger;
+          //  this.clearUserInfo();
           this.$store.dispatch('token/setToken', res.data.token);
           // 登录成功后获取用户权限数据
           // 存储角色和权限

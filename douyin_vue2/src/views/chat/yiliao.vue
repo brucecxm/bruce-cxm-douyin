@@ -32,11 +32,15 @@
 
 <script>
 import SockJS from 'sockjs-client';
+import { mapState } from 'vuex';
 import Stomp from 'stompjs';
+import { getUserInfo } from '@/api/user';
 
 export default {
   data() {
     return {
+      myInfo: {}, // 自己信息
+      receiverInfo: {}, // 对方信息
       username: '',
       receiver: '',
       text: '',
@@ -45,12 +49,70 @@ export default {
       connected: false
     };
   },
+  computed: {
+    // 映射 userInfo 模块的 state（需指定模块名）
+    ...mapState('userInfo', ['userInfo'])
+    // 映射后可直接通过 this.userInfo 获取数据
+  },
   mounted() {
-    this.username = this.getMyUserId() || '';
+    debugger;
+    console.log('登录成功，用户信息:', this.userInfo);
+
+    console.log('登录成功，用户信息:', this.userInfo);
+
+    console.log('组件创建时的用户信息：', this.userInfo);
+    console.log(
+      '组件创建时的用户信息：',
+      this.userInfo.name,
+      this.userInfo.age
+    );
+    // 或者转成普通对象后打印（避免触发响应式细节）
+    console.log(
+      '组件创建时的用户信息：',
+      JSON.parse(JSON.stringify(this.userInfo))
+    );
+    // 获取自己信息
+    this.myInfo = this.$store.state.userInfo || {};
+    console.log('我的信息', this.myInfo);
+    console.log(
+      '我的信息（原始数据）',
+      JSON.parse(JSON.stringify(this.$store.state.userInfo))
+    );
+    // 获取对方 id
     this.receiver = this.getReceiverId() || '';
+    // 获取对方信息
+    this.fetchReceiverInfo();
+    this.username = this.getMyUserId() || '';
     this.connect();
   },
   methods: {
+    async fetchReceiverInfo() {
+      if (!this.receiver) return;
+      try {
+        const res = await getUserInfo({ userId: this.receiver });
+        if (res.data && res.data.code === 0) {
+          this.receiverInfo = res.data.data;
+        } else if (res.code === 0) {
+          this.receiverInfo = res.data;
+        }
+      } catch (e) {
+        console.error('获取对方信息失败', e);
+      }
+    },
+    getAvatar(sender) {
+      // 根据 sender 判断返回头像
+      if (sender == this.username) {
+        return (
+          this.myInfo.avatar ||
+          'http://gips3.baidu.com/it/u=1821127123,1149655687&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        );
+      } else {
+        return (
+          this.receiverInfo.avatar ||
+          'http://gips3.baidu.com/it/u=1821127123,1149655687&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
+        );
+      }
+    },
     getMyUserId() {
       let userId =
         localStorage.getItem('myUserId') || this.$store.state.userInfo;
@@ -264,5 +326,27 @@ button:disabled {
 
 button:not(:disabled):hover {
   background-color: #059e4a;
+}
+.chat-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 0 18px 0;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.header-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  margin-right: 12px;
+  border: 1px solid #eee;
+}
+.header-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
 }
 </style>
