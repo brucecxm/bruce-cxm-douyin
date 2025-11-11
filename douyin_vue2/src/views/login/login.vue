@@ -337,15 +337,13 @@ export default {
           debugger;
           //  this.clearUserInfo();
           this.$store.dispatch('token/setToken', res.data.token);
-          // 登录成功后获取用户权限数据
-          // 存储角色和权限
           this.$store.dispatch('auth/loginSetRoles', res.data.roleList);
           this.$store.dispatch(
             'auth/loginSetPermissions',
             res.data.permissionList
           );
           localStorage.setItem('token', res.data.token);
-          this.$router.push('/');
+          this.$router.push('/chatyi');
         }
       } catch (error) {
         console.error(error);
