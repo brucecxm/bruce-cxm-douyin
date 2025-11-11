@@ -132,7 +132,9 @@ public class RedisConfig extends CachingConfigurerSupport implements Application
         // 单节点Redis配置（集群/哨兵模式可按需修改）
         config.useSingleServer()
                 .setAddress("redis://" + host + ":" + port)
-                .setDatabase(database); // 可根据需求指定Redis数据库
+                .setDatabase(database) // 可根据需求指定Redis数据库
+                .setPassword(password); // 添加Redis密码配置
+
         return Redisson.create(config);
     }
 
