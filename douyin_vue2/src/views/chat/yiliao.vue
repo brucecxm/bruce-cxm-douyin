@@ -52,7 +52,8 @@ export default {
   },
   methods: {
     getMyUserId() {
-      let userId = localStorage.getItem('myUserId');
+      let userId =
+        localStorage.getItem('myUserId') || this.$store.state.userInfo;
       if (userId) return userId;
       const params = new URLSearchParams(window.location.search);
       userId = params.get('myUserId') || '';
