@@ -17,9 +17,9 @@ public class UserHandshakeHandler extends DefaultHandshakeHandler {
     @Override
     protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler,
                                       Map<String, Object> attributes) {
-        String username = (String) attributes.get("username");
+        String myId = (String) attributes.get("myId");
         // 返回 Principal 对象，Spring 会用它做用户区分
-        return new StompPrincipal(username);
+        return new StompPrincipal(myId);
     }
 
     private static class StompPrincipal implements Principal {

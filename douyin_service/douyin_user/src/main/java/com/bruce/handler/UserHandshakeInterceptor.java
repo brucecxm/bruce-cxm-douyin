@@ -16,18 +16,18 @@ public class UserHandshakeInterceptor implements HandshakeInterceptor {
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                    WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
 
-        // 假设用户名是通过请求参数传递的 ws://host/ws?username=xxx
+        // 假设用户名是通过请求参数传递的 ws://host/ws?myId=xxx
         String query = request.getURI().getQuery();
-        if (query != null && query.contains("username=")) {
-            String username = null;
+        if (query != null && query.contains("myId=")) {
+            String myId = null;
             for (String param : query.split("&")) {
-                if (param.startsWith("username=")) {
-                    username = param.substring("username=".length());
+                if (param.startsWith("myId=")) {
+                    myId = param.substring("myId=".length());
                     break;
                 }
             }
-            if (username != null && !username.trim().isEmpty()) {
-                attributes.put("username", username);
+            if (myId != null && !myId.trim().isEmpty()) {
+                attributes.put("myId", myId);
                 return true;
             }
         }
