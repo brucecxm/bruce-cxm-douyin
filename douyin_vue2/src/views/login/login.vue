@@ -343,7 +343,20 @@ export default {
             res.data.permissionList
           );
           localStorage.setItem('token', res.data.token);
-          this.$router.push('/chatyi');
+          // 再存一份到 localStorage
+          localStorage.setItem('userInfo', JSON.stringify(res.data.userInfo));
+          localStorage.setItem('roleList', JSON.stringify(res.data.roleList));
+          localStorage.setItem(
+            'permissionList',
+            JSON.stringify(res.data.permissionList)
+          );
+          // 传递参数（如：传递 id 和 name）
+          this.$router.push({
+            path: '/chatyi', // 或 name: 'ChatyiVue'（使用路由名称也可以）
+            query: {
+              id: 476112047682593
+            }
+          });
         }
       } catch (error) {
         console.error(error);

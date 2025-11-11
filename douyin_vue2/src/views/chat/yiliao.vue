@@ -6,7 +6,7 @@
       <div
         v-for="(msg, index) in messages"
         :key="index"
-        :class="['message-row', msg.sender === username ? 'me' : 'other']"
+        :class="['message-row', msg.sender === myId ? 'me' : 'other']"
       >
         <img class="avatar" :src="getAvatar(msg.sender)" alt="avatar" />
         <div class="message-bubble">
@@ -34,14 +34,13 @@
 import SockJS from 'sockjs-client';
 import { mapState } from 'vuex';
 import Stomp from 'stompjs';
-import { getUserInfo } from '@/api/user';
 
 export default {
   data() {
     return {
       myInfo: {}, // 自己信息
       receiverInfo: {}, // 对方信息
-      username: '',
+      myId: '',
       receiver: '',
       text: '',
       messages: [],
@@ -56,52 +55,19 @@ export default {
   },
   mounted() {
     debugger;
-    console.log('登录成功，用户信息:', this.userInfo);
-
-    console.log('登录成功，用户信息:', this.userInfo);
-
     console.log('组件创建时的用户信息：', this.userInfo);
-    console.log(
-      '组件创建时的用户信息：',
-      this.userInfo.name,
-      this.userInfo.age
-    );
-    // 或者转成普通对象后打印（避免触发响应式细节）
-    console.log(
-      '组件创建时的用户信息：',
-      JSON.parse(JSON.stringify(this.userInfo))
-    );
-    // 获取自己信息
-    this.myInfo = this.$store.state.userInfo || {};
-    console.log('我的信息', this.myInfo);
-    console.log(
-      '我的信息（原始数据）',
-      JSON.parse(JSON.stringify(this.$store.state.userInfo))
-    );
-    // 获取对方 id
-    this.receiver = this.getReceiverId() || '';
-    // 获取对方信息
-    this.fetchReceiverInfo();
-    this.username = this.getMyUserId() || '';
+    this.myId = this.userInfo.id;
+    this.receiver = this.$route.query.id;
+    if (!this.myId || !this.receiver) {
+      this.$message.error('系统错误，请联系管理员');
+      return; // 终止后续逻辑
+    }
     this.connect();
   },
   methods: {
-    async fetchReceiverInfo() {
-      if (!this.receiver) return;
-      try {
-        const res = await getUserInfo({ userId: this.receiver });
-        if (res.data && res.data.code === 0) {
-          this.receiverInfo = res.data.data;
-        } else if (res.code === 0) {
-          this.receiverInfo = res.data;
-        }
-      } catch (e) {
-        console.error('获取对方信息失败', e);
-      }
-    },
     getAvatar(sender) {
       // 根据 sender 判断返回头像
-      if (sender == this.username) {
+      if (sender == this.myId) {
         return (
           this.myInfo.avatar ||
           'http://gips3.baidu.com/it/u=1821127123,1149655687&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
@@ -113,25 +79,8 @@ export default {
         );
       }
     },
-    getMyUserId() {
-      let userId =
-        localStorage.getItem('myUserId') || this.$store.state.userInfo;
-      if (userId) return userId;
-      const params = new URLSearchParams(window.location.search);
-      userId = params.get('myUserId') || '';
-      if (userId) localStorage.setItem('myUserId', userId);
-      return userId;
-    },
-    getReceiverId() {
-      let receiverId = localStorage.getItem('receiverId');
-      if (receiverId) return receiverId;
-      const params = new URLSearchParams(window.location.search);
-      receiverId = params.get('receiverId') || '';
-      if (receiverId) localStorage.setItem('receiverId', receiverId);
-      return receiverId;
-    },
     connect() {
-      if (!this.username) {
+      if (!this.myId) {
         alert('未获取到用户名，请检查 URL 参数 myUserId');
         return;
       }
@@ -139,8 +88,8 @@ export default {
         alert('未获取到接收者用户名，请检查 URL 参数 receiverId');
         return;
       }
-      const username = encodeURIComponent(this.username);
-      const socket = new SockJS(`/api/user/ws?username=${username}`);
+      const myId = encodeURIComponent(this.myId);
+      const socket = new SockJS(`/api/user/ws?myId=${myId}`);
       this.stompClient = Stomp.over(socket);
       this.stompClient.connect(
         {},
@@ -161,7 +110,7 @@ export default {
     sendText() {
       if (!this.text.trim()) return;
       const msg = {
-        sender: this.username,
+        sender: this.myId,
         receiver: this.receiver,
         content: this.text.trim(),
         type: 'text',
@@ -201,10 +150,10 @@ export default {
         minute: '2-digit'
       });
     },
-    getAvatar(username) {
+    getAvatar(myId) {
       // 这里可以改成真实头像地址或者根据用户名生成头像
       // 先用简单占位颜色头像
-      console.log('获取头像', username);
+      console.log('获取头像', myId);
       return 'http://gips3.baidu.com/it/u=1821127123,1149655687&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280';
     }
   }
