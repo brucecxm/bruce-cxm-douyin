@@ -59,9 +59,27 @@ spring:
 #
 
   datasource:
+    # 显式指定Druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
     username: remote_user
     password: bruce_CXM_123
     url: jdbc:mysql://1.94.131.16:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+    # Druid专属配置
+    druid:
+      initial-size: 5        # 初始连接数
+      max-active: 20         # 最大连接数
+      min-idle: 5            # 最小空闲连接数
+      max-wait: 60000        # 获取连接的最大等待时间（毫秒）
+      # 可选：配置监控、过滤等功能
+      filters: stat,wall,slf4j  # 统计、防SQL注入、日志过滤器
+      web-stat-filter:
+        enabled: true
+      stat-view-servlet:
+        enabled: true
+        login-username: admin  # 监控页登录用户名
+        login-password: admin  # 监控页登录密码
+
+
 
   security:
     oauth2:

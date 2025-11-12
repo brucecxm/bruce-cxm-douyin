@@ -350,13 +350,24 @@ export default {
             'permissionList',
             JSON.stringify(res.data.permissionList)
           );
-          // 传递参数（如：传递 id 和 name）
-          this.$router.push({
-            path: '/chatyi', // 或 name: 'ChatyiVue'（使用路由名称也可以）
-            query: {
-              id: 476112047682593
-            }
-          });
+          debugger;
+          if (this.userInfo.id === '476112047682593') {
+            // 传递参数（如：传递 id 和 name）
+            this.$router.push({
+              path: '/chatyi', // 或 name: 'ChatyiVue'（使用路由名称也可以）
+              query: {
+                id: '480971991428129'
+              }
+            });
+          } else {
+            // 传递参数（如：传递 id 和 name）
+            this.$router.push({
+              path: '/chatyi', // 或 name: 'ChatyiVue'（使用路由名称也可以）
+              query: {
+                id: '476112047682593'
+              }
+            });
+          }
         }
       } catch (error) {
         console.error(error);

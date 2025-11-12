@@ -116,6 +116,7 @@ export default {
         type: 'text',
         timestamp: Date.now()
       };
+      debugger;
       this.stompClient.send('/app/private-chat', {}, JSON.stringify(msg));
       this.messages.push(msg); // 立即显示发送消息
       this.text = '';
@@ -149,12 +150,6 @@ export default {
         hour: '2-digit',
         minute: '2-digit'
       });
-    },
-    getAvatar(myId) {
-      // 这里可以改成真实头像地址或者根据用户名生成头像
-      // 先用简单占位颜色头像
-      console.log('获取头像', myId);
-      return 'http://gips3.baidu.com/it/u=1821127123,1149655687&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280';
     }
   }
 };
