@@ -16,6 +16,12 @@ public class RabbitConfig {
     }
 
 
+    // 声明交换机
+    @Bean
+    public DirectExchange chatNotifyExchange() {
+        // 参数：交换机名称、是否持久化、是否自动删除
+        return new DirectExchange("chat.notify.exchange", true, false);
+    }
 
     @Bean
     public Queue emailQueue() {

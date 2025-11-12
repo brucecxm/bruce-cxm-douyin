@@ -1,7 +1,10 @@
 package com.bruce.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.bruce.pojo.ChatMessageYi;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -9,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 聊天控制器 - 简化版本，移除了对不存在的ChatService的依赖
@@ -19,17 +23,47 @@ public class ChatController {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     // 一对一私聊消息处理
     @MessageMapping("/private-chat")
     public void privateChat(ChatMessageYi message, Principal principal) {
         System.out.println("当前发消息的是：" + principal.getName());
         System.out.println("准备发送给：" + message.getReceiver());
-        // 给指定用户发送点对点消息，接收者浏览器要订阅 /user/{receiver}/queue/messages
-        messagingTemplate.convertAndSendToUser(
-                message.getReceiver(),
-                "/queue/messages",
-                message
-        );
+
+        // 使用Sa-Token判断接收者是否在线（已登录）
+        boolean receiverOnline = StpUtil.isLogin(message.getReceiver());
+
+        if (receiverOnline) {
+            // 场景1/2：接收者在线，直接推送消息
+            messagingTemplate.convertAndSendToUser(
+                    message.getReceiver(),
+                    "/queue/messages",
+                    message);
+        } else {
+            // 场景3/4：接收者不在线，暂存消息并发送离线通知（如推送、短信等）
+            // 将消息持久化到Redis离线消息队列，待接收者上线后补发
+            String offlineKey = "offline_msg:" + message.getReceiver();
+            redisTemplate.opsForList().rightPush(offlineKey, message);
+            redisTemplate.expire(offlineKey, 7, TimeUnit.DAYS); // 离线消息保留7天
+
+            // 发送RabbitMQ延迟消息，触发第三方通知服务（极光、个推、短信等）
+            rabbitTemplate.convertAndSend(
+                    "chat.notify.exchange",
+                    "chat.notify.delay",
+                    message,
+                    msg -> {
+                        // 延迟5秒发送，避免瞬时大量通知
+                        msg.getMessageProperties().setDelay(5000);
+                        return msg;
+                    });
+
+            System.out.println("接收者离线，消息已暂存Redis并等待补发：" + message.getReceiver());
+        }
     }
 
     // 简化的发送消息接口，不依赖ChatService

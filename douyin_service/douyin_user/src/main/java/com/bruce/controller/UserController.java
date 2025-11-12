@@ -112,44 +112,81 @@ public class UserController extends ApiController {
     public R<List<Permission>> getPermissions(@PathVariable Long userId) {
         return R.ok(permissionService.getPermissionsByUserId(userId));
     }
+    // 定义参数接收实体类
+    static   class LogoutRequest {
+        private String action;  // 操作类型：logout、logoutByDevice等
+        private Object param;   // 操作参数，根据action不同格式不同
 
-    @RequestMapping("logout")
-    public void handleLogoutAction(String action, Object param) {
+        // getter和setter（必须，用于JSON反序列化）
+        public String getAction() {
+            return action;
+        }
+        public void setAction(String action) {
+            this.action = action;
+        }
+        public Object getParam() {
+            return param;
+        }
+        public void setParam(Object param) {
+            this.param = param;
+        }
+    }
+    @PostMapping("logout")
+    public void handleLogoutAction(@RequestBody LogoutRequest request) {
+        String action = request.getAction();
+        Object param = request.getParam();
+
         if ("logout".equals(action)) {
             // 强制指定账号注销下线，参数应为用户ID（例如：10001）
-            if (param instanceof Integer) {
-                StpUtil.logout((Integer) param);
+            if (param instanceof Long) {
+                StpUtil.logout((Long) param);
+            } else {
+                System.out.println("logout操作参数错误，应为Long类型用户ID");
             }
         } else if ("logoutByDevice".equals(action)) {
-            // 强制指定账号在指定端注销下线，参数为 Object[] 数组：[用户ID, 端]
+            // 强制指定账号在指定端注销下线，参数为数组：[用户ID, 端]
             if (param instanceof Object[] && ((Object[]) param).length == 2) {
                 Object[] params = (Object[]) param;
-                if (params[0] instanceof Integer && params[1] instanceof String) {
-                    StpUtil.logout((Integer) params[0], (String) params[1]);
+                if (params[0] instanceof Long && params[1] instanceof String) {
+                    StpUtil.logout((Long) params[0], (String) params[1]);
+                } else {
+                    System.out.println("logoutByDevice参数类型错误，应为[Long, String]");
                 }
+            } else {
+                System.out.println("logoutByDevice参数错误，应为长度为2的数组");
             }
         } else if ("logoutByToken".equals(action)) {
-            // 强制指定 Token 注销下线，参数为 Token 字符串
+            // 强制指定Token注销下线，参数为Token字符串
             if (param instanceof String) {
                 StpUtil.logoutByTokenValue((String) param);
+            } else {
+                System.out.println("logoutByToken参数错误，应为String类型Token");
             }
         } else if ("kickout".equals(action)) {
             // 将指定账号踢下线，参数应为用户ID
-            if (param instanceof Integer) {
-                StpUtil.kickout((Integer) param);
+            if (param instanceof Long) {
+                StpUtil.kickout((Long) param);
+            } else {
+                System.out.println("kickout操作参数错误，应为Long类型用户ID");
             }
         } else if ("kickoutByDevice".equals(action)) {
-            // 将指定账号在指定端踢下线，参数为 Object[] 数组：[用户ID, 端]
+            // 将指定账号在指定端踢下线，参数为数组：[用户ID, 端]
             if (param instanceof Object[] && ((Object[]) param).length == 2) {
                 Object[] params = (Object[]) param;
-                if (params[0] instanceof Integer && params[1] instanceof String) {
-                    StpUtil.kickout((Integer) params[0], (String) params[1]);
+                if (params[0] instanceof Long && params[1] instanceof String) {
+                    StpUtil.kickout((Long) params[0], (String) params[1]);
+                } else {
+                    System.out.println("kickoutByDevice参数类型错误，应为[Long, String]");
                 }
+            } else {
+                System.out.println("kickoutByDevice参数错误，应为长度为2的数组");
             }
         } else if ("kickoutByToken".equals(action)) {
-            // 将指定 Token 踢下线，参数为 Token 字符串
+            // 将指定Token踢下线，参数为Token字符串
             if (param instanceof String) {
                 StpUtil.kickoutByTokenValue((String) param);
+            } else {
+                System.out.println("kickoutByToken参数错误，应为String类型Token");
             }
         } else {
             System.out.println("无效的操作: " + action);
