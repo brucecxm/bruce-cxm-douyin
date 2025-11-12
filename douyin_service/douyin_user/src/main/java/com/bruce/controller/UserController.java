@@ -26,7 +26,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -53,7 +52,6 @@ public class UserController extends ApiController {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
-
     @Autowired
     private RedisUtil redisUtil;
 
@@ -67,7 +65,7 @@ public class UserController extends ApiController {
     private FriendService friendService;
 
     @Resource
-    private VideoService videoService;  // 用于将对象转换为JSON字符串
+    private VideoService videoService; // 用于将对象转换为JSON字符串
 
     @Autowired
     private DcSystemService dcSystemService;
@@ -83,13 +81,12 @@ public class UserController extends ApiController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
-    private ObjectMapper objectMapper;  // 用于将对象转换为JSON字符串
+    private ObjectMapper objectMapper; // 用于将对象转换为JSON字符串
 
     public UserController() {
         // 创建一个固定大小的线程池
         this.executorService = Executors.newFixedThreadPool(10);
     }
-
 
     @Autowired
     private UserRoleService userRoleService;
@@ -115,7 +112,6 @@ public class UserController extends ApiController {
     public R<List<Permission>> getPermissions(@PathVariable Long userId) {
         return R.ok(permissionService.getPermissionsByUserId(userId));
     }
-
 
     @RequestMapping("logout")
     public void handleLogoutAction(String action, Object param) {
@@ -208,11 +204,26 @@ public class UserController extends ApiController {
                 if (code == null || !emailVerificationCode.equals(code)) {
                     return Result.error(Constant.Error.CAPTCHA_ERROR);
                 }
-                user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, userName));
+                // 热点数据：先从 Redis 查用户
+                String userKey = Constant.User.USER_NAME + ":" + userName;
+                String userJson = stringRedisTemplate.opsForValue().get(userKey);
+                if (userJson != null) {
+                    user = objectMapper.readValue(userJson, User.class);
+                } else {
+                    user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, userName));
+                    if (user != null) {
+                        // 存入 Redis，10 分钟过期
+                        stringRedisTemplate.opsForValue().set(userKey, objectMapper.writeValueAsString(user), 10,
+                                TimeUnit.MINUTES);
+                    }
+                }
                 if (user == null) {
                     // 用户不存在则自动注册，随机8位密码可用于后续找回
                     String randomPassword = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
                     user = registerNewUser(userName, randomPassword);
+                    // 注册后同步到 Redis
+                    stringRedisTemplate.opsForValue().set(userKey, objectMapper.writeValueAsString(user), 10,
+                            TimeUnit.MINUTES);
                 }
                 // 登录
                 StpUtil.login(user.getId());
@@ -222,11 +233,26 @@ public class UserController extends ApiController {
                 if (password == null || password.isEmpty()) {
                     return Result.error("密码不能为空");
                 }
+                // 热点数据：先从 Redis 查用户
+                String userKey = Constant.User.USER_NAME + ":" + userName;
+                String userJson = stringRedisTemplate.opsForValue().get(userKey);
+                if (userJson != null) {
+                    user = objectMapper.readValue(userJson, User.class);
+                } else {
+                    user = userService.getUserByUsername(userName);
+                    if (user != null) {
+                        // 存入 Redis，10 分钟过期
+                        stringRedisTemplate.opsForValue().set(userKey, objectMapper.writeValueAsString(user), 10,
+                                TimeUnit.MINUTES);
+                    }
+                }
+                if (user == null) {
+                    return Result.error(Constant.Error.INVALID_CREDENTIALS);
+                }
                 // 使用优化后的用户服务验证密码
                 if (!userService.verifyPassword(userName, password)) {
                     return Result.error(Constant.Error.INVALID_CREDENTIALS);
                 }
-                user = userService.getUserByUsername(userName);
                 // 登录
                 StpUtil.login(user.getId());
             }
@@ -244,19 +270,19 @@ public class UserController extends ApiController {
             String token = StpUtil.getTokenValue();
             Long userId = Long.parseLong(StpUtil.getLoginId().toString());
             User userInfo = null;
-            String userKey = userId + Constant.User._USER_INFO;
+            String userInfoKey = userId + Constant.User._USER_INFO;
             // 先从 Redis 中查询用户信息
-            String userJson = stringRedisTemplate.opsForValue().get(userKey);
-            if (userJson != null) {
+            String userInfoJson = stringRedisTemplate.opsForValue().get(userInfoKey);
+            if (userInfoJson != null) {
                 // Redis 中存在，直接反序列化为对象
-                userInfo = objectMapper.readValue(userJson, User.class);
+                userInfo = objectMapper.readValue(userInfoJson, User.class);
             } else {
                 // Redis 中不存在，从数据库查询
                 userInfo = userService.getById(userId);
                 if (userInfo != null) {
                     // 将查询到的用户信息存入 Redis (10分钟)
-                    userJson = objectMapper.writeValueAsString(userInfo);
-                    stringRedisTemplate.opsForValue().set(userKey, userJson, 10, TimeUnit.MINUTES);
+                    userInfoJson = objectMapper.writeValueAsString(userInfo);
+                    stringRedisTemplate.opsForValue().set(userInfoKey, userInfoJson, 10, TimeUnit.MINUTES);
                 }
             }
             Map<String, Object> response = new HashMap<>();
@@ -272,7 +298,6 @@ public class UserController extends ApiController {
             return Result.error("登录失败，请稍后重试");
         }
     }
-
 
     @GetMapping("/userInfo")
     public Result<UserInfo> userInfo(@RequestParam Map<String, Object> params) {
@@ -316,8 +341,7 @@ public class UserController extends ApiController {
         try {
             if (pageStr.isEmpty() || pageSizeStr.isEmpty()) {
                 List<Video> videoList = videoService.list(
-                        new LambdaQueryWrapper<Video>().eq(Video::getUserId, userId)
-                );
+                        new LambdaQueryWrapper<Video>().eq(Video::getUserId, userId));
                 userInfo.setVideoList(videoList);
             } else {
                 long page, pageSize;
@@ -330,8 +354,7 @@ public class UserController extends ApiController {
                 Page<Video> pageQry = new Page<>(page, pageSize);
                 IPage<Video> videoPage = videoService.page(
                         pageQry,
-                        new LambdaQueryWrapper<Video>().eq(Video::getUserId, userId)
-                );
+                        new LambdaQueryWrapper<Video>().eq(Video::getUserId, userId));
                 userInfo.setVideoPage(videoPage);
             }
         } catch (Exception e) {
@@ -342,16 +365,12 @@ public class UserController extends ApiController {
         return Result.success(userInfo);
     }
 
-
     // 图片验证码接口
     @GetMapping("/getVerificationCode")
-    public void getVerificationCode(HttpServletResponse response, @RequestParam Map<String, Object> params) throws IOException {
-        String uuid = params.containsKey("uuid") ?
-                String.valueOf(params.get("uuid")) :
-                "";
-        String userName = params.containsKey("userName") ?
-                String.valueOf(params.get("userName")) :
-                "";
+    public void getVerificationCode(HttpServletResponse response, @RequestParam Map<String, Object> params)
+            throws IOException {
+        String uuid = params.containsKey("uuid") ? String.valueOf(params.get("uuid")) : "";
+        String userName = params.containsKey("userName") ? String.valueOf(params.get("userName")) : "";
         if (uuid == null || uuid.isEmpty()) {
             uuid = String.valueOf(System.currentTimeMillis()); // 生成唯一标识符
         }
@@ -392,10 +411,9 @@ public class UserController extends ApiController {
         rabbitTemplate.convertAndSend("email.queue", message);
     }
 
-
-    //简单的参数类型 如果没有用参数注解  spring会默认把参数前面加上@RequestParam
-//简单的参数类型 如果没有用参数注解  spring会默认把参数前面加上@RequestParam
-//简单的参数类型 如果没有用参数注解  spring会默认把参数前面加上@RequestParam
+    // 简单的参数类型 如果没有用参数注解 spring会默认把参数前面加上@RequestParam
+    // 简单的参数类型 如果没有用参数注解 spring会默认把参数前面加上@RequestParam
+    // 简单的参数类型 如果没有用参数注解 spring会默认把参数前面加上@RequestParam
     @PostMapping("/register")
     @Transactional
     public Result register(@RequestParam Map<String, Object> params) {
@@ -433,7 +451,8 @@ public class UserController extends ApiController {
     }
 
     @Transactional
-    public User registerNewUser(String username, String password) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public User registerNewUser(String username, String password)
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
         // 查询是否已存在
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(User::getUsername, username);
@@ -463,20 +482,17 @@ public class UserController extends ApiController {
         user.setNickname(Constant.Chinese.NEW_USER + idService.SnowflakeGen());
         user.setAvatar(
                 dcSystemService.getOne(new LambdaQueryWrapper<DcSystem>()
-                                .eq(DcSystem::getSysName, Constant.User.DEFAULT_USER_AVATAR))
-                        .getSysValue()
-        );
+                        .eq(DcSystem::getSysName, Constant.User.DEFAULT_USER_AVATAR))
+                        .getSysValue());
         user.setBackImg(
                 dcSystemService.getOne(new LambdaQueryWrapper<DcSystem>()
-                                .eq(DcSystem::getSysName, Constant.User.DEFAULT_USER_BACK_IMG))
-                        .getSysValue()
-        );
+                        .eq(DcSystem::getSysName, Constant.User.DEFAULT_USER_BACK_IMG))
+                        .getSysValue());
         user.setRoleId(Constant.Role.USER);
 
         userService.save(user);
 
         return user;
     }
-
 
 }
