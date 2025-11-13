@@ -89,89 +89,94 @@ public class UserControllerTimeLogAspect {
     /**
      * 解析请求上下文信息（兼容HTTP和非HTTP场景）
      */
-    private void parseRequestContext(ProceedingJoinPoint joinPoint, InterfaceLog log) {
+    private void parseRequestContext(ProceedingJoinPoint joinPoint, InterfaceLog interfaceLog) {
         // 获取方法信息
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
-        log.setControllerMethod(method.getDeclaringClass().getSimpleName() + "." + method.getName());
+        interfaceLog.setControllerMethod(method.getDeclaringClass().getSimpleName() + "." + method.getName());
 
         // 解析请求参数（脱敏处理敏感信息）
         Object[] args = joinPoint.getArgs();
-        log.setRequestParams(desensitizeParams(args));
+        interfaceLog.setRequestParams(desensitizeParams(args));
 
         // 区分HTTP请求和WebSocket请求
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes != null && attributes.getRequest() != null) {
             // HTTP请求处理
             HttpServletRequest request = attributes.getRequest();
-            log.setRequestType("HTTP");
-            log.setRequestUrl(request.getRequestURL().toString());
-            log.setHttpMethod(request.getMethod());
-            log.setIpAddress(getClientIp(request));
+            interfaceLog.setRequestUrl(request.getRequestURL().toString());
+            interfaceLog.setHttpMethod(request.getMethod());
+            interfaceLog.setIpAddress(getClientIp(request));
         } else if (isWebSocketRequest(args)) {
             // WebSocket请求处理
-            log.setRequestType("WebSocket");
-            log.setRequestUrl("ws://" + getLocalIp() + ":" + getLocalPort() + "/" + log.getControllerMethod());
-            log.setHttpMethod("WS");
-            log.setIpAddress(getLocalIp()); // WebSocket取本地IP
+            interfaceLog.setRequestUrl("ws://" + getLocalIp() + ":" + getLocalPort() + "/" + interfaceLog.getControllerMethod());
+            interfaceLog.setHttpMethod("WS");
+            interfaceLog.setIpAddress(getLocalIp()); // WebSocket取本地IP
         } else {
             // 其他类型请求（如内部调用）
-            log.setRequestType("INTERNAL");
-            log.setRequestUrl("internal://" + log.getControllerMethod());
-            log.setHttpMethod("N/A");
-            log.setIpAddress(getLocalIp());
+            interfaceLog.setRequestUrl("internal://" + interfaceLog.getControllerMethod());
+            interfaceLog.setHttpMethod("N/A");
+            interfaceLog.setIpAddress(getLocalIp());
         }
     }
 
     /**
      * 处理成功响应结果
      */
-    private void handleSuccessResult(InterfaceLog log, Object result) {
-        log.setStatus(1); // 1-成功
+    private void handleSuccessResult(InterfaceLog interfaceLog, Object result) {
+        interfaceLog.setStatus(1); // 1-成功
         if (result != null) {
             // 限制结果长度，避免大对象占用过多存储
             String resultStr = result.toString();
-            log.setResponseResult(resultStr.length() > 2000 ? resultStr.substring(0, 2000) + "..." : resultStr);
+            interfaceLog.setResponseResult(resultStr.length() > 2000 ? resultStr.substring(0, 2000) + "..." : resultStr);
         } else {
-            log.setResponseResult("null");
+            interfaceLog.setResponseResult("null");
         }
     }
 
     /**
      * 处理异常信息
      */
-    private void handleException(InterfaceLog log, Throwable e) {
-        log.setStatus(0); // 0-异常
-        log.setErrorMsg(e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName());
+    private void handleException(InterfaceLog interfaceLog, Throwable e) {
+        interfaceLog.setStatus(0); // 0-异常
+        interfaceLog.setErrorMsg(e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName());
         // 记录异常堆栈（可选，按需开启）
-        // log.setErrorStack(Arrays.toString(e.getStackTrace()).substring(0, 2000));
+        // interfaceLog.setErrorStack(Arrays.toString(e.getStackTrace()).substring(0, 2000));
     }
 
     /**
      * 保存日志到数据库（兼容异步场景）
      */
-    private void saveInterfaceLog(InterfaceLog log) {
+    private void saveInterfaceLog(InterfaceLog interfaceLog) {
         try {
-            interfaceLogService.save(log);
+            interfaceLogService.save(interfaceLog);
         } catch (Exception e) {
             // 日志保存失败不影响主流程，仅记录警告
-            log.warn("接口日志保存失败: {}", e.getMessage());
+            this.log.warn("接口日志保存失败: {}", e.getMessage());
         }
     }
 
     /**
      * 控制台日志输出（彩色区分）
      */
-    private void printConsoleLog(InterfaceLog log, long costTime) {
-        String baseLog = "[" + AnsiColor.BLUE + log.getRequestId() + AnsiColor.RESET + "] " +
-                "类型: " + log.getRequestType() + ", " +
-                "方法: " + AnsiColor.BOLD + log.getControllerMethod() + AnsiColor.RESET + ", " +
+    private void printConsoleLog(InterfaceLog interfaceLog, long costTime) {
+        // 根据httpMethod推断请求类型
+        String requestType = "HTTP";
+        if ("WS".equals(interfaceLog.getHttpMethod())) {
+            requestType = "WebSocket";
+        } else if ("N/A".equals(interfaceLog.getHttpMethod())) {
+            requestType = "INTERNAL";
+        }
+        
+        String baseLog = "[" + AnsiColor.BLUE + interfaceLog.getRequestId() + AnsiColor.RESET + "] " +
+                "类型: " + requestType + ", " +
+                "方法: " + AnsiColor.BOLD + interfaceLog.getControllerMethod() + AnsiColor.RESET + ", " +
                 "耗时: " + AnsiColor.YELLOW + costTime + "ms" + AnsiColor.RESET;
 
-        if (log.getStatus() == 1) {
-            log.info(baseLog + ", 状态: " + AnsiColor.GREEN + "成功" + AnsiColor.RESET);
+        if (interfaceLog.getStatus() == 1) {
+            this.log.info(baseLog + ", 状态: " + AnsiColor.GREEN + "成功" + AnsiColor.RESET);
         } else {
-            log.error(baseLog + ", 状态: " + AnsiColor.RED + "异常" + AnsiColor.RESET + ", 原因: " + log.getErrorMsg());
+            this.log.error(baseLog + ", 状态: " + AnsiColor.RED + "异常" + AnsiColor.RESET + ", 原因: " + interfaceLog.getErrorMsg());
         }
     }
 
