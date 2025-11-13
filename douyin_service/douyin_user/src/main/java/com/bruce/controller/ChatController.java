@@ -2,6 +2,7 @@ package com.bruce.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.bruce.pojo.ChatMessageYi;
+import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -13,6 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.util.concurrent.TimeUnit;
+
+import static com.bruce.config.RabbitConfig.NOTIFY_DELAY_EXCHANGE;
+import static com.bruce.config.RabbitConfig.NOTIFY_DELAY_ROUTING_KEY;
 
 /**
  * 聊天控制器 - 简化版本，移除了对不存在的ChatService的依赖
@@ -51,16 +55,18 @@ public class ChatController {
             redisTemplate.opsForList().rightPush(offlineKey, message);
             redisTemplate.expire(offlineKey, 7, TimeUnit.DAYS); // 离线消息保留7天
 
-            // 发送RabbitMQ延迟消息，触发第三方通知服务（极光、个推、短信等）
             rabbitTemplate.convertAndSend(
-                    "chat.notify.exchange",
-                    "chat.notify.delay",
-                    message,
+                    NOTIFY_DELAY_EXCHANGE,  // 交换机名称（从配置类引用，避免硬编码）
+                    NOTIFY_DELAY_ROUTING_KEY,  // 路由键
+                    message,  // 消息内容（支持序列化的对象，如JSON字符串、自定义POJO）
                     msg -> {
-                        // 延迟5秒发送，避免瞬时大量通知
-                        msg.getMessageProperties().setDelay(5000);
+                        // 设置延迟时间
+                        msg.getMessageProperties().setDelay(5);
+                        // 可选：设置消息持久化（避免RabbitMQ重启后消息丢失）
+                        msg.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
                         return msg;
-                    });
+                    }
+            );
 
             System.out.println("接收者离线，消息已暂存Redis并等待补发：" + message.getReceiver());
         }

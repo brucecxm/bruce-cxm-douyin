@@ -63,7 +63,7 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     username: remote_user
     password: bruce_CXM_123
-    url: jdbc:mysql://1.94.131.16:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+    url: jdbc:mysql://1.94.131.16:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
     # Druid专属配置
     druid:
       initial-size: 5        # 初始连接数
