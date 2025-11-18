@@ -326,15 +326,12 @@ export default {
           isCheck: this.enableValidation
         });
         if (res.code === 1) {
-          debugger;
           this.$message({ message: res.msg || '登录失败', type: 'error' });
         } else {
-          debugger;
           // this.$store.dispatch('userInfo/setUserInfo', res.data.userInfo);
           this.setUserInfo(res.data.userInfo); // 调用 action 存值
           console.log('登录成功，用户信息:', this.userInfo);
 
-          debugger;
           //  this.clearUserInfo();
           this.$store.dispatch('token/setToken', res.data.token);
           this.$store.dispatch('auth/loginSetRoles', res.data.roleList);
@@ -350,7 +347,6 @@ export default {
             'permissionList',
             JSON.stringify(res.data.permissionList)
           );
-          debugger;
           if (this.userInfo.id === '476112047682593') {
             // 传递参数（如：传递 id 和 name）
             this.$router.push({
