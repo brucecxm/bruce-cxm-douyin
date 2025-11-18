@@ -1,9 +1,16 @@
 <template>
-  <div :style="[computedMessageStyle, containerStyle]" class="userinfo">
+  <div
+    :style="[computedMessageStyle, containerStyle]"
+    class="userinfo"
+    @click="handleClick"
+  >
     <!-- 包裹头像和在线指示点 -->
     <div
       class="avatar-wrapper"
-      :style="[avatarWrapperStyle, { width: computedHeight, height: computedHeight }]"
+      :style="[
+        avatarWrapperStyle,
+        { width: computedHeight, height: computedHeight }
+      ]"
     >
       <div
         class="avatar"
@@ -19,11 +26,18 @@
         ]"
       ></div>
       <!-- 仅当状态为“在线”时显示绿色指示点 -->
-      <div v-if="message.status === '在线'" class="online-dot" :style="onlineDotStyle"></div>
+      <div
+        v-if="message.status === '在线'"
+        class="online-dot"
+        :style="onlineDotStyle"
+      ></div>
     </div>
 
     <!-- 用户名与状态 -->
-    <div class="UserAndStatus" :style="[userAndStatusStyle, { height: computedHeight }]">
+    <div
+      class="UserAndStatus"
+      :style="[userAndStatusStyle, { height: computedHeight }]"
+    >
       <div class="username" :style="usernameStyle">{{ message.username }}</div>
       <div class="status" :style="statusStyle">{{ message.status }}</div>
     </div>
@@ -89,6 +103,13 @@ export default {
   },
   created() {
     console.log(this.message);
+  },
+  methods: {
+    // 处理点击事件，将事件传递给父组件
+    handleClick() {
+      console.log('UserInfo component clicked:', this.message);
+      this.$emit('click', this.message);
+    }
   }
 };
 </script>
@@ -99,6 +120,14 @@ export default {
   flex-direction: row;
   padding: 0px;
   margin: 5px 0;
+  position: relative;
+  z-index: 10;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  /* 确保点击区域覆盖整个组件 */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .avatar-wrapper {

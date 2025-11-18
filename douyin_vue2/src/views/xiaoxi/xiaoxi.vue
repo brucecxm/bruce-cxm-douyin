@@ -105,6 +105,7 @@
             v-for="(item, index) in filteredUsers"
             :key="index"
             :message="item"
+            @click="handleUserClick(item)"
           />
           <div v-if="filteredUsers.length === 0" class="no-data">暂无数据</div>
 
@@ -252,14 +253,14 @@ export default {
         this.othercss.right = '0vw';
       }
     },
-    
+
     async fetchFriendInfos() {
       try {
         const response = await getFriendApi();
         // 检查响应数据是否存在且有效
         if (response && response.data && Array.isArray(response.data)) {
           // 将朋友数据转换为topUsers所需的格式
-          this.topUsers = response.data.map(friend => ({
+          this.topUsers = response.data.map((friend) => ({
             name: friend.nickname || friend.username || '未知用户',
             avatar: friend.avatar || '默认头像地址',
             heat: Math.floor(Math.random() * 100) // 可以根据实际需求设置热度值
@@ -332,6 +333,32 @@ export default {
         console.log('触发加载更多');
         this.fetchUserInfos();
       }
+    },
+
+    // 处理用户点击事件，跳转到聊天界面
+    handleUserClick(user) {
+      debugger;
+      console.log('User clicked in xiaoxi.vue:', user);
+      // 检查用户对象是否存在
+      if (!user) {
+        console.error('User object is undefined or null');
+        return;
+      }
+
+      // 检查用户对象中是否包含userId或id字段，如果没有则使用username作为临时标识
+      const friendId = user.userId || user.id || user.username || '';
+      if (friendId) {
+        console.log('Navigating to chat with ID:', friendId);
+        // 跳转到聊天界面，传递好友id参数
+        this.$router.push({
+          path: '/chatyi',
+          query: {
+            id: friendId
+          }
+        });
+      } else {
+        console.warn('用户数据中缺少必要的标识字段，无法跳转');
+      }
     }
   },
 
@@ -341,10 +368,22 @@ export default {
       try {
         // 为每个图标添加ID以便更精确地选择
         const iconElements = [
-          { selector: '.left-icon-1', path: '/src/assets/xiaoxi/header/xiaoxi_add.png' },
-          { selector: '.left-icon-2', path: '/src/assets/xiaoxi/header/xiaoxi_hongbao.png' },
-          { selector: '.right-icon-1', path: '/src/assets/xiaoxi/header/xiaoxi_menu.png' },
-          { selector: '.right-icon-2', path: '/src/assets/xiaoxi/header/xiaoxi_search.png' }
+          {
+            selector: '.left-icon-1',
+            path: '/src/assets/xiaoxi/header/xiaoxi_add.png'
+          },
+          {
+            selector: '.left-icon-2',
+            path: '/src/assets/xiaoxi/header/xiaoxi_hongbao.png'
+          },
+          {
+            selector: '.right-icon-1',
+            path: '/src/assets/xiaoxi/header/xiaoxi_menu.png'
+          },
+          {
+            selector: '.right-icon-2',
+            path: '/src/assets/xiaoxi/header/xiaoxi_search.png'
+          }
         ];
 
         iconElements.forEach((icon) => {
