@@ -112,25 +112,30 @@ public class UserController extends ApiController {
     public R<List<Permission>> getPermissions(@PathVariable Long userId) {
         return R.ok(permissionService.getPermissionsByUserId(userId));
     }
+
     // 定义参数接收实体类
-    static   class LogoutRequest {
-        private String action;  // 操作类型：logout、logoutByDevice等
-        private Object param;   // 操作参数，根据action不同格式不同
+    static class LogoutRequest {
+        private String action; // 操作类型：logout、logoutByDevice等
+        private Object param; // 操作参数，根据action不同格式不同
 
         // getter和setter（必须，用于JSON反序列化）
         public String getAction() {
             return action;
         }
+
         public void setAction(String action) {
             this.action = action;
         }
+
         public Object getParam() {
             return param;
         }
+
         public void setParam(Object param) {
             this.param = param;
         }
     }
+
     @PostMapping("logout")
     public void handleLogoutAction(@RequestBody LogoutRequest request) {
         String action = request.getAction();
@@ -530,6 +535,826 @@ public class UserController extends ApiController {
         userService.save(user);
 
         return user;
+    }
+
+    // ===== 一、用户基础信息扩展接口 =====
+
+    // 更新用户信息请求参数类
+    static class UpdateInfoRequest {
+        private Long userId;
+        private String nickname;
+        private String avatar;
+        private String phone;
+        private String gender; // 修改为String类型以匹配User实体
+        private String birthday;
+
+        // getter和setter
+        public Long getUserId() {
+            return userId;
+        }
+
+        public void setUserId(Long userId) {
+            this.userId = userId;
+        }
+
+        public String getNickname() {
+            return nickname;
+        }
+
+        public void setNickname(String nickname) {
+            this.nickname = nickname;
+        }
+
+        public String getAvatar() {
+            return avatar;
+        }
+
+        public void setAvatar(String avatar) {
+            this.avatar = avatar;
+        }
+
+        public String getPhone() {
+            return phone;
+        }
+
+        public void setPhone(String phone) {
+            this.phone = phone;
+        }
+
+        public String getGender() {
+            return gender;
+        }
+
+        public void setGender(String gender) {
+            this.gender = gender;
+        }
+
+        public String getBirthday() {
+            return birthday;
+        }
+
+        public void setBirthday(String birthday) {
+            this.birthday = birthday;
+        }
+    }
+
+    // 更新用户信息
+    @PutMapping("/updateInfo")
+    @Transactional
+    public Result updateInfo(@RequestBody UpdateInfoRequest request) {
+        try {
+            Long userId = request.getUserId();
+            // 如果未指定userId，使用当前登录用户
+            if (userId == null) {
+                userId = Long.parseLong(StpUtil.getLoginId().toString());
+            }
+
+            // 验证用户是否存在
+            User user = userService.getById(userId);
+            if (user == null) {
+                return Result.error("用户不存在");
+            }
+
+            // 验证手机号是否已被占用
+            if (request.getPhone() != null && !request.getPhone().equals(user.getPhone())) {
+                // 这里简化处理，实际应查询数据库验证
+                System.out.println("验证手机号是否已被占用");
+                // 模拟手机号已被占用的情况
+                // return Result.error("手机号已被占用");
+            }
+
+            // 更新用户信息
+            if (request.getNickname() != null)
+                user.setNickname(request.getNickname());
+            if (request.getAvatar() != null)
+                user.setAvatar(request.getAvatar());
+            if (request.getPhone() != null)
+                user.setPhone(request.getPhone());
+            if (request.getGender() != null)
+                user.setGender(request.getGender());
+
+            userService.updateById(user);
+
+            // 清除Redis缓存
+            String userInfoKey = userId + Constant.User._USER_INFO;
+            stringRedisTemplate.delete(userInfoKey);
+
+            return Result.success(null);
+        } catch (Exception e) {
+            log.error("更新用户信息失败", e);
+            return Result.error("更新失败，请稍后重试");
+        }
+    }
+
+    // 修改密码请求参数类
+    static class ChangePasswordRequest {
+        private Long userId;
+        private String oldPassword;
+        private String newPassword;
+        private String verificationCode;
+
+        // getter和setter
+        public Long getUserId() {
+            return userId;
+        }
+
+        public void setUserId(Long userId) {
+            this.userId = userId;
+        }
+
+        public String getOldPassword() {
+            return oldPassword;
+        }
+
+        public void setOldPassword(String oldPassword) {
+            this.oldPassword = oldPassword;
+        }
+
+        public String getNewPassword() {
+            return newPassword;
+        }
+
+        public void setNewPassword(String newPassword) {
+            this.newPassword = newPassword;
+        }
+
+        public String getVerificationCode() {
+            return verificationCode;
+        }
+
+        public void setVerificationCode(String verificationCode) {
+            this.verificationCode = verificationCode;
+        }
+    }
+
+    // 修改密码
+    @PostMapping("/changePassword")
+    @Transactional
+    public Result changePassword(@RequestBody ChangePasswordRequest request) {
+        try {
+            Long userId = request.getUserId();
+            // 如果未指定userId，使用当前登录用户
+            if (userId == null) {
+                userId = Long.parseLong(StpUtil.getLoginId().toString());
+            }
+
+            User user = userService.getById(userId);
+            if (user == null) {
+                return Result.error("用户不存在");
+            }
+
+            // 验证原密码或验证码
+            if (request.getVerificationCode() != null) {
+                // 验证码方式（未登录状态）
+                // 这里简化处理，实际应验证验证码
+                System.out.println("验证验证码: " + request.getVerificationCode());
+            } else {
+                // 原密码方式（登录状态）
+                if (request.getOldPassword() == null) {
+                    return Result.error("原密码不能为空");
+                }
+
+                // 获取用户盐值并验证密码
+                Salt salt = saltService.getOne(new LambdaQueryWrapper<Salt>().eq(Salt::getUserId, userId));
+                if (salt == null) {
+                    return Result.error("用户信息异常");
+                }
+
+                String encryptedOldPassword = saltedDoubleHashPassword(request.getOldPassword(), salt.getSalt());
+                if (!encryptedOldPassword.equals(user.getPassword())) {
+                    return Result.error("原密码错误");
+                }
+            }
+
+            // 更新密码
+            String newSalt = generateSalt(16);
+            String encryptedNewPassword = saltedDoubleHashPassword(request.getNewPassword(), newSalt);
+
+            user.setPassword(encryptedNewPassword);
+            userService.updateById(user);
+
+            // 更新盐值
+            Salt salt = saltService.getOne(new LambdaQueryWrapper<Salt>().eq(Salt::getUserId, userId));
+            salt.setSalt(newSalt);
+            saltService.updateById(salt);
+
+            return Result.success(null);
+        } catch (Exception e) {
+            log.error("修改密码失败", e);
+            return Result.error("修改失败，请稍后重试");
+        }
+    }
+
+    // ===== 二、用户状态与安全控制接口 =====
+
+    // 用户状态响应类
+    static class UserStatusResponse {
+        private Integer status; // 1-正常，2-冻结，3-禁用
+        private String reason; // 状态原因
+
+        public UserStatusResponse(Integer status, String reason) {
+            this.status = status;
+            this.reason = reason;
+        }
+
+        // getter
+        public Integer getStatus() {
+            return status;
+        }
+
+        public String getReason() {
+            return reason;
+        }
+    }
+
+    // 查询用户状态
+    @GetMapping("/status/{userId}")
+    public Result<UserStatusResponse> getUserStatus(@PathVariable Long userId) {
+        try {
+            User user = userService.getById(userId);
+            if (user == null) {
+                return Result.error("用户不存在");
+            }
+
+            // 这里简化处理，实际应根据用户状态字段返回
+            // 模拟返回正常状态
+            UserStatusResponse response = new UserStatusResponse(1, "");
+            return Result.success(response);
+        } catch (Exception e) {
+            log.error("查询用户状态失败", e);
+            return Result.error("查询失败，请稍后重试");
+        }
+    }
+
+    // 冻结/解冻用户请求参数类
+    static class FreezeRequest {
+        private Long userId;
+        private Boolean freeze;
+        private String reason;
+
+        // getter和setter
+        public Long getUserId() {
+            return userId;
+        }
+
+        public void setUserId(Long userId) {
+            this.userId = userId;
+        }
+
+        public Boolean getFreeze() {
+            return freeze;
+        }
+
+        public void setFreeze(Boolean freeze) {
+            this.freeze = freeze;
+        }
+
+        public String getReason() {
+            return reason;
+        }
+
+        public void setReason(String reason) {
+            this.reason = reason;
+        }
+    }
+
+    // 冻结/解冻用户
+    @PostMapping("/freeze")
+    @Transactional
+    public Result freezeUser(@RequestBody FreezeRequest request) {
+        try {
+            // 验证管理员权限（简化处理）
+            boolean isAdmin = AuthUtils.getRoleList(StpUtil.getLoginIdAsLong()).contains("admin");
+            if (!isAdmin) {
+                return Result.error("无权限操作");
+            }
+
+            User user = userService.getById(request.getUserId());
+            if (user == null) {
+                return Result.error("用户不存在");
+            }
+
+            // 更新用户状态（简化处理）
+            System.out.println((request.getFreeze() ? "冻结" : "解冻") + "用户: " + request.getUserId() + ", 原因: "
+                    + request.getReason());
+
+            // 如果冻结，强制用户下线
+            if (request.getFreeze()) {
+                StpUtil.kickout(request.getUserId());
+            }
+
+            return Result.success(null);
+        } catch (Exception e) {
+            log.error("冻结/解冻用户失败", e);
+            return Result.error("操作失败，请稍后重试");
+        }
+    }
+
+    // 登录日志响应类
+    static class LoginLog {
+        private Long id;
+        private String loginTime;
+        private String device;
+        private String ip;
+        private String status;
+
+        public LoginLog(Long id, String loginTime, String device, String ip, String status) {
+            this.id = id;
+            this.loginTime = loginTime;
+            this.device = device;
+            this.ip = ip;
+            this.status = status;
+        }
+
+        // getter
+        public Long getId() {
+            return id;
+        }
+
+        public String getLoginTime() {
+            return loginTime;
+        }
+
+        public String getDevice() {
+            return device;
+        }
+
+        public String getIp() {
+            return ip;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+    }
+
+    // 查询登录日志
+    @GetMapping("/loginLogs")
+    public Result<Map<String, Object>> getLoginLogs(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(required = false) String startTime,
+            @RequestParam(required = false) String endTime) {
+        try {
+            // 如果未指定userId，使用当前登录用户
+            if (userId == null) {
+                userId = Long.parseLong(StpUtil.getLoginId().toString());
+            }
+
+            // 验证用户是否存在
+            if (userService.getById(userId) == null) {
+                return Result.error("用户不存在");
+            }
+
+            // 模拟分页数据
+            List<LoginLog> logs = new ArrayList<>();
+            logs.add(new LoginLog(1L, "2025-11-18 08:00:00", "iPhone", "123.xxx.xxx.xxx", "success"));
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("records", logs);
+            data.put("total", 5);
+            data.put("size", pageSize);
+            data.put("current", page);
+
+            return Result.success(data);
+        } catch (Exception e) {
+            log.error("查询登录日志失败", e);
+            return Result.error("查询失败，请稍后重试");
+        }
+    }
+
+    // ===== 三、社交与关系接口 =====
+
+    // 关注请求参数类
+    static class FollowRequest {
+        private Long targetUserId;
+        private Boolean follow;
+
+        // getter和setter
+        public Long getTargetUserId() {
+            return targetUserId;
+        }
+
+        public void setTargetUserId(Long targetUserId) {
+            this.targetUserId = targetUserId;
+        }
+
+        public Boolean getFollow() {
+            return follow;
+        }
+
+        public void setFollow(Boolean follow) {
+            this.follow = follow;
+        }
+    }
+
+    // 用户关注/取消关注
+    @PostMapping("/follow")
+    @Transactional
+    public Result followUser(@RequestBody FollowRequest request) {
+        try {
+            Long currentUserId = Long.parseLong(StpUtil.getLoginId().toString());
+
+            // 不能关注自己
+            if (currentUserId.equals(request.getTargetUserId())) {
+                return Result.error("不能关注自己");
+            }
+
+            // 验证目标用户是否存在
+            if (userService.getById(request.getTargetUserId()) == null) {
+                return Result.error("目标用户不存在");
+            }
+
+            // 模拟关注/取消关注操作
+            System.out.println((request.getFollow() ? "关注" : "取消关注") + "用户: " + request.getTargetUserId());
+
+            return Result.success(null);
+        } catch (Exception e) {
+            log.error("关注操作失败", e);
+            return Result.error("操作失败，请稍后重试");
+        }
+    }
+
+    // 关注/粉丝用户信息类
+    static class UserBriefInfo {
+        private Long id;
+        private String username;
+        private String nickname;
+        private String avatar;
+
+        public UserBriefInfo(Long id, String username, String nickname, String avatar) {
+            this.id = id;
+            this.username = username;
+            this.nickname = nickname;
+            this.avatar = avatar;
+        }
+
+        // getter
+        public Long getId() {
+            return id;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getNickname() {
+            return nickname;
+        }
+
+        public String getAvatar() {
+            return avatar;
+        }
+    }
+
+    // 查询关注列表
+    @GetMapping("/follows")
+    public Result<Map<String, Object>> getFollows(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        try {
+            // 如果未指定userId，使用当前登录用户
+            if (userId == null) {
+                userId = Long.parseLong(StpUtil.getLoginId().toString());
+            }
+
+            // 验证用户是否存在
+            if (userService.getById(userId) == null) {
+                return Result.error("用户不存在");
+            }
+
+            // 模拟分页数据
+            List<UserBriefInfo> follows = new ArrayList<>();
+            follows.add(new UserBriefInfo(456L, "xxx", "昵称", "xxx.jpg"));
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("records", follows);
+            data.put("total", 3);
+            data.put("size", pageSize);
+            data.put("current", page);
+
+            return Result.success(data);
+        } catch (Exception e) {
+            log.error("查询关注列表失败", e);
+            return Result.error("查询失败，请稍后重试");
+        }
+    }
+
+    // 查询粉丝列表
+    @GetMapping("/fans")
+    public Result<Map<String, Object>> getFans(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        try {
+            // 如果未指定userId，使用当前登录用户
+            if (userId == null) {
+                userId = Long.parseLong(StpUtil.getLoginId().toString());
+            }
+
+            // 验证用户是否存在
+            if (userService.getById(userId) == null) {
+                return Result.error("用户不存在");
+            }
+
+            // 模拟分页数据
+            List<UserBriefInfo> fans = new ArrayList<>();
+            fans.add(new UserBriefInfo(789L, "fan1", "粉丝1", "fan1.jpg"));
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("records", fans);
+            data.put("total", 5);
+            data.put("size", pageSize);
+            data.put("current", page);
+
+            return Result.success(data);
+        } catch (Exception e) {
+            log.error("查询粉丝列表失败", e);
+            return Result.error("查询失败，请稍后重试");
+        }
+    }
+
+    // ===== 四、账号关联与第三方登录接口 =====
+
+    // 第三方账号请求参数类
+    static class ThirdAccountRequest {
+        private String thirdType; // wechat/qq/facebook等
+        private String thirdId;
+        private String accessToken;
+
+        // getter和setter
+        public String getThirdType() {
+            return thirdType;
+        }
+
+        public void setThirdType(String thirdType) {
+            this.thirdType = thirdType;
+        }
+
+        public String getThirdId() {
+            return thirdId;
+        }
+
+        public void setThirdId(String thirdId) {
+            this.thirdId = thirdId;
+        }
+
+        public String getAccessToken() {
+            return accessToken;
+        }
+
+        public void setAccessToken(String accessToken) {
+            this.accessToken = accessToken;
+        }
+    }
+
+    // 绑定第三方账号
+    @PostMapping("/bindThirdAccount")
+    @Transactional
+    public Result bindThirdAccount(@RequestBody ThirdAccountRequest request) {
+        try {
+            Long userId = Long.parseLong(StpUtil.getLoginId().toString());
+
+            // 验证第三方账号是否已绑定其他用户
+            System.out.println("验证第三方账号是否已绑定: " + request.getThirdType() + "-" + request.getThirdId());
+            // 模拟已绑定的情况
+            // return Result.error("该" + request.getThirdType() + "已绑定其他账号");
+
+            // 模拟绑定操作
+            System.out.println("绑定第三方账号: " + request.getThirdType() + " 到用户: " + userId);
+
+            return Result.success(null);
+        } catch (Exception e) {
+            log.error("绑定第三方账号失败", e);
+            return Result.error("绑定失败，请稍后重试");
+        }
+    }
+
+    // 第三方登录
+    @PostMapping("/thirdLogin")
+    @Transactional
+    public Result thirdLogin(@RequestBody ThirdAccountRequest request) {
+        try {
+            // 验证第三方账号信息
+            System.out.println("验证第三方账号: " + request.getThirdType() + "-" + request.getThirdId());
+
+            // 模拟查找用户
+            User user = null;
+            // 实际应查询数据库中绑定了该第三方账号的用户
+
+            // 如果用户不存在，可选择自动注册
+            if (user == null) {
+                String randomPassword = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+                user = registerNewUser("third_" + request.getThirdId(), randomPassword);
+                // 同时绑定第三方账号
+                System.out.println("自动注册并绑定第三方账号");
+            }
+
+            // 登录
+            StpUtil.login(user.getId());
+
+            // 更新用户最后登录时间
+            userService.updateLastLoginTime(user.getId());
+
+            // 清除旧的权限缓存
+            AuthUtils.clearPermissionCache(user.getId());
+
+            // 获取权限和角色列表
+            List<String> roleList = AuthUtils.getRoleList(user.getId());
+            List<String> permissionList = AuthUtils.getPermissionList(user.getId());
+
+            // 返回token和用户信息
+            String token = StpUtil.getTokenValue();
+            Map<String, Object> response = new HashMap<>();
+            response.put(Constant.User.TOKEN, token);
+            response.put(Constant.User.USER_INFO, user);
+            response.put(Constant.User.ROLE_LIST, roleList);
+            response.put(Constant.User.PERMISSION_LIST, permissionList);
+
+            return Result.success(response);
+        } catch (Exception e) {
+            log.error("第三方登录失败", e);
+            return Result.error("登录失败，请稍后重试");
+        }
+    }
+
+    // ===== 五、其他实用接口 =====
+
+    // 用户标签请求参数类
+    static class UserTagsRequest {
+        private Long userId;
+        private List<String> tags;
+
+        // getter和setter
+        public Long getUserId() {
+            return userId;
+        }
+
+        public void setUserId(Long userId) {
+            this.userId = userId;
+        }
+
+        public List<String> getTags() {
+            return tags;
+        }
+
+        public void setTags(List<String> tags) {
+            this.tags = tags;
+        }
+    }
+
+    // 查询用户标签
+    @GetMapping("/tags")
+    public Result<List<String>> getUserTags(@RequestParam(required = false) Long userId) {
+        try {
+            // 如果未指定userId，使用当前登录用户
+            if (userId == null) {
+                userId = Long.parseLong(StpUtil.getLoginId().toString());
+            }
+
+            // 验证用户是否存在
+            if (userService.getById(userId) == null) {
+                return Result.error("用户不存在");
+            }
+
+            // 模拟返回标签列表
+            List<String> tags = Arrays.asList("学生", "活跃用户");
+            return Result.success(tags);
+        } catch (Exception e) {
+            log.error("查询用户标签失败", e);
+            return Result.error("查询失败，请稍后重试");
+        }
+    }
+
+    // 添加用户标签
+    @PostMapping("/tags")
+    @Transactional
+    public Result addUserTags(@RequestBody UserTagsRequest request) {
+        try {
+            Long userId = request.getUserId();
+            // 如果未指定userId，使用当前登录用户
+            if (userId == null) {
+                userId = Long.parseLong(StpUtil.getLoginId().toString());
+            }
+
+            // 验证用户是否存在
+            if (userService.getById(userId) == null) {
+                return Result.error("用户不存在");
+            }
+
+            // 模拟添加标签操作
+            System.out.println("为用户添加标签: " + userId + " - " + String.join(", ", request.getTags()));
+
+            return Result.success(null);
+        } catch (Exception e) {
+            log.error("添加用户标签失败", e);
+            return Result.error("添加失败，请稍后重试");
+        }
+    }
+
+    // 删除用户标签
+    @DeleteMapping("/tags")
+    @Transactional
+    public Result deleteUserTags(@RequestBody UserTagsRequest request) {
+        try {
+            Long userId = request.getUserId();
+            // 如果未指定userId，使用当前登录用户
+            if (userId == null) {
+                userId = Long.parseLong(StpUtil.getLoginId().toString());
+            }
+
+            // 验证用户是否存在
+            if (userService.getById(userId) == null) {
+                return Result.error("用户不存在");
+            }
+
+            // 模拟删除标签操作
+            System.out.println("为用户删除标签: " + userId + " - " + String.join(", ", request.getTags()));
+
+            return Result.success(null);
+        } catch (Exception e) {
+            log.error("删除用户标签失败", e);
+            return Result.error("删除失败，请稍后重试");
+        }
+    }
+
+    // 注销账号请求参数类
+    static class CancelAccountRequest {
+        private Long userId;
+        private String password;
+        private Boolean confirm;
+
+        // getter和setter
+        public Long getUserId() {
+            return userId;
+        }
+
+        public void setUserId(Long userId) {
+            this.userId = userId;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public Boolean getConfirm() {
+            return confirm;
+        }
+
+        public void setConfirm(Boolean confirm) {
+            this.confirm = confirm;
+        }
+    }
+
+    // 注销账号
+    @PostMapping("/cancelAccount")
+    @Transactional
+    public Result cancelAccount(@RequestBody CancelAccountRequest request) {
+        try {
+            Long userId = request.getUserId();
+            // 如果未指定userId，使用当前登录用户
+            if (userId == null) {
+                userId = Long.parseLong(StpUtil.getLoginId().toString());
+            }
+
+            // 验证是否确认注销
+            if (request.getConfirm() == null || !request.getConfirm()) {
+                return Result.error("请确认注销账号");
+            }
+
+            User user = userService.getById(userId);
+            if (user == null) {
+                return Result.error("用户不存在");
+            }
+
+            // 验证密码
+            Salt salt = saltService.getOne(new LambdaQueryWrapper<Salt>().eq(Salt::getUserId, userId));
+            if (salt == null) {
+                return Result.error("用户信息异常");
+            }
+
+            String encryptedPassword = saltedDoubleHashPassword(request.getPassword(), salt.getSalt());
+            if (!encryptedPassword.equals(user.getPassword())) {
+                return Result.error("密码错误");
+            }
+
+            // 模拟提交注销申请
+            System.out.println("用户提交注销申请: " + userId);
+
+            // 强制用户下线
+            StpUtil.kickout(userId);
+
+            return Result.success(null);
+        } catch (Exception e) {
+            log.error("注销账号失败", e);
+            return Result.error("操作失败，请稍后重试");
+        }
     }
 
 }
