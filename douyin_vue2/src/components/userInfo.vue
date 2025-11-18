@@ -133,6 +133,9 @@ export default {
   width: 70%;
   height: 60%;
   font-size: 60%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .status {

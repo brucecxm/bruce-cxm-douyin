@@ -132,6 +132,7 @@ import HorizontalScrollList from '@/components/HorizontalScrollList.vue';
 import UserInfo from '../../components/userInfo.vue';
 import caidan from '@/components/caidan.vue';
 import footerVue from '@/components/footer.vue';
+import { getFriendApi } from '@/api/user.js';
 
 export default {
   components: {
@@ -251,6 +252,28 @@ export default {
         this.othercss.right = '0vw';
       }
     },
+    
+    async fetchFriendInfos() {
+      try {
+        const response = await getFriendApi();
+        // 检查响应数据是否存在且有效
+        if (response && response.data && Array.isArray(response.data)) {
+          // 将朋友数据转换为topUsers所需的格式
+          this.topUsers = response.data.map(friend => ({
+            name: friend.nickname || friend.username || '未知用户',
+            avatar: friend.avatar || '默认头像地址',
+            heat: Math.floor(Math.random() * 100) // 可以根据实际需求设置热度值
+          }));
+          console.log('朋友列表加载成功:', this.topUsers);
+        } else {
+          console.error('朋友列表数据格式错误:', response);
+          // 保留默认数据作为备用
+        }
+      } catch (error) {
+        console.error('加载朋友列表失败:', error);
+        // 保留默认数据作为备用
+      }
+    },
 
     async fetchUserInfos() {
       if (this.loading || !this.hasMore) return;
@@ -318,22 +341,10 @@ export default {
       try {
         // 为每个图标添加ID以便更精确地选择
         const iconElements = [
-          {
-            selector: '.left-icon-1',
-            path: '/src/assets/xiaoxi/header/xiaoxi_add.png'
-          },
-          {
-            selector: '.left-icon-2',
-            path: '/src/assets/xiaoxi/header/xiaoxi_hongbao.png'
-          },
-          {
-            selector: '.right-icon-1',
-            path: '/src/assets/xiaoxi/header/xiaoxi_menu.png'
-          },
-          {
-            selector: '.right-icon-2',
-            path: '/src/assets/xiaoxi/header/xiaoxi_search.png'
-          }
+          { selector: '.left-icon-1', path: '/src/assets/xiaoxi/header/xiaoxi_add.png' },
+          { selector: '.left-icon-2', path: '/src/assets/xiaoxi/header/xiaoxi_hongbao.png' },
+          { selector: '.right-icon-1', path: '/src/assets/xiaoxi/header/xiaoxi_menu.png' },
+          { selector: '.right-icon-2', path: '/src/assets/xiaoxi/header/xiaoxi_search.png' }
         ];
 
         iconElements.forEach((icon) => {
@@ -357,6 +368,9 @@ export default {
       }
     });
 
+    // 获取朋友列表数据
+    this.fetchFriendInfos();
+    // 获取用户信息数据
     this.fetchUserInfos();
 
     // 确保容器存在再添加事件监听
