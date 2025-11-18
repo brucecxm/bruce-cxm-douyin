@@ -54,7 +54,7 @@ spring:
 minio:
   accessKey: minio
   secretKey: minio123
-  bucket: leadnews
+  bucket: douyin
   endpoint: http://1.94.131.16:9000
   readPath: http://1.94.131.16:9000
 

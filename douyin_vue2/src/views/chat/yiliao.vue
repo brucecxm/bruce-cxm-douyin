@@ -23,6 +23,15 @@
               查看原图
             </button>
           </div>
+          <div v-else-if="msg.type === 'video'" class="video-content">
+            <video
+              :src="msg.content"
+              alt="聊天视频"
+              class="chat-video"
+              controls
+              preload="metadata"
+            ></video>
+          </div>
           <div class="time">{{ formatTime(msg.timestamp) }}</div>
         </div>
       </div>
@@ -39,12 +48,12 @@
       ></textarea>
       <input
         type="file"
-        accept="image/*"
+        accept="image/*,video/*"
         ref="fileInput"
         style="display: none"
         @change="handleFileChange"
       />
-      <button @click="triggerFileInput" class="image-button">📷</button>
+      <button @click="triggerFileInput" class="image-button">📎</button>
       <button @click="sendText" :disabled="!text.trim()">发送</button>
     </div>
   </div>
@@ -148,41 +157,106 @@ export default {
     },
     handleFileChange(e) {
       const file = e.target.files[0];
-      if (file && file.type.startsWith('image/')) {
-        this.uploadImage(file);
+      if (!file) return;
+
+      // 根据文件类型选择不同的上传方法
+      if (file.type.startsWith('image/')) {
+        this.uploadFile(file, 'image');
+      } else if (file.type.startsWith('video/')) {
+        this.uploadFile(file, 'video');
+      } else {
+        this.$message.warning('暂不支持上传此类文件');
       }
+
       // 清空input，以便可以重复选择同一文件
       this.$refs.fileInput.value = '';
     },
-    uploadImage(file) {
-      console.log('开始上传图片到文件服务器:', file.name);
+    async uploadFile(file, fileType) {
+      try {
+        console.log(
+          `开始上传${fileType === 'image' ? '图片' : '视频'}到文件服务器:`,
+          file.name
+        );
 
-      // 模拟上传过程，实际项目中应该调用文件上传接口
-      // 这里使用一个假的上传进度模拟
-      const uploadProgress = setInterval(() => {
-        console.log('上传中...');
-      }, 1000);
+        // 显示上传中状态
+        const uploadMessage = {
+          sender: this.myId,
+          receiver: this.receiver,
+          content: `正在上传${fileType === 'image' ? '图片' : '视频'}...`,
+          type: 'uploading',
+          tempId: Date.now(),
+          timestamp: Date.now()
+        };
+        this.messages.push(uploadMessage);
+        this.scrollToBottom();
 
-      // 模拟上传完成，获取文件服务器的链接
-      setTimeout(() => {
-        clearInterval(uploadProgress);
+        // 创建FormData对象
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append(
+          'prefix',
+          fileType === 'image' ? 'chat_images' : 'chat_videos'
+        );
 
-        // 模拟获取到的文件服务器链接
-        const imageUrl = `https://example.com/files/${Date.now()}-${file.name}`; // 原图链接
-        const thumbnailUrl = `https://example.com/files/thumbnail/${Date.now()}-${file.name}`; // 缩略图链接
+        // 根据文件类型选择不同的上传接口，使用完整URL
+        const baseUrl = 'http://localhost:9522';
+        const url =
+          fileType === 'image'
+            ? `${baseUrl}/file/upload/image`
+            : `${baseUrl}/file/upload/video`;
 
-        console.log('图片上传完成，文件服务器链接:', imageUrl);
-        console.log('缩略图链接:', thumbnailUrl);
+        // 调用后端接口上传文件
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            // 注意：Content-Type由浏览器自动设置为multipart/form-data
+            Authorization: localStorage.getItem('token') || '' // 如果需要认证
+          },
+          body: formData
+        });
 
-        this.sendImageMessage(imageUrl, thumbnailUrl);
-      }, 2000);
+        if (!response.ok) {
+          throw new Error(`上传失败: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        // 移除上传中消息
+        const index = this.messages.findIndex(
+          (msg) => msg.tempId === uploadMessage.tempId
+        );
+        if (index > -1) {
+          this.messages.splice(index, 1);
+        }
+
+        if (result.success && result.fileUrl) {
+          if (fileType === 'image') {
+            this.sendImageMessage(result.fileUrl);
+          } else {
+            this.sendVideoMessage(result.fileUrl);
+          }
+        } else {
+          throw new Error(result.message || '上传失败');
+        }
+      } catch (error) {
+        console.error('文件上传失败:', error);
+        this.$message.error(`文件上传失败: ${error.message}`);
+
+        // 移除上传中消息
+        const index = this.messages.findIndex(
+          (msg) => msg.type === 'uploading' && msg.sender === this.myId
+        );
+        if (index > -1) {
+          this.messages.splice(index, 1);
+        }
+      }
     },
-    sendImageMessage(imageUrl, thumbnailUrl) {
+    sendImageMessage(imageUrl) {
       const msg = {
         sender: this.myId,
         receiver: this.receiver,
-        content: imageUrl, // 存储原图链接
-        thumbnailUrl: thumbnailUrl, // 存储缩略图链接
+        content: imageUrl, // 原图链接
+        thumbnailUrl: imageUrl, // 暂时使用原图作为缩略图
         type: 'image',
         timestamp: Date.now()
       };
@@ -191,64 +265,21 @@ export default {
       this.messages.push(msg); // 立即显示发送的图片消息
       this.scrollToBottom();
     },
-    viewOriginalImage(msg) {
-      console.log('查看原图:', msg.content);
-      // 实际项目中可以打开一个模态框显示原图
-      // 这里简单地在新标签页中打开图片
-      window.open(msg.content, '_blank');
-    },
-    triggerFileInput() {
-      this.$refs.fileInput.click();
-    },
-    handleFileChange(e) {
-      const file = e.target.files[0];
-      if (file && file.type.startsWith('image/')) {
-        this.uploadImage(file);
-      }
-      // 清空input，以便可以重复选择同一文件
-      this.$refs.fileInput.value = '';
-    },
-    uploadImage(file) {
-      console.log('开始上传图片到文件服务器:', file.name);
-
-      // 模拟上传过程，实际项目中应该调用文件上传接口
-      // 这里使用一个假的上传进度模拟
-      const uploadProgress = setInterval(() => {
-        console.log('上传中...');
-      }, 1000);
-
-      // 模拟上传完成，获取文件服务器的链接
-      setTimeout(() => {
-        clearInterval(uploadProgress);
-
-        // 模拟获取到的文件服务器链接
-        const imageUrl = `https://example.com/files/${Date.now()}-${file.name}`; // 原图链接
-        const thumbnailUrl = `https://example.com/files/thumbnail/${Date.now()}-${file.name}`; // 缩略图链接
-
-        console.log('图片上传完成，文件服务器链接:', imageUrl);
-        console.log('缩略图链接:', thumbnailUrl);
-
-        this.sendImageMessage(imageUrl, thumbnailUrl);
-      }, 2000);
-    },
-    sendImageMessage(imageUrl, thumbnailUrl) {
+    sendVideoMessage(videoUrl) {
       const msg = {
         sender: this.myId,
         receiver: this.receiver,
-        content: imageUrl, // 存储原图链接
-        thumbnailUrl: thumbnailUrl, // 存储缩略图链接
-        type: 'image',
+        content: videoUrl,
+        type: 'video',
         timestamp: Date.now()
       };
 
       this.stompClient.send('/app/private-chat', {}, JSON.stringify(msg));
-      this.messages.push(msg); // 立即显示发送的图片消息
+      this.messages.push(msg); // 立即显示发送的视频消息
       this.scrollToBottom();
     },
     viewOriginalImage(msg) {
       console.log('查看原图:', msg.content);
-      // 实际项目中可以打开一个模态框显示原图
-      // 这里简单地在新标签页中打开图片
       window.open(msg.content, '_blank');
     },
     scrollToBottom() {
@@ -407,6 +438,18 @@ button:not(:disabled):hover {
 }
 .image-button:hover {
   background-color: #e0e0e0;
+}
+.video-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.chat-video {
+  max-width: 250px;
+  max-height: 300px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 .image-content {
   display: flex;
