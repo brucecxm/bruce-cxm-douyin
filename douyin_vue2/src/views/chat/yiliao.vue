@@ -10,7 +10,19 @@
       >
         <img class="avatar" :src="getAvatar(msg.sender)" alt="avatar" />
         <div class="message-bubble">
-          <div class="content">{{ msg.content }}</div>
+          <div class="content" v-if="msg.type === 'text' || !msg.type">
+            {{ msg.content }}
+          </div>
+          <div v-else-if="msg.type === 'image'" class="image-content">
+            <img
+              :src="msg.thumbnailUrl || msg.content"
+              alt="聊天图片"
+              class="chat-image"
+            />
+            <button @click="viewOriginalImage(msg)" class="view-original-btn">
+              查看原图
+            </button>
+          </div>
           <div class="time">{{ formatTime(msg.timestamp) }}</div>
         </div>
       </div>
@@ -25,6 +37,14 @@
         rows="1"
         ref="input"
       ></textarea>
+      <input
+        type="file"
+        accept="image/*"
+        ref="fileInput"
+        style="display: none"
+        @change="handleFileChange"
+      />
+      <button @click="triggerFileInput" class="image-button">📷</button>
       <button @click="sendText" :disabled="!text.trim()">发送</button>
     </div>
   </div>
@@ -122,6 +142,114 @@ export default {
       this.text = '';
       this.scrollToBottom();
       this.$refs.input.style.height = 'auto'; // 重置textarea高度
+    },
+    triggerFileInput() {
+      this.$refs.fileInput.click();
+    },
+    handleFileChange(e) {
+      const file = e.target.files[0];
+      if (file && file.type.startsWith('image/')) {
+        this.uploadImage(file);
+      }
+      // 清空input，以便可以重复选择同一文件
+      this.$refs.fileInput.value = '';
+    },
+    uploadImage(file) {
+      console.log('开始上传图片到文件服务器:', file.name);
+
+      // 模拟上传过程，实际项目中应该调用文件上传接口
+      // 这里使用一个假的上传进度模拟
+      const uploadProgress = setInterval(() => {
+        console.log('上传中...');
+      }, 1000);
+
+      // 模拟上传完成，获取文件服务器的链接
+      setTimeout(() => {
+        clearInterval(uploadProgress);
+
+        // 模拟获取到的文件服务器链接
+        const imageUrl = `https://example.com/files/${Date.now()}-${file.name}`; // 原图链接
+        const thumbnailUrl = `https://example.com/files/thumbnail/${Date.now()}-${file.name}`; // 缩略图链接
+
+        console.log('图片上传完成，文件服务器链接:', imageUrl);
+        console.log('缩略图链接:', thumbnailUrl);
+
+        this.sendImageMessage(imageUrl, thumbnailUrl);
+      }, 2000);
+    },
+    sendImageMessage(imageUrl, thumbnailUrl) {
+      const msg = {
+        sender: this.myId,
+        receiver: this.receiver,
+        content: imageUrl, // 存储原图链接
+        thumbnailUrl: thumbnailUrl, // 存储缩略图链接
+        type: 'image',
+        timestamp: Date.now()
+      };
+
+      this.stompClient.send('/app/private-chat', {}, JSON.stringify(msg));
+      this.messages.push(msg); // 立即显示发送的图片消息
+      this.scrollToBottom();
+    },
+    viewOriginalImage(msg) {
+      console.log('查看原图:', msg.content);
+      // 实际项目中可以打开一个模态框显示原图
+      // 这里简单地在新标签页中打开图片
+      window.open(msg.content, '_blank');
+    },
+    triggerFileInput() {
+      this.$refs.fileInput.click();
+    },
+    handleFileChange(e) {
+      const file = e.target.files[0];
+      if (file && file.type.startsWith('image/')) {
+        this.uploadImage(file);
+      }
+      // 清空input，以便可以重复选择同一文件
+      this.$refs.fileInput.value = '';
+    },
+    uploadImage(file) {
+      console.log('开始上传图片到文件服务器:', file.name);
+
+      // 模拟上传过程，实际项目中应该调用文件上传接口
+      // 这里使用一个假的上传进度模拟
+      const uploadProgress = setInterval(() => {
+        console.log('上传中...');
+      }, 1000);
+
+      // 模拟上传完成，获取文件服务器的链接
+      setTimeout(() => {
+        clearInterval(uploadProgress);
+
+        // 模拟获取到的文件服务器链接
+        const imageUrl = `https://example.com/files/${Date.now()}-${file.name}`; // 原图链接
+        const thumbnailUrl = `https://example.com/files/thumbnail/${Date.now()}-${file.name}`; // 缩略图链接
+
+        console.log('图片上传完成，文件服务器链接:', imageUrl);
+        console.log('缩略图链接:', thumbnailUrl);
+
+        this.sendImageMessage(imageUrl, thumbnailUrl);
+      }, 2000);
+    },
+    sendImageMessage(imageUrl, thumbnailUrl) {
+      const msg = {
+        sender: this.myId,
+        receiver: this.receiver,
+        content: imageUrl, // 存储原图链接
+        thumbnailUrl: thumbnailUrl, // 存储缩略图链接
+        type: 'image',
+        timestamp: Date.now()
+      };
+
+      this.stompClient.send('/app/private-chat', {}, JSON.stringify(msg));
+      this.messages.push(msg); // 立即显示发送的图片消息
+      this.scrollToBottom();
+    },
+    viewOriginalImage(msg) {
+      console.log('查看原图:', msg.content);
+      // 实际项目中可以打开一个模态框显示原图
+      // 这里简单地在新标签页中打开图片
+      window.open(msg.content, '_blank');
     },
     scrollToBottom() {
       this.$nextTick(() => {
@@ -270,6 +398,76 @@ button:disabled {
 
 button:not(:disabled):hover {
   background-color: #059e4a;
+}
+.image-button {
+  padding: 0 10px;
+  background-color: #f0f0f0;
+  color: #333;
+  font-size: 20px;
+}
+.image-button:hover {
+  background-color: #e0e0e0;
+}
+.image-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.chat-image {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.chat-image:hover {
+  transform: scale(1.05);
+}
+.view-original-btn {
+  padding: 2px 8px;
+  font-size: 12px;
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #666;
+  border-radius: 10px;
+}
+.view-original-btn:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.image-button {
+  padding: 0 10px;
+  background-color: #f0f0f0;
+  color: #333;
+  font-size: 20px;
+}
+.image-button:hover {
+  background-color: #e0e0e0;
+}
+.image-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.chat-image {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.chat-image:hover {
+  transform: scale(1.05);
+}
+.view-original-btn {
+  padding: 2px 8px;
+  font-size: 12px;
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #666;
+  border-radius: 10px;
+}
+.view-original-btn:hover {
+  background-color: rgba(0, 0, 0, 0.2);
 }
 .chat-header {
   display: flex;

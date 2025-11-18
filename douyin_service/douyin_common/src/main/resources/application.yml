@@ -1,0 +1,67 @@
+spring:
+  mail:
+    host: smtp.qq.com              # QQ ???????
+    port: 587                       # QQ ????????587 ?? TLS?
+    username: 2168356558@qq.com  # ????? QQ ????
+    password: uqntyoshsokbecic # QQ ?????????????
+    properties:
+      mail.smtp.auth: true           # ?? SMTP ????
+      mail.smtp.starttls.enable: true # ?? TLS
+  rabbitmq:
+    host: 1.94.131.16
+    port: 5672
+    username: itcast
+    password: 123321
+    virtual-host: / # ????
+    #开启手动确认是否消息消费成功
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 100
+  application:
+    name: DouyinVideoService
+
+  datasource:
+    # 显式指定Druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    username: remote_user
+    password: bruce_CXM_123
+    url: jdbc:mysql://1.94.131.16:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+    # Druid专属配置
+    druid:
+      initial-size: 5        # 初始连接数
+      max-active: 20         # 最大连接数
+      min-idle: 5            # 最小空闲连接数
+      max-wait: 60000        # 获取连接的最大等待时间（毫秒）
+      # 可选：配置监控、过滤等功能
+      filters: stat,wall,slf4j  # 统计、防SQL注入、日志过滤器
+      web-stat-filter:
+        enabled: true
+      stat-view-servlet:
+        enabled: true
+        login-username: admin  # 监控页登录用户名
+        login-password: admin  # 监控页登录密码
+
+
+
+  redis:
+    host: 1.94.131.16  # Redis 服务器的主机地址
+    port: 6379  # Redis 服务器的端口号
+    password:  # Redis 密码（如果没有可以留空）
+    database: 0  # Redis 数据库索引
+
+
+minio:
+  accessKey: minio
+  secretKey: minio123
+  bucket: leadnews
+  endpoint: http://1.94.131.16:9000
+  readPath: http://1.94.131.16:9000
+
+
+server:
+  port: 9522
+eureka:
+  client:
+    service-url:
+      defaultZone: http://1.94.131.16:10086/eureka
