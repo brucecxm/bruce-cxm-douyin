@@ -18,15 +18,14 @@ export const userRegisterService = (registerData) => {
   });
 };
 
-export const getUserInfo = (Data) => {
-  //对于get请求 默认用url形式传参数
-  //对于get请求 默认用url形式传参数
-  //对于get请求 默认用url形式传参数
-  const params = new URLSearchParams();
-  for (let key in Data) {
-    params.append(key, Data[key]);
-  }
-  return request.get('/user/userInfo', params);
+export const getUserInfo = (userId, page, pageSize) => {
+  //构建参数对象
+  const params = {
+    userId: userId,
+    page: page,
+    pageSize: pageSize
+  };
+  return request.get('/user/userInfo', { params });
 };
 
 //提供调用登录接口的函数

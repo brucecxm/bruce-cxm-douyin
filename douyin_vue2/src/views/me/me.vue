@@ -185,6 +185,7 @@ export default {
     }
   },
   mounted() {
+    console.log('MePage mounted');
     this.loadInitialData();
   },
   methods: {
@@ -215,16 +216,13 @@ export default {
 
     // 获取用户信息和视频数据
     fetchUserAndVideosData(page) {
-      // 避免重复加载
-      if (this.loading) return;
-
       getUserInfo(null, page, this.pageSize)
         .then((res) => {
           if (res && res.data) {
             // 只在第一页赋值用户信息
             if (page === 1) {
               // 避免不必要的更新导致的重渲染
-              const newUserInfo = res.data.userInfo || {};
+              const newUserInfo = res.data || {};
               // 只有当数据发生变化时才更新
               if (
                 JSON.stringify(newUserInfo) !== JSON.stringify(this.userInfo)
@@ -234,7 +232,7 @@ export default {
             }
 
             // 处理视频数据
-            const videos = res.data.videobox || [];
+            const videos = res.data.videoPage.records || [];
             const total = res.data.total || 0;
 
             if (page === 1) {

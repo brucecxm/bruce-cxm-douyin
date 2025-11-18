@@ -9,7 +9,9 @@ import com.bruce.service.UserRelationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user/relation")
@@ -50,7 +52,7 @@ public class UserRelationController {
     public R<String> unblock(@RequestParam Long targetUserId) {
         Long userId = StpUtil.getLoginIdAsLong();
         relationService.unblock(userId, targetUserId);
-        return R.ok("已拉黑");
+        return R.ok("已取消拉黑");
     }
 
     @GetMapping("/canChat")
@@ -122,6 +124,24 @@ public class UserRelationController {
     public R<String> relationWith(@RequestParam Long targetUserId) {
         Long userId = StpUtil.getLoginIdAsLong();
         return R.ok(relationService.getRelationType(userId, targetUserId));
+    }
+
+    // 获取用户关系详细状态
+    @GetMapping("/status")
+    public R<Map<String, Boolean>> getRelationStatus(@RequestParam Long targetUserId) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        Map<String, Boolean> status = new HashMap<>();
+        // 检查是否关注对方
+//        status.put("followed", relationService.isFollowing(userId, targetUserId));
+        // 检查对方是否关注自己
+//        status.put("fan", relationService.isFollowing(targetUserId, userId));
+        // 检查是否互相关注
+        status.put("mutual", status.get("followed") && status.get("fan"));
+        // 检查是否拉黑
+//        status.put("blocked", relationService.isBlocked(userId, targetUserId));
+        // 检查是否密友
+//        status.put("bestFriend", relationService.isBestFriend(userId, targetUserId));
+        return R.ok(status);
     }
 
 }
