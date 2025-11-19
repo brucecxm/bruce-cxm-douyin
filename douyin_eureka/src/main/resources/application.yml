@@ -1,9 +1,37 @@
 server:
-  port: 10086
+  port: 8080
+  servlet:
+    context-path: /
 spring:
-  profiles:
-    active: dev  # 生产环境
   application:
-    name: eureka-server
+    name: spring-boot-admin-server
+  boot:
+    admin:
+      context-path: /admin  # 设置Spring Boot Admin的上下文路径
+
+# Spring Boot Admin服务器配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+    info:
+      enabled: true
+    metrics:
+      enabled: true
+
+# Eureka服务器配置
+eureka:
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+  server:
+    enableSelfPreservation: false
+    # 设置Eureka控制台路径，避免与Admin冲突
+    path: /eureka
 
 

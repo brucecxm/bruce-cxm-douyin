@@ -4,3 +4,20 @@ eureka:
   client:
     service-url:
       defaultZone: http://127.0.0.1:10086/eureka
+
+# Spring Boot Admin 客户端配置
+spring:
+  boot:
+    admin:
+      client:
+        url: http://localhost:8080  # Admin 服务端地址
+
+# Actuator 配置（生产环境更安全的配置）
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,prometheus"  # 生产环境仅暴露必要端点
+  endpoint:
+    health:
+      show-details: when_authorized  # 仅授权用户显示健康状态详情
