@@ -80,7 +80,7 @@ export default defineConfig(({ mode }) => {
         ...commonConfig.server,
         proxy: {
           '/api': {
-            target: 'http://localhost:7456',
+            target: 'http://localhost:9430',
             // target: 'https://116.196.98.171:9430',
             changeOrigin: true,
             ws: true, // ✅ 加上这行支持 WebSocket 代理
@@ -131,7 +131,7 @@ export default defineConfig(({ mode }) => {
         ...commonConfig.server,
         proxy: {
           '/api': {
-            target: 'http://localhost:7456',
+            target: 'http://localhost:9430',
             changeOrigin: true,
             rewrite: (path) => path.replace(/^\/api/, ''),
             logLevel: 'info'
