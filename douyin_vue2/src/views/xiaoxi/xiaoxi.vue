@@ -38,6 +38,7 @@
               border: '2px solid #1890ff',
               borderRadius: '30px' // 改为方形
             }"
+            @user-click="handleUserClick"
           />
           <!-- <el-input
             v-model="input"
@@ -337,7 +338,6 @@ export default {
 
     // 处理用户点击事件，跳转到聊天界面
     handleUserClick(user) {
-      debugger;
       console.log('User clicked in xiaoxi.vue:', user);
       // 检查用户对象是否存在
       if (!user) {
@@ -345,8 +345,8 @@ export default {
         return;
       }
 
-      // 检查用户对象中是否包含userId或id字段，如果没有则使用username作为临时标识
-      const friendId = user.userId || user.id || user.username || '';
+      // 检查用户对象中是否包含userId、id、username或name字段作为标识
+      const friendId = user.userId || user.id || user.username || user.name || '';
       if (friendId) {
         console.log('Navigating to chat with ID:', friendId);
         // 跳转到聊天界面，传递好友id参数

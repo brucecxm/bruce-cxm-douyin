@@ -1,7 +1,7 @@
 <template>
   <div class="scroll-container" :style="containerStyle">
     <div class="scroll-content" :style="contentStyle">
-      <div class="user-item" v-for="(user, index) in users" :key="index" :style="getUserItemStyle(user, index)">
+      <div class="user-item" v-for="(user, index) in users" :key="index" :style="getUserItemStyle(user, index)" @click="handleUserClick(user, index)">
         <img :src="user.avatar" class="avatar" :style="avatarStyle" />
         <div class="name" :style="nameStyle">{{ user.name }}</div>
         <div v-if="user.heat" class="heat" :style="heatStyle">🔥 {{ user.heat }}</div>
@@ -49,6 +49,10 @@ export default {
         return this.userItemStyle(user, index);
       }
       return this.userItemStyle;
+    },
+    handleUserClick(user, index) {
+      // 触发自定义事件，将用户数据传递给父组件
+      this.$emit('user-click', user, index);
     }
   }
 };
@@ -79,6 +83,12 @@ export default {
   align-items: center;
   margin-right: 16px;
   width: 64px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.user-item:hover {
+  transform: scale(1.05);
 }
 
 .avatar {
