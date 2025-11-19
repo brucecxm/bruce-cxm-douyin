@@ -2,12 +2,11 @@
   "name": "douyin_vue",
   "version": "0.0.0",
   "scripts": {
-    "dev": "rd /s /q node_modules\\.vite 2>nul || echo Cache directory doesn't exist && vite",
-    "build": "rd /s /q node_modules\\.vite 2>nul || echo Cache directory doesn't exist && node --max-old-space-size=1024 ./node_modules/vite/bin/vite.js build",
-    "build:prod": "rd /s /q node_modules\\.vite 2>nul || echo Cache directory doesn't exist && node --max-old-space-size=1024 ./node_modules/vite/bin/vite.js build --mode production",
-    "build:dev": "rd /s /q node_modules\\.vite 2>nul || echo Cache directory doesn't exist && node --max-old-space-size=1024 ./node_modules/vite/bin/vite.js build --mode development",
-    "preview": "vite preview --port 4173",
-    "build-only": "rd /s /q node_modules\\.vite 2>nul || echo Cache directory doesn't exist && node --max-old-space-size=1024 ./node_modules/vite/bin/vite.js build",
+    "dev": "node -e \"const fs = require('fs'); const path = require('path'); const viteCacheDir = path.join('node_modules', '.vite'); if (fs.existsSync(viteCacheDir)) { fs.rmdirSync(viteCacheDir, { recursive: true }); console.log('Cache directory removed'); } else { console.log('Cache directory does\\'t exist'); }\" && vite",
+    "build": "node -e \"const fs = require('fs'); const path = require('path'); const viteCacheDir = path.join('node_modules', '.vite'); if (fs.existsSync(viteCacheDir)) { fs.rmdirSync(viteCacheDir, { recursive: true }); console.log('Cache directory removed'); } else { console.log('Cache directory does\\'t exist'); }\" && node --max-old-space-size=4096 ./node_modules/vite/bin/vite.js build",
+    "build:prod": "node -e \"const fs = require('fs'); const path = require('path'); const viteCacheDir = path.join('node_modules', '.vite'); if (fs.existsSync(viteCacheDir)) { fs.rmdirSync(viteCacheDir, { recursive: true }); console.log('Cache directory removed'); } else { console.log('Cache directory does\\'t exist'); }\" && node --max-old-space-size=4096 ./node_modules/vite/bin/vite.js build --mode production",
+    "build:dev": "node -e \"const fs = require('fs'); const path = require('path'); const viteCacheDir = path.join('node_modules', '.vite'); if (fs.existsSync(viteCacheDir)) { fs.rmdirSync(viteCacheDir, { recursive: true }); console.log('Cache directory removed'); } else { console.log('Cache directory does\\'t exist'); }\" && node --max-old-space-size=4096 ./node_modules/vite/bin/vite.js build --mode development",
+    "build-only": "node -e \"const fs = require('fs'); const path = require('path'); const viteCacheDir = path.join('node_modules', '.vite'); if (fs.existsSync(viteCacheDir)) { fs.rmdirSync(viteCacheDir, { recursive: true }); console.log('Cache directory removed'); } else { console.log('Cache directory does\\'t exist'); }\" && node --max-old-space-size=4096 ./node_modules/vite/bin/vite.js build",
     "lint": "eslint --fix src/**/*.{js,vue}",
     "lintvue": "eslint src/**/*.{js,vue}",
     "format": "prettier --write src/**/*.{js,vue,ts,json,css,scss,html}"
