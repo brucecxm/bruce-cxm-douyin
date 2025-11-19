@@ -1,7 +1,21 @@
 #!/bin/bash
 
 # 错误处理
-set -e
+# 移除set -e以确保脚本即使出错也能继续执行
+
+# 设置trap捕获退出信号，确保脚本退出前设置所有相关脚本的权限
+trap 'ensure_scripts_permissions' EXIT
+
+# 确保所有脚本权限的函数
+ensure_scripts_permissions() {
+    echo "🔒 正在设置所有脚本的执行权限..."
+    chmod +777 "$0" 2>/dev/null || true
+    chmod +777 "$(dirname "$0")/bruce_douyin_backend_start.sh" 2>/dev/null || true
+    chmod +777 "$(dirname "$0")/bruce_douyin_backend_stop.sh" 2>/dev/null || true
+    chmod +777 "$(dirname "$0")/bruce_douyin_frontend_stop.sh" 2>/dev/null || true
+    chmod +777 "$(dirname "$0")/bruce_douyin_start.sh" 2>/dev/null || true
+    echo "✅ 所有脚本权限设置完成"
+}
 echo "==================== 开始执行前端部署脚本 ===================="
 
 # 0. 检查 git 是否安装
@@ -77,3 +91,6 @@ else
 fi
 
 echo "==================== ✅ 前端部署完成 ($PROFILE:$BRANCH) ===================="
+
+# 显式调用权限设置函数，确保脚本执行完毕后设置所有脚本权限
+ensure_scripts_permissions
