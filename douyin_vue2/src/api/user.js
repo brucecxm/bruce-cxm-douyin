@@ -48,7 +48,9 @@ export const requestFriendApi = (User) => {
 export const getrequestFriendApi = () => {
   return request.get('/user/friend/requests');
 };
-
+export const getFriendApiDetail = () => {
+  return request.get('/user/friend/list/detail');
+};
 export const getFriendApi = () => {
   return request.get('/user/friend/list');
 };

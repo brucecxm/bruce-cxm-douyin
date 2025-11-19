@@ -50,19 +50,12 @@
             <div class="num">{{ userInfo.likes || '0' }}</div>
             <div class="label">获赞</div>
           </div>
-          <div class="stat-item" @click="goToOrderList">
-            <div class="num">🛒</div>
-            <div class="label">订单</div>
-          </div>
-          <div class="stat-item" @click="goToCollect">
-            <div class="num">⭐</div>
-            <div class="label">收藏</div>
-          </div>
-          <el-button
+          <button class="edit-home-btn">编辑主页</button>
+          <!-- <el-button
 class="edit-btn"
 type="primary" @click="goEditMeInfo"
           >编辑主页</el-button
-          >
+          > -->
         </div>
         <div class="userinfo">
           <div class="intro" style="font-size: 15px; margin-top: 10px">
@@ -655,5 +648,21 @@ export default {
   .label {
     font-size: 14px;
   }
+}
+
+.edit-home-btn {
+  /* 按钮基础样式 */
+  padding: 8px 16px;
+  border: none;
+  margin-right: 10px;
+  border-radius: 4px; /* 圆角效果 */
+  background-color: #f5f5f5; /* 浅灰色背景 */
+  color: #333; /* 文字颜色 */
+  font-size: 14px; /* 文字大小 */
+  cursor: pointer; /* 鼠标悬浮时的指针样式 */
+}
+.edit-home-btn:hover {
+  /* 悬浮时的交互效果（可选） */
+  background-color: #e9e9e9;
 }
 </style>

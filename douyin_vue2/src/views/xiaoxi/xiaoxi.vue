@@ -134,7 +134,7 @@ import HorizontalScrollList from '@/components/HorizontalScrollList.vue';
 import UserInfo from '../../components/userInfo.vue';
 import caidan from '@/components/caidan.vue';
 import footerVue from '@/components/footer.vue';
-import { getFriendApi } from '@/api/user.js';
+import { getFriendApi, getFriendApiDetail } from '@/api/user.js';
 
 export default {
   components: {
@@ -170,44 +170,7 @@ export default {
           height: '60px'
         }
       ],
-      topUsers: [
-        {
-          name: '单曲猫咪',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280',
-          heat: 91
-        },
-        {
-          name: '阿泽',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '阿泽',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '阿泽',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '阿泽',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '阿泽',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '阿泽',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        }
-      ],
+      topUsers: [],
       input: '',
       page: 1,
       pageSize: 5,
@@ -257,13 +220,15 @@ export default {
 
     async fetchFriendInfos() {
       try {
-        const response = await getFriendApi();
+        const response = await getFriendApiDetail();
+        debugger;
         // 检查响应数据是否存在且有效
         if (response && response.data && Array.isArray(response.data)) {
           // 将朋友数据转换为topUsers所需的格式
           this.topUsers = response.data.map((friend) => ({
             name: friend.nickname || friend.username || '未知用户',
             avatar: friend.avatar || '默认头像地址',
+            userId: friend.userId || '未知用户ID',
             heat: Math.floor(Math.random() * 100) // 可以根据实际需求设置热度值
           }));
           console.log('朋友列表加载成功:', this.topUsers);
@@ -346,7 +311,8 @@ export default {
       }
 
       // 检查用户对象中是否包含userId、id、username或name字段作为标识
-      const friendId = user.userId || user.id || user.username || user.name || '';
+      const friendId =
+        user.userId || user.id || user.username || user.name || '';
       if (friendId) {
         console.log('Navigating to chat with ID:', friendId);
         // 跳转到聊天界面，传递好友id参数

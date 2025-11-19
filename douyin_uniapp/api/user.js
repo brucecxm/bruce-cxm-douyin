@@ -54,6 +54,10 @@ export const getFriendApi = () => {
   return request.get('/user/friend/list');
 };
 
+export const getFriendApiDetail = () => {
+  return request.get('/user/friend/list/detail');
+};
+
 export const getVerificationCodeService = (params) => {
   const queryParams = new URLSearchParams();
   for (let key in params) {

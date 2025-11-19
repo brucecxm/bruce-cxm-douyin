@@ -40,6 +40,7 @@ public class FileController {
      */
     @ApiOperation("上传图片文件")
     @PostMapping("/upload/image")
+
     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file,
                                          @RequestParam(value = "prefix", required = false, defaultValue = "images") String prefix) {
         return uploadFile(file, prefix, "image");

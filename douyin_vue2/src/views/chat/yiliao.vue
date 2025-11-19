@@ -199,7 +199,7 @@ export default {
         );
 
         // 根据文件类型选择不同的上传接口，使用完整URL
-        const baseUrl = 'http://localhost:9522';
+        const baseUrl = 'http://172.20.10.1:9522';
         const url =
           fileType === 'image'
             ? `${baseUrl}/file/upload/image`
