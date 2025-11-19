@@ -95,6 +95,25 @@ export default defineConfig(({ mode }) => {
         }
       },
       optimizeDeps: {
+        // 排除不需要预构建的依赖（已是 ESM 格式或体积较大的库）
+        exclude: [
+          'vue',
+          'vue-router',
+          '@fortawesome/fontawesome-svg-core',
+          '@fortawesome/free-solid-svg-icons',
+          'hls.js',
+          '@videojs/http-streaming',
+          'leaflet'
+        ],
+        // 强制预构建某些依赖（避免重复处理）
+        include: [
+          'axios/dist/axios.min.js',
+          'vuex',
+          'element-ui',
+          'vant',
+          'video.js',
+          'vue-infinite-scroll'
+        ],
         esbuildOptions: {
           // 增加 esbuild 日志
           logLevel: 'info'
@@ -143,8 +162,24 @@ export default defineConfig(({ mode }) => {
             logLevel: 'info'
           }
         }
+      },
+      optimizeDeps: {
+        // 排除不需要预构建的依赖
+        exclude: [
+          'vue',
+          'vue-router'
+        ],
+        // 强制预构建某些依赖
+        include: [
+          'axios/dist/axios.min.js',
+          'vuex',
+          'element-ui',
+          'vant',
+          'video.js',
+          'vue-infinite-scroll'
+        ]
       }
-      // 生产环境一般由nginx等代理做HTTPS，不用在Vite里开https
     };
+    // 生产环境一般由nginx等代理做HTTPS，不用在Vite里开https
   }
 });
