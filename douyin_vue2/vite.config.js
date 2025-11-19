@@ -47,7 +47,11 @@ export default defineConfig(({ mode }) => {
       host: true,
       logLevel: 'info', // 服务器日志级别
       // https: httpsOptions, // 开启 https，使用证书
-      proxy: {}
+      proxy: {},
+      watch: {
+        // 监听时忽略 node_modules 和 dist（避免无意义的文件监控消耗内存）
+        ignored: ['**/node_modules/**', '**/dist/**'],
+      }
     }
   };
 
@@ -73,7 +77,8 @@ export default defineConfig(({ mode }) => {
           onwarn(warning, warn) {
             console.log(`[Rollup Warning] ${warning.message}`);
             warn(warning);
-          }
+          },
+          external: ['vue', 'vue-router'] // 假设这些通过 CDN 引入，不打包进产物
         }
       },
       server: {
@@ -118,7 +123,8 @@ export default defineConfig(({ mode }) => {
           onwarn(warning, warn) {
             console.log(`[Rollup Warning] ${warning.message}`);
             warn(warning);
-          }
+          },
+          external: ['vue', 'vue-router'] // 假设这些通过 CDN 引入，不打包进产物
         },
         terserOptions: {
           compress: {
