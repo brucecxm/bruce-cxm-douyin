@@ -43,6 +43,27 @@ public interface UserRelationService extends IService<UserRelation> {
     List<UserBlacklist> getBlacklist(Long userId);
 
     String getRelationType(Long userId, Long targetUserId);
+    
+    /**
+     * 获取用户的粉丝数量
+     * @param userId 用户ID
+     * @return 粉丝数量
+     */
+    Integer getFansCount(Long userId);
+    
+    /**
+     * 获取用户的关注数量
+     * @param userId 用户ID
+     * @return 关注数量
+     */
+    Integer getFollowCount(Long userId);
+    
+    /**
+     * 获取用户的互关数量
+     * @param userId 用户ID
+     * @return 互关数量
+     */
+    Integer getMutualFollowCount(Long userId);
 
 }
 

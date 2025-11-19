@@ -66,6 +66,9 @@ public class UserController extends ApiController {
 
     @Resource
     private VideoService videoService; // 用于将对象转换为JSON字符串
+    
+    @Autowired
+    private UserRelationService userRelationService;
 
     @Autowired
     private DcSystemService dcSystemService;
@@ -379,6 +382,22 @@ public class UserController extends ApiController {
 
         UserInfo userInfo = new UserInfo();
         BeanUtils.copyProperties(user, userInfo);
+        
+        // 设置粉丝、关注和互关数量
+        Long userIdLong = Long.parseLong(userId);
+        Integer fansCount = userRelationService.getFansCount(userIdLong);
+        Integer followCount = userRelationService.getFollowCount(userIdLong);
+        Integer mutualFollowCount = userRelationService.getMutualFollowCount(userIdLong);
+        
+        // 设置后端属性
+        userInfo.setFansCount(fansCount);
+        userInfo.setFollowCount(followCount);
+        userInfo.setMutualFollowCount(mutualFollowCount);
+        
+        // 设置前端兼容性属性
+        userInfo.setFollowers(fansCount);
+        userInfo.setFollowing(followCount);
+        userInfo.setMutualFollow(mutualFollowCount);
 
         try {
             if (pageStr.isEmpty() || pageSizeStr.isEmpty()) {

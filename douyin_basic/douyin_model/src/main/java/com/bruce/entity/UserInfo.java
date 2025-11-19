@@ -15,10 +15,42 @@ import java.util.List;
  */
 @SuppressWarnings("serial")
 @Data
-public class UserInfo {
+public class UserInfo extends User{
+
+
+    String videoImg;
+
+    // 粉丝数量
+    Integer fansCount;
+
+    // 关注数量
+    Integer followCount;
+
+    // 互关数量
+    Integer mutualFollowCount;
+
+    // 以下属性用于前端兼容性
+
+    /**
+     * 粉丝数量（前端使用）
+     */
+    private Integer followers;
+
+    /**
+     * 关注数量（前端使用）
+     */
+    private Integer following;
+
+    /**
+     * 互关数量（前端使用）
+     */
+    private Integer mutualFollow;
+
     List<Video> videoList;
     IPage<Video> videoPage;
     private int id;
+    private Integer Following;
+    private Integer MutualFollow;
 
     private String username;
     private String gender;

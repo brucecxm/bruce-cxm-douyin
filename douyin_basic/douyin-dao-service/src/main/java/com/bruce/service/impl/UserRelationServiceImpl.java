@@ -311,6 +311,30 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
         return relationTypeStr;
     }
 
+    @Override
+    public Integer getFansCount(Long userId) {
+        // 查询以该用户为目标用户的所有关注关系数量
+        return Math.toIntExact(count(new LambdaQueryWrapper<UserRelation>()
+                .eq(UserRelation::getTargetUserId, userId)
+                .in(UserRelation::getRelationType, 1, 2, 3, 4)));
+    }
+
+    @Override
+    public Integer getFollowCount(Long userId) {
+        // 查询该用户关注的所有用户数量
+        return Math.toIntExact(count(new LambdaQueryWrapper<UserRelation>()
+                .eq(UserRelation::getUserId, userId)
+                .in(UserRelation::getRelationType, 1, 2, 3, 4)));
+    }
+
+    @Override
+    public Integer getMutualFollowCount(Long userId) {
+        // 查询该用户的所有互相关注关系数量
+        return Math.toIntExact(count(new LambdaQueryWrapper<UserRelation>()
+                .eq(UserRelation::getUserId, userId)
+                .eq(UserRelation::getRelationType, 2)));
+    }
+
 
 }
 

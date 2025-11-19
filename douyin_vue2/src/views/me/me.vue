@@ -46,6 +46,10 @@
             <div class="num">{{ userInfo.following || '0' }}</div>
             <div class="label">关注</div>
           </div>
+          <div class="stat-item" @click="gofriend('mutualFollow')">
+            <div class="num">{{ userInfo.mutualFollow || '0' }}</div>
+            <div class="label">互关</div>
+          </div>
           <div class="stat-item" @click="gofriend('likes')">
             <div class="num">{{ userInfo.likes || '0' }}</div>
             <div class="label">获赞</div>
