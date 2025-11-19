@@ -48,7 +48,6 @@ public class UserInfo extends User{
 
     List<Video> videoList;
     IPage<Video> videoPage;
-    private int id;
     private Integer Following;
     private Integer MutualFollow;
 
@@ -65,10 +64,6 @@ public class UserInfo extends User{
 
     private String avatar;       // 发起人头像URL
 
-    private Date createTime;
-
-
-    private Date updateTime;
 
 
     private String backImg;
