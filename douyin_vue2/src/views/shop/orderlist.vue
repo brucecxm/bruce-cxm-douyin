@@ -11,36 +11,36 @@
 
     <!-- 订单状态筛选 -->
     <div class="status-tabs">
-      <div 
-        class="tab" 
+      <div
+        class="tab"
         :class="{ active: currentStatus === 'all' }"
         @click="switchStatus('all')"
       >
         全部
       </div>
-      <div 
-        class="tab" 
+      <div
+        class="tab"
         :class="{ active: currentStatus === 'pending' }"
         @click="switchStatus('pending')"
       >
         待付款
       </div>
-      <div 
-        class="tab" 
+      <div
+        class="tab"
         :class="{ active: currentStatus === 'paid' }"
         @click="switchStatus('paid')"
       >
         待发货
       </div>
-      <div 
-        class="tab" 
+      <div
+        class="tab"
         :class="{ active: currentStatus === 'shipped' }"
         @click="switchStatus('shipped')"
       >
         待收货
       </div>
-      <div 
-        class="tab" 
+      <div
+        class="tab"
         :class="{ active: currentStatus === 'completed' }"
         @click="switchStatus('completed')"
       >
@@ -50,11 +50,7 @@
 
     <!-- 订单列表 -->
     <div class="order-list">
-      <div 
-        v-for="order in filteredOrders" 
-        :key="order.id"
-        class="order-item"
-      >
+      <div v-for="order in filteredOrders" :key="order.id" class="order-item">
         <!-- 店铺信息 -->
         <div class="shop-info">
           <div class="shop-name">{{ order.shopName }}</div>
@@ -65,8 +61,8 @@
 
         <!-- 订单商品列表 -->
         <div class="order-products">
-          <div 
-            v-for="(product, index) in order.products" 
+          <div
+            v-for="(product, index) in order.products"
             :key="index"
             class="product-item"
           >
@@ -94,35 +90,35 @@
             {{ getStatusText(order.status) }}
           </div>
           <div class="order-actions">
-            <button 
+            <button
               v-if="order.status === 'pending'"
               class="action-btn cancel"
               @click="cancelOrder(order.id)"
             >
               取消订单
             </button>
-            <button 
+            <button
               v-if="order.status === 'pending'"
               class="action-btn pay"
               @click="payOrder(order.id, order.totalPrice)"
             >
               去支付
             </button>
-            <button 
+            <button
               v-if="order.status === 'shipped'"
               class="action-btn receive"
               @click="confirmReceipt(order.id)"
             >
               确认收货
             </button>
-            <button 
+            <button
               v-if="order.status === 'completed'"
               class="action-btn review"
               @click="reviewOrder(order.id)"
             >
               评价
             </button>
-            <button 
+            <button
               v-if="order.status !== 'pending'"
               class="action-btn view"
               @click="viewOrderDetail(order.id)"
@@ -145,8 +141,7 @@
 
 <script>
 import request from '@/utils/request.js';
-import { toast } from 'vant';
-
+import { Toast } from 'vant';
 export default {
   data() {
     return {
@@ -155,19 +150,19 @@ export default {
       userId: '',
       // 后端Integer状态值到前端字符串状态值的映射
       statusMap: {
-        1: 'pending',    // 待付款
-        2: 'paid',       // 待派送
-        3: 'shipped',    // 已派送/待收货
-        4: 'completed',  // 已完成
-        5: 'cancelled'   // 已取消
+        1: 'pending', // 待付款
+        2: 'paid', // 待派送
+        3: 'shipped', // 已派送/待收货
+        4: 'completed', // 已完成
+        5: 'cancelled' // 已取消
       },
       // 前端字符串状态值到后端Integer状态值的映射
       reverseStatusMap: {
-        'pending': 1,
-        'paid': 2,
-        'shipped': 3,
-        'completed': 4,
-        'cancelled': 5
+        pending: 1,
+        paid: 2,
+        shipped: 3,
+        completed: 4,
+        cancelled: 5
       }
     };
   },
@@ -181,7 +176,7 @@ export default {
       if (this.currentStatus === 'all') {
         return this.orders;
       }
-      return this.orders.filter(order => order.status === this.currentStatus);
+      return this.orders.filter((order) => order.status === this.currentStatus);
     }
   },
   methods: {
@@ -189,7 +184,7 @@ export default {
     goBack() {
       this.$router.back();
     },
-    
+
     // 加载用户信息
     loadUserInfo() {
       try {
@@ -200,7 +195,7 @@ export default {
         console.error('加载用户信息失败:', error);
       }
     },
-    
+
     // 加载订单列表
     async loadOrderList() {
       try {
@@ -209,25 +204,29 @@ export default {
             userId: this.userId
           }
         });
-        
+
         if (res.code === 200 && res.data) {
-          this.orders = res.data.map(order => ({
+          this.orders = res.data.map((order) => ({
             id: order.id,
             orderNo: order.number || '', // 后端字段名为number
             shopName: order.shopName || '店铺名称',
-            shopAvatar: order.shopAvatar || 'https://img.yzcdn.cn/vant/cat.jpeg',
+            shopAvatar:
+              order.shopAvatar || 'https://img.yzcdn.cn/vant/cat.jpeg',
             // 将后端Integer状态值转换为前端字符串状态值
             status: order.status ? this.statusMap[order.status] : 'pending',
-            createTime: order.orderTime ? this.formatDate(order.orderTime) : new Date().toLocaleString(),
+            createTime: order.orderTime
+              ? this.formatDate(order.orderTime)
+              : new Date().toLocaleString(),
             totalPrice: order.amount || 0, // 后端字段名为amount
             totalQuantity: order.totalQuantity || 0,
-            products: order.orderDetails?.map(item => ({
-              image: item.image || 'https://img.yzcdn.cn/vant/apple-1.jpg',
-              name: item.name || '商品名称', // 后端字段名为name
-              specs: item.dishFlavor || '标准规格',
-              price: item.amount || 0,
-              quantity: item.number || 1
-            })) || []
+            products:
+              order.orderDetails?.map((item) => ({
+                image: item.image || 'https://img.yzcdn.cn/vant/apple-1.jpg',
+                name: item.name || '商品名称', // 后端字段名为name
+                specs: item.dishFlavor || '标准规格',
+                price: item.amount || 0,
+                quantity: item.number || 1
+              })) || []
           }));
         } else {
           // 如果没有订单数据，使用模拟数据
@@ -235,12 +234,12 @@ export default {
         }
       } catch (error) {
         console.error('加载订单列表失败:', error);
-        toast('加载订单列表失败，请重试');
+        Toast('加载订单列表失败，请重试');
         // 使用模拟数据
         this.setDefaultOrderData();
       }
     },
-    
+
     // 格式化日期
     formatDate(dateStr) {
       const date = new Date(dateStr);
@@ -251,7 +250,7 @@ export default {
       const minutes = String(date.getMinutes()).padStart(2, '0');
       return `${year}-${month}-${day} ${hours}:${minutes}`;
     },
-    
+
     // 设置默认订单数据（模拟数据）
     setDefaultOrderData() {
       this.orders = [
@@ -321,22 +320,23 @@ export default {
         }
       ];
     },
-    
+
     // 切换订单状态筛选
     async switchStatus(status) {
       this.currentStatus = status;
       // 状态切换时重新加载订单数据
       await this.loadPageOrders(1, 10, status);
     },
-    
+
     // 加载分页订单数据
     async loadPageOrders(current, size, status) {
       try {
         // 将前端字符串状态值转换为后端Integer状态值
-        const statusValue = status === 'all' ? null : this.reverseStatusMap[status];
-        
-        toast.loading('加载中...', { duration: 0 }); // 显示加载动画
-        
+        const statusValue =
+          status === 'all' ? null : this.reverseStatusMap[status];
+
+        Toast.loading('加载中...', { duration: 0 }); // 显示加载动画
+
         const res = await request.get('/shop/order/page', {
           params: {
             current: current || 1,
@@ -345,28 +345,32 @@ export default {
             userId: this.userId
           }
         });
-        
-        toast.clear(); // 清除加载动画
-        
+
+        Toast.clear(); // 清除加载动画
+
         if (res.code === 200 && res.data && res.data.records) {
           // 处理分页数据，将后端数据转换为前端所需格式
-          this.orders = res.data.records.map(order => ({
+          this.orders = res.data.records.map((order) => ({
             id: order.id,
             orderNo: order.number || '', // 后端字段名为number
             shopName: order.shopName || '店铺名称',
-            shopAvatar: order.shopAvatar || 'https://img.yzcdn.cn/vant/cat.jpeg',
+            shopAvatar:
+              order.shopAvatar || 'https://img.yzcdn.cn/vant/cat.jpeg',
             // 将后端Integer状态值转换为前端字符串状态值
             status: order.status ? this.statusMap[order.status] : 'pending',
-            createTime: order.orderTime ? this.formatDate(order.orderTime) : new Date().toLocaleString(),
+            createTime: order.orderTime
+              ? this.formatDate(order.orderTime)
+              : new Date().toLocaleString(),
             totalPrice: order.amount || 0, // 后端字段名为amount
             totalQuantity: order.totalQuantity || 0,
-            products: order.orderDetails?.map(item => ({
-              image: item.image || 'https://img.yzcdn.cn/vant/apple-1.jpg',
-              name: item.name || '商品名称', // 后端字段名为name
-              specs: item.dishFlavor || '标准规格',
-              price: item.amount || 0,
-              quantity: item.number || 1
-            })) || []
+            products:
+              order.orderDetails?.map((item) => ({
+                image: item.image || 'https://img.yzcdn.cn/vant/apple-1.jpg',
+                name: item.name || '商品名称', // 后端字段名为name
+                specs: item.dishFlavor || '标准规格',
+                price: item.amount || 0,
+                quantity: item.number || 1
+              })) || []
           }));
         } else {
           // 如果没有订单数据，显示空状态
@@ -378,42 +382,42 @@ export default {
         }
       } catch (error) {
         console.error('加载分页订单数据失败:', error);
-        toast('加载订单数据失败，请重试');
+        Toast('加载订单数据失败，请重试');
         // 加载失败时使用模拟数据
         this.setDefaultOrderData();
       }
     },
-    
+
     // 获取订单状态文本
     getStatusText(status) {
       const statusMap = {
-        'pending': '待付款',
-        'paid': '待发货',
-        'shipped': '待收货',
-        'completed': '已完成',
-        'cancelled': '已取消'
+        pending: '待付款',
+        paid: '待发货',
+        shipped: '待收货',
+        completed: '已完成',
+        cancelled: '已取消'
       };
       return statusMap[status] || '未知状态';
     },
-    
+
     // 取消订单
     async cancelOrder(orderId) {
       try {
         // 显示确认对话框
-        if (!await this.$confirm('确定要取消该订单吗？')) {
+        if (!(await this.$confirm('确定要取消该订单吗？'))) {
           return;
         }
-        
-        toast.loading('取消中...', { duration: 0 }); // 显示加载动画
-        
+
+        Toast.loading('取消中...', { duration: 0 }); // 显示加载动画
+
         const res = await request.post(`/shop/order/cancel/${orderId}`);
-        
-        toast.clear(); // 清除加载动画
-        
+
+        Toast.clear(); // 清除加载动画
+
         if (res.code === 200) {
-          toast(res.msg || '订单已取消');
+          Toast(res.msg || '订单已取消');
           // 更新订单状态
-          const order = this.orders.find(o => o.id === orderId);
+          const order = this.orders.find((o) => o.id === orderId);
           if (order) {
             order.status = 'cancelled';
           }
@@ -426,10 +430,10 @@ export default {
         }
       } catch (error) {
         console.error('取消订单失败:', error);
-        toast(error.message || '取消订单失败，请重试');
+        Toast(error.message || '取消订单失败，请重试');
       }
     },
-    
+
     // 支付订单
     payOrder(orderId, amount) {
       // 跳转到支付页面或打开支付弹窗
@@ -441,25 +445,25 @@ export default {
         }
       });
     },
-    
+
     // 确认收货
     async confirmReceipt(orderId) {
       try {
         // 显示确认对话框
-        if (!await this.$confirm('确认已收到商品吗？确认后订单将完成。')) {
+        if (!(await this.$confirm('确认已收到商品吗？确认后订单将完成。'))) {
           return;
         }
-        
-        toast.loading('确认中...', { duration: 0 }); // 显示加载动画
-        
+
+        Toast.loading('确认中...', { duration: 0 }); // 显示加载动画
+
         const res = await request.post(`/shop/order/confirm/${orderId}`);
-        
-        toast.clear(); // 清除加载动画
-        
+
+        Toast.clear(); // 清除加载动画
+
         if (res.code === 200) {
-          toast(res.msg || '已确认收货');
+          Toast(res.msg || '已确认收货');
           // 更新订单状态
-          const order = this.orders.find(o => o.id === orderId);
+          const order = this.orders.find((o) => o.id === orderId);
           if (order) {
             order.status = 'completed';
           }
@@ -472,22 +476,22 @@ export default {
         }
       } catch (error) {
         console.error('确认收货失败:', error);
-        toast(error.message || '确认收货失败，请重试');
+        Toast(error.message || '确认收货失败，请重试');
       }
     },
-    
+
     // 评价订单
     reviewOrder(orderId) {
       // 跳转到评价页面
-      toast('评价功能开发中');
+      Toast('评价功能开发中');
     },
-    
+
     // 查看订单详情
     viewOrderDetail(orderId) {
       // 跳转到订单详情页面
-      toast('订单详情功能开发中');
+      Toast('订单详情功能开发中');
     },
-    
+
     // 去逛逛
     goShopping() {
       this.$router.push('/shop');
@@ -787,7 +791,7 @@ export default {
   .status-tabs {
     font-size: 13px;
   }
-  
+
   .product-item img {
     width: 70px;
     height: 70px;

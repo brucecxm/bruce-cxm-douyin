@@ -31,8 +31,8 @@
     <!-- 支付方式 -->
     <div class="payment-method-section">
       <h3 class="section-title">支付方式</h3>
-      <div 
-        v-for="method in paymentMethods" 
+      <div
+        v-for="method in paymentMethods"
         :key="method.code"
         class="payment-method-item"
         :class="{ active: selectedMethod === method.code }"
@@ -42,7 +42,10 @@
           <i :class="method.icon"></i>
           <span class="method-name">{{ method.name }}</span>
         </div>
-        <i class="fas fa-check-circle" v-if="selectedMethod === method.code"></i>
+        <i
+          class="fas fa-check-circle"
+          v-if="selectedMethod === method.code"
+        ></i>
       </div>
     </div>
 
@@ -57,9 +60,15 @@
     <div class="payment-result-modal" v-if="showResult">
       <div class="modal-content">
         <div class="result-icon" :class="paymentSuccess ? 'success' : 'fail'">
-          <i :class="paymentSuccess ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
+          <i
+            :class="
+              paymentSuccess ? 'fas fa-check-circle' : 'fas fa-times-circle'
+            "
+          ></i>
         </div>
-        <p class="result-text">{{ paymentSuccess ? '支付成功' : '支付失败' }}</p>
+        <p class="result-text">
+          {{ paymentSuccess ? '支付成功' : '支付失败' }}
+        </p>
         <p class="result-message">{{ resultMessage }}</p>
         <button class="btn-confirm" @click="closeResult">确认</button>
       </div>
@@ -69,7 +78,7 @@
 
 <script>
 import request from '@/utils/request.js';
-import { toast } from 'vant';
+import { Toast } from 'vant';
 
 export default {
   data() {
@@ -106,11 +115,11 @@ export default {
     // 获取路由参数
     this.orderId = this.$route.query.orderId || '';
     this.totalAmount = parseFloat(this.$route.query.amount) || 0;
-    
+
     if (this.orderId) {
       this.loadOrderDetail();
     } else {
-      toast('订单信息有误');
+      Toast('订单信息有误');
       setTimeout(() => {
         this.$router.back();
       }, 1500);
@@ -121,16 +130,18 @@ export default {
     goBack() {
       this.$router.back();
     },
-    
+
     // 加载订单详情
     async loadOrderDetail() {
       try {
         const res = await request.get(`/shop/order/getById/${this.orderId}`);
-        
+
         if (res.code === 200 && res.data) {
           const order = res.data;
           this.orderNumber = order.number || '';
-          this.orderTime = order.orderTime ? this.formatDate(order.orderTime) : '';
+          this.orderTime = order.orderTime
+            ? this.formatDate(order.orderTime)
+            : '';
           // 确保金额一致
           if (order.amount) {
             this.totalAmount = parseFloat(order.amount);
@@ -140,10 +151,10 @@ export default {
         }
       } catch (error) {
         console.error('加载订单详情失败:', error);
-        toast('加载订单详情失败');
+        Toast('加载订单详情失败');
       }
     },
-    
+
     // 格式化日期
     formatDate(dateStr) {
       const date = new Date(dateStr);
@@ -154,18 +165,18 @@ export default {
       const minutes = String(date.getMinutes()).padStart(2, '0');
       return `${year}-${month}-${day} ${hours}:${minutes}`;
     },
-    
+
     // 选择支付方式
     selectMethod(methodCode) {
       this.selectedMethod = methodCode;
     },
-    
+
     // 提交支付
     async submitPayment() {
       if (this.isProcessing) return;
-      
+
       this.isProcessing = true;
-      
+
       try {
         // 构建支付请求数据
         const paymentData = {
@@ -173,24 +184,23 @@ export default {
           payMethod: this.selectedMethod,
           amount: this.totalAmount
         };
-        
+
         // 这里简化处理，模拟支付请求
         // 在实际项目中，应该调用后端支付接口
         await this.simulatePayment(paymentData);
-        
+
         // 支付成功后更新订单状态
         await this.updateOrderStatus();
-        
+
         // 显示支付成功结果
         this.paymentSuccess = true;
         this.resultMessage = '支付成功，即将跳转到订单列表';
         this.showResult = true;
-        
+
         // 3秒后跳转到订单列表
         setTimeout(() => {
           this.$router.push('/shop/orderlist');
         }, 3000);
-        
       } catch (error) {
         console.error('支付失败:', error);
         this.paymentSuccess = false;
@@ -200,7 +210,7 @@ export default {
         this.isProcessing = false;
       }
     },
-    
+
     // 模拟支付请求（实际项目中应该调用后端接口）
     simulatePayment(paymentData) {
       return new Promise((resolve, reject) => {
@@ -208,7 +218,7 @@ export default {
         setTimeout(() => {
           // 随机模拟支付成功或失败（90%成功率）
           const success = Math.random() > 0.1;
-          
+
           if (success) {
             resolve({ code: 200 });
           } else {
@@ -217,15 +227,18 @@ export default {
         }, 2000);
       });
     },
-    
+
     // 更新订单状态
     async updateOrderStatus() {
       try {
         // 调用后端接口更新订单状态为已支付
-        const res = await request.post(`/shop/order/updateStatus/${this.orderId}`, {
-          status: 2 // 2表示已支付/待发货
-        });
-        
+        const res = await request.post(
+          `/shop/order/updateStatus/${this.orderId}`,
+          {
+            status: 2 // 2表示已支付/待发货
+          }
+        );
+
         if (res.code !== 200) {
           console.warn('更新订单状态失败，但不影响支付流程');
         }
@@ -233,11 +246,11 @@ export default {
         console.warn('更新订单状态出错，但不影响支付流程:', error);
       }
     },
-    
+
     // 关闭结果弹窗
     closeResult() {
       this.showResult = false;
-      
+
       // 如果支付失败，返回上一页
       if (!this.paymentSuccess) {
         this.$router.back();
@@ -478,7 +491,7 @@ export default {
   .amount-value {
     font-size: 32px;
   }
-  
+
   .modal-content {
     width: 90%;
   }

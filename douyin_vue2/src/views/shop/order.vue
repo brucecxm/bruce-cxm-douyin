@@ -105,7 +105,7 @@
 
 <script>
 import request from '@/utils/request.js';
-import { toast } from 'vant';
+import { Toast } from 'vant';
 
 export default {
   data() {
@@ -163,7 +163,7 @@ export default {
         if (orderData) {
           this.orderData = JSON.parse(orderData);
           // 处理购物车数据
-          this.cartItems = this.orderData.cartItems.map(item => ({
+          this.cartItems = this.orderData.cartItems.map((item) => ({
             image: item.image || 'https://img.yzcdn.cn/vant/apple-1.jpg',
             name: item.title || '商品名称',
             specs: item.dishFlavor || '标准规格',
@@ -177,7 +177,7 @@ export default {
         this.setDefaultOrderData();
       }
     },
-    
+
     // 设置默认订单数据
     setDefaultOrderData() {
       this.cartItems = [
@@ -197,7 +197,7 @@ export default {
         }
       ];
     },
-    
+
     // 加载用户信息
     loadUserInfo() {
       try {
@@ -208,7 +208,7 @@ export default {
         console.error('加载用户信息失败:', error);
       }
     },
-    
+
     // 加载用户地址
     async loadUserAddress() {
       try {
@@ -227,16 +227,16 @@ export default {
         };
       }
     },
-    
+
     // 打开密码弹窗
     openPasswordModal() {
       if (!this.amount || parseFloat(this.amount) <= 0) {
-        toast('请输入有效的支付金额');
+        Toast('请输入有效的支付金额');
         return;
       }
       this.showPasswordModal = true;
     },
-    
+
     // 处理数字键盘输入
     pressKey(key) {
       if (key.label === '删除') {
@@ -249,7 +249,7 @@ export default {
         this.submitOrderWithPayment();
       }
     },
-    
+
     // 提交订单并支付
     async submitOrderWithPayment() {
       try {
@@ -261,7 +261,7 @@ export default {
           payMethod: 1, // 1微信，2支付宝（这里默认使用微信支付）
           remark: this.orderRemark,
           // 订单详情信息，实际项目中可能需要单独提交
-          orderDetails: this.cartItems.map(item => ({
+          orderDetails: this.cartItems.map((item) => ({
             name: item.name, // 后端字段名为name
             dishId: item.dishId || 0,
             dishFlavor: item.specs,
@@ -269,38 +269,38 @@ export default {
             amount: item.price
           }))
         };
-        
+
         // 提交订单
         const res = await request.post('/shop/order/submit', orderSubmitData);
-        
+
         if (res.code === 200) {
-          toast('订单提交成功！');
+          Toast('订单提交成功！');
           this.resetPasswordModal();
-          
+
           // 清空购物车数据
           localStorage.removeItem('orderData');
-          
+
           // 跳转到订单列表或订单详情页面
           setTimeout(() => {
             this.$router.push('/shop/orderlist');
           }, 1500);
         } else {
-          toast('订单提交失败：' + (res.msg || '未知错误'));
+          Toast('订单提交失败：' + (res.msg || '未知错误'));
           this.resetPasswordModal();
         }
       } catch (error) {
         console.error('提交订单失败:', error);
-        toast('订单提交失败，请重试');
+        Toast('订单提交失败，请重试');
         this.resetPasswordModal();
       }
     },
-    
+
     // 重置密码弹窗
     resetPasswordModal() {
       this.password = '';
       this.showPasswordModal = false;
     },
-    
+
     // 编辑地址
     editAddress() {
       // 这里应该跳转到地址选择页面
@@ -313,14 +313,14 @@ export default {
       if (!fullAddress) return;
       this.address = { name, phone, fullAddress };
     },
-    
+
     // 提交订单
     submitOrder() {
       if (!this.address) {
-        toast('请填写收货地址');
+        Toast('请填写收货地址');
         return;
       }
-      
+
       this.amount = this.finalPrice.toString();
       this.noshow = false;
       this.showPasswordModal = true;
