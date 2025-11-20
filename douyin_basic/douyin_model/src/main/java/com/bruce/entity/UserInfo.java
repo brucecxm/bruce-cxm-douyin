@@ -48,8 +48,6 @@ public class UserInfo extends User{
 
     List<Video> videoList;
     IPage<Video> videoPage;
-    private Integer Following;
-    private Integer MutualFollow;
 
     private String username;
     private String gender;
