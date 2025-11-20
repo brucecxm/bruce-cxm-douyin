@@ -118,7 +118,7 @@ eureka:
   client:
     service-url:
 #      defaultZone: http://127.0.0.1:10086/eureka  # Eureka 服务注册中心的地址
-      defaultZone: http://1.94.131.16:10086/eureka  # Eureka 服务注册中心的地址
+      defaultZone: http://1.94.131.16:8080/eureka  # Eureka 服务注册中心的地址
 #    registerWithEureka: false
 #    fetchRegistry: false
 #    enabled: false
