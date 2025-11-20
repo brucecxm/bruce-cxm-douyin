@@ -83,7 +83,6 @@ export default {
     // 映射后可直接通过 this.userInfo 获取数据
   },
   mounted() {
-    debugger;
     console.log('组件创建时的用户信息：', this.userInfo);
     this.myId = this.userInfo.id;
     this.receiver = this.$route.query.id;
@@ -145,7 +144,6 @@ export default {
         type: 'text',
         timestamp: Date.now()
       };
-      debugger;
       this.stompClient.send('/app/private-chat', {}, JSON.stringify(msg));
       this.messages.push(msg); // 立即显示发送消息
       this.text = '';

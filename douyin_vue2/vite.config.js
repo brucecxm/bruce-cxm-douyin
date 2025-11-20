@@ -77,15 +77,14 @@ export default defineConfig(({ mode }) => {
           onwarn(warning, warn) {
             console.log(`[Rollup Warning] ${warning.message}`);
             warn(warning);
-          },
-          external: ['vue', 'vue-router'] // 假设这些通过 CDN 引入，不打包进产物
+          }
         }
       },
       server: {
         ...commonConfig.server,
         proxy: {
           '/api': {
-            target: 'http://localhost:9430',
+            target: 'http://localhost:7456',
             // target: 'https://116.196.98.171:9430',
             changeOrigin: true,
             ws: true, // ✅ 加上这行支持 WebSocket 代理
@@ -97,8 +96,6 @@ export default defineConfig(({ mode }) => {
       optimizeDeps: {
         // 排除不需要预构建的依赖（已是 ESM 格式或体积较大的库）
         exclude: [
-          'vue',
-          'vue-router',
           '@fortawesome/fontawesome-svg-core',
           '@fortawesome/free-solid-svg-icons',
           'hls.js',
@@ -142,8 +139,7 @@ export default defineConfig(({ mode }) => {
           onwarn(warning, warn) {
             console.log(`[Rollup Warning] ${warning.message}`);
             warn(warning);
-          },
-          external: ['vue', 'vue-router'] // 假设这些通过 CDN 引入，不打包进产物
+          }
         },
         terserOptions: {
           compress: {
@@ -156,7 +152,7 @@ export default defineConfig(({ mode }) => {
         ...commonConfig.server,
         proxy: {
           '/api': {
-            target: 'http://localhost:9430',
+            target: 'http://localhost:7456',
             changeOrigin: true,
             rewrite: (path) => path.replace(/^\/api/, ''),
             logLevel: 'info'
@@ -165,10 +161,7 @@ export default defineConfig(({ mode }) => {
       },
       optimizeDeps: {
         // 排除不需要预构建的依赖
-        exclude: [
-          'vue',
-          'vue-router'
-        ],
+        exclude: [],
         // 强制预构建某些依赖
         include: [
           'axios/dist/axios.min.js',

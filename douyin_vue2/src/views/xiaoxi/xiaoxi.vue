@@ -221,7 +221,6 @@ export default {
     async fetchFriendInfos() {
       try {
         const response = await getFriendApiDetail();
-        debugger;
         // 检查响应数据是否存在且有效
         if (response && response.data && Array.isArray(response.data)) {
           // 将朋友数据转换为topUsers所需的格式

@@ -2,6 +2,7 @@ package com.bruce.entity;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.math.BigDecimal;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -47,6 +48,8 @@ public class User  {
     private int isPrivate;
     // 最后登录时间
     private LocalDateTime lastLoginTime;
+    // 钱包余额
+    private BigDecimal balance;
 
     }
 

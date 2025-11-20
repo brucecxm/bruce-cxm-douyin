@@ -39,7 +39,9 @@
           </div>
           <div class="douyinnum" style="color: white">
             <div class="user-name-row">
-              <div class="user-name">{{ userInfo.nickname || '未设置昵称' }}</div>
+              <div class="user-name">
+                {{ userInfo.nickname || '未设置昵称' }}
+              </div>
               <div class="private-account" v-if="userInfo.isPrivate">
                 <i class="icon-lock"></i>
               </div>
@@ -66,7 +68,13 @@
             <div class="label">粉丝</div>
           </div>
           <div class="user-actions">
-            <button class="btn-edit-profile" @click="goEditMeInfo">编辑主页</button>
+            <button class="btn-edit-profile" @click="goEditMeInfo">
+              编辑主页
+            </button>
+            <button class="btn-wallet" @click="goWallet">
+              <i class="icon-wallet"></i>
+              钱包
+            </button>
             <button class="btn-settings">
               <i class="icon-settings"></i>
             </button>
@@ -99,16 +107,13 @@ type="primary" @click="goEditMeInfo"
         ></under-line-tags-vue>
       </template>
       <template #item="{ item }">
-        <div
-          @click="navigateToDetail(item)"
-          class="itemdetail"
-        >
+        <div @click="navigateToDetail(item)" class="itemdetail">
           <img :src="item.cover" alt="视频封面" />
           <!-- 视频时长显示 -->
           <div class="video-duration" v-if="activeTabIndex === 0">
             {{ formatDuration(item.duration || 0) }}
           </div>
-          
+
           <!-- 显示播放量或点赞数 -->
           <div class="item-stats">
             <span v-if="activeTabIndex === 0" class="stat-item">
@@ -206,12 +211,12 @@ export default {
     // 格式化视频时长
     formatDuration(seconds) {
       if (!seconds || isNaN(seconds)) return '0:00';
-      
+
       const mins = Math.floor(seconds / 60);
       const secs = Math.floor(seconds % 60);
       return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
     },
-    
+
     // 加载初始数据
     loadInitialData() {
       this.loading = true;
@@ -273,6 +278,7 @@ export default {
           }
         })
         .catch((error) => {
+          this.$router.push('/login');
           console.error('获取用户信息失败:', error);
           this.$toast && this.$toast('获取用户信息失败，请稍后重试');
         })
@@ -398,6 +404,10 @@ export default {
     // 跳转到编辑主页
     goEditMeInfo() {
       this.$router.push({ path: '/editMeInfo' });
+    },
+    // 跳转到钱包页面
+    goWallet() {
+      this.$router.push('/wallet');
     },
 
     // 跳转到订单列表
@@ -610,6 +620,16 @@ export default {
   border-radius: 16px;
   font-size: 14px;
   font-weight: 500;
+}
+
+.btn-wallet {
+  padding: 6px 16px;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-left: 8px;
 }
 
 .btn-settings {
@@ -886,6 +906,4 @@ export default {
     font-size: 14px;
   }
 }
-
-
 </style>
