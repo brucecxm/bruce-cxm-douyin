@@ -1,6 +1,9 @@
 package com.bruce.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
+import com.bruce.entity.FileOperationLog;
 import com.bruce.file.service.FileStorageService;
+import com.bruce.service.FileOperationLogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +16,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -31,6 +35,12 @@ public class FileController {
 
     @Autowired
     private FileStorageService fileStorageService;
+    
+    @Autowired
+    private FileOperationLogService fileOperationLogService;
+    
+    @Autowired
+    private HttpServletRequest request;
 
     /**
      * 上传图片文件
@@ -40,7 +50,6 @@ public class FileController {
      */
     @ApiOperation("上传图片文件")
     @PostMapping("/upload/image")
-
     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file,
                                          @RequestParam(value = "prefix", required = false, defaultValue = "images") String prefix) {
         return uploadFile(file, prefix, "image");
@@ -95,18 +104,29 @@ public class FileController {
     @ApiOperation("删除文件")
     @DeleteMapping("/delete")
     public ResponseEntity<?> deleteFile(@RequestParam("fileUrl") String fileUrl) {
+        FileOperationLog log = createLog("delete", fileUrl, extractFileName(fileUrl), null, null);
         try {
             if (StringUtils.isEmpty(fileUrl)) {
+                log.setStatus(0);
+                log.setErrorMessage("文件URL不能为空");
+                fileOperationLogService.saveLog(log);
                 return ResponseEntity.badRequest().body("文件URL不能为空");
             }
 
             fileStorageService.delete(fileUrl);
+            log.setStatus(1); // 成功
+            fileOperationLogService.saveLog(log);
+            
             Map<String, Object> result = new HashMap<>();
             result.put("success", true);
             result.put("message", "文件删除成功");
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             log.error("删除文件失败: {}", e.getMessage(), e);
+            log.setStatus(0);
+            log.setErrorMessage(e.getMessage());
+            fileOperationLogService.saveLog(log);
+            
             Map<String, Object> result = new HashMap<>();
             result.put("success", false);
             result.put("message", "文件删除失败: " + e.getMessage());
@@ -122,18 +142,30 @@ public class FileController {
     @ApiOperation("下载文件")
     @GetMapping("/download")
     public ResponseEntity<?> downloadFile(@RequestParam("fileUrl") String fileUrl) {
+        FileOperationLog log = createLog("download", fileUrl, extractFileName(fileUrl), null, null);
         try {
             if (StringUtils.isEmpty(fileUrl)) {
+                log.setStatus(0);
+                log.setErrorMessage("文件URL不能为空");
+                fileOperationLogService.saveLog(log);
                 return ResponseEntity.badRequest().body("文件URL不能为空");
             }
 
             byte[] data = fileStorageService.downLoadFile(fileUrl);
             if (data == null || data.length == 0) {
+                log.setStatus(0);
+                log.setErrorMessage("文件不存在");
+                fileOperationLogService.saveLog(log);
                 return ResponseEntity.notFound().build();
             }
 
             // 从URL中提取文件名
             String fileName = extractFileName(fileUrl);
+            
+            // 更新日志信息
+            log.setStatus(1); // 成功
+            log.setFileSize((long) data.length);
+            fileOperationLogService.saveLog(log);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
@@ -142,6 +174,9 @@ public class FileController {
             return new ResponseEntity<>(data, headers, HttpStatus.OK);
         } catch (Exception e) {
             log.error("下载文件失败: {}", e.getMessage(), e);
+            log.setStatus(0);
+            log.setErrorMessage(e.getMessage());
+            fileOperationLogService.saveLog(log);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("文件下载失败: " + e.getMessage());
         }
     }
@@ -191,6 +226,7 @@ public class FileController {
      * 内部方法：单个文件上传处理
      */
     private ResponseEntity<?> uploadFile(MultipartFile file, String prefix, String fileType) {
+        FileOperationLog log = createLog("upload", null, file.getOriginalFilename(), file.getSize(), file.getContentType());
         try {
             validateFile(file);
 
@@ -215,6 +251,11 @@ public class FileController {
                         break;
                 }
             }
+            
+            // 更新日志信息
+            log.setFileUrl(fileUrl);
+            log.setStatus(1); // 成功
+            fileOperationLogService.saveLog(log);
 
             Map<String, Object> result = new HashMap<>();
             result.put("success", true);
@@ -226,9 +267,17 @@ public class FileController {
             return ResponseEntity.ok(result);
         } catch (IllegalArgumentException e) {
             log.warn("文件验证失败: {}", e.getMessage());
+            // 更新失败日志
+            log.setStatus(0);
+            log.setErrorMessage(e.getMessage());
+            fileOperationLogService.saveLog(log);
             return ResponseEntity.badRequest().body("文件验证失败: " + e.getMessage());
         } catch (Exception e) {
             log.error("文件上传失败: {}", e.getMessage(), e);
+            // 更新失败日志
+            log.setStatus(0);
+            log.setErrorMessage(e.getMessage());
+            fileOperationLogService.saveLog(log);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("文件上传失败: " + e.getMessage());
         }
     }
@@ -253,6 +302,7 @@ public class FileController {
             int failCount = 0;
 
             for (MultipartFile file : files) {
+                FileOperationLog log = createLog("upload", null, file.getOriginalFilename(), file.getSize(), file.getContentType());
                 try {
                     validateFile(file);
 
@@ -273,11 +323,21 @@ public class FileController {
                                 break;
                         }
                     }
+                    
+                    // 更新成功日志
+                    log.setFileUrl(fileUrl);
+                    log.setStatus(1);
+                    fileOperationLogService.saveLog(log);
 
                     fileResults.put(originalFilename, fileUrl);
                     successCount++;
                 } catch (Exception e) {
                     log.error("文件 {} 上传失败: {}", file.getOriginalFilename(), e.getMessage());
+                    // 更新失败日志
+                    log.setStatus(0);
+                    log.setErrorMessage(e.getMessage());
+                    fileOperationLogService.saveLog(log);
+                    
                     fileResults.put(file.getOriginalFilename(), "上传失败: " + e.getMessage());
                     failCount++;
                 }
@@ -339,5 +399,61 @@ public class FileController {
             return parts[parts.length - 1];
         }
         return "download_file";
+    }
+    
+    /**
+     * 创建文件操作日志对象
+     */
+    private FileOperationLog createLog(String operationType, String fileUrl, String fileName, Long fileSize, String fileType) {
+        FileOperationLog log = new FileOperationLog();
+        log.setUserId(getCurrentUserId());
+        log.setOperationType(operationType);
+        log.setFileUrl(fileUrl);
+        log.setFileName(fileName);
+        log.setFileSize(fileSize);
+        log.setFileType(fileType);
+        log.setIpAddress(getClientIp());
+        log.setCreateTime(new java.util.Date());
+        return log;
+    }
+    
+    /**
+     * 获取当前用户ID
+     */
+    private Long getCurrentUserId() {
+        try {
+            if (StpUtil.isLogin()) {
+                Object loginId = StpUtil.getLoginId();
+                if (loginId instanceof Long) {
+                    return (Long) loginId;
+                } else if (loginId instanceof String) {
+                    return Long.parseLong(loginId.toString());
+                }
+            }
+        } catch (Exception e) {
+            log.warn("获取用户ID失败: {}", e.getMessage());
+        }
+        return null;
+    }
+    
+    /**
+     * 获取客户端IP地址
+     */
+    private String getClientIp() {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        // 处理多个代理的情况
+        if (ip != null && ip.contains(",")) {
+            ip = ip.split(",")[0].trim();
+        }
+        return ip;
     }
 }
