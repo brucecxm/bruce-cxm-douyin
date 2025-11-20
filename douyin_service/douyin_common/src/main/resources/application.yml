@@ -7,6 +7,14 @@ spring:
     properties:
       mail.smtp.auth: true           # ?? SMTP ????
       mail.smtp.starttls.enable: true # ?? TLS
+  # Spring Boot Admin 配置
+  boot:
+    admin:
+      client:
+        url: http://1.94.131.16:9090 # Admin服务器地址
+        auto-registration: true  # 启用自动注册
+        auto-deregistration: true  # 启用自动注销
+        register-once: true  # 只注册一次
   rabbitmq:
     host: 1.94.131.16
     port: 5672
@@ -61,6 +69,22 @@ minio:
 
 server:
   port: 9522
+
+# 暴露所有Actuator端点用于Admin监控
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: /actuator  # 明确指定基础路径
+  endpoint:
+    health:
+      show-details: ALWAYS
+    info:
+      enabled: true  # 启用info端点
+  info:
+    env:
+      enabled: true  # 启用环境信息
 eureka:
   client:
     service-url:
