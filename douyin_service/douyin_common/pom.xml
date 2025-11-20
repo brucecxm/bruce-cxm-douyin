@@ -19,6 +19,20 @@
 
 
     <dependencies>
+        <!-- 添加对douyin_model模块的依赖 -->
+        <dependency>
+            <groupId>org.example</groupId>
+            <artifactId>douyin_model</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        
+        <!-- 添加对douyin-dao-service模块的依赖 -->
+        <dependency>
+            <groupId>org.example</groupId>
+            <artifactId>douyin-dao-service</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        
         <!-- 测试依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -28,13 +28,13 @@ class FileControllerTest {
     @Mock
     private MockHttpServletRequest request;
 
-    @InjectMocks
     private FileController fileController;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        // 注入MockHttpServletRequest
+        // 初始化Mock对象
+        MockitoAnnotations.initMocks(this);
+        // 创建控制器实例
         fileController = new FileController();
         // 使用反射设置私有字段
         setPrivateField(fileController, "fileStorageService", fileStorageService);
@@ -51,7 +51,7 @@ class FileControllerTest {
             java.lang.reflect.Field field = object.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);
             field.set(object, value);
-        } catch (Exception e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }

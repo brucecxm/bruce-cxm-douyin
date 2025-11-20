@@ -352,6 +352,11 @@ public class FileController {
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             log.error("批量文件上传失败: {}", e.getMessage(), e);
+            // 创建并记录批量上传整体失败的日志
+            FileOperationLog logfile = createLog("batch_upload", null, "批量上传失败", null, null);
+            logfile.setStatus(0);
+            logfile.setErrorMessage(e.getMessage());
+            fileOperationLogService.saveLog(logfile);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("批量文件上传失败: " + e.getMessage());
         }
     }
