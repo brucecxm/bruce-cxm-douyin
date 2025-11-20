@@ -1,10 +1,14 @@
 package com.bruce.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bruce.entity.User;
 import com.bruce.mapper.UserMapper;
 import com.bruce.service.UserService;
 import org.springframework.stereotype.Service;
+
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -14,22 +18,49 @@ import java.util.List;
  */
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
-    
+
     @Override
-    public List<Long> getHotUserIds(int limit) {
-        // 这里实现获取热门用户ID的逻辑
-        // 实际应用中，可以根据用户活跃度、粉丝数量等指标来排序并获取热门用户
-        // 这里使用简单的模拟实现
-        return baseMapper.selectHotUserIds(limit);
+    public List<User> searchUsersByInfo(String keyword) {
+        // 实现根据关键词搜索用户的逻辑
+        return baseMapper.selectList(new LambdaQueryWrapper<User>()
+                .like(User::getUsername, keyword)
+                .or()
+                .like(User::getNickname, keyword)
+                .last("LIMIT 20"));
     }
-    
+
     @Override
-    public User getById(Long userId) {
-        return super.getById(userId);
+    public User getUserByUsername(String username) {
+        return baseMapper.selectOne(new LambdaQueryWrapper<User>()
+                .eq(User::getUsername, username));
     }
-    
+
     @Override
-    public boolean updateById(User user) {
-        return super.updateById(user);
+    public boolean verifyPassword(String username, String password) {
+        User user = getUserByUsername(username);
+        if (user != null) {
+            // 实际应用中应该使用密码加密验证
+            return user.getPassword().equals(password);
+        }
+        return false;
+    }
+
+    @Override
+    public void updateLastLoginTime(Long userId) {
+        User user = new User();
+        user.setId(userId);
+        // 将java.util.Date转换为java.time.LocalDateTime
+        user.setUpdateTime(new Date().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime());
+        baseMapper.updateById(user);
+    }
+
+    @Override
+    public boolean resetPassword(Long userId, String newPassword) {
+        User user = new User();
+        user.setId(userId);
+        user.setPassword(newPassword);
+        return baseMapper.updateById(user) > 0;
     }
 }
