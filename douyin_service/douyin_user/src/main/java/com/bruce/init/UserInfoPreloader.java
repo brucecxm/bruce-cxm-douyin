@@ -1,5 +1,6 @@
 package com.bruce.init;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.bruce.entity.User;
 import com.bruce.entity.UserInfo;
 import com.bruce.service.UserService;
@@ -25,13 +26,13 @@ import java.util.concurrent.TimeUnit;
 public class UserInfoPreloader {
 
     private static final Logger log = LoggerFactory.getLogger(UserInfoPreloader.class);
-    
+
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
-    
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -40,35 +41,35 @@ public class UserInfoPreloader {
      */
     @PostConstruct
     public void preloadHotUsers() {
-        log.info("开始预热高频用户数据...");
+        log.info("开始预热用户数据...");
         try {
-            // 1. 获取高频用户ID列表（从数据库查询前1000名活跃用户）
-            List<Long> hotUserIds = userService.getHotUserIds(1000);
-            log.info("获取到{}个高频用户ID需要预热", hotUserIds.size());
+            // 1. 获取表中前1000个用户
+            List<User> users = userService.list(new LambdaQueryWrapper<User>().last("LIMIT 1000"));
+            log.info("获取到{}个用户需要预热", users.size());
 
             // 2. 多线程并行加载到缓存
             ExecutorService executor = Executors.newFixedThreadPool(10);  // 10个线程并行
-            for (Long userId : hotUserIds) {
+            for (User user : users) {
+                // 创建临时变量避免lambda中的变量捕获问题
+                final User userTemp = user;
                 executor.submit(() -> {
                     try {
-                        // 查询用户信息
-                        User user = userService.getById(userId);
-                        if (user != null) {
+                        if (userTemp != null) {
                             // 使用与UserController一致的缓存键格式
-                            String key = "user_info:" + userId;
-                            
+                            String key = "user_info:" + userTemp.getId();
+
                             // 序列化为JSON字符串存储
-                            String userJson = objectMapper.writeValueAsString(user);
+                            String userJson = objectMapper.writeValueAsString(userTemp);
                             stringRedisTemplate.opsForValue().set(key, userJson, 10, TimeUnit.MINUTES);
-                            
-                            log.debug("成功预热用户ID: {} 到缓存", userId);
+
+                            log.debug("成功预热用户ID: {} 到缓存", userTemp.getId());
                         }
                     } catch (Exception e) {
-                        log.error("预热用户ID: {} 失败", userId, e);
+                        log.error("预热用户ID: {} 失败", userTemp.getId(), e);
                     }
                 });
             }
-            
+
             // 关闭线程池
             executor.shutdown();
             log.info("用户数据预热任务已提交，正在异步执行");
