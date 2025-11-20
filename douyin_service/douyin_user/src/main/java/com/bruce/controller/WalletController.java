@@ -2,7 +2,10 @@ package com.bruce.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.entity.User;
+import com.bruce.entitys.WalletTransaction;
+import com.bruce.mapper.WalletTransactionMapper;
 import com.bruce.service.TransferService;
 import com.bruce.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,8 @@ public class WalletController {
     private UserService userService;
     @Autowired
     private TransferService transferService;
+    @Autowired
+    private WalletTransactionMapper walletTransactionMapper;
 
     @PostMapping
     public ResponseEntity<?> transfer(@RequestParam Long fromUserId,
@@ -137,6 +142,45 @@ public class WalletController {
             Map<String, Object> response = new HashMap<>();
             response.put("balance", user.getBalance() != null ? user.getBalance() : BigDecimal.ZERO);
 
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    
+    /**
+     * 获取钱包交易记录
+     * @param page 页码
+     * @param pageSize 每页大小
+     * @return 交易记录列表
+     */
+    @GetMapping("/transactions")
+    public ResponseEntity<?> getWalletTransactions(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "20") Integer pageSize) {
+        try {
+            // 获取当前登录用户ID
+            Long userId = Long.parseLong(StpUtil.getLoginId().toString());
+            
+            // 这里假设walletId等于userId，实际项目中可能需要从wallet表中查询
+            Long walletId = userId;
+            
+            // 构建分页查询条件
+            Page<WalletTransaction> pageInfo = new Page<>(page, pageSize);
+            LambdaQueryWrapper<WalletTransaction> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(WalletTransaction::getWalletId, walletId)
+                       .orderByDesc(WalletTransaction::getCreateTime);
+            
+            // 执行查询
+            Page<WalletTransaction> result = walletTransactionMapper.selectPage(pageInfo, queryWrapper);
+            
+            // 构建响应
+            Map<String, Object> response = new HashMap<>();
+            response.put("records", result.getRecords());
+            response.put("total", result.getTotal());
+            response.put("page", result.getCurrent());
+            response.put("pageSize", result.getSize());
+            
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

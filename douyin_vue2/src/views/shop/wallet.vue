@@ -8,49 +8,187 @@
 
     <!-- 已开通钱包 -->
     <div v-else-if="walletEnabled" class="wallet-content">
-      <!-- Header Section -->
-      <div class="header">
-        <div class="balance">余额: ¥{{ balance }}</div>
-        <div class="actions">
-          <button @click="showRechargeDialog">充值</button>
-          <button @click="showWithdrawDialog">提现</button>
+      <!-- 顶部蓝色背景区域 -->
+      <div class="top-blue-section">
+        <div class="header-bar">
+          <h2>**明的钱包</h2>
+          <div class="header-actions">
+            <span class="edit-btn">补全资料提升限额</span>
+            <i class="icon-more"></i>
+            <i class="icon-settings"></i>
+          </div>
+        </div>
+
+        <!-- 余额展示 -->
+        <div class="balance-section">
+          <div class="balance-info">
+            <div class="balance-label">总资产(元)</div>
+            <div class="balance-amount">¥{{ balance.toFixed(2) }}</div>
+            <div class="balance-safe">
+              <i class="icon-safe"></i>
+              <span>安全保障中</span>
+            </div>
+          </div>
+          <i class="icon-arrow"></i>
+        </div>
+
+        <!-- 快捷操作按钮 -->
+        <div class="quick-actions">
+          <button class="action-btn primary-btn" @click="showRechargeDialog">
+            充值
+          </button>
+          <button class="action-btn secondary-btn" @click="showWithdrawDialog">
+            提现
+          </button>
         </div>
       </div>
 
-      <!-- Recharge Dialog -->
-      <div v-if="showRecharge" class="dialog">
-        <div class="dialog-content">
-          <h3>充值</h3>
-          <input
-            type="number"
-            v-model="rechargeAmount"
-            placeholder="输入充值金额"
-          />
-          <button @click="recharge">确认充值</button>
-          <button @click="closeDialog">取消</button>
+      <!-- 资产卡片 -->
+      <div class="asset-cards">
+        <div class="asset-item">
+          <span class="asset-icon diamond-icon">💎</span>
+          <span class="asset-value">{{ diamonds || 0 }}</span>
+          <span class="asset-label">钻石</span>
+        </div>
+        <div class="asset-item">
+          <span class="asset-icon coin-icon">💰</span>
+          <span class="asset-value">{{ coins || 0 }}</span>
+          <span class="asset-label">金币</span>
+        </div>
+        <div class="asset-item">
+          <span class="asset-icon coupon-icon">🎫</span>
+          <span class="asset-value">{{ coupons || 0 }}</span>
+          <span class="asset-label">优惠券</span>
+        </div>
+        <div class="asset-item">
+          <span class="asset-icon card-icon">💳</span>
+          <span class="asset-value">{{ bankCards || 0 }}</span>
+          <span class="asset-label">银行卡</span>
         </div>
       </div>
 
-      <!-- Withdraw Dialog -->
-      <div v-if="showWithdraw" class="dialog">
-        <div class="dialog-content">
-          <h3>提现</h3>
-          <input
-            type="number"
-            v-model="withdrawAmount"
-            placeholder="输入提现金额"
-          />
-          <button @click="withdraw">确认提现</button>
-          <button @click="closeDialog">取消</button>
+      <!-- 交易记录 -->
+      <div class="transaction-section">
+        <div class="section-header">
+          <h3>账单</h3>
+          <div class="transaction-more" @click="viewAllTransactions">
+            <span>全部</span>
+            <i class="icon-arrow-right"></i>
+          </div>
+        </div>
+        <div
+          class="transaction-item"
+          v-for="item in transactions"
+          :key="item.id"
+        >
+          <div class="transaction-info">
+            <div
+              class="transaction-icon"
+              :class="getTransactionIcon(item.type)"
+            ></div>
+            <div class="transaction-details">
+              <div class="transaction-title">{{ item.description }}</div>
+              <div class="transaction-time">
+                {{ formatTime(item.createTime) }}
+              </div>
+            </div>
+          </div>
+          <div
+            class="transaction-amount"
+            :class="
+              item.type === 'TRANSFER_IN' ? 'amount-income' : 'amount-outcome'
+            "
+          >
+            {{ item.type === 'TRANSFER_IN' ? '+' : '-' }}¥{{
+              item.amount.toFixed(2)
+            }}
+          </div>
+        </div>
+        <div v-if="transactions.length === 0" class="empty-transactions">
+          <p>暂无交易记录</p>
         </div>
       </div>
 
-      <!-- Expenditure Details Section -->
-      <div class="expenditure">
-        <h3>支出明细</h3>
-        <div class="item" v-for="item in expenditures" :key="item.id">
-          <div>{{ item.date }} - {{ item.description }}</div>
-          <div>¥{{ item.amount }}</div>
+      <!-- 服务网格 -->
+      <div class="services-grid">
+        <div class="service-item" @click="navigateTo('loan')">
+          <div class="service-icon loan-icon">
+            <i class="icon-loan"></i>
+          </div>
+          <span class="service-name">放心借</span>
+        </div>
+        <div class="service-item" @click="navigateTo('payment')">
+          <div class="service-icon payment-icon">
+            <i class="icon-payment"></i>
+          </div>
+          <span class="service-name">抖音支付</span>
+        </div>
+        <div class="service-item" @click="navigateTo('recharge')">
+          <div class="service-icon recharge-icon">
+            <i class="icon-recharge"></i>
+          </div>
+          <span class="service-name">手机充值</span>
+        </div>
+        <div class="service-item" @click="navigateTo('insurance')">
+          <div class="service-icon insurance-icon">
+            <i class="icon-insurance"></i>
+          </div>
+          <span class="service-name">我的保障</span>
+        </div>
+        <div class="service-item" @click="navigateTo('phoneBill')">
+          <div class="service-icon phone-bill-icon">
+            <i class="icon-phone-bill"></i>
+          </div>
+          <span class="service-name">抖音信用卡</span>
+        </div>
+        <div class="service-item" @click="navigateTo('utilities')">
+          <div class="service-icon utilities-icon">
+            <i class="icon-utilities"></i>
+          </div>
+          <span class="service-name">生活缴费</span>
+        </div>
+        <div class="service-item" @click="navigateTo('ride')">
+          <div class="service-icon ride-icon">
+            <i class="icon-ride"></i>
+          </div>
+          <span class="service-name">打车</span>
+        </div>
+        <div class="service-item" @click="navigateTo('more')">
+          <div class="service-icon more-icon">
+            <i class="icon-more-services"></i>
+          </div>
+          <span class="service-name">更多服务</span>
+        </div>
+      </div>
+
+      <!-- 活动区域 -->
+      <div class="activity-section">
+        <div class="activity-item">
+          <div class="activity-icon">💳</div>
+          <div class="activity-info">
+            <div class="activity-title">放心借</div>
+            <div class="activity-desc">领额度收20元</div>
+          </div>
+          <button class="activity-btn">收下</button>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">⭐</div>
+          <div class="activity-info">
+            <div class="activity-title">抖音支付积分</div>
+            <div class="activity-desc">100积分兑3元</div>
+          </div>
+          <div class="activity-more">
+            <span>积分明细</span>
+            <i class="icon-arrow-right"></i>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">🎁</div>
+          <div class="activity-info">
+            <div class="activity-title">天天领音符</div>
+            <div class="activity-desc">连续签到得奖励</div>
+          </div>
+          <button class="activity-btn">立即签到</button>
         </div>
       </div>
     </div>
@@ -134,6 +272,34 @@
         <button @click="closeEnableDialog">取消</button>
       </div>
     </div>
+
+    <!-- Recharge Dialog -->
+    <div v-if="showRecharge" class="dialog">
+      <div class="dialog-content">
+        <h3>充值</h3>
+        <input
+          type="number"
+          v-model="rechargeAmount"
+          placeholder="输入充值金额"
+        />
+        <button @click="recharge">确认充值</button>
+        <button @click="closeDialog">取消</button>
+      </div>
+    </div>
+
+    <!-- Withdraw Dialog -->
+    <div v-if="showWithdraw" class="dialog">
+      <div class="dialog-content">
+        <h3>提现</h3>
+        <input
+          type="number"
+          v-model="withdrawAmount"
+          placeholder="输入提现金额"
+        />
+        <button @click="withdraw">确认提现</button>
+        <button @click="closeDialog">取消</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -153,6 +319,10 @@ export default {
       loading: true,
       walletEnabled: false,
       balance: 0,
+      diamonds: 0,
+      coins: 0,
+      coupons: 16,
+      bankCards: 2,
       showRecharge: false,
       showWithdraw: false,
       showEnableDialog: false,
@@ -161,7 +331,7 @@ export default {
       paymentPassword: '',
       confirmPassword: '',
       passwordError: '',
-      expenditures: [],
+      transactions: [],
       enablingWallet: false,
       passwordStrength: 'weak',
       strengthWidth: 33,
@@ -196,23 +366,78 @@ export default {
         const balanceResponse = await getWalletBalance();
         this.balance = balanceResponse.data.balance || 0;
 
-        const transactionsResponse = await getWalletTransactions();
+        const transactionsResponse = await getWalletTransactions({
+          page: 1,
+          pageSize: 5
+        });
         if (
           transactionsResponse.data.list &&
           transactionsResponse.data.list.length > 0
         ) {
-          this.expenditures = transactionsResponse.data.list.map((item) => ({
-            id: item.id,
-            date: item.date,
-            description:
-              item.description || (item.type === 'recharge' ? '充值' : '提现'),
-            amount: item.amount
-          }));
+          this.transactions = transactionsResponse.data.list;
+        } else {
+          // 模拟数据
+          this.transactions = [
+            {
+              id: 1,
+              type: 'TRANSFER_OUT',
+              description: '聊天转账退款成功',
+              amount: 200,
+              createTime: new Date().getTime() - 14 * 24 * 60 * 60 * 1000
+            },
+            {
+              id: 2,
+              type: 'TRANSFER_IN',
+              description: '抖音支付充值',
+              amount: 100,
+              createTime: new Date().getTime() - 2 * 24 * 60 * 60 * 1000
+            },
+            {
+              id: 3,
+              type: 'TRANSFER_OUT',
+              description: '购买商品',
+              amount: 56.8,
+              createTime: new Date().getTime() - 5 * 24 * 60 * 60 * 1000
+            }
+          ];
         }
       } catch (error) {
         console.error('加载钱包数据失败:', error);
         this.$message.error('加载钱包数据失败');
       }
+    },
+
+    // 格式化时间
+    formatTime(timestamp) {
+      const now = new Date();
+      const date = new Date(timestamp);
+      const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) {
+        return '今天';
+      } else if (diffDays === 1) {
+        return '昨天';
+      } else if (diffDays < 7) {
+        return `${diffDays}天前`;
+      } else {
+        return `${date.getMonth() + 1}月${date.getDate()}日`;
+      }
+    },
+
+    // 获取交易类型图标
+    getTransactionIcon(type) {
+      if (type === 'TRANSFER_IN') return 'income-icon';
+      return 'outcome-icon';
+    },
+
+    // 查看全部交易记录
+    viewAllTransactions() {
+      this.$message.info('查看全部交易记录');
+    },
+
+    // 导航到服务页面
+    navigateTo(service) {
+      this.$message.info(`跳转到${service}服务`);
     },
 
     // 显示开通钱包对话框
@@ -359,11 +584,15 @@ export default {
 </script>
 
 <style scoped>
+/* 全局样式 */
 .wallet-container {
   width: 100%;
   min-height: 100vh;
-  font-family: Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
   background-color: #f5f5f5;
+  color: #333;
 }
 
 /* 加载中样式 */
@@ -378,8 +607,8 @@ export default {
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #007bff;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top: 4px solid #1677ff;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -393,57 +622,382 @@ export default {
   }
 }
 
-/* 已开通钱包样式 */
-.wallet-content {
-  padding: 20px;
+/* 顶部蓝色背景区域 */
+.top-blue-section {
+  background: linear-gradient(135deg, #1677ff, #0050c9);
+  padding: 16px;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 4px 12px rgba(22, 119, 255, 0.2);
 }
 
-.header {
-  background-color: #007bff;
-  color: white;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.balance {
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-.actions {
+.header-bar {
   display: flex;
-  gap: 15px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  color: white;
 }
 
-.actions button {
-  padding: 10px 20px;
+.header-bar h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.edit-btn {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+/* 余额展示 */
+.balance-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.balance-info {
+  flex: 1;
+}
+
+.balance-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 6px;
+}
+
+.balance-amount {
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.balance-safe {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.balance-safe i {
+  margin-right: 4px;
+}
+
+/* 快捷操作按钮 */
+.quick-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 10px 0;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
+  border-radius: 20px;
+  font-size: 14px;
   font-weight: 500;
-  transition: background-color 0.3s;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.actions button:first-child {
-  background-color: #28a745;
+.primary-btn {
+  background-color: white;
+  color: #1677ff;
+}
+
+.primary-btn:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.secondary-btn {
+  background-color: rgba(255, 255, 255, 0.2);
   color: white;
 }
 
-.actions button:first-child:hover {
-  background-color: #218838;
+.secondary-btn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
-.actions button:nth-child(2) {
-  background-color: #dc3545;
+/* 资产卡片 */
+.asset-cards {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  background-color: white;
+  margin: -10px 16px 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.asset-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.asset-icon {
+  font-size: 24px;
+  margin-bottom: 6px;
+}
+
+.asset-value {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.asset-label {
+  font-size: 12px;
+  color: #666;
+}
+
+/* 交易记录 */
+.transaction-section {
+  background-color: white;
+  margin: 0 16px 16px;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.transaction-more {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #999;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.transaction-item:last-child {
+  border-bottom: none;
+}
+
+.transaction-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.transaction-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  font-size: 18px;
+}
+
+.income-icon {
+  background-color: #e6f7ff;
+  color: #1890ff;
+}
+
+.outcome-icon {
+  background-color: #fff7e6;
+  color: #fa8c16;
+}
+
+.transaction-details {
+  flex: 1;
+}
+
+.transaction-title {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.transaction-time {
+  font-size: 12px;
+  color: #999;
+}
+
+.transaction-amount {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.amount-income {
+  color: #1890ff;
+}
+
+.amount-outcome {
+  color: #333;
+}
+
+.empty-transactions {
+  text-align: center;
+  padding: 20px 0;
+  color: #999;
+}
+
+/* 服务网格 */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 16px;
+  background-color: white;
+  margin: 0 16px 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.service-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 0;
+}
+
+.service-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  font-size: 24px;
+}
+
+.loan-icon {
+  background-color: #fff2f0;
+  color: #ff4d4f;
+}
+
+.payment-icon {
+  background-color: #f6ffed;
+  color: #52c41a;
+}
+
+.recharge-icon {
+  background-color: #e6f7ff;
+  color: #1890ff;
+}
+
+.insurance-icon {
+  background-color: #f9f0ff;
+  color: #722ed1;
+}
+
+.phone-bill-icon {
+  background-color: #fff7e6;
+  color: #fa8c16;
+}
+
+.utilities-icon {
+  background-color: #f0f5ff;
+  color: #2f54eb;
+}
+
+.ride-icon {
+  background-color: #f6ffed;
+  color: #52c41a;
+}
+
+.more-icon {
+  background-color: #f0f0f0;
+  color: #666;
+}
+
+.service-name {
+  font-size: 12px;
+  color: #333;
+}
+
+/* 活动区域 */
+.activity-section {
+  padding: 0 16px 16px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: white;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  font-size: 20px;
+  background-color: #f0f5ff;
+}
+
+.activity-info {
+  flex: 1;
+}
+
+.activity-title {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.activity-desc {
+  font-size: 12px;
+  color: #666;
+}
+
+.activity-btn {
+  padding: 6px 16px;
+  background-color: #1677ff;
   color: white;
+  border: none;
+  border-radius: 16px;
+  font-size: 12px;
+  cursor: pointer;
 }
 
-.actions button:nth-child(2):hover {
-  background-color: #c82333;
+.activity-more {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: #999;
 }
 
 /* 未开通钱包样式 */
@@ -518,25 +1072,6 @@ export default {
 .benefit-icon {
   font-size: 18px;
   margin-right: 8px;
-}
-
-.primary-btn {
-  margin-top: 20px;
-  padding: 12px 40px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.primary-btn:hover {
-  background-color: #0056b3;
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-  transform: translateY(-2px);
 }
 
 .wallet-note {
@@ -669,50 +1204,75 @@ export default {
 }
 
 .dialog button:first-of-type {
-  background-color: #007bff;
+  background-color: #1677ff;
   color: white;
 }
 
 .dialog button:first-of-type:hover {
-  background-color: #0056b3;
+  background-color: #0958d9;
 }
 
 .dialog button:last-of-type {
-  background-color: #6c757d;
-  color: white;
+  background-color: #f5f5f5;
+  color: #666;
 }
 
 .dialog button:last-of-type:hover {
-  background-color: #5a6268;
+  background-color: #e8e8e8;
 }
 
-/* 支出明细样式 */
-.expenditure {
-  background-color: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+/* 图标样式 - 使用Unicode图标或CSS绘制简单图标 */
+.icon-safe::before {
+  content: '🔒';
+  margin-right: 4px;
 }
 
-.expenditure h3 {
-  color: #333;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
+.icon-arrow::before {
+  content: '›';
+  font-size: 20px;
+  color: white;
 }
 
-.expenditure .item {
-  margin-bottom: 15px;
-  padding: 15px;
-  border-radius: 4px;
-  background-color: #f9f9f9;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: background-color 0.3s;
+.icon-more::before {
+  content: '⋮';
+  font-size: 18px;
+  color: white;
 }
 
-.expenditure .item:hover {
-  background-color: #f0f0f0;
+.icon-settings::before {
+  content: '⚙';
+  font-size: 16px;
+  color: white;
+}
+
+.icon-arrow-right::before {
+  content: '›';
+  margin-left: 4px;
+  font-size: 16px;
+}
+
+.icon-loan::before {
+  content: '💳';
+}
+.icon-payment::before {
+  content: '💰';
+}
+.icon-recharge::before {
+  content: '📱';
+}
+.icon-insurance::before {
+  content: '🛡️';
+}
+.icon-phone-bill::before {
+  content: '📲';
+}
+.icon-utilities::before {
+  content: '⚡';
+}
+.icon-ride::before {
+  content: '🚕';
+}
+.icon-more-services::before {
+  content: '⋯';
 }
 </style>
