@@ -6,9 +6,7 @@ import com.bruce.entity.User;
 import com.bruce.mapper.UserMapper;
 import com.bruce.service.UserService;
 import org.springframework.stereotype.Service;
-
-import java.time.ZoneId;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -18,7 +16,7 @@ import java.util.List;
  */
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
-
+    
     @Override
     public List<User> searchUsersByInfo(String keyword) {
         // 实现根据关键词搜索用户的逻辑
@@ -28,13 +26,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .like(User::getNickname, keyword)
                 .last("LIMIT 20"));
     }
-
+    
     @Override
     public User getUserByUsername(String username) {
         return baseMapper.selectOne(new LambdaQueryWrapper<User>()
                 .eq(User::getUsername, username));
     }
-
+    
     @Override
     public boolean verifyPassword(String username, String password) {
         User user = getUserByUsername(username);
@@ -44,18 +42,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         return false;
     }
-
+    
     @Override
     public void updateLastLoginTime(Long userId) {
         User user = new User();
         user.setId(userId);
-        // 将java.util.Date转换为java.time.LocalDateTime
-        user.setUpdateTime(new Date().toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime());
+        user.setUpdateTime(LocalDateTime.now());
         baseMapper.updateById(user);
     }
-
+    
     @Override
     public boolean resetPassword(Long userId, String newPassword) {
         User user = new User();
