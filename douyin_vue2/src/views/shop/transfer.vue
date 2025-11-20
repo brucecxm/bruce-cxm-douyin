@@ -81,7 +81,13 @@
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 import axios from 'axios';
+import { mapState } from 'vuex';
+
+import { mapActions } from 'vuex';
 export default {
+  computed: {
+    ...mapState('userInfo', ['userInfo'])
+  },
   data() {
     return {
       fromUser: '',
@@ -108,11 +114,17 @@ export default {
   },
   mounted() {
     // 从 Vuex 中获取 userInfo
-    const userInfoMap = this.$store.state.userInfo.userInfo;
-    this.fromUser = userInfoMap.userId || '';
-    this.toUser = this.$route.query.toUser || '';
+    const userInfoMap = this.userInfo;
+    console.log(this.userInfo);
+    debugger;
+    this.fromUser = userInfoMap.id || '';
+    // 优先取路由动态参数 id，不存在则分割 URL 路径取最后一段，默认 ''
+    this.toUser =
+      this.$route.params.id ||
+      this.$route.path.split('/').filter(Boolean).pop() ||
+      '';
 
-    const socket = new SockJS('http://localhost:7426/ws');
+    const socket = new SockJS('http://localhost:7456/ws');
     this.stomp = Stomp.over(socket);
 
     this.stomp.connect({}, () => {
@@ -123,6 +135,8 @@ export default {
   },
 
   methods: {
+    ...mapActions('userInfo', ['setUserInfo', 'clearUserInfo']),
+
     openPasswordModal() {
       if (!this.amount || parseFloat(this.amount) <= 0) {
         this.$message.error('请输入有效的转账金额');

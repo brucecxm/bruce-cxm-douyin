@@ -27,26 +27,6 @@ public class WalletController {
     @Autowired
     private WalletTransactionMapper walletTransactionMapper;
 
-    @PostMapping
-    public ResponseEntity<?> transfer(@RequestParam Long fromUserId,
-                                      @RequestParam Long toUserId,
-                                      @RequestParam BigDecimal amount,
-                                      @RequestParam String password
-    ) {
-        try {
-            LambdaQueryWrapper<User> queryWrapper=new LambdaQueryWrapper<>();
-            queryWrapper.eq(User::getId,fromUserId);
-            User user= userService.getOne(queryWrapper);
-            if(!user.getPaymentPassword().equals(password))
-            {
-                return ResponseEntity.badRequest().body("支付密码错误");
-            }
-            transferService.transfer(fromUserId, toUserId, amount);
-            return ResponseEntity.ok("成功");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
 
 
     /**
@@ -147,7 +127,7 @@ public class WalletController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    
+
     /**
      * 获取钱包交易记录
      * @param page 页码
@@ -161,26 +141,26 @@ public class WalletController {
         try {
             // 获取当前登录用户ID
             Long userId = Long.parseLong(StpUtil.getLoginId().toString());
-            
+
             // 这里假设walletId等于userId，实际项目中可能需要从wallet表中查询
             Long walletId = userId;
-            
+
             // 构建分页查询条件
             Page<WalletTransaction> pageInfo = new Page<>(page, pageSize);
             LambdaQueryWrapper<WalletTransaction> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(WalletTransaction::getWalletId, walletId)
                        .orderByDesc(WalletTransaction::getCreateTime);
-            
+
             // 执行查询
             Page<WalletTransaction> result = walletTransactionMapper.selectPage(pageInfo, queryWrapper);
-            
+
             // 构建响应
             Map<String, Object> response = new HashMap<>();
             response.put("records", result.getRecords());
             response.put("total", result.getTotal());
             response.put("page", result.getCurrent());
             response.put("pageSize", result.getSize());
-            
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
