@@ -38,27 +38,41 @@ public class TransferServiceImpl implements TransferService {
 
     public void transfer(Long fromUserId, Long toUserId, BigDecimal amount) {
         // 默认使用Redis锁
-        transfer(fromUserId, toUserId, amount, LockType.REDIS_LOCK);
+        transfer(fromUserId, toUserId, amount, LockType.DATABASE_LOCK);
     }
 
     public void transfer(Long fromUserId, Long toUserId, BigDecimal amount, LockType lockType) {
         // 参数校验
         validateTransferParams(fromUserId, toUserId, amount);
 
-        // 生成锁键 - 使用用户ID的有序组合，确保同一对用户的转账操作总是使用相同的锁键
-        String lockKey = generateLockKey(fromUserId, toUserId);
-        boolean lockAcquired = false;
+        // 生成账户粒度锁键
+        String fromLockKey = "wallet_lock:" + fromUserId; // 转出账户锁
+        String toLockKey = "wallet_lock:" + toUserId; // 转入账户锁
+
+        // 按用户ID顺序确定获取锁的顺序，避免死锁
+        boolean fromLockAcquired = false;
+        boolean toLockAcquired = false;
+
+        // 确定获取锁的顺序
+        String firstLockKey = fromUserId < toUserId ? fromLockKey : toLockKey;
+        String secondLockKey = fromUserId < toUserId ? toLockKey : fromLockKey;
 
         try {
-            // 获取锁
-            lockAcquired = distributedLockService.acquireLock(lockKey, lockType);
-            if (!lockAcquired) {
-                log.warn("转账操作获取锁失败: fromUserId={}, toUserId={}, amount={}, lockType={}",
-                         fromUserId, toUserId, amount, lockType);
-                throw new RuntimeException("系统繁忙，请稍后重试");
+            // 第一阶段：尝试获取第一个锁（使用重试机制）
+            fromLockAcquired = acquireLockWithRetry(firstLockKey, lockType, 3, 100);
+            if (!fromLockAcquired) {
+                log.warn("转账操作获取第一个账户锁失败: fromUserId={}, toUserId={}", fromUserId, toUserId);
+                throw new RuntimeException("当前转账人数较多，请10秒后重试，或查看转账记录确认状态");
             }
+            log.info("转账操作获取第一个账户锁成功: lockKey={}", firstLockKey);
 
-            log.info("转账操作获取锁成功: lockKey={}, lockType={}", lockKey, lockType);
+            // 第二阶段：尝试获取第二个锁（使用重试机制）
+            toLockAcquired = acquireLockWithRetry(secondLockKey, lockType, 3, 100);
+            if (!toLockAcquired) {
+                log.warn("转账操作获取第二个账户锁失败: fromUserId={}, toUserId={}", fromUserId, toUserId);
+                throw new RuntimeException("当前转账人数较多，请10秒后重试，或查看转账记录确认状态");
+            }
+            log.info("转账操作获取第二个账户锁成功: lockKey={}", secondLockKey);
 
             // 执行转账操作
             doTransfer(fromUserId, toUserId, amount);
@@ -69,16 +83,65 @@ public class TransferServiceImpl implements TransferService {
                      fromUserId, toUserId, amount, e.getMessage());
             throw e; // 重新抛出异常，让上层处理
         } finally {
-            // 释放锁
-            if (lockAcquired) {
-                boolean releaseSuccess = distributedLockService.releaseLock(lockKey, lockType);
+            // 释放锁 - 先获取的锁后释放
+            if (toLockAcquired) {
+                boolean releaseSuccess = distributedLockService.releaseLock(secondLockKey, lockType);
                 if (releaseSuccess) {
-                    log.info("转账操作释放锁成功: lockKey={}, lockType={}", lockKey, lockType);
+                    log.info("转账操作释放第二个账户锁成功: lockKey={}", secondLockKey);
                 } else {
-                    log.error("转账操作释放锁失败: lockKey={}, lockType={}", lockKey, lockType);
+                    log.error("转账操作释放第二个账户锁失败: lockKey={}", secondLockKey);
+                }
+            }
+
+            if (fromLockAcquired) {
+                boolean releaseSuccess = distributedLockService.releaseLock(firstLockKey, lockType);
+                if (releaseSuccess) {
+                    log.info("转账操作释放第一个账户锁成功: lockKey={}", firstLockKey);
+                } else {
+                    log.error("转账操作释放第一个账户锁失败: lockKey={}", firstLockKey);
                 }
             }
         }
+    }
+
+    /**
+     * 带重试机制的锁获取方法
+     * @param lockKey 锁键
+     * @param lockType 锁类型
+     * @param retryCount 最大重试次数
+     * @param retryIntervalMs 重试间隔（毫秒）
+     * @return 是否成功获取锁
+     */
+    private boolean acquireLockWithRetry(String lockKey, LockType lockType, int retryCount, long retryIntervalMs) {
+        boolean lockAcquired = false;
+        int attempt = 0;
+
+        while (attempt <= retryCount && !lockAcquired) {
+            lockAcquired = distributedLockService.acquireLock(lockKey, lockType);
+            if (!lockAcquired) {
+                attempt++;
+                if (attempt <= retryCount) {
+                    log.info("尝试获取锁失败，准备重试: attempt={}, maxRetries={}, lockKey={}",
+                            attempt, retryCount, lockKey);
+                    try {
+                        // 睡眠指定时间后重试
+                        Thread.sleep(retryIntervalMs);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        log.warn("锁获取重试被中断", e);
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (lockAcquired) {
+            log.info("成功获取锁: lockKey={}, attempts={}", lockKey, attempt);
+        } else {
+            log.warn("多次尝试获取锁失败: lockKey={}, maxRetries={}", lockKey, retryCount);
+        }
+
+        return lockAcquired;
     }
 
     /**
@@ -130,7 +193,7 @@ public class TransferServiceImpl implements TransferService {
         // 更新转出方钱包
         Wallet fromWalletUpdate = new Wallet();
         fromWalletUpdate.setBalance(newFromBalance);
-        int fromResult = walletMapper.update(fromWalletUpdate, 
+        int fromResult = walletMapper.update(fromWalletUpdate,
             new UpdateWrapper<Wallet>().eq("id", from.getId()));
         if (fromResult == 0) {
             log.error("转出方钱包更新失败，可能被其他操作修改: userId={}", fromUserId);
@@ -140,7 +203,7 @@ public class TransferServiceImpl implements TransferService {
         // 更新转入方钱包
         Wallet toWalletUpdate = new Wallet();
         toWalletUpdate.setBalance(newToBalance);
-        int toResult = walletMapper.update(toWalletUpdate, 
+        int toResult = walletMapper.update(toWalletUpdate,
             new UpdateWrapper<Wallet>().eq("id", to.getId()));
         if (toResult == 0) {
             log.error("转入方钱包更新失败，可能被其他操作修改: userId={}", toUserId);
