@@ -83,3 +83,12 @@ export const getEmailVerificationCodeService = (Data) => {
   }
   return request.post('/user/getEmailVerificationCode', params);
 };
+
+// 更新用户信息
+export const updateUserInfo = (userInfo) => {
+  return request.post('/user/update', userInfo, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+};

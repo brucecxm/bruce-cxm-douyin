@@ -60,6 +60,44 @@ public class UserController extends ApiController {
 
     @Autowired
     private UserService userService;
+    
+    /**
+     * 更新用户信息
+     * @param user 用户信息
+     * @return 更新结果
+     */
+    @PostMapping("/update")
+    public Result updateUserInfo(@RequestBody User user) {
+        try {
+            // 获取当前登录用户ID
+            Long userId = StpUtil.getLoginIdAsLong();
+            
+            // 确保只能更新自己的信息
+            if (user.getId() == null || !user.getId().equals(userId)) {
+                return Result.error("无权修改其他用户信息");
+            }
+            
+            // 更新用户信息
+            boolean success = userService.updateById(user);
+            if (success) {
+                // 清除 Redis 缓存，确保下次查询时获取最新数据
+                String cacheKey = "user_info:" + userId;
+                try {
+                    stringRedisTemplate.delete(cacheKey);
+                    log.info("用户信息缓存已清除，用户ID: {}", userId);
+                } catch (Exception e) {
+                    log.error("清除用户信息缓存失败，用户ID: {}", userId, e);
+                    // Redis 操作失败不应影响主流程
+                }
+                return Result.success("更新成功");
+            } else {
+                return Result.error("更新失败");
+            }
+        } catch (Exception e) {
+            log.error("更新用户信息失败", e);
+            return Result.error("更新失败，请稍后重试");
+        }
+    }
 
     @Autowired
     private FriendService friendService;
