@@ -7,8 +7,12 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.bruce.common.BaseContext;
 import com.bruce.common.R;
 import com.bruce.entity.AddressBook;
+import com.bruce.entity.InterfaceLog;
 import com.bruce.service.AddressBookService;
+import com.bruce.service.InterfaceLogService;
 import com.bruce.service.TicketService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,15 +33,34 @@ public class AddressBookController {
     @Autowired
     private TicketService ticketService;
 
+    @Autowired
+    private InterfaceLogService interfaceLogService;
+    @Autowired
+    private ObjectMapper objectMapper;
     @GetMapping("/checkTicket")
     public String checkTicket(
-            @RequestParam String ticket,
             @RequestParam(required = false) String client,
             @RequestParam(required = false) String ssoLogoutCall) {
+        List<InterfaceLog> interfaceLogList = interfaceLogService.list();
+        // 2. 调用 writeValueAsString 方法进行转换
+        try {
+            // 2. 调用 writeValueAsString 方法进行转换
+            String json = objectMapper.writeValueAsString(interfaceLogList);
 
-        // 调用服务来校验 ticket
-        String result = ticketService.checkTicket(ticket, client, ssoLogoutCall);
-        return result;
+            // 打印结果查看
+            System.out.println(json);
+            // 调用服务来校验 ticket
+//            String result = ticketService.checkTicket(ticket, client, ssoLogoutCall) + json;
+            return json;
+            // 现在你可以将 json 字符串用于存储、传输等用途
+            // ...
+
+        } catch (JsonProcessingException e) {
+            // 处理转换异常，例如日志记录
+            e.printStackTrace();
+        }
+        return "11";
+
     }
 
 
@@ -87,18 +110,18 @@ public class AddressBookController {
         return R.success(addressBook);
     }
 
-    /**
-     * 根据id查询地址
-     */
-    @GetMapping("/{id}")
-    public R get(@PathVariable Long id) {
-        AddressBook addressBook = addressBookService.getById(id);
-        if (addressBook != null) {
-            return R.success(addressBook);
-        } else {
-            return R.error("没有找到该对象");
-        }
-    }
+//    /**
+//     * 根据id查询地址
+//     */
+//    @GetMapping("/{id}")
+//    public R get(@PathVariable Long id) {
+//        AddressBook addressBook = addressBookService.getById(id);
+//        if (addressBook != null) {
+//            return R.success(addressBook);
+//        } else {
+//            return R.error("没有找到该对象");
+//        }
+//    }
 
     /**
      * 查询默认地址

@@ -28,7 +28,7 @@ public class TransferServiceImpl implements TransferService {
     @Autowired
     private  SimpMessagingTemplate messagingTemplate;
 
-    @Transactional
+    @Transactional(timeout = 5) // 设置事务超时时间为5秒
     public void transfer(Long fromUserId, Long toUserId, BigDecimal amount) {
         if (fromUserId.equals(toUserId)) throw new RuntimeException("不能转给自己");
 
