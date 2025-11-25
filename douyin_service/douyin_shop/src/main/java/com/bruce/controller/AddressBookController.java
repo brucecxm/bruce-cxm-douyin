@@ -48,7 +48,7 @@ public class AddressBookController {
             String json = objectMapper.writeValueAsString(interfaceLogList);
 
             // 打印结果查看
-            System.out.println(json);
+            System.out.println("comming");
             // 调用服务来校验 ticket
 //            String result = ticketService.checkTicket(ticket, client, ssoLogoutCall) + json;
             return json;
