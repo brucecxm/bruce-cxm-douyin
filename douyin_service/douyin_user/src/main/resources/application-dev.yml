@@ -77,7 +77,7 @@ spring:
         enabled: true
         login-username: admin  # 监控页登录用户名
         login-password: admin  # 监控页登录密码
-
+        allow: 0.0.0.0        # 允许所有IP访问（或留空：allow:）
 
 
   security:
