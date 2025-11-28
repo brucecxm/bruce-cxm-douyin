@@ -452,9 +452,9 @@ public class UserController extends ApiController {
             return Result.error("用户ID格式错误，请输入有效的数字ID");
         }
 
-        if (userIdLongcan <= 0 || userIdLongcan > 1000000000L) { // 假设业务中用户ID最大为10亿
-            return Result.error("用户ID超出合法范围（1-1000000000）");
-        }
+//        if (userIdLongcan <= 0 || userIdLongcan > 1000000000L) { // 假设业务中用户ID最大为10亿
+//            return Result.error("用户ID超出合法范围（1-1000000000）");
+//        }
 
         // 4. 业务规则校验（拦截已知的非法ID，如恶意构造的特殊值）
         if (userIdLongcan == 999999999L || userIdLongcan == 123456789L) { // 示例：拦截特定非法ID
