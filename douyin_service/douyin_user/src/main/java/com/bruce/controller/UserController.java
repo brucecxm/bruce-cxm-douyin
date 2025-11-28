@@ -488,6 +488,17 @@ public class UserController extends ApiController {
             // 预热完成后：布隆过滤器返回不存在则可以直接返回（假阴性概率极低）
             if (!isWarmupCompleted) {
                 log.debug("布隆过滤器预热未完成，即使布隆过滤器返回不存在，也继续查询数据库");
+
+                // 在预热未完成时，同时应用空值缓存策略
+                try {
+                    String emptyValue = stringRedisTemplate.opsForValue().get(emptyKey);
+                    if ("null".equals(emptyValue)) {
+                        log.debug("空值缓存命中，用户ID {} 不存在", userIdLong);
+                        return Result.error("用户不存在");
+                    }
+                } catch (Exception e) {
+                    log.error("读取空值缓存失败，降级查询数据库", e);
+                }
             } else if (!userBloomFilter.contains(userIdLong)) {
                 // 预热完成后，布隆过滤器返回不存在，则用户几乎肯定不存在
                 log.debug("布隆过滤器预热已完成，用户ID {} 不在布隆过滤器中，直接返回不存在", userIdLong);
@@ -616,14 +627,15 @@ public class UserController extends ApiController {
 
                 String userJson = objectMapper.writeValueAsString(user);
                 stringRedisTemplate.opsForValue().set(key, userJson, 10, TimeUnit.MINUTES);
-                // 如果是空值缓存策略，删除空值标记
-                if ("empty".equals(type)) {
+                // 如果是空值缓存策略或布隆过滤器策略，删除空值标记
+                if ("empty".equals(type) || "bloom".equals(type) || "布隆".equals(type)) {
                     stringRedisTemplate.delete(emptyKey);
                 }
             } else {
-                // 方案1: 缓存空值
-                if ("empty".equals(type)) {
+                // 方案1: 缓存空值 - 对空值缓存策略和布隆过滤器策略都应用空值缓存
+                if ("empty".equals(type) || "bloom".equals(type) || "布隆".equals(type)) {
                     stringRedisTemplate.opsForValue().set(emptyKey, "null", 5, TimeUnit.MINUTES);
+                    log.debug("为用户ID {} 设置空值缓存，过期时间5分钟", userId);
                 }
             }
         } catch (JsonProcessingException e) {
