@@ -23,9 +23,12 @@
 
 
 
-
-
-
+        <!-- Redisson 核心依赖 -->
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>3.26.0</version> <!-- 最新稳定版，可根据需求调整 -->
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

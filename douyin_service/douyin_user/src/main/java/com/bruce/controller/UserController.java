@@ -16,9 +16,11 @@ import com.bruce.utils.AuthUtils;
 import com.bruce.utils.JwtUtil;
 import com.bruce.utils.RedisUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -29,7 +31,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
+import org.redisson.api.RBloomFilter;
+import org.redisson.api.RLock;
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -51,7 +54,10 @@ public class UserController extends ApiController {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
-
+    @Autowired
+    private RedissonClient redissonClient;
+    @Autowired
+    private  RBloomFilter<Long> userBloomFilter;
     @Autowired
     private RedisUtil redisUtil;
 
@@ -60,7 +66,7 @@ public class UserController extends ApiController {
 
     @Autowired
     private UserService userService;
-    
+
     /**
      * 更新用户信息
      * @param user 用户信息
@@ -71,12 +77,12 @@ public class UserController extends ApiController {
         try {
             // 获取当前登录用户ID
             Long userId = StpUtil.getLoginIdAsLong();
-            
+
             // 确保只能更新自己的信息
             if (user.getId() == null || !user.getId().equals(userId)) {
                 return Result.error("无权修改其他用户信息");
             }
-            
+
             // 更新用户信息
             boolean success = userService.updateById(user);
             if (success) {
@@ -104,7 +110,7 @@ public class UserController extends ApiController {
 
     @Resource
     private VideoService videoService; // 用于将对象转换为JSON字符串
-    
+
     @Autowired
     private UserRelationService userRelationService;
 
@@ -382,57 +388,129 @@ public class UserController extends ApiController {
         }
     }
 
+
+
+
+
+
+
+
+    //todo  缓存穿透实例接口
+    //todo  缓存穿透实例接口
+    //todo  缓存穿透实例接口
+    //todo  缓存穿透实例接口
+    //todo  缓存穿透实例接口
+    //todo  缓存穿透实例接口
+    //todo  缓存穿透实例接口
+    //todo  缓存穿透实例接口
+    //todo  缓存穿透实例接口
+    //todo  缓存穿透实例接口
+    //todo  缓存穿透实例接口
+    //todo  缓存穿透实例接口
     @GetMapping("/userInfo")
     public Result<UserInfo> userInfo(@RequestParam Map<String, Object> params) {
         String pageStr = String.valueOf(params.getOrDefault("page", ""));
         String pageSizeStr = String.valueOf(params.getOrDefault("pageSize", ""));
         String userId = String.valueOf(params.getOrDefault("userId", ""));
+        String type = String.valueOf(params.getOrDefault("type", ""));
 
         if (userId.isEmpty()) {
             userId = String.valueOf(StpUtil.getLoginId());
         }
 
-        String key = "user_info:" + userId;
+        Long userIdLong;
+        try {
+            userIdLong = Long.parseLong(userId);
+        } catch (NumberFormatException e) {
+            return Result.error("用户ID格式错误");
+        }
+
+        // 根据type选择缓存穿透解决方案
         User user = null;
+        String key = "user_info:" + userId;
+        String emptyKey = "empty_user:" + userId;
+
+        // 方案1: 布隆过滤器 (type=bloom)
+        if ("bloom".equals(type)) {
+            if (!userBloomFilter.contains(userIdLong)) {
+                    return Result.error("用户不存在");
+            }
+        }
 
         try {
             String userJson = stringRedisTemplate.opsForValue().get(key);
             if (userJson != null) {
                 user = objectMapper.readValue(userJson, User.class);
             }
+
+            // 方案1: 空值缓存 (type=empty)
+            if ("empty".equals(type) && user == null) {
+                String emptyValue = stringRedisTemplate.opsForValue().get(emptyKey);
+                if ("null".equals(emptyValue)) {
+                    return Result.error("用户不存在");
+                }
+            }
         } catch (Exception e) {
-            // 可打印日志但不中断流程
             log.error("Redis 用户信息反序列化失败，降级查询数据库", e);
         }
 
+        // 方案3: 互斥锁 (type=lock)
         if (user == null) {
-            user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getId, userId));
-            if (user == null) {
-                return Result.error("用户不存在");
+            if ("lock".equals(type)) {
+                RLock lock = redissonClient.getLock("user_info_lock:" + userId);
+                try {
+                    // 尝试获取锁，最多等待5秒，锁自动释放时间30秒
+                    if (lock.tryLock(5, 30, TimeUnit.SECONDS)) {
+                        try {
+                            // 双重检查
+                            String userJson = stringRedisTemplate.opsForValue().get(key);
+                            if (userJson != null) {
+                                user = objectMapper.readValue(userJson, User.class);
+                            } else {
+                                user = queryUserFromDb(userIdLong, key, emptyKey, type);
+                            }
+                        } catch (JsonMappingException e) {
+                            throw new RuntimeException(e);
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        } finally {
+                            lock.unlock();
+                        }
+                    } else {
+                        // 获取锁失败，重试读取缓存
+                        try {
+                            String userJson = stringRedisTemplate.opsForValue().get(key);
+                            if (userJson != null) {
+                                user = objectMapper.readValue(userJson, User.class);
+                            }
+                        } catch (Exception e) {
+                            log.error("重试读取缓存失败", e);
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    log.error("获取锁异常", e);
+                    Thread.currentThread().interrupt();
+                }
+            } else {
+                user = queryUserFromDb(userIdLong, key, emptyKey, type);
             }
-            try {
-                String userJson = objectMapper.writeValueAsString(user);
-                stringRedisTemplate.opsForValue().set(key, userJson, 10, TimeUnit.MINUTES);
-            } catch (JsonProcessingException e) {
-                log.error("用户信息序列化失败", e);
-            }
+        }
+
+        if (user == null) {
+            return Result.error("用户不存在");
         }
 
         UserInfo userInfo = new UserInfo();
         BeanUtils.copyProperties(user, userInfo);
-        
+
         // 设置粉丝、关注和互关数量
-        Long userIdLong = Long.parseLong(userId);
         Integer fansCount = userRelationService.getFansCount(userIdLong);
         Integer followCount = userRelationService.getFollowCount(userIdLong);
         Integer mutualFollowCount = userRelationService.getMutualFollowCount(userIdLong);
-        
-        // 设置后端属性
+
         userInfo.setFansCount(fansCount);
         userInfo.setFollowCount(followCount);
         userInfo.setMutualFollowCount(mutualFollowCount);
-        
-        // 设置前端兼容性属性
         userInfo.setFollowers(fansCount);
         userInfo.setFollowing(followCount);
         userInfo.setMutualFollow(mutualFollowCount);
@@ -464,6 +542,32 @@ public class UserController extends ApiController {
         return Result.success(userInfo);
     }
 
+    /**
+     * 从数据库查询用户信息并处理缓存
+     */
+    private User queryUserFromDb(Long userId, String key, String emptyKey, String type) {
+        User user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getId, userId));
+
+        try {
+            if (user != null) {
+                String userJson = objectMapper.writeValueAsString(user);
+                stringRedisTemplate.opsForValue().set(key, userJson, 10, TimeUnit.MINUTES);
+                // 如果是空值缓存策略，删除空值标记
+                if ("empty".equals(type)) {
+                    stringRedisTemplate.delete(emptyKey);
+                }
+            } else {
+                // 方案1: 缓存空值
+                if ("empty".equals(type)) {
+                    stringRedisTemplate.opsForValue().set(emptyKey, "null", 5, TimeUnit.MINUTES);
+                }
+            }
+        } catch (JsonProcessingException e) {
+            log.error("用户信息序列化失败", e);
+        }
+
+        return user;
+    }
     // 图片验证码接口
     @GetMapping("/getVerificationCode")
     public void getVerificationCode(HttpServletResponse response, @RequestParam Map<String, Object> params)
