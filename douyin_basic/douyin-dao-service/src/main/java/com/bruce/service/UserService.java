@@ -47,5 +47,11 @@ public interface UserService extends IService<User> {
      * @return 操作结果
      */
     boolean resetPassword(Long userId, String newPassword);
+    
+    /**
+     * 获取所有用户ID列表
+     * @return 用户ID列表
+     */
+    List<Long> listAllUserId();
 }
 

@@ -31,6 +31,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import com.bruce.monitor.BloomFilterMonitor;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import javax.annotation.Resource;
@@ -57,7 +58,10 @@ public class UserController extends ApiController {
     @Autowired
     private RedissonClient redissonClient;
     @Autowired
-    private  RBloomFilter<Long> userBloomFilter;
+    private RBloomFilter<Long> userBloomFilter;
+
+    @Autowired
+    private BloomFilterMonitor bloomFilterMonitor;
     @Autowired
     private RedisUtil redisUtil;
 
@@ -69,6 +73,7 @@ public class UserController extends ApiController {
 
     /**
      * 更新用户信息
+     *
      * @param user 用户信息
      * @return 更新结果
      */
@@ -388,30 +393,74 @@ public class UserController extends ApiController {
         }
     }
 
+    // todo 缓存穿透实例接口
+    // todo 缓存穿透实例接口
+    // todo 缓存穿透实例接口
+    // todo 缓存穿透实例接口
+    // todo 缓存穿透实例接口
+    // todo 缓存穿透实例接口
+    // todo 缓存穿透实例接口
+    // todo 缓存穿透实例接口
+    // todo 缓存穿透实例接口
+    // todo 缓存穿透实例接口
+    // todo 缓存穿透实例接口
+    // todo 缓存穿透实例接口
+    // todo 下面的就是 启动时通过多线程异步预热数据 预热完成前用把缓存设置为空的办法 预热完毕后在用布隆过滤器
+    // todo 下面的就是 启动时通过多线程异步预热数据 预热完成前用把缓存设置为空的办法 预热完毕后在用布隆过滤器
+    // todo 下面的就是 启动时通过多线程异步预热数据 预热完成前用把缓存设置为空的办法 预热完毕后在用布隆过滤器
+    // 这个方案通过“线程安全的状态标记+多线程异步预热+降级兜底”实现高效启动：
+    // 服务启动时先将布隆过滤器预热状态设为false，此时请求不使用布隆过滤器，而是通过缓存空数据/直接查库兜底；
+    // 同时后台多线程分片加载全量用户数据到布隆过滤器，完成后将状态标记为true，
+    // 请求自动切换为“布隆过滤器+查库”的高效逻辑——既避免了服务启动阻塞，又保证了预热完成后布隆过滤器的性能优势。
 
+    // ****************************************************************
 
-
-
-
-
-
-    //todo  缓存穿透实例接口
-    //todo  缓存穿透实例接口
-    //todo  缓存穿透实例接口
-    //todo  缓存穿透实例接口
-    //todo  缓存穿透实例接口
-    //todo  缓存穿透实例接口
-    //todo  缓存穿透实例接口
-    //todo  缓存穿透实例接口
-    //todo  缓存穿透实例接口
-    //todo  缓存穿透实例接口
-    //todo  缓存穿透实例接口
-    //todo  缓存穿透实例接口
+    // todo 下面是通过脚本 比如python 或者别的 每天凌晨相当于手动把需要预热的数据写入redis
+    // 性能优化方案：可通过离线任务预先生成布隆过滤器快照（如每日凌晨用 Spark/Flink 读取用户全量表，
+    // 生成布隆过滤器并序列化存储到 Redis），服务启动时直接加载 Redis 中的快照数据，无需实时预热；
+    // 同时在业务侧通过binlog 增量同步（如 Canal 监听用户表变更），将新增/删除的用户ID实时同步到布隆过滤器。
     @GetMapping("/userInfo")
     public Result<UserInfo> userInfo(@RequestParam Map<String, Object> params) {
         String pageStr = String.valueOf(params.getOrDefault("page", ""));
         String pageSizeStr = String.valueOf(params.getOrDefault("pageSize", ""));
+        // String userId = String.valueOf(params.getOrDefault("userId", ""));
+
         String userId = String.valueOf(params.getOrDefault("userId", ""));
+//todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
+//todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
+//todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
+//todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
+//todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
+
+
+
+//        // 1. 非空校验（空字符串或空白字符）
+//        if (userId.trim().isEmpty()) {
+//            return Result.error("用户ID不能为空");
+//        }
+
+        // 2. 格式校验（是否为纯数字，避免非数字ID穿透）
+        if (!userId.matches("^\\d+$")) {
+            return Result.error("用户ID必须为数字格式");
+        }
+
+        // 3. 数值范围校验（防止过大/过小的非法ID，如-1、999999999999）
+        long userIdLongcan;
+        try {
+            userIdLongcan = Long.parseLong(userId);
+        } catch (NumberFormatException e) {
+            return Result.error("用户ID格式错误，请输入有效的数字ID");
+        }
+
+        if (userIdLongcan <= 0 || userIdLongcan > 1000000000L) { // 假设业务中用户ID最大为10亿
+            return Result.error("用户ID超出合法范围（1-1000000000）");
+        }
+
+        // 4. 业务规则校验（拦截已知的非法ID，如恶意构造的特殊值）
+        if (userIdLongcan == 999999999L || userIdLongcan == 123456789L) { // 示例：拦截特定非法ID
+            return Result.error("用户ID非法，禁止访问");
+        }
+
         String type = String.valueOf(params.getOrDefault("type", ""));
 
         if (userId.isEmpty()) {
@@ -432,8 +481,17 @@ public class UserController extends ApiController {
 
         // 方案1: 布隆过滤器 (type=bloom)
         if ("bloom".equals(type)) {
-            if (!userBloomFilter.contains(userIdLong)) {
-                    return Result.error("用户不存在");
+            // 检查布隆过滤器预热是否完成
+            boolean isWarmupCompleted = bloomFilterMonitor.isWarmupCompleted();
+
+            // 预热完成前：布隆过滤器返回不存在也需要查库验证，避免误判
+            // 预热完成后：布隆过滤器返回不存在则可以直接返回（假阴性概率极低）
+            if (!isWarmupCompleted) {
+                log.debug("布隆过滤器预热未完成，即使布隆过滤器返回不存在，也继续查询数据库");
+            } else if (!userBloomFilter.contains(userIdLong)) {
+                // 预热完成后，布隆过滤器返回不存在，则用户几乎肯定不存在
+                log.debug("布隆过滤器预热已完成，用户ID {} 不在布隆过滤器中，直接返回不存在", userIdLong);
+                return Result.error("用户不存在");
             }
         }
 
@@ -550,6 +608,12 @@ public class UserController extends ApiController {
 
         try {
             if (user != null) {
+                // 将存在的用户ID添加到布隆过滤器
+                if (!userBloomFilter.contains(userId)) {
+                    userBloomFilter.add(userId);
+                    log.info("用户ID {} 已添加到布隆过滤器", userId);
+                }
+
                 String userJson = objectMapper.writeValueAsString(user);
                 stringRedisTemplate.opsForValue().set(key, userJson, 10, TimeUnit.MINUTES);
                 // 如果是空值缓存策略，删除空值标记
@@ -564,10 +628,13 @@ public class UserController extends ApiController {
             }
         } catch (JsonProcessingException e) {
             log.error("用户信息序列化失败", e);
+        } catch (Exception e) {
+            log.error("处理用户数据时发生异常", e);
         }
 
         return user;
     }
+
     // 图片验证码接口
     @GetMapping("/getVerificationCode")
     public void getVerificationCode(HttpServletResponse response, @RequestParam Map<String, Object> params)
