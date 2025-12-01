@@ -462,6 +462,8 @@ public class UserController extends ApiController {
         }
 
         String type = String.valueOf(params.getOrDefault("type", ""));
+        // 新增isredis参数处理，检查是否传了isredis参数
+        boolean isRedis = params.containsKey("isredis");
 
         if (userId.isEmpty()) {
             userId = String.valueOf(StpUtil.getLoginId());
@@ -479,89 +481,94 @@ public class UserController extends ApiController {
         String key = "user_info:" + userId;
         String emptyKey = "empty_user:" + userId;
 
-        // 方案1: 布隆过滤器 (type=bloom)
-        if ("bloom".equals(type)) {
-            // 检查布隆过滤器预热是否完成
-            boolean isWarmupCompleted = bloomFilterMonitor.isWarmupCompleted();
+        // 如果传了isredis参数，直接从数据库查询，不使用redis
+        if (isRedis) {
+            user = queryUserFromDbDirect(userIdLong);
+        } else {
+            // 方案1: 布隆过滤器 (type=bloom)
+            if ("bloom".equals(type)) {
+                // 检查布隆过滤器预热是否完成
+                boolean isWarmupCompleted = bloomFilterMonitor.isWarmupCompleted();
 
-            // 预热完成前：布隆过滤器返回不存在也需要查库验证，避免误判
-            // 预热完成后：布隆过滤器返回不存在则可以直接返回（假阴性概率极低）
-            if (!isWarmupCompleted) {
-                log.debug("布隆过滤器预热未完成，即使布隆过滤器返回不存在，也继续查询数据库");
+                // 预热完成前：布隆过滤器返回不存在也需要查库验证，避免误判
+                // 预热完成后：布隆过滤器返回不存在则可以直接返回（假阴性概率极低）
+                if (!isWarmupCompleted) {
+                    log.debug("布隆过滤器预热未完成，即使布隆过滤器返回不存在，也继续查询数据库");
 
-                // 在预热未完成时，同时应用空值缓存策略
-                try {
-                    String emptyValue = stringRedisTemplate.opsForValue().get(emptyKey);
-                    if ("null".equals(emptyValue)) {
-                        log.debug("空值缓存命中，用户ID {} 不存在", userIdLong);
-                        return Result.error("用户不存在");
+                    // 在预热未完成时，同时应用空值缓存策略
+                    try {
+                        String emptyValue = stringRedisTemplate.opsForValue().get(emptyKey);
+                        if ("null".equals(emptyValue)) {
+                            log.debug("空值缓存命中，用户ID {} 不存在", userIdLong);
+                            return Result.error("用户不存在");
+                        }
+                    } catch (Exception e) {
+                        log.error("读取空值缓存失败，降级查询数据库", e);
                     }
-                } catch (Exception e) {
-                    log.error("读取空值缓存失败，降级查询数据库", e);
-                }
-            } else if (!userBloomFilter.contains(userIdLong)) {
-                // 预热完成后，布隆过滤器返回不存在，则用户几乎肯定不存在
-                log.debug("布隆过滤器预热已完成，用户ID {} 不在布隆过滤器中，直接返回不存在", userIdLong);
-                return Result.error("用户不存在");
-            }
-        }
-
-        try {
-            String userJson = stringRedisTemplate.opsForValue().get(key);
-            if (userJson != null) {
-                user = objectMapper.readValue(userJson, User.class);
-            }
-
-            // 方案1: 空值缓存 (type=empty)
-            if ("empty".equals(type) && user == null) {
-                String emptyValue = stringRedisTemplate.opsForValue().get(emptyKey);
-                if ("null".equals(emptyValue)) {
+                } else if (!userBloomFilter.contains(userIdLong)) {
+                    // 预热完成后，布隆过滤器返回不存在，则用户几乎肯定不存在
+                    log.debug("布隆过滤器预热已完成，用户ID {} 不在布隆过滤器中，直接返回不存在", userIdLong);
                     return Result.error("用户不存在");
                 }
             }
-        } catch (Exception e) {
-            log.error("Redis 用户信息反序列化失败，降级查询数据库", e);
-        }
 
-        // 方案3: 互斥锁 (type=lock)
-        if (user == null) {
-            if ("lock".equals(type)) {
-                RLock lock = redissonClient.getLock("user_info_lock:" + userId);
-                try {
-                    // 尝试获取锁，最多等待5秒，锁自动释放时间30秒
-                    if (lock.tryLock(5, 30, TimeUnit.SECONDS)) {
-                        try {
-                            // 双重检查
-                            String userJson = stringRedisTemplate.opsForValue().get(key);
-                            if (userJson != null) {
-                                user = objectMapper.readValue(userJson, User.class);
-                            } else {
-                                user = queryUserFromDb(userIdLong, key, emptyKey, type);
-                            }
-                        } catch (JsonMappingException e) {
-                            throw new RuntimeException(e);
-                        } catch (JsonProcessingException e) {
-                            throw new RuntimeException(e);
-                        } finally {
-                            lock.unlock();
-                        }
-                    } else {
-                        // 获取锁失败，重试读取缓存
-                        try {
-                            String userJson = stringRedisTemplate.opsForValue().get(key);
-                            if (userJson != null) {
-                                user = objectMapper.readValue(userJson, User.class);
-                            }
-                        } catch (Exception e) {
-                            log.error("重试读取缓存失败", e);
-                        }
-                    }
-                } catch (InterruptedException e) {
-                    log.error("获取锁异常", e);
-                    Thread.currentThread().interrupt();
+            try {
+                String userJson = stringRedisTemplate.opsForValue().get(key);
+                if (userJson != null) {
+                    user = objectMapper.readValue(userJson, User.class);
                 }
-            } else {
-                user = queryUserFromDb(userIdLong, key, emptyKey, type);
+
+                // 方案1: 空值缓存 (type=empty)
+                if ("empty".equals(type) && user == null) {
+                    String emptyValue = stringRedisTemplate.opsForValue().get(emptyKey);
+                    if ("null".equals(emptyValue)) {
+                        return Result.error("用户不存在");
+                    }
+                }
+            } catch (Exception e) {
+                log.error("Redis 用户信息反序列化失败，降级查询数据库", e);
+            }
+
+            // 方案3: 互斥锁 (type=lock)
+            if (user == null) {
+                if ("lock".equals(type)) {
+                    RLock lock = redissonClient.getLock("user_info_lock:" + userId);
+                    try {
+                        // 尝试获取锁，最多等待5秒，锁自动释放时间30秒
+                        if (lock.tryLock(5, 30, TimeUnit.SECONDS)) {
+                            try {
+                                // 双重检查
+                                String userJson = stringRedisTemplate.opsForValue().get(key);
+                                if (userJson != null) {
+                                    user = objectMapper.readValue(userJson, User.class);
+                                } else {
+                                    user = queryUserFromDb(userIdLong, key, emptyKey, type);
+                                }
+                            } catch (JsonMappingException e) {
+                                throw new RuntimeException(e);
+                            } catch (JsonProcessingException e) {
+                                throw new RuntimeException(e);
+                            } finally {
+                                lock.unlock();
+                            }
+                        } else {
+                            // 获取锁失败，重试读取缓存
+                            try {
+                                String userJson = stringRedisTemplate.opsForValue().get(key);
+                                if (userJson != null) {
+                                    user = objectMapper.readValue(userJson, User.class);
+                                }
+                            } catch (Exception e) {
+                                log.error("重试读取缓存失败", e);
+                            }
+                        }
+                    } catch (InterruptedException e) {
+                        log.error("获取锁异常", e);
+                        Thread.currentThread().interrupt();
+                    }
+                } else {
+                    user = queryUserFromDb(userIdLong, key, emptyKey, type);
+                }
             }
         }
 
@@ -644,6 +651,15 @@ public class UserController extends ApiController {
             log.error("处理用户数据时发生异常", e);
         }
 
+        return user;
+    }
+
+    /**
+     * 直接从数据库查询用户信息，不处理缓存
+     */
+    private User queryUserFromDbDirect(Long userId) {
+        User user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getId, userId));
+        log.debug("直接从数据库查询用户信息，用户ID: {}", userId);
         return user;
     }
 
