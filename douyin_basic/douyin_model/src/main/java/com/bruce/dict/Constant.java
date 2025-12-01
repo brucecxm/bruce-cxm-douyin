@@ -9,7 +9,7 @@ public class Constant {
      * 🟩 接口参数字段常量
      */
     public static class ApiParam {
-        public static final String TYPE = "Type";
+        public static final String TYPE = "type";
         public static final String VIDEO_TYPE = "videoType";
         public static final String CONTENT_ID = "contentId";
         public static final String CONTENT_TYPE = "contentType";

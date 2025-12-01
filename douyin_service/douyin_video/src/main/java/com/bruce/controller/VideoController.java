@@ -318,68 +318,78 @@ public class VideoController extends ApiController {
     }
 
     @PostMapping("/like")
-    public ResponseEntity<String> like(@RequestBody Map<String, Object> requestone) {
-        Map<String, Object> request = (Map<String, Object>) requestone.get("params");
+    public ResponseEntity<Map<String, Object>> like(@RequestBody LikeRequest likeRequest) {
         try {
             StpUtil.checkLogin();
         } catch (NotLoginException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("用户未登录");
+            Map<String, Object> response = new HashMap<>();
+            response.put("code", 401);
+            response.put("message", "用户未登录");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
+        // 获取当前登录用户ID
+        Long userId = Long.valueOf(StpUtil.getLoginId().toString());
+
         // 限流逻辑：每个用户每秒最多允许10次点赞操作
-        String userIdStr = StpUtil.getLoginId().toString();
-        String rateLimitKey = "rate:limit:like:" + userIdStr;
+        String rateLimitKey = "rate:limit:like:" + userId;
         long current = System.currentTimeMillis() / 1000;
         redisTemplate.opsForHash().put(rateLimitKey, "last", current);
         redisTemplate.expire(rateLimitKey, 1, java.util.concurrent.TimeUnit.SECONDS);
         Long count = redisTemplate.opsForHash().increment(rateLimitKey, "count", 1);
         if (count > 10) {
-            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("点赞操作过于频繁，请稍后再试");
+            Map<String, Object> response = new HashMap<>();
+            response.put("code", 429);
+            response.put("message", "点赞操作过于频繁，请稍后再试");
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(response);
         }
 
-        Object userIdOb = StpUtil.getLoginId();
-        Long userId = null;
-        if (userIdOb != null) {
-            // 先将 userIdOb 转换为 String，再转换为 Long
-            userId = Long.valueOf(userIdOb.toString());
-        }
-        // 从 Map 中获取内容 ID 和 type（表示红心的颜色）
-        Long contentId = Long.valueOf(request.get(Constant.ApiParam.CONTENT_ID).toString());
-        String type = (String) request.get(Constant.ApiParam.TYPE); // type 值判断
-        String content_type = (String) request.get(Constant.ApiParam.CONTENT_TYPE); // type 值判断
-        // 生成 Redis 键，通常以内容 ID 和用户 ID 组成
-        String redisKey = "like:content:" + content_type + contentId;
-        String batchKey = "like:batch:" + content_type;
-        String resultMessage = "";
-        boolean success = false;
-        String operation = "";
+        // 从请求对象中获取参数
+        Long contentId = likeRequest.getContentId();
+        String type = likeRequest.getType();
+        String contentType = likeRequest.getContentType();
+
+        // 生成 Redis 键
+        String redisKey = "like:content:" + contentType + contentId;
+        String batchKey = "like:batch:" + contentType;
 
         // 处理点赞和取消点赞逻辑
+        boolean isLiked = redisTemplate.opsForSet().isMember(redisKey, userId);
+        String operation;
+        String resultMessage;
+        boolean success = false;
+
         if ("red".equals(type)) {
-            // 判断用户是否已经点赞
-            if (redisTemplate.opsForSet().isMember(redisKey, userId)) {
+            // 取消点赞操作
+            if (isLiked) {
                 // 将用户 ID 从 Redis 中移除，表示取消点赞
                 redisTemplate.opsForSet().remove(redisKey, userId);
                 // 将点赞数减 1
                 redisTemplate.opsForValue().decrement(redisKey + ":count", 1);
                 operation = "del";
-                resultMessage = content_type + "取消点赞成功";
+                resultMessage = contentType + "取消点赞成功";
                 success = true;
             } else {
-                resultMessage = "您尚未点赞";
+                Map<String, Object> response = new HashMap<>();
+                response.put("code", 400);
+                response.put("message", "您尚未点赞");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
         } else {
-            // 判断用户是否已经点赞
-            if (!redisTemplate.opsForSet().isMember(redisKey, userId)) {
+            // 点赞操作
+            if (!isLiked) {
                 // 将用户 ID 存入 Redis，表示该用户已点赞
                 redisTemplate.opsForSet().add(redisKey, userId);
                 // 将点赞数加 1
                 redisTemplate.opsForValue().increment(redisKey + ":count", 1);
                 operation = "add";
-                resultMessage = content_type + "点赞成功";
+                resultMessage = contentType + "点赞成功";
                 success = true;
             } else {
-                resultMessage = "您已点赞";
+                Map<String, Object> response = new HashMap<>();
+                response.put("code", 400);
+                response.put("message", "您已点赞");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
         }
 
@@ -405,11 +415,67 @@ public class VideoController extends ApiController {
             }
         }
 
-        // 根据操作结果返回相应的响应
-        if (success) {
-            return ResponseEntity.ok(resultMessage);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resultMessage);
+        // 获取最新的点赞数
+        Integer likeCount = (Integer) redisTemplate.opsForValue().get(redisKey + ":count");
+        if (likeCount == null) {
+            // 如果Redis中没有点赞数，从数据库查询
+            LambdaQueryWrapper<Favor> likeQueryWrapper = new LambdaQueryWrapper<Favor>()
+                    .eq(Favor::getCommentId, contentId);
+            likeCount = favorService.count(likeQueryWrapper);
+            // 将查询结果存入Redis
+            redisTemplate.opsForValue().set(redisKey + ":count", likeCount);
+        }
+
+        // 返回统一格式的响应
+        Map<String, Object> data = new HashMap<>();
+        data.put("likeCount", likeCount);
+        data.put("isLiked", "red".equals(type) ? false : true);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("code", 200);
+        response.put("message", resultMessage);
+        response.put("data", data);
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    
+
+
+
+
+
+
+    // 点赞请求对象
+    static class LikeRequest {
+        private Long contentId;
+        private String type;
+        private String contentType;
+
+        // getter and setter methods
+        public Long getContentId() {
+            return contentId;
+        }
+
+        public void setContentId(Long contentId) {
+            this.contentId = contentId;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getContentType() {
+            return contentType;
+        }
+
+        public void setContentType(String contentType) {
+            this.contentType = contentType;
         }
     }
 
