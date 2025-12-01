@@ -20,6 +20,7 @@ import com.bruce.vo.VideoVO;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.swagger.annotations.*;
+import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -329,6 +330,18 @@ public class VideoController extends ApiController {
         } catch (NotLoginException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("用户未登录");
         }
+        
+        // 限流逻辑：每个用户每秒最多允许10次点赞操作
+        String userIdStr = StpUtil.getLoginId().toString();
+        String rateLimitKey = "rate:limit:like:" + userIdStr;
+        long current = System.currentTimeMillis() / 1000;
+        redisTemplate.opsForHash().put(rateLimitKey, "last", current);
+        redisTemplate.expire(rateLimitKey, 1, java.util.concurrent.TimeUnit.SECONDS);
+        Long count = redisTemplate.opsForHash().increment(rateLimitKey, "count", 1);
+        if (count > 10) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("点赞操作过于频繁，请稍后再试");
+        }
+        
         Object userIdOb = StpUtil.getLoginId();
         Long userId = null;
         if (userIdOb != null) {
@@ -341,36 +354,67 @@ public class VideoController extends ApiController {
         String content_type = (String) request.get(Constant.ApiParam.CONTENT_TYPE);  // type 值判断
         // 生成 Redis 键，通常以内容 ID 和用户 ID 组成
         String redisKey = "like:content:" + content_type + contentId;
-        // 如果 type 是 "red"，表示已点赞，进行取消点赞操作
+        String batchKey = "like:batch:" + content_type;
+        String resultMessage = "";
+        boolean success = false;
+        String operation = "";
+        
+        // 处理点赞和取消点赞逻辑
         if ("red".equals(type)) {
-            // 判断用户是否已经点赞（可以存储用户已点赞的状态）
-            if (!redisTemplate.opsForSet().isMember(redisKey, userId)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("您尚未点赞");
-            }
-            // 将用户 ID 从 Redis 中移除，表示取消点赞
-            redisTemplate.opsForSet().remove(redisKey, userId);
-            // 将点赞数减 1
-            redisTemplate.opsForValue().decrement(redisKey + ":count", 1);
-            // 构建消息对象（可以是 DTO）
-            LikeMessage message = new LikeMessage(contentId, userId, "del", System.currentTimeMillis());
-            // 发送到 MQ
-            rabbitTemplate.convertAndSend("like.exchange", "like.video", message);
-            return ResponseEntity.ok(content_type + "取消点赞成功");
-        } else {
-            // 如果 type 不是 "red"，表示未点赞，进行点赞操作
             // 判断用户是否已经点赞
             if (redisTemplate.opsForSet().isMember(redisKey, userId)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("您已点赞");
+                // 将用户 ID 从 Redis 中移除，表示取消点赞
+                redisTemplate.opsForSet().remove(redisKey, userId);
+                // 将点赞数减 1
+                redisTemplate.opsForValue().decrement(redisKey + ":count", 1);
+                operation = "del";
+                resultMessage = content_type + "取消点赞成功";
+                success = true;
+            } else {
+                resultMessage = "您尚未点赞";
             }
-            // 将用户 ID 存入 Redis，表示该用户已点赞
-            redisTemplate.opsForSet().add(redisKey, userId);
-            // 将点赞数加 1
-            redisTemplate.opsForValue().increment(redisKey + ":count", 1);
-            // 构建消息对象（可以是 DTO）
-            LikeMessage message = new LikeMessage(contentId, userId, "add", System.currentTimeMillis());
-            // 发送到 MQ
-            rabbitTemplate.convertAndSend("like.exchange", "like.video", message);
-            return ResponseEntity.ok(content_type + "点赞成功");
+        } else {
+            // 判断用户是否已经点赞
+            if (!redisTemplate.opsForSet().isMember(redisKey, userId)) {
+                // 将用户 ID 存入 Redis，表示该用户已点赞
+                redisTemplate.opsForSet().add(redisKey, userId);
+                // 将点赞数加 1
+                redisTemplate.opsForValue().increment(redisKey + ":count", 1);
+                operation = "add";
+                resultMessage = content_type + "点赞成功";
+                success = true;
+            } else {
+                resultMessage = "您已点赞";
+            }
+        }
+        
+        // 优化：将点赞消息先存入Redis列表，而非直接发送到MQ
+        if (success) {
+            LikeMessage message = new LikeMessage(contentId, userId, operation, System.currentTimeMillis());
+            redisTemplate.opsForList().rightPush(batchKey, message);
+            
+            // 检查是否达到批量发送阈值
+            Long size = redisTemplate.opsForList().size(batchKey);
+            if (size >= 100) { // 每100条消息批量发送一次
+                // 批量发送消息到MQ
+                List<LikeMessage> messages = redisTemplate.opsForList().range(batchKey, 0, 99);
+                if (messages != null && !messages.isEmpty()) {
+                    // 设置消息持久化
+                    rabbitTemplate.convertAndSend("like.exchange", "like.video", messages, msg -> {
+                        msg.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
+                        return msg;
+                    });
+                    // 删除已发送的消息
+                    redisTemplate.opsForList().trim(batchKey, 100, -1);
+                }
+            }
+        }
+        
+        // 根据操作结果返回相应的响应
+        if (success) {
+            return ResponseEntity.ok(resultMessage);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resultMessage);
         }
     }
 

@@ -78,18 +78,51 @@ public class RabbitConfig {
         return rabbitTemplate;
     }
 
+    // 点赞相关配置
     public static final String EXCHANGE = "like.exchange";
     public static final String QUEUE = "like.video.queue";
     public static final String ROUTING_KEY = "like.video";
+    
+    // 死信队列配置
+    public static final String DEAD_LETTER_EXCHANGE = "like.dead.letter.exchange";
+    public static final String DEAD_LETTER_QUEUE = "like.dead.letter.queue";
+    public static final String DEAD_LETTER_ROUTING_KEY = "like.dead.letter";
+
+    // 声明死信交换机
+    @Bean
+    public DirectExchange deadLetterExchange() {
+        return new DirectExchange(DEAD_LETTER_EXCHANGE, true, false);
+    }
+
+    // 声明死信队列
+    @Bean
+    public Queue deadLetterQueue() {
+        return QueueBuilder.durable(DEAD_LETTER_QUEUE).build();
+    }
+
+    // 绑定死信队列
+    @Bean
+    public Binding deadLetterBinding() {
+        return BindingBuilder.bind(deadLetterQueue())
+                .to(deadLetterExchange())
+                .with(DEAD_LETTER_ROUTING_KEY);
+    }
 
     @Bean
     public TopicExchange likeExchange() {
-        return new TopicExchange(EXCHANGE);
+        // 设置交换机持久化
+        return new TopicExchange(EXCHANGE, true, false);
     }
 
     @Bean
     public Queue likeQueue() {
-        return new Queue(QUEUE);
+        // 设置队列持久化和懒加载，并配置死信队列
+        return QueueBuilder.durable(QUEUE)
+                .withArgument("x-queue-mode", "lazy") // 懒加载，适合大量消息存储
+                .withArgument("x-dead-letter-exchange", DEAD_LETTER_EXCHANGE)
+                .withArgument("x-dead-letter-routing-key", DEAD_LETTER_ROUTING_KEY)
+                .withArgument("x-message-ttl", 3600000) // 1小时后过期
+                .build();
     }
 
     @Bean
