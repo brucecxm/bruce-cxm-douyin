@@ -533,9 +533,11 @@ public class UserController extends ApiController {
             if (user == null) {
                 if ("lock".equals(type)) {
                     RLock lock = redissonClient.getLock("user_info_lock:" + userId);
+                    boolean lockAcquired = false;
                     try {
                         // 尝试获取锁，最多等待5秒，锁自动释放时间30秒
-                        if (lock.tryLock(5, 30, TimeUnit.SECONDS)) {
+                        lockAcquired = lock.tryLock(5, 30, TimeUnit.SECONDS);
+                        if (lockAcquired) {
                             try {
                                 // 双重检查
                                 String userJson = stringRedisTemplate.opsForValue().get(key);
@@ -544,27 +546,63 @@ public class UserController extends ApiController {
                                 } else {
                                     user = queryUserFromDb(userIdLong, key, emptyKey, type);
                                 }
-                            } catch (JsonMappingException e) {
-                                throw new RuntimeException(e);
                             } catch (JsonProcessingException e) {
-                                throw new RuntimeException(e);
+                                log.error("处理用户数据序列化异常", e);
+                                // 序列化异常，尝试直接查询数据库（兜底）
+                                user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getId, userIdLong));
                             } finally {
                                 lock.unlock();
-                            }
-                        } else {
-                            // 获取锁失败，重试读取缓存
-                            try {
-                                String userJson = stringRedisTemplate.opsForValue().get(key);
-                                if (userJson != null) {
-                                    user = objectMapper.readValue(userJson, User.class);
-                                }
-                            } catch (Exception e) {
-                                log.error("重试读取缓存失败", e);
                             }
                         }
                     } catch (InterruptedException e) {
                         log.error("获取锁异常", e);
                         Thread.currentThread().interrupt();
+                    }
+
+                    // 获取锁失败或处理异常后，重试读取缓存（包括空值缓存）
+                    if (!lockAcquired || user == null) {
+                        try {
+                            // 重试读取正常缓存
+                            String userJson = stringRedisTemplate.opsForValue().get(key);
+                            if (userJson != null) {
+                                user = objectMapper.readValue(userJson, User.class);
+                            } else {
+                                // 检查空值缓存
+                                String emptyValue = stringRedisTemplate.opsForValue().get(emptyKey);
+                                if ("null".equals(emptyValue)) {
+                                    log.debug("空值缓存命中，用户ID {} 不存在", userIdLong);
+                                    // 空值缓存存在，说明数据真的不存在
+                                    return Result.error("用户不存在");
+                                } else {
+                                    // 空值缓存不存在，且获取锁失败，说明可能是并发查询，尝试直接查询数据库兜底
+                                    log.debug("获取锁失败，尝试直接查询数据库兜底，用户ID: {}", userIdLong);
+                                    user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getId, userIdLong));
+                                    // 如果兜底查询到数据，更新缓存
+                                    if (user != null) {
+                                        try {
+                                            String userJsonStr = objectMapper.writeValueAsString(user);
+                                            stringRedisTemplate.opsForValue().set(key, userJsonStr, 10, TimeUnit.MINUTES);
+                                            // 将存在的用户ID添加到布隆过滤器
+                                            if (!userBloomFilter.contains(userIdLong)) {
+                                                userBloomFilter.add(userIdLong);
+                                                log.info("用户ID {} 已添加到布隆过滤器", userIdLong);
+                                            }
+                                        } catch (JsonProcessingException e) {
+                                            log.error("兜底查询后更新缓存失败", e);
+                                            // 更新缓存失败不影响返回结果
+                                        }
+                                    } else {
+                                        // 兜底查询也没有数据，设置空值缓存
+                                        stringRedisTemplate.opsForValue().set(emptyKey, "null", 5, TimeUnit.MINUTES);
+                                        log.debug("兜底查询无数据，为用户ID {} 设置空值缓存，过期时间5分钟", userIdLong);
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            log.error("获取锁失败后重试缓存或兜底查询异常", e);
+                            // 异常兜底：如果所有尝试都失败，返回友好错误，而不是直接返回用户不存在
+                            return Result.error("请求繁忙，请稍后重试");
+                        }
                     }
                 } else {
                     user = queryUserFromDb(userIdLong, key, emptyKey, type);
