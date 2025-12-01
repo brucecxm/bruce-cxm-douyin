@@ -1,6 +1,5 @@
 package com.bruce.controller;
 
-
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -188,7 +187,6 @@ public class VideoController extends ApiController {
         return ResponseEntity.ok(Collections.singletonMap("code", 200));
     }
 
-
     @PostMapping("/publishss")
     public ResponseEntity<?> publish(@RequestBody Map<String, Object> req) {
         Object userId = StpUtil.getLoginId();
@@ -213,13 +211,11 @@ public class VideoController extends ApiController {
         return ResponseEntity.ok(Collections.singletonMap("code", 200));
     }
 
-
     @GetMapping("/getVideoPage")
     public List<Map<String, Object>> getVideoInfo(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "4") int size,
-            @RequestParam String videoType
-    ) {
+            @RequestParam String videoType) {
         Page<Video> pageInfo = new Page<>(page, size);
         // LambdaQueryWrapper 用于 Video 表查询
         LambdaQueryWrapper<Video> videoQueryWrapper = new LambdaQueryWrapper<Video>()
@@ -267,7 +263,7 @@ public class VideoController extends ApiController {
             // 收藏数
             LambdaQueryWrapper<Favor> collectWrapper = new LambdaQueryWrapper<Favor>()
                     .eq(Favor::getCommentId, video.getVideoId());
-//                    .eq(Like::getCollect, 1);
+            // .eq(Like::getCollect, 1);
             int collectCount = favorService.count(collectWrapper);
             vo.setCollectNum((long) collectCount);
             // 分享数
@@ -295,7 +291,6 @@ public class VideoController extends ApiController {
         return result;
     }
 
-
     @GetMapping("/auth")
     public Map<String, Object> getAuth(
             @RequestParam(required = false) Integer userid,
@@ -304,7 +299,7 @@ public class VideoController extends ApiController {
         Object UserIdObj = StpUtil.getLoginId();
         Long loginUserId = UserIdObj != null ? Long.parseLong(UserIdObj.toString()) : 0L;
         if (userid == null) {
-            userid = loginUserId.intValue();  // 使用当前登录用户ID
+            userid = loginUserId.intValue(); // 使用当前登录用户ID
         }
         Map<String, Object> result = new HashMap<>();
         // 查询用户信息
@@ -330,7 +325,7 @@ public class VideoController extends ApiController {
         } catch (NotLoginException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("用户未登录");
         }
-        
+
         // 限流逻辑：每个用户每秒最多允许10次点赞操作
         String userIdStr = StpUtil.getLoginId().toString();
         String rateLimitKey = "rate:limit:like:" + userIdStr;
@@ -341,7 +336,7 @@ public class VideoController extends ApiController {
         if (count > 10) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("点赞操作过于频繁，请稍后再试");
         }
-        
+
         Object userIdOb = StpUtil.getLoginId();
         Long userId = null;
         if (userIdOb != null) {
@@ -350,15 +345,15 @@ public class VideoController extends ApiController {
         }
         // 从 Map 中获取内容 ID 和 type（表示红心的颜色）
         Long contentId = Long.valueOf(request.get(Constant.ApiParam.CONTENT_ID).toString());
-        String type = (String) request.get(Constant.ApiParam.TYPE);  // type 值判断
-        String content_type = (String) request.get(Constant.ApiParam.CONTENT_TYPE);  // type 值判断
+        String type = (String) request.get(Constant.ApiParam.TYPE); // type 值判断
+        String content_type = (String) request.get(Constant.ApiParam.CONTENT_TYPE); // type 值判断
         // 生成 Redis 键，通常以内容 ID 和用户 ID 组成
         String redisKey = "like:content:" + content_type + contentId;
         String batchKey = "like:batch:" + content_type;
         String resultMessage = "";
         boolean success = false;
         String operation = "";
-        
+
         // 处理点赞和取消点赞逻辑
         if ("red".equals(type)) {
             // 判断用户是否已经点赞
@@ -387,12 +382,12 @@ public class VideoController extends ApiController {
                 resultMessage = "您已点赞";
             }
         }
-        
+
         // 优化：将点赞消息先存入Redis列表，而非直接发送到MQ
         if (success) {
             LikeMessage message = new LikeMessage(contentId, userId, operation, System.currentTimeMillis());
             redisTemplate.opsForList().rightPush(batchKey, message);
-            
+
             // 检查是否达到批量发送阈值
             Long size = redisTemplate.opsForList().size(batchKey);
             if (size >= 100) { // 每100条消息批量发送一次
@@ -409,7 +404,7 @@ public class VideoController extends ApiController {
                 }
             }
         }
-        
+
         // 根据操作结果返回相应的响应
         if (success) {
             return ResponseEntity.ok(resultMessage);
@@ -418,10 +413,8 @@ public class VideoController extends ApiController {
         }
     }
 
-
     @Autowired
     private MinioClient minioClient;
-
 
     private final String BUCKET = "douyin";
 
@@ -447,8 +440,7 @@ public class VideoController extends ApiController {
                             .object(videoInfo.getM3u8MinioPath())
                             .method(Method.GET)
                             .expiry(URL_EXPIRE_SECONDS)
-                            .build()
-            );
+                            .build());
 
             // 3. 构建返回数据
             Map<String, Object> data = new HashMap<>();
@@ -464,83 +456,70 @@ public class VideoController extends ApiController {
         }
     }
 
+    // @GetMapping("/one")
+    // public R getone() {
+    // List<Video> videos = this.videoService.list();
+    // System.out.println("one");
+    //
+    // List<VideoWithAvatar> videosWithAvatar = new ArrayList<>();
+    // for (Video video : videos) {
+    // VideoWithAvatar videoWithAvatar = new VideoWithAvatar();
+    // // 复制 Video 对象的属性到 VideoWithAvatar 对象
+    // BeanUtils.copyProperties(video, videoWithAvatar);
+    // Map<String, String> map = ThreadLocalUtil.get();
+    //// todo 远程调用用户和音乐信息 后面异常要加到全局异常处理器 这里的异常需要更细节的处理 下面more接口还有一个异常
+    // try {
+    // String avatar = userClient.avatar(video.getAuthId(),
+    // map.get("Authorization")).getUserPic();
+    // videoWithAvatar.setAvatar(avatar); // 这是第60行
+    //
+    // String nickname = userClient.avatar(video.getAuthId(),
+    // map.get("Authorization")).getNickname();
+    // videoWithAvatar.setNickname(nickname); // 这是第60行
+    //
+    // String musicAvatar = musicClient.avatar(video.getMusicId());
+    // videoWithAvatar.setMusicAvatar(musicAvatar); //
+    // videosWithAvatar.add(videoWithAvatar);
+    //
+    // } catch (Exception e) {
+    // System.out.println("没有捕获到完整的视频信息 位于DouyinVideoService /one接口");
+    //
+    // }
+    // }
+    // return success(videosWithAvatar);
+    // }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    @GetMapping("/one")
-//    public R getone() {
-//        List<Video> videos = this.videoService.list();
-//        System.out.println("one");
-//
-//        List<VideoWithAvatar> videosWithAvatar = new ArrayList<>();
-//        for (Video video : videos) {
-//            VideoWithAvatar videoWithAvatar = new VideoWithAvatar();
-//            // 复制 Video 对象的属性到 VideoWithAvatar 对象
-//            BeanUtils.copyProperties(video, videoWithAvatar);
-//            Map<String, String> map = ThreadLocalUtil.get();
-////todo   远程调用用户和音乐信息  后面异常要加到全局异常处理器   这里的异常需要更细节的处理  下面more接口还有一个异常
-//            try {
-//                String avatar = userClient.avatar(video.getAuthId(), map.get("Authorization")).getUserPic();
-//                videoWithAvatar.setAvatar(avatar); // 这是第60行
-//
-//                String nickname = userClient.avatar(video.getAuthId(), map.get("Authorization")).getNickname();
-//                videoWithAvatar.setNickname(nickname); // 这是第60行
-//
-//                String musicAvatar = musicClient.avatar(video.getMusicId());
-//                videoWithAvatar.setMusicAvatar(musicAvatar); //
-//                videosWithAvatar.add(videoWithAvatar);
-//
-//            } catch (Exception e) {
-//                System.out.println("没有捕获到完整的视频信息 位于DouyinVideoService /one接口");
-//
-//            }
-//        }
-//        return success(videosWithAvatar);
-//    }
-
-//    @GetMapping("/more")
-//    public R getmore() {
-//        List<Video> videos = this.videoService.list();
-//        System.out.println("more");
-//
-//        List<VideoWithAvatar> videosWithAvatar = new ArrayList<>();
-//        for (Video video : videos) {
-//            VideoWithAvatar videoWithAvatar = new VideoWithAvatar();
-//            // 复制 Video 对象的属性到 VideoWithAvatar 对象
-//            BeanUtils.copyProperties(video, videoWithAvatar);
-//            Map<String, String> map = ThreadLocalUtil.get();
-//            try {
-//                String avatar = userClient.avatar(video.getAuthId(), map.get("Authorization")).getUserPic();
-//                videoWithAvatar.setAvatar(avatar); // 这是第60行
-//
-//                String nickname = userClient.avatar(video.getAuthId(), map.get("Authorization")).getNickname();
-//                videoWithAvatar.setNickname(nickname); // 这是第60行
-//
-//                String musicAvatar = musicClient.avatar(video.getMusicId());
-//                videoWithAvatar.setMusicAvatar(musicAvatar); //
-//                videosWithAvatar.add(videoWithAvatar);
-//
-//            } catch (Exception e) {
-//                System.out.println("没有捕获到完整的视频信息 位于DouyinVideoService /more接口");
-//
-//            }
-//
-//
-//        }
-//        return success(videosWithAvatar);
-//    }
+    // @GetMapping("/more")
+    // public R getmore() {
+    // List<Video> videos = this.videoService.list();
+    // System.out.println("more");
+    //
+    // List<VideoWithAvatar> videosWithAvatar = new ArrayList<>();
+    // for (Video video : videos) {
+    // VideoWithAvatar videoWithAvatar = new VideoWithAvatar();
+    // // 复制 Video 对象的属性到 VideoWithAvatar 对象
+    // BeanUtils.copyProperties(video, videoWithAvatar);
+    // Map<String, String> map = ThreadLocalUtil.get();
+    // try {
+    // String avatar = userClient.avatar(video.getAuthId(),
+    // map.get("Authorization")).getUserPic();
+    // videoWithAvatar.setAvatar(avatar); // 这是第60行
+    //
+    // String nickname = userClient.avatar(video.getAuthId(),
+    // map.get("Authorization")).getNickname();
+    // videoWithAvatar.setNickname(nickname); // 这是第60行
+    //
+    // String musicAvatar = musicClient.avatar(video.getMusicId());
+    // videoWithAvatar.setMusicAvatar(musicAvatar); //
+    // videosWithAvatar.add(videoWithAvatar);
+    //
+    // } catch (Exception e) {
+    // System.out.println("没有捕获到完整的视频信息 位于DouyinVideoService /more接口");
+    //
+    // }
+    //
+    //
+    // }
+    // return success(videosWithAvatar);
+    // }
 }
-
