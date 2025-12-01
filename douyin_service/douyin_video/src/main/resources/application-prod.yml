@@ -1,15 +1,14 @@
 spring:
-
   servlet:
     multipart:
-      max-file-size: 10GB       # 允许大文件
+      max-file-size: 10GB # 允许大文件
       max-request-size: 10GB
 
   redis:
     # Redis数据库索引（默认为0）
     database: 12
     # Redis服务器地址
-    host: 127.0.0.1
+    host: 1.94.131.16
     # Redis服务器连接端口
     port: 6379
     # Redis服务器连接密码（默认为空）
@@ -28,7 +27,7 @@ spring:
         min-idle: 0
 
   rabbitmq:
-    host: 127.0.0.1
+    host: 1.94.131.16
     port: 5672
     username: itcast
     password: 123321
@@ -39,7 +38,7 @@ spring:
   datasource:
     username: root
     password: bruce_CXM_123
-    url: jdbc:mysql://localhost:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+    url: jdbc:mysql://1.94.131.16:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
 
 minio:
   accessKey: minio
@@ -48,12 +47,9 @@ minio:
   endpoint: http://127.0.0.1:9000
   readPath: http://127.0.0.1:9000
 
-
-
-
 ffmpeg:
-  path: /usr/local/bin/ffmpeg  # FFmpeg安装路径（根据服务器实际情况修改）
+  path: /usr/local/bin/ffmpeg # FFmpeg安装路径（根据服务器实际情况修改）
 
 video:
   temp:
-    dir: /tmp/video-temp/  # 本地临时目录（用于存放合并后的视频和转换过程文件）
+    dir: /tmp/video-temp/ # 本地临时目录（用于存放合并后的视频和转换过程文件）

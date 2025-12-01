@@ -1,42 +1,12 @@
-
-
-
-
 spring:
   profiles:
-    active: dev  # 生产环境
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    active: dev # 生产环境
 
 server:
   port: 9573
 
-
 upload:
-  temp.dir: /tmp/upload_chunks  # 临时分片存储目录
-
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://127.0.0.1:10086/eureka
-#    registerWithEureka: false
-#    fetchRegistry: false
-#    enabled: false
-
+  temp.dir: /tmp/upload_chunks # 临时分片存储目录
 
 mybatis:
   configuration:
@@ -59,7 +29,6 @@ sa-token:
   # 是否输出操作日志
   is-log: true
 
-
 logging:
   level:
     root: info
@@ -69,12 +38,11 @@ logging:
     jdbc.audit: debug
     jdbc.resultset: debug
     jdbc.connection: debug
-    com.example.mapper: debug  # 替换成你的 Mapper 包路径
+    com.example.mapper: debug # 替换成你的 Mapper 包路径
 
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 
-
 agora:
   appId: your_real_agora_app_id
-  appCertificate: your_real_agora_app_certificate  # 如果你还有这个字段
+  appCertificate: your_real_agora_app_certificate # 如果你还有这个字段

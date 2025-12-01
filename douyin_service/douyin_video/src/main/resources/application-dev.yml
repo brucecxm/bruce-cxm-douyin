@@ -1,19 +1,17 @@
 spring:
-
   servlet:
     multipart:
-      max-file-size: 10GB       # 允许大文件
+      max-file-size: 10GB # 允许大文件
       max-request-size: 10GB
 
   redis:
     # Redis数据库索引（默认为0）
     database: 12
     # Redis服务器地址
-    host: 127.0.0.1
+    host: 1.94.131.16
     # Redis服务器连接端口
     port: 6379
-    # Redis服务器连接密码（默认为空）
-    # password:
+    password: ""
     # 连接超时时间
     timeout: 10s
     lettuce:
@@ -28,7 +26,7 @@ spring:
         min-idle: 0
 
   rabbitmq:
-    host: 192.168.200.130
+    host: 1.94.131.16
     port: 5672
     username: itcast
     password: 123321
@@ -36,22 +34,64 @@ spring:
   application:
     name: DouyinVideoService
   datasource:
-    username: root
-    password: root
-    url: jdbc:log4jdbc:mysql://localhost:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+    # 显式指定Druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    username: remote_user
+    password: bruce_CXM_123
+    url: jdbc:mysql://1.94.131.16:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+    # Druid专属配置
+    druid:
+      initial-size: 5 # 初始连接数
+      max-active: 20 # 最大连接数
+      min-idle: 5 # 最小空闲连接数
+      max-wait: 60000 # 获取连接的最大等待时间（毫秒）
+      # 可选：配置监控、过滤等功能
+      filters: stat,wall,slf4j # 统计、防SQL注入、日志过滤器
+      web-stat-filter:
+        enabled: true
+      stat-view-servlet:
+        enabled: true
+        login-username: admin # 监控页登录用户名
+        login-password: admin # 监控页登录密码
+        allow: 0.0.0.0 # 允许所有IP访问（或留空：allow:）
+
+
+
+ffmpeg:
+  path: D:\\test\\ffmpeg-master-latest-win64-gpl-shared\\bin\\ffmpeg.exe # FFmpeg安装路径（根据服务器实际情况修改）
+
+video:
+  temp:
+    dir: D:\\test\\video-temp\\ # 本地临时目录（用于存放合并后的视频和转换过程文件）tmp/video-temp/  # 本地临时目录（用于存放合并后的视频和转换过程文件）
+
+
+
+eureka:
+  client:
+    service-url:
+#      defaultZone: http://127.0.0.1:10086/eureka  # Eureka 服务注册中心的地址
+      defaultZone: http://1.94.131.16:8080/eureka  # Eureka 服务注册中心的地址
+#    registerWithEureka: false
+#    fetchRegistry: false
+#    enabled: false
+#    healthcheck:
+#      enabled: false
+#  instance:
+#    preferIpAddress: true
+#    lease-renewal-interval-in-seconds: 30
+#    lease-expiration-duration-in-seconds: 90
+#    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+#  server:
+#    enableSelfPreservation: true
+#    evictionIntervalTimerInMs: 5000
+
+
+
 
 minio:
   accessKey: minio
   secretKey: minio123
   bucket: douyin
-  endpoint: http://192.168.200.130:9000
-  readPath: http://192.168.200.130:9000
+  endpoint: http://1.94.131.16:9000
+  readPath: http://1.94.131.16:9000
 
-
-
-ffmpeg:
-  path: D:\\test\\ffmpeg-master-latest-win64-gpl-shared\\bin\\ffmpeg.exe  # FFmpeg安装路径（根据服务器实际情况修改）
-
-video:
-  temp:
-    dir: D:\\test\\video-temp\\  # 本地临时目录（用于存放合并后的视频和转换过程文件）tmp/video-temp/  # 本地临时目录（用于存放合并后的视频和转换过程文件）
