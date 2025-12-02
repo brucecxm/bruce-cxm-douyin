@@ -1,11 +1,7 @@
-
-
 spring:
   application:
     name: api-gateway
   # redis配置
-
-
 
   cloud:
     gateway:
@@ -40,11 +36,6 @@ spring:
           enabled: true
           lower-case-service-id: true
 
-
-
-
-
-
 # redis配置
 redis:
   # Redis数据库索引（默认为0）
@@ -54,7 +45,7 @@ redis:
   # Redis服务器连接端口
   port: 6379
   # Redis服务器连接密码（默认为空）
-  # password:
+  password: Aa.147258
   # 连接超时时间
   timeout: 10s
   lettuce:
@@ -68,9 +59,7 @@ redis:
       # 连接池中的最小空闲连接
       min-idle: 0
 
-
-
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:10086/eureka  # Eureka服务器地址
+      defaultZone: http://localhost:10086/eureka # Eureka服务器地址

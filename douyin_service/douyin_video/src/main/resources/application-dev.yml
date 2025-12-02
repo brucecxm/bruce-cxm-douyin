@@ -11,7 +11,7 @@ spring:
     host: 1.94.131.16
     # Redis服务器连接端口
     port: 6379
-    password: ""
+    password: Aa.147258
     # 连接超时时间
     timeout: 10s
     lettuce:
@@ -55,8 +55,6 @@ spring:
         login-password: admin # 监控页登录密码
         allow: 0.0.0.0 # 允许所有IP访问（或留空：allow:）
 
-
-
 ffmpeg:
   path: D:\\test\\ffmpeg-master-latest-win64-gpl-shared\\bin\\ffmpeg.exe # FFmpeg安装路径（根据服务器实际情况修改）
 
@@ -64,13 +62,11 @@ video:
   temp:
     dir: D:\\test\\video-temp\\ # 本地临时目录（用于存放合并后的视频和转换过程文件）tmp/video-temp/  # 本地临时目录（用于存放合并后的视频和转换过程文件）
 
-
-
 eureka:
   client:
     service-url:
-#      defaultZone: http://127.0.0.1:10086/eureka  # Eureka 服务注册中心的地址
-      defaultZone: http://1.94.131.16:8080/eureka  # Eureka 服务注册中心的地址
+      #      defaultZone: http://127.0.0.1:10086/eureka  # Eureka 服务注册中心的地址
+      defaultZone: http://1.94.131.16:8080/eureka # Eureka 服务注册中心的地址
 #    registerWithEureka: false
 #    fetchRegistry: false
 #    enabled: false
@@ -85,13 +81,9 @@ eureka:
 #    enableSelfPreservation: true
 #    evictionIntervalTimerInMs: 5000
 
-
-
-
 minio:
   accessKey: minio
   secretKey: minio123
   bucket: douyin
   endpoint: http://1.94.131.16:9000
   readPath: http://1.94.131.16:9000
-

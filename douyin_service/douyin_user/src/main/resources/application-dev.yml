@@ -1,5 +1,3 @@
-
-
 spring:
   # redis配置
   redis:
@@ -9,7 +7,7 @@ spring:
     host: 1.94.131.16
     # Redis服务器连接端口
     port: 6379
-    password: ""
+    password: Aa.147258
     # 连接超时时间
     timeout: 10s
     lettuce:
@@ -25,14 +23,14 @@ spring:
 
   application:
     # 应用的名称，可选
-    name: DouyinUserService  # 设置应用名称为 DouyinUserService
+    name: DouyinUserService # 设置应用名称为 DouyinUserService
 
   rabbitmq:
-    host: 1.94.131.16  # RabbitMQ 服务器的主机地址
-    port: 5672  # RabbitMQ 服务器的端口号
-    username: itcast  # RabbitMQ 的用户名
-    password: 123321  # RabbitMQ 的密码
-    virtual-host: /  # RabbitMQ 的虚拟主机
+    host: 1.94.131.16 # RabbitMQ 服务器的主机地址
+    port: 5672 # RabbitMQ 服务器的端口号
+    username: itcast # RabbitMQ 的用户名
+    password: 123321 # RabbitMQ 的密码
+    virtual-host: / # RabbitMQ 的虚拟主机
     connection - timeout: 5000 # 设置连接超时时间为5秒，可根据需求调整
     template:
       retry:
@@ -41,21 +39,12 @@ spring:
         multiplier: 1 # 失败后下次等待时长倍数，下次等待时长 = initial - interval * multiplier
         max - attempts: 3 # 最大重试次数为3次，可调整
 
-
-
-
-
-
-
-
-
-
-#
-#  datasource:
-#    username: root
-#    password: root
-#    url: jdbc:mysql://localhost:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
-#
+  #
+  #  datasource:
+  #    username: root
+  #    password: root
+  #    url: jdbc:mysql://localhost:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+  #
 
   datasource:
     # 显式指定Druid数据源
@@ -65,36 +54,35 @@ spring:
     url: jdbc:mysql://1.94.131.16:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
     # Druid专属配置
     druid:
-      initial-size: 5        # 初始连接数
-      max-active: 20         # 最大连接数
-      min-idle: 5            # 最小空闲连接数
-      max-wait: 60000        # 获取连接的最大等待时间（毫秒）
+      initial-size: 5 # 初始连接数
+      max-active: 20 # 最大连接数
+      min-idle: 5 # 最小空闲连接数
+      max-wait: 60000 # 获取连接的最大等待时间（毫秒）
       # 可选：配置监控、过滤等功能
-      filters: stat,wall,slf4j  # 统计、防SQL注入、日志过滤器
+      filters: stat,wall,slf4j # 统计、防SQL注入、日志过滤器
       web-stat-filter:
         enabled: true
       stat-view-servlet:
         enabled: true
-        login-username: admin  # 监控页登录用户名
-        login-password: admin  # 监控页登录密码
-        allow: 0.0.0.0        # 允许所有IP访问（或留空：allow:）
-
+        login-username: admin # 监控页登录用户名
+        login-password: admin # 监控页登录密码
+        allow: 0.0.0.0 # 允许所有IP访问（或留空：allow:）
 
   security:
     oauth2:
       client:
         registration:
           qq:
-            client-id: YOUR_APP_ID  # QQ应用的App ID
-            client-secret: YOUR_APP_KEY  # QQ应用的App Key
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"  # OAuth2重定向URI
-            authorization-grant-type: authorization_code  # 授权类型
-            scope: get_user_info  # 请求的权限范围
+            client-id: YOUR_APP_ID # QQ应用的App ID
+            client-secret: YOUR_APP_KEY # QQ应用的App Key
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}" # OAuth2重定向URI
+            authorization-grant-type: authorization_code # 授权类型
+            scope: get_user_info # 请求的权限范围
         provider:
           qq:
-            authorization-uri: https://graph.qq.com/oauth2.0/authorize  # QQ的授权URI
-            token-uri: https://graph.qq.com/oauth2.0/token  # QQ的令牌URI
-            user-info-uri: https://graph.qq.com/user/get_user_info  # QQ的用户信息URI
+            authorization-uri: https://graph.qq.com/oauth2.0/authorize # QQ的授权URI
+            token-uri: https://graph.qq.com/oauth2.0/token # QQ的令牌URI
+            user-info-uri: https://graph.qq.com/user/get_user_info # QQ的用户信息URI
 
   # Eureka容错配置，允许服务在Eureka不可用时继续运行
   cloud:
@@ -112,12 +100,11 @@ spring:
                   healthCheckUrl: http://localhost:8080/actuator/health
                   statusPageUrl: http://localhost:8080/actuator/info
 
-
 eureka:
   client:
     service-url:
-#      defaultZone: http://127.0.0.1:10086/eureka  # Eureka 服务注册中心的地址
-      defaultZone: http://1.94.131.16:8080/eureka  # Eureka 服务注册中心的地址
+      #      defaultZone: http://127.0.0.1:10086/eureka  # Eureka 服务注册中心的地址
+      defaultZone: http://1.94.131.16:8080/eureka # Eureka 服务注册中心的地址
 #    registerWithEureka: false
 #    fetchRegistry: false
 #    enabled: false
@@ -132,13 +119,9 @@ eureka:
 #    enableSelfPreservation: true
 #    evictionIntervalTimerInMs: 5000
 
-
-
-
 minio:
   accessKey: minio
   secretKey: minio123
   bucket: douyin
   endpoint: http://1.94.131.16:9000
   readPath: http://1.94.131.16:9000
-

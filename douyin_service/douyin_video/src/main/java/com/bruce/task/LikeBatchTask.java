@@ -37,7 +37,7 @@ public class LikeBatchTask {
             List<LikeMessage> messages = redisTemplate.opsForList().range(batchKey, 0, -1);
             if (messages != null && !messages.isEmpty()) {
                 // 批量发送消息到MQ，并设置持久化
-                rabbitTemplate.convertAndSend("like.exchange", "like.video", messages, message -> {
+                rabbitTemplate.convertAndSend("like.exchange", "like.video.batch", messages, message -> {
                     message.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
                     return message;
                 });

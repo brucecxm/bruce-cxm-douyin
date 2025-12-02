@@ -83,6 +83,10 @@ public class RabbitConfig {
     public static final String QUEUE = "like.video.queue";
     public static final String ROUTING_KEY = "like.video";
     
+    // 批量点赞相关配置
+    public static final String BATCH_QUEUE = "like.video.batch.queue";
+    public static final String BATCH_ROUTING_KEY = "like.video.batch";
+    
     // 死信队列配置
     public static final String DEAD_LETTER_EXCHANGE = "like.dead.letter.exchange";
     public static final String DEAD_LETTER_QUEUE = "like.dead.letter.queue";
@@ -128,6 +132,28 @@ public class RabbitConfig {
     @Bean
     public Binding likeBinding() {
         return BindingBuilder.bind(likeQueue()).to(likeExchange()).with(ROUTING_KEY);
+    }
+    
+    /**
+     * 声明批量点赞队列
+     */
+    @Bean
+    public Queue batchLikeQueue() {
+        // 设置队列持久化和懒加载，并配置死信队列
+        return QueueBuilder.durable(BATCH_QUEUE)
+                .withArgument("x-queue-mode", "lazy") // 懒加载，适合大量消息存储
+                .withArgument("x-dead-letter-exchange", DEAD_LETTER_EXCHANGE)
+                .withArgument("x-dead-letter-routing-key", DEAD_LETTER_ROUTING_KEY)
+                .withArgument("x-message-ttl", 3600000) // 1小时后过期
+                .build();
+    }
+    
+    /**
+     * 绑定批量点赞队列到交换机
+     */
+    @Bean
+    public Binding batchLikeBinding() {
+        return BindingBuilder.bind(batchLikeQueue()).to(likeExchange()).with(BATCH_ROUTING_KEY);
     }
 
 

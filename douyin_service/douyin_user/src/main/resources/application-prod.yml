@@ -1,5 +1,3 @@
-
-
 spring:
   # redis配置
   redis:
@@ -10,7 +8,7 @@ spring:
     # Redis服务器连接端口
     port: 6379
     # Redis服务器连接密码（默认为空）
-    # password:
+    password: Aa.147258
     # 连接超时时间
     timeout: 10s
     lettuce:
@@ -26,14 +24,14 @@ spring:
 
   application:
     # 应用的名称，可选
-    name: DouyinUserService  # 设置应用名称为 DouyinUserService
+    name: DouyinUserService # 设置应用名称为 DouyinUserService
 
   rabbitmq:
-    host: 127.0.0.1  # RabbitMQ 服务器的主机地址
-    port: 5672  # RabbitMQ 服务器的端口号
-    username: itcast  # RabbitMQ 的用户名
-    password: 123321  # RabbitMQ 的密码
-    virtual-host: /  # RabbitMQ 的虚拟主机
+    host: 127.0.0.1 # RabbitMQ 服务器的主机地址
+    port: 5672 # RabbitMQ 服务器的端口号
+    username: itcast # RabbitMQ 的用户名
+    password: 123321 # RabbitMQ 的密码
+    virtual-host: / # RabbitMQ 的虚拟主机
 
   datasource:
     username: root
@@ -45,23 +43,21 @@ spring:
       client:
         registration:
           qq:
-            client-id: YOUR_APP_ID  # QQ应用的App ID
-            client-secret: YOUR_APP_KEY  # QQ应用的App Key
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"  # OAuth2重定向URI
-            authorization-grant-type: authorization_code  # 授权类型
-            scope: get_user_info  # 请求的权限范围
+            client-id: YOUR_APP_ID # QQ应用的App ID
+            client-secret: YOUR_APP_KEY # QQ应用的App Key
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}" # OAuth2重定向URI
+            authorization-grant-type: authorization_code # 授权类型
+            scope: get_user_info # 请求的权限范围
         provider:
           qq:
-            authorization-uri: https://graph.qq.com/oauth2.0/authorize  # QQ的授权URI
-            token-uri: https://graph.qq.com/oauth2.0/token  # QQ的令牌URI
-            user-info-uri: https://graph.qq.com/user/get_user_info  # QQ的用户信息URI
-
+            authorization-uri: https://graph.qq.com/oauth2.0/authorize # QQ的授权URI
+            token-uri: https://graph.qq.com/oauth2.0/token # QQ的令牌URI
+            user-info-uri: https://graph.qq.com/user/get_user_info # QQ的用户信息URI
 
 eureka:
   client:
     service-url:
-      defaultZone: http://127.0.0.1:10086/eureka  # Eureka 服务注册中心的地址
-
+      defaultZone: http://127.0.0.1:10086/eureka # Eureka 服务注册中心的地址
 
 minio:
   accessKey: minio
