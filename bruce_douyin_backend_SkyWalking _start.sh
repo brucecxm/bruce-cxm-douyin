@@ -113,6 +113,8 @@ echo "➡️ 执行 mvn install ..."
 mvn install || { echo "❌ mvn install 执行失败"; exit 1; }
 echo "✅ mvn install 成功"
 
+# 5. Redis 检查已移除，由服务内部自行处理
+
 # 6. 启动 JAR 服务
 cd jar || { echo "❌ 进入 jar 目录失败"; exit 1; }
 
@@ -168,7 +170,7 @@ for index in "${selected_indexes[@]}"; do
             sudo bash -c "cat > $SERVICE_FILE <<EOF
 [Unit]
 Description=Douyin Service: $jar_file
-After=network.target redis.service skywalking-oap.service  # 依赖SkyWalking OAP
+After=network.target skywalking-oap.service  # 依赖SkyWalking OAP
 
 [Service]
 User=root
