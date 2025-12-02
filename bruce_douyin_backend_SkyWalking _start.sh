@@ -130,16 +130,46 @@ if command -v redis-cli &> /dev/null; then
         REDIS_CLI="$REDIS_CLI -a $REDIS_PASSWORD --no-auth-warning"
     fi
     
-    if $REDIS_CLI ping | grep -q "PONG"; then
+    if $REDIS_CLI ping 2>&1 | grep -q "PONG"; then
         echo "✅ Redis 已运行"
     else
         echo "🔄 Redis 未运行，尝试启动..."
-        if systemctl list-units --type=service | grep -q "redis"; then
-            sudo systemctl start redis
-            sleep 2 # 给Redis启动时间
-            $REDIS_CLI ping | grep -q "PONG" && echo "✅ Redis 启动成功" || { echo "❌ Redis 启动失败"; exit 1; }
+        # 检查系统中所有与redis相关的服务
+        REDIS_SERVICES=$(systemctl list-units --type=service | grep -i redis | awk '{print $1}')
+        if [ -n "$REDIS_SERVICES" ]; then
+            echo "🔍 检测到Redis相关服务: $REDIS_SERVICES"
+            # 尝试启动第一个Redis服务
+            FIRST_REDIS_SERVICE=$(echo "$REDIS_SERVICES" | head -n 1)
+            echo "🚀 尝试启动Redis服务: $FIRST_REDIS_SERVICE"
+            if sudo systemctl start "$FIRST_REDIS_SERVICE"; then
+                echo "⏳ 等待Redis启动..."
+                sleep 3 # 给Redis更多启动时间
+                # 详细输出Redis状态和连接测试
+                echo "📋 Redis服务状态:"
+                sudo systemctl status "$FIRST_REDIS_SERVICE" --no-pager | head -n 20
+                echo "📡 测试Redis连接:"
+                $REDIS_CLI ping 2>&1
+                if $REDIS_CLI ping 2>&1 | grep -q "PONG"; then
+                    echo "✅ Redis 启动成功"
+                else
+                    echo "❌ Redis 启动失败，请检查Redis配置和日志"
+                    echo "📌 建议手动执行以下命令排查:"
+                    echo "   1. sudo systemctl status $FIRST_REDIS_SERVICE"
+                    echo "   2. sudo journalctl -u $FIRST_REDIS_SERVICE -n 50"
+                    echo "   3. $REDIS_CLI ping 2>&1"
+                    exit 1
+                fi
+            else
+                echo "❌ 启动Redis服务失败: $FIRST_REDIS_SERVICE"
+                echo "📌 建议手动执行: sudo systemctl start $FIRST_REDIS_SERVICE"
+                exit 1
+            fi
         else
-            echo "❌ 系统中未安装 Redis"
+            echo "❌ 系统中未检测到Redis服务"
+            echo "📌 建议检查:"
+            echo "   1. Redis是否已安装"
+            echo "   2. Redis服务是否正确配置"
+            echo "   3. 尝试手动启动Redis: redis-server"
             exit 1
         fi
     fi
