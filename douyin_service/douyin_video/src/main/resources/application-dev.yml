@@ -31,6 +31,12 @@ spring:
     username: itcast
     password: 123321
     virtual-host: /
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    listener:
+      simple:
+#        acknowledge-mode: manual
+        prefetch: 100
   application:
     name: DouyinVideoService
   datasource:

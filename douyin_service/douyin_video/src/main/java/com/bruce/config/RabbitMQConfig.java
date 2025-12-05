@@ -3,7 +3,9 @@ package com.bruce.config;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -78,6 +80,26 @@ public class RabbitMQConfig {
         rabbitTemplate.setMandatory(true);
 
         return rabbitTemplate;
+    }
+
+    /**
+     * 配置监听器容器工厂，确保手动确认模式被正确设置
+     * 
+     * @return SimpleRabbitListenerContainerFactory
+     */
+    @Bean
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(jsonMessageConverter());
+        // 明确设置手动确认模式，不受其他配置影响
+        factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+        // 设置并发消费者数量
+        factory.setConcurrentConsumers(5);
+        factory.setMaxConcurrentConsumers(10);
+        // 设置预取计数
+        factory.setPrefetchCount(100);
+        return factory;
     }
 
     /**
