@@ -17,9 +17,29 @@ public class RabbitMQListener {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    //
+    // todo 自动确认（AutoAck） 消息一旦被 RabbitMQ 推送给消费者，立即标记为 “已投递” 并删除（无论消费者是否处理成功）
+    // 非关键消息（允许丢失）
+    // todo 自动确认（AutoAck） 消息一旦被 RabbitMQ 推送给消费者，立即标记为 “已投递” 并删除（无论消费者是否处理成功）
+    // 非关键消息（允许丢失）
+    // todo 自动确认（AutoAck） 消息一旦被 RabbitMQ 推送给消费者，立即标记为 “已投递” 并删除（无论消费者是否处理成功）
+    // 非关键消息（允许丢失）
+    // todo 自动确认（AutoAck） 消息一旦被 RabbitMQ 推送给消费者，立即标记为 “已投递” 并删除（无论消费者是否处理成功）
+    // 非关键消息（允许丢失）
+    // todo 手动确认（ManualAck） 消费者处理完消息后，主动发送 Ack/Nack 指令给 RabbitMQ，RabbitMQ 才会删除 /
+    // 重发消息 关键消息（不允许丢失 / 重复）
+    // todo 手动确认（ManualAck） 消费者处理完消息后，主动发送 Ack/Nack 指令给 RabbitMQ，RabbitMQ 才会删除 /
+    // 重发消息 关键消息（不允许丢失 / 重复）
+    // todo 手动确认（ManualAck） 消费者处理完消息后，主动发送 Ack/Nack 指令给 RabbitMQ，RabbitMQ 才会删除 /
+    // 重发消息 关键消息（不允许丢失 / 重复）
+    // todo 手动确认（ManualAck） 消费者处理完消息后，主动发送 Ack/Nack 指令给 RabbitMQ，RabbitMQ 才会删除 /
+    // 重发消息 关键消息（不允许丢失 / 重复）
+    //
+    //
+
     /**
      * 监听简单文本消息
-     * 
+     *
      * @param message 消息内容
      * @param channel 通道信息
      */

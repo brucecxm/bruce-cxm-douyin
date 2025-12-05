@@ -37,6 +37,10 @@ public class RabbitMQConfig {
         // 设置消息转换器
         rabbitTemplate.setMessageConverter(jsonMessageConverter());
 
+        // todo 消息已成功到达交换机（生产者 ConfirmCallback 已返回 ack=true）；
+        // todo 消息已成功到达交换机（生产者 ConfirmCallback 已返回 ack=true）；
+        // todo 消息已成功到达交换机（生产者 ConfirmCallback 已返回 ack=true）；
+        // todo 消息已成功到达交换机（生产者 ConfirmCallback 已返回 ack=true）；
         // 设置确认回调
         rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
             if (ack) {
@@ -49,7 +53,19 @@ public class RabbitMQConfig {
         });
 
         // 设置返回回调
+        // todo 触发 ReturnsCallback：说明消息未到达队列（路由失败）；
+        // todo 触发 ReturnsCallback：说明消息未到达队列（路由失败）；
+        // todo 触发 ReturnsCallback：说明消息未到达队列（路由失败）；
+        // todo 未触发 ReturnsCallback：说明消息已成功路由到至少一个队列（只要有匹配队列，就不会触发）。//todo 触发
+        // ReturnsCallback：说明消息未到达队列（路由失败）；
+        // todo 未触发 ReturnsCallback：说明消息已成功路由到至少一个队列（只要有匹配队列，就不会触发）。//todo 触发
+        // ReturnsCallback：说明消息未到达队列（路由失败）；
+        // todo 未触发 ReturnsCallback：说明消息已成功路由到至少一个队列（只要有匹配队列，就不会触发）。
         rabbitTemplate.setReturnCallback((message, replyCode, replyText, exchange, routingKey) -> {
+            //
+            // todo 不管是 “交换机→队列”，还是 “直接发默认交换机（空字符串）到队列”，只要消息没找到目标队列 + mandatory=true，就会触发
+            // ReturnCallback；
+            // todo 如果 mandatory=false（默认），RabbitMQ 会直接丢弃路由失败的消息，ReturnCallback 不会触发。
             System.err.println("消息发送到队列失败: ");
             System.err.println("  消息: " + message);
             System.err.println("  回复码: " + replyCode);
