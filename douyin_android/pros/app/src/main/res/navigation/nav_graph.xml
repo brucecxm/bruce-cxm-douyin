@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/CommunityFragment">
+
+    <fragment
+        android:id="@+id/CommunityFragment"
+        android:name="com.example.myapplication.CommunityFragment"
+        android:label="社区购物"
+        tools:layout="@layout/fragment_community">
+        
+        <action
+            android:id="@+id/action_CommunityFragment_to_ChatDetailFragment"
+            app:destination="@id/ChatDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/ChatFragment"
+        android:name="com.example.myapplication.ChatFragment"
+        android:label="聊天"
+        tools:layout="@layout/fragment_chat">
+        
+        <action
+            android:id="@+id/action_ChatFragment_to_ChatDetailFragment"
+            app:destination="@id/ChatDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/LocalFragment"
+        android:name="com.example.myapplication.LocalFragment"
+        android:label="同城"
+        tools:layout="@layout/fragment_local">
+        
+        <action
+            android:id="@+id/action_LocalFragment_to_ChatDetailFragment"
+            app:destination="@id/ChatDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/MyFragment"
+        android:name="com.example.myapplication.MyFragment"
+        android:label="我的"
+        tools:layout="@layout/fragment_my" />
+
+    <fragment
+        android:id="@+id/FirstFragment"
+        android:name="com.example.myapplication.FirstFragment"
+        android:label="@string/first_fragment_label"
+        tools:layout="@layout/fragment_first">
+
+        <action
+            android:id="@+id/action_FirstFragment_to_SecondFragment"
+            app:destination="@id/SecondFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/SecondFragment"
+        android:name="com.example.myapplication.SecondFragment"
+        android:label="@string/second_fragment_label"
+        tools:layout="@layout/fragment_second">
+
+        <action
+            android:id="@+id/action_SecondFragment_to_FirstFragment"
+            app:destination="@id/FirstFragment" />
+            
+        <action
+            android:id="@+id/action_SecondFragment_to_OrderActivity"
+            app:destination="@id/OrderActivity" />
+    </fragment>
+    
+    <activity
+        android:id="@+id/OrderActivity"
+        android:name="com.example.myapplication.OrderActivity"
+        android:label="确认订单" />
+    
+    <fragment
+        android:id="@+id/ChatDetailFragment"
+        android:name="com.example.myapplication.ChatDetailFragment"
+        android:label="聊天详情"
+        tools:layout="@layout/fragment_chat" />
+</navigation>

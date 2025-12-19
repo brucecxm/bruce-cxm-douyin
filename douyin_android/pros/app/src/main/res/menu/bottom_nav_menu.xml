@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/CommunityFragment"
+        android:icon="@android:drawable/ic_dialog_dialer"
+        android:title="社区购物" />
+
+    <item
+        android:id="@+id/ChatFragment"
+        android:icon="@android:drawable/ic_dialog_email"
+        android:title="聊天" />
+
+    <item
+        android:id="@+id/LocalFragment"
+        android:icon="@android:drawable/ic_dialog_map"
+        android:title="同城" />
+
+    <item
+        android:id="@+id/MyFragment"
+        android:icon="@android:drawable/ic_dialog_info"
+        android:title="我的" />
+
+</menu>

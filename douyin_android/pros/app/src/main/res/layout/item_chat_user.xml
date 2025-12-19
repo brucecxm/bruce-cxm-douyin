@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:background="@color/white"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <!-- 用户头像 -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/imageViewAvatar"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_user_placeholder"
+        android:background="@color/gray_light"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+    <!-- 用户信息容器 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintStart_toEndOf="@+id/imageViewAvatar"
+        app:layout_constraintTop_toTopOf="@+id/imageViewAvatar"
+        app:layout_constraintBottom_toBottomOf="@+id/imageViewAvatar"
+        app:layout_constraintEnd_toStartOf="@+id/textViewUnreadCount">
+
+        <!-- 用户名 -->
+        <TextView
+            android:id="@+id/textViewUserName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="用户名"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/textViewLastMessageTime" />
+
+        <!-- 最后一条消息 -->
+        <TextView
+            android:id="@+id/textViewLastMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="最后一条消息"
+            android:textSize="14sp"
+            android:textColor="@color/gray"
+            android:ellipsize="end"
+            android:maxLines="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewUserName"
+            app:layout_constraintEnd_toStartOf="@+id/textViewLastMessageTime"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- 最后一条消息时间 -->
+        <TextView
+            android:id="@+id/textViewLastMessageTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12:00"
+            android:textSize="12sp"
+            android:textColor="@color/gray"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/textViewUserName" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 未读消息数量 -->
+    <TextView
+        android:id="@+id/textViewUnreadCount"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:text="1"
+        android:textSize="12sp"
+        android:textColor="@color/white"
+        android:textAlignment="center"
+        android:background="@drawable/rounded_corner"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

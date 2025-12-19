@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CommunityFragment">
+
+    <!-- 筛选栏 - 增加elevation提升层级，避免被遮挡 -->
+    <LinearLayout
+        android:id="@+id/community_filter_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@android:color/white"
+        android:padding="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:elevation="2dp"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent">
+
+    <Button
+        android:id="@+id/community_filter_all"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="全部"
+        android:background="@drawable/filter_button_bg"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
+        android:padding="4dp"
+        android:layout_margin="2dp" />
+
+    <Button
+        android:id="@+id/community_filter_electronics"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="数码"
+        android:background="@drawable/filter_button_bg"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
+        android:padding="4dp"
+        android:layout_margin="2dp" />
+
+    <Button
+        android:id="@+id/community_filter_clothing"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="服饰"
+        android:background="@drawable/filter_button_bg"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
+        android:padding="4dp"
+        android:layout_margin="2dp" />
+
+    <Button
+        android:id="@+id/community_filter_home"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="家居"
+        android:background="@drawable/filter_button_bg"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
+        android:padding="4dp"
+        android:layout_margin="2dp" />
+</LinearLayout>
+
+    <!-- 社区商品列表 - 核心修改：高度改为0dp，补充底部约束 -->
+<androidx.recyclerview.widget.RecyclerView
+android:id="@+id/communityRecyclerView"
+android:layout_width="match_parent"
+android:layout_height="0dp"
+    android:padding="8dp"
+    app:layout_constraintTop_toBottomOf="@id/community_filter_layout"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    tools:listitem="@layout/item_product" />
+    </androidx.constraintlayout.widget.ConstraintLayout>

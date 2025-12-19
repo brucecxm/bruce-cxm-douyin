@@ -1,0 +1,17 @@
+[
+  {
+    "path": "/index",
+    "file": "index.html",
+    "title": "首页"
+  },
+  {
+    "path": "/page1",
+    "file": "page1.html",
+    "title": "页面1"
+  },
+  {
+    "path": "/page2",
+    "file": "page2.html",
+    "title": "页面2"
+  }
+]
