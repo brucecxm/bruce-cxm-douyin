@@ -16,6 +16,12 @@ target/
 
 /douyin_node_backend/node_modules/
 
+/logs/
+
+/douyin_android/pros/app/build/
+
+/douyin_uniapp/unpackage/
+
 /.idea/
 
 *.iml

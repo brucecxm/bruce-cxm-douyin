@@ -18,13 +18,13 @@
     <properties>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.cloud.version>Hoxton.SR10</spring.cloud.version>
+        <spring.cloud.version>2021.0.8</spring.cloud.version>
         <mybatisplus.version>3.4.2</mybatisplus.version>
-        <mysql.version>5.1.46</mysql.version>
-        <spring.boot.version>2.3.9.RELEASE</spring.boot.version>
-        <spring.redis>2.3.9.RELEASE</spring.redis>
-        <com.alibaba.cloud>2.2.5.RELEASE</com.alibaba.cloud>
-        <spring.druid>1.1.23</spring.druid>
+        <mysql.version>8.0.33</mysql.version>
+        <spring.boot.version>2.7.18</spring.boot.version>
+        <spring.redis>2.7.18</spring.redis>
+        <com.alibaba.cloud>2021.0.5.0</com.alibaba.cloud>
+        <spring.druid>1.2.15</spring.druid>
     </properties>
 
     <parent>
@@ -34,12 +34,6 @@
     </parent>
 
     <dependencies>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-boot-starter</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>

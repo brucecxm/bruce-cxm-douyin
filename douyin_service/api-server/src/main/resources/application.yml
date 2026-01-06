@@ -1,4 +1,7 @@
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
   datasource:
     url: jdbc:mysql://1.94.131.16:3306/vue_multi_page?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&characterSetResults=utf8&allowPublicKeyRetrieval=true
     username: remote_user

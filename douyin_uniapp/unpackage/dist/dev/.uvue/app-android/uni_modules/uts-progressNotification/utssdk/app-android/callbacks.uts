@@ -1,3 +1,0 @@
-export let globalNotificationProgressCallBack: (() => void) | null = () => { };
-export let globalNotificationProgressFinishCallBack = () => { };
-//# sourceMappingURL=callbacks.uts.map

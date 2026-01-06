@@ -78,6 +78,28 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
+        
+        <!-- Exclude SpringFox from dependencies since this module doesn't use Swagger -->
+        <dependency>
+            <groupId>org.example</groupId>
+            <artifactId>douyin_file_starter</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.springfox</groupId>
+                    <artifactId>springfox-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.example</groupId>
+            <artifactId>douyin-dao-service</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.springfox</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
     <build>
