@@ -20,7 +20,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etUsername;
     private EditText etPassword;
     private Button btnLogin;
-    private Button btnRegister;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +37,6 @@ public class LoginActivity extends AppCompatActivity {
         etUsername = findViewById(R.id.et_username);
         etPassword = findViewById(R.id.et_password);
         btnLogin = findViewById(R.id.btn_login);
-        btnRegister = findViewById(R.id.btn_register);
     }
     
     private void setListeners() {
@@ -46,13 +44,6 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 login();
-            }
-        });
-        
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
             }
         });
     }
@@ -121,9 +112,9 @@ public class LoginActivity extends AppCompatActivity {
                             
                             editor.apply();
                             
-                            // 跳转到主界面
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                            finish();
+                            // 跳转到HTML显示页面
+                                    startActivity(new Intent(LoginActivity.this, HtmlDisplayActivity.class));
+                                    finish();
                         } else {
                             Toast.makeText(LoginActivity.this, response.getMessage(), Toast.LENGTH_SHORT).show();
                         }

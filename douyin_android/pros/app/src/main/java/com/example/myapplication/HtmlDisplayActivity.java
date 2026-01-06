@@ -1,8 +1,12 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -20,6 +24,12 @@ import java.util.Map;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.nio.charset.StandardCharsets;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
+import okio.ByteString;
 
 public class HtmlDisplayActivity extends AppCompatActivity {
 
@@ -27,6 +37,17 @@ public class HtmlDisplayActivity extends AppCompatActivity {
     private WebView webView;
     private LocalHttpServer localHttpServer;
     private static final int SERVER_PORT = 8080;
+    private LinearLayout titleBarLayout;
+    
+    // WebSocket相关成员变量
+    private OkHttpClient wsClient;
+    private WebSocket webSocket;
+    private String wsUrl;
+    private WebSocketListener webSocketListener;
+    private String jsCallback;
+    
+    // WebSocket连接状态
+    private boolean isWebSocketConnected = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,10 +60,14 @@ public class HtmlDisplayActivity extends AppCompatActivity {
         initData();
     }
 
+    private TextView titleTextView;
+
     private void initView() {
         // 初始化WebView组件
         Log.d(TAG, "initView: 初始化WebView");
         webView = findViewById(R.id.web_view);
+        titleTextView = findViewById(R.id.title_text);
+        titleBarLayout = findViewById(R.id.title_bar_layout);
 
         // 设置WebView客户端
         webView.setWebViewClient(new WebViewClient() {
@@ -77,8 +102,12 @@ public class HtmlDisplayActivity extends AppCompatActivity {
             localHttpServer.start();
             Log.d(TAG, "initData: 本地HTTP服务器启动成功，端口: " + SERVER_PORT);
 
-            // 通过HTTP协议访问本地HTML文件
-            String url = "http://localhost:" + SERVER_PORT + "/index.html";
+            // 获取要加载的URL，如果没有传递URL，则加载默认页面
+            String url = getIntent().getStringExtra("url");
+            if (url == null || url.isEmpty()) {
+                // 加载默认页面
+                url = "http://localhost:" + SERVER_PORT + "/login.html";
+            }
             Log.d(TAG, "initData: 加载URL: " + url);
             webView.loadUrl(url);
         } catch (IOException e) {
@@ -90,21 +119,154 @@ public class HtmlDisplayActivity extends AppCompatActivity {
     }
 
     /**
+     * 自动生成原生页面路由配置文件
+     */
+    private void generateNativeRoutesConfig() {
+        Log.d(TAG, "generateNativeRoutesConfig: 开始生成原生页面路由配置");
+
+        // 要扫描的包名
+        String packageName = "com.example.myapplication";
+
+        // 要排除的Activity（如MainActivity、HtmlDisplayActivity等）
+        String[] excludedActivities = {
+                "MainActivity",
+                "HtmlDisplayActivity"
+        };
+
+        // 创建路由配置列表
+        org.json.JSONArray nativeRoutes = new org.json.JSONArray();
+
+        try {
+            // 获取应用程序的包管理器
+            android.content.pm.PackageManager packageManager = getPackageManager();
+
+            // 获取应用程序的所有Activity
+            android.content.pm.PackageInfo packageInfo = packageManager.getPackageInfo(
+                    getPackageName(),
+                    android.content.pm.PackageManager.GET_ACTIVITIES);
+
+            // 遍历所有Activity
+            for (android.content.pm.ActivityInfo activityInfo : packageInfo.activities) {
+                String activityName = activityInfo.name;
+                String simpleName = activityName.substring(activityName.lastIndexOf(".") + 1);
+
+                // 跳过排除的Activity
+                boolean isExcluded = false;
+                for (String excluded : excludedActivities) {
+                    if (simpleName.equals(excluded)) {
+                        isExcluded = true;
+                        break;
+                    }
+                }
+                if (isExcluded) {
+                    Log.d(TAG, "generateNativeRoutesConfig: 跳过排除的Activity: " + simpleName);
+                    continue;
+                }
+
+                // 生成路由路径（小写，去掉Activity后缀）
+                String path = "/" + simpleName.replace("Activity", "").toLowerCase();
+
+                // 生成标题（首字母大写，去掉Activity后缀，添加空格）
+                String title = simpleName.replace("Activity", "");
+                title = title.replaceAll("([a-z])([A-Z])", "$1 $2");
+                title = title.substring(0, 1).toUpperCase() + title.substring(1);
+
+                // 创建路由配置对象
+                org.json.JSONObject route = new org.json.JSONObject();
+                route.put("path", path);
+                route.put("activity", activityName);
+                route.put("title", title);
+
+                // 添加到路由列表
+                nativeRoutes.put(route);
+                Log.d(TAG, "generateNativeRoutesConfig: 添加路由: " + route.toString());
+            }
+
+            // 将路由配置写入文件
+            String jsonString = nativeRoutes.toString(2); // 格式化JSON，缩进2个空格
+
+            // 获取assets目录的绝对路径
+            java.io.File assetsDir = new java.io.File(getFilesDir().getParent() + "/assets");
+            if (!assetsDir.exists()) {
+                assetsDir.mkdirs();
+            }
+
+            // 写入文件
+            java.io.File nativeRoutesFile = new java.io.File(assetsDir, "native_routes.json");
+            java.io.FileWriter writer = new java.io.FileWriter(nativeRoutesFile);
+            writer.write(jsonString);
+            writer.flush();
+            writer.close();
+
+            Log.d(TAG, "generateNativeRoutesConfig: 原生页面路由配置生成成功: " + nativeRoutesFile.getAbsolutePath());
+        } catch (Exception e) {
+            Log.e(TAG, "generateNativeRoutesConfig: 生成原生页面路由配置失败", e);
+        }
+    }
+
+    /**
      * JavaScript接口类，用于Vue页面调用Android原生方法
      */
     private class AndroidJsBridge {
+        private android.widget.Toast loadingToast;
 
         /**
          * 显示Toast消息
          */
         @android.webkit.JavascriptInterface
-        public void showToast(String message) {
-            Log.d(TAG, "showToast: 收到JS调用，消息: " + message);
+        public void showToast(String message, int duration) {
+            Log.d(TAG, "showToast: 收到JS调用，消息: " + message + ", 时长: " + duration);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    android.widget.Toast.makeText(HtmlDisplayActivity.this, message, android.widget.Toast.LENGTH_SHORT)
+                    // 根据duration参数决定显示时长
+                    int toastDuration = duration <= 1500 ? android.widget.Toast.LENGTH_SHORT : android.widget.Toast.LENGTH_LONG;
+                    android.widget.Toast.makeText(HtmlDisplayActivity.this, message, toastDuration)
                             .show();
+                }
+            });
+        }
+        
+        /**
+         * 显示Toast消息（兼容旧版本，只接受一个参数）
+         */
+        @android.webkit.JavascriptInterface
+        public void showToast(String message) {
+            showToast(message, 1500); // 默认时长1500ms
+        }
+
+        /**
+         * 显示加载中Toast
+         */
+        @android.webkit.JavascriptInterface
+        public void showLoading(String message) {
+            Log.d(TAG, "showLoading: 收到JS调用，消息: " + message);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (loadingToast != null) {
+                        loadingToast.cancel();
+                    }
+                    loadingToast = android.widget.Toast.makeText(HtmlDisplayActivity.this, message,
+                            android.widget.Toast.LENGTH_LONG);
+                    loadingToast.show();
+                }
+            });
+        }
+
+        /**
+         * 隐藏加载中Toast
+         */
+        @android.webkit.JavascriptInterface
+        public void hideLoading() {
+            Log.d(TAG, "hideLoading: 收到JS调用");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (loadingToast != null) {
+                        loadingToast.cancel();
+                        loadingToast = null;
+                    }
                 }
             });
         }
@@ -124,6 +286,8 @@ public class HtmlDisplayActivity extends AppCompatActivity {
                 url += "/page1.html";
             } else if (path.equals("/page2")) {
                 url += "/page2.html";
+            } else if (path.equals("/login")) {
+                url += "/login.html";
             } else {
                 // 默认加载首页
                 url += "/index.html";
@@ -137,6 +301,83 @@ public class HtmlDisplayActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     webView.loadUrl(finalUrl);
+                }
+            });
+        }
+
+        /**
+         * 跳转到原生登录页面
+         */
+        @android.webkit.JavascriptInterface
+        public void navigateToLoginPage() {
+            Log.d(TAG, "navigateToLoginPage: 收到JS调用，跳转到登录页面");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // 跳转到登录页面
+                    Intent intent = new Intent(HtmlDisplayActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    // 可以选择是否关闭当前页面
+                    // finish();
+                }
+            });
+        }
+
+        /**
+         * 根据URL或ID跳转到原生页面
+         */
+        @android.webkit.JavascriptInterface
+        public void navigateToNativePage(String target) {
+            Log.d(TAG, "navigateToNativePage: 收到JS调用，目标: " + target);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        // 直接写死的原生页面路由配置
+                        String nativeRoutesJson = "[\n" +
+                                "  {\n" +
+                                "    \"path\": \"/login\",\n" +
+                                "    \"activity\": \"com.example.myapplication.LoginActivity\",\n" +
+                                "    \"title\": \"登录页面\"\n" +
+                                "  },\n" +
+                                "  {\n" +
+                                "    \"path\": \"/register\",\n" +
+                                "    \"activity\": \"com.example.myapplication.RegisterActivity\",\n" +
+                                "    \"title\": \"注册页面\"\n" +
+                                "  }\n" +
+                                "]";
+                        Log.d(TAG, "navigateToNativePage: 原生页面路由配置: " + nativeRoutesJson);
+
+                        // 解析JSON配置
+                        org.json.JSONArray nativeRoutes = new org.json.JSONArray(nativeRoutesJson);
+
+                        // 根据目标匹配路由
+                        for (int i = 0; i < nativeRoutes.length(); i++) {
+                            org.json.JSONObject route = nativeRoutes.getJSONObject(i);
+                            String path = route.getString("path");
+                            String activityName = route.getString("activity");
+
+                            // 匹配目标路径或活动名称
+                            // 支持匹配完整路径、路径名（如/login或login）、活动名称（不区分大小写）
+                            if (path.equals(target) ||
+                                    path.equals("/" + target) ||
+                                    path.toLowerCase().contains(target.toLowerCase()) ||
+                                    activityName.toLowerCase().contains(target.toLowerCase())) {
+                                Log.d(TAG, "navigateToNativePage: 匹配到路由: " + path + "，活动: " + activityName);
+
+                                // 动态加载并启动Activity
+                                Class<?> activityClass = Class.forName(activityName);
+                                Intent intent = new Intent(HtmlDisplayActivity.this, activityClass);
+                                startActivity(intent);
+                                return;
+                            }
+                        }
+
+                        // 如果没有匹配到路由
+                        Log.d(TAG, "navigateToNativePage: 未找到匹配的原生页面: " + target);
+                    } catch (Exception e) {
+                        Log.e(TAG, "navigateToNativePage: 跳转到原生页面失败", e);
+                    }
                 }
             });
         }
@@ -188,6 +429,100 @@ public class HtmlDisplayActivity extends AppCompatActivity {
             // 这里可以返回本地存储的版本号
             return "v1.0.0";
         }
+
+        /**
+         * 设置页面标题
+         */
+        @android.webkit.JavascriptInterface
+        public void setTitle(String title) {
+            Log.d(TAG, "setTitle: 收到JS调用，设置标题: " + title);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    titleTextView.setText(title);
+                }
+            });
+        }
+
+        /**
+         * 隐藏标题栏
+         */
+        @android.webkit.JavascriptInterface
+        public void hideTitleBar() {
+            Log.d(TAG, "hideTitleBar: 收到JS调用，隐藏标题栏");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    titleBarLayout.setVisibility(View.GONE);
+                }
+            });
+        }
+
+        /**
+         * 显示标题栏
+         */
+        @android.webkit.JavascriptInterface
+        public void showTitleBar() {
+            Log.d(TAG, "showTitleBar: 收到JS调用，显示标题栏");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    titleBarLayout.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+        
+        /**
+         * 连接WebSocket
+         */
+        @android.webkit.JavascriptInterface
+        public void connectWebSocket(String url, String callbackName) {
+            Log.d(TAG, "connectWebSocket: 收到JS调用，连接WebSocket: " + url + ", 回调: " + callbackName);
+            HtmlDisplayActivity.this.jsCallback = callbackName;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    HtmlDisplayActivity.this.connectWebSocket(url);
+                }
+            });
+        }
+        
+        /**
+         * 断开WebSocket连接
+         */
+        @android.webkit.JavascriptInterface
+        public void disconnectWebSocket() {
+            Log.d(TAG, "disconnectWebSocket: 收到JS调用，断开WebSocket连接");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    HtmlDisplayActivity.this.disconnectWebSocket();
+                }
+            });
+        }
+        
+        /**
+         * 发送WebSocket消息
+         */
+        @android.webkit.JavascriptInterface
+        public void sendWebSocketMessage(String message) {
+            Log.d(TAG, "sendWebSocketMessage: 收到JS调用，发送WebSocket消息: " + message);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    sendWebSocketMessage(message);
+                }
+            });
+        }
+        
+        /**
+         * 订阅WebSocket消息
+         */
+        @android.webkit.JavascriptInterface
+        public void subscribeWebSocket(String callbackName) {
+            Log.d(TAG, "subscribeWebSocket: 收到JS调用，订阅WebSocket消息，回调: " + callbackName);
+            HtmlDisplayActivity.this.jsCallback = callbackName;
+        }
     }
 
     /**
@@ -234,7 +569,7 @@ public class HtmlDisplayActivity extends AppCompatActivity {
     private class LocalHttpServer extends NanoHTTPD {
         // 代理配置：匹配/api开头的请求，转发到目标服务器
         private static final String PROXY_PREFIX = "/api";
-        private static final String TARGET_SERVER = "http://10.7.27.97:7456";
+        private static final String TARGET_SERVER = "http://1.94.131.16:7400";
         // WebSocket目标服务器（将http替换为ws）
         private static final String TARGET_WS_SERVER = TARGET_SERVER.replace("http", "ws");
 
@@ -394,12 +729,15 @@ public class HtmlDisplayActivity extends AppCompatActivity {
                 okhttp3.RequestBody requestBody = null;
                 if ("POST".equals(method) || "PUT".equals(method) || "DELETE".equals(method)) {
                     // 读取请求体
-                    StringBuilder bodyBuilder = new StringBuilder();
                     Map<String, String> files = new HashMap<>();
                     session.parseBody(files);
-                    bodyBuilder.append(session.getQueryParameterString());
+                    
+                    // 获取请求体内容
+                    String body = "";
+                    if (files.containsKey("postData")) {
+                        body = files.get("postData");
+                    }
 
-                    String body = bodyBuilder.toString();
                     if (!body.isEmpty()) {
                         requestBody = okhttp3.RequestBody.create(
                                 body,
@@ -539,6 +877,12 @@ public class HtmlDisplayActivity extends AppCompatActivity {
             Log.d(TAG, "onDestroy: 本地HTTP服务器已停止");
         }
 
+        // 关闭WebSocket连接
+        if (webSocket != null) {
+            webSocket.close(1000, "活动销毁");
+            webSocket = null;
+        }
+
         // 销毁WebView，释放资源
         if (webView != null) {
             webView.destroy();
@@ -562,6 +906,114 @@ public class HtmlDisplayActivity extends AppCompatActivity {
         webView.restoreState(savedInstanceState);
     }
 
+    /**
+     * 连接WebSocket
+     */
+    private void connectWebSocket(String url) {
+        Log.d(TAG, "connectWebSocket: 连接WebSocket: " + url);
+        this.wsUrl = url;
+        
+        // 初始化WebSocket客户端
+        wsClient = new OkHttpClient.Builder()
+                .build();
+        
+        // 创建WebSocket监听器
+        webSocketListener = new WebSocketListener() {
+            @Override
+            public void onOpen(WebSocket webSocket, Response response) {
+                Log.d(TAG, "WebSocket: 连接成功");
+                isWebSocketConnected = true;
+                notifyJs("{\"type\":\"open\",\"message\":\"WebSocket连接成功\"}");
+            }
+            
+            @Override
+            public void onMessage(WebSocket webSocket, String text) {
+                Log.d(TAG, "WebSocket: 收到消息: " + text);
+                notifyJs("{\"type\":\"message\",\"message\":\"" + text + "\"}");
+            }
+            
+            @Override
+            public void onMessage(WebSocket webSocket, ByteString bytes) {
+                Log.d(TAG, "WebSocket: 收到二进制消息: " + bytes.hex());
+                notifyJs("{\"type\":\"binaryMessage\",\"message\":\"" + bytes.hex() + "\"}");
+            }
+            
+            @Override
+            public void onClosing(WebSocket webSocket, int code, String reason) {
+                Log.d(TAG, "WebSocket: 正在关闭连接，代码: " + code + ", 原因: " + reason);
+                isWebSocketConnected = false;
+                webSocket.close(1000, null);
+                notifyJs("{\"type\":\"closing\",\"code\":\"" + code + ",\"reason\":\"" + reason + "\"}");
+            }
+            
+            @Override
+            public void onClosed(WebSocket webSocket, int code, String reason) {
+                Log.d(TAG, "WebSocket: 连接已关闭，代码: " + code + ", 原因: " + reason);
+                isWebSocketConnected = false;
+                notifyJs("{\"type\":\"closed\",\"code\":\"" + code + ",\"reason\":\"" + reason + "\"}");
+            }
+            
+            @Override
+            public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+                Log.e(TAG, "WebSocket: 连接失败", t);
+                isWebSocketConnected = false;
+                notifyJs("{\"type\":\"error\",\"message\":\"" + t.getMessage() + "\"}");
+            }
+        };
+        
+        // 创建WebSocket请求
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        
+        // 建立WebSocket连接
+        webSocket = wsClient.newWebSocket(request, webSocketListener);
+    }
+    
+    /**
+     * 断开WebSocket连接
+     */
+    private void disconnectWebSocket() {
+        Log.d(TAG, "disconnectWebSocket: 断开WebSocket连接");
+        if (webSocket != null) {
+            webSocket.close(1000, "主动关闭连接");
+            webSocket = null;
+        }
+        isWebSocketConnected = false;
+    }
+    
+    /**
+     * 发送WebSocket消息
+     */
+    private void sendWebSocketMessage(String message) {
+        Log.d(TAG, "sendWebSocketMessage: 发送WebSocket消息: " + message);
+        if (webSocket != null && isWebSocketConnected) {
+            boolean success = webSocket.send(message);
+            if (success) {
+                notifyJs("{\"type\":\"sendSuccess\",\"message\":\"消息发送成功\"}");
+            } else {
+                notifyJs("{\"type\":\"sendError\",\"message\":\"消息发送失败\"}");
+            }
+        } else {
+            notifyJs("{\"type\":\"sendError\",\"message\":\"WebSocket未连接\"}");
+        }
+    }
+    
+    /**
+     * 通知JavaScript WebSocket事件
+     */
+    private void notifyJs(String message) {
+        Log.d(TAG, "notifyJs: 通知JavaScript: " + message);
+        if (jsCallback != null && !jsCallback.isEmpty()) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    webView.evaluateJavascript(jsCallback + "(\"" + message + "\")", null);
+                }
+            });
+        }
+    }
+    
     @Override
     public void onBackPressed() {
         // 如果WebView可以返回，则返回上一页，否则退出活动

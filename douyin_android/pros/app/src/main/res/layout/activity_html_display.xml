@@ -8,6 +8,7 @@
 
     <!-- 标题栏 -->
     <LinearLayout
+        android:id="@+id/title_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:orientation="horizontal"
@@ -17,6 +18,7 @@
         android:elevation="4dp">
 
         <TextView
+            android:id="@+id/title_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="HTML显示页面"

@@ -2,7 +2,7 @@ package com.example.myapplication.utils;
 
 public class ApiConstants {
     // 后端服务地址
-    public static final String BASE_URL = "http://10.7.27.97:7456";
+    public static final String BASE_URL = "http://10.7.27.169:7400";
     
     // 登录接口
     public static final String LOGIN_URL = "/user/doLogin";

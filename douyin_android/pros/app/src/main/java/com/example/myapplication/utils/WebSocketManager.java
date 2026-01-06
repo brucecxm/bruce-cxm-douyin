@@ -17,7 +17,7 @@ import okio.ByteString;
 
 public class WebSocketManager {
     private static final String TAG = "WebSocketManager";
-    private static final String BASE_WS_URL = "ws://10.7.27.97:7456/ws";
+    private static final String BASE_WS_URL = "ws://10.7.27.169:7400/ws";
     private WebSocket webSocket;
     private WebSocketListener webSocketListener;
     private Gson gson = new Gson();

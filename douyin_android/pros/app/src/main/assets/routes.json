@@ -13,5 +13,90 @@
     "path": "/page2",
     "file": "page2.html",
     "title": "页面2"
+  },
+  {
+    "path": "/login",
+    "file": "login.html",
+    "title": "登录"
+  },
+  {
+    "path": "/register",
+    "file": "register.html",
+    "title": "注册"
+  },
+  {
+    "path": "/categories",
+    "file": "categories.html",
+    "title": "分类"
+  },
+  {
+    "path": "/address",
+    "file": "address.html",
+    "title": "收货地址"
+  },
+  {
+    "path": "/detail",
+    "file": "detail.html",
+    "title": "商品详情"
+  },
+  {
+    "path": "/publish",
+    "file": "publish.html",
+    "title": "发布商品"
+  },
+  {
+    "path": "/profile",
+    "file": "profile.html",
+    "title": "个人中心"
+  },
+  {
+    "path": "/search",
+    "file": "search.html",
+    "title": "搜索"
+  },
+  {
+    "path": "/orders",
+    "file": "orders.html",
+    "title": "我的订单"
+  },
+  {
+    "path": "/orderDetail",
+    "file": "orderDetail.html",
+    "title": "订单详情"
+  },
+  {
+    "path": "/favorites",
+    "file": "favorites.html",
+    "title": "我的收藏"
+  },
+  {
+    "path": "/messages",
+    "file": "messages.html",
+    "title": "消息中心"
+  },
+  {
+    "path": "/chat",
+    "file": "chat.html",
+    "title": "聊天"
+  },
+  {
+    "path": "/myProducts",
+    "file": "myProducts.html",
+    "title": "我的发布"
+  },
+  {
+    "path": "/settings",
+    "file": "settings.html",
+    "title": "设置"
+  },
+  {
+    "path": "/cart",
+    "file": "cart.html",
+    "title": "购物车"
+  },
+  {
+    "path": "/websocket-test",
+    "file": "websocket-test.html",
+    "title": "WebSocket测试"
   }
 ]

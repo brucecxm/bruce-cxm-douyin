@@ -63,8 +63,10 @@ dependencies {
     // 添加本地HTTP服务器库
     implementation("org.nanohttpd:nanohttpd:2.3.1")
     
-    // 添加MinIO客户端依赖
-    implementation("io.minio:minio:8.5.2")
+    // 添加MinIO客户端依赖，排除snappy依赖以支持API 24
+    implementation("io.minio:minio:8.5.2") {
+        exclude(group = "org.xerial.snappy", module = "snappy-java")
+    }
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     testImplementation(libs.junit)

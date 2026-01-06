@@ -11,6 +11,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>douyin_video</module>
+        <module>api-server</module>
         <module>douyin_user</module>
         <module>douyin_shop</module>
         <module>douyin_common</module>
@@ -25,11 +26,7 @@
     </modules>
     <artifactId>douyin_service</artifactId>
 
-    <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+
 
 
     <dependencies>

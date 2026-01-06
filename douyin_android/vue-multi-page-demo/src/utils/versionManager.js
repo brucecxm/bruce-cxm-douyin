@@ -72,15 +72,16 @@ export async function checkForUpdates() {
 
 // 初始化版本检查
 export function initVersionCheck() {
-  // 页面加载完成后检查版本
-  window.addEventListener('load', async () => {
-    await checkForUpdates();
-  });
-
-  // 定期检查版本（可选）
-  setInterval(() => {
-    checkForUpdates();
-  }, 24 * 60 * 60 * 1000); // 每天检查一次
+  console.log('初始化版本检查');
+  //   // 页面加载完成后检查版本
+  //   window.addEventListener('load', async () => {
+  //     await checkForUpdates();
+  //   });
+  // 
+  //   // 定期检查版本（可选）
+  //   setInterval(() => {
+  //     checkForUpdates();
+  //   }, 24 * 60 * 60 * 1000); // 每天检查一次
 }
 
 export default {

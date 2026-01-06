@@ -137,39 +137,6 @@ public class VersionManager {
     }
     
     /**
-     * 比较版本号
-     */
-    private boolean isNewVersion(String serverVersion, String localVersion) {
-        if (serverVersion.equals(localVersion)) {
-            return false;
-        }
-        
-        // 简单的版本比较逻辑，可根据实际需求优化
-        String[] serverParts = serverVersion.replace("v", "").split(".");
-        String[] localParts = localVersion.replace("v", "").split(".");
-        
-        int minLength = Math.min(serverParts.length, localParts.length);
-        for (int i = 0; i < minLength; i++) {
-            try {
-                int serverNum = Integer.parseInt(serverParts[i]);
-                int localNum = Integer.parseInt(localParts[i]);
-                
-                if (serverNum > localNum) {
-                    return true;
-                } else if (serverNum < localNum) {
-                    return false;
-                }
-            } catch (NumberFormatException e) {
-                Log.e(TAG, "版本号格式错误", e);
-                return false;
-            }
-        }
-        
-        // 如果前面的版本号都相同，比较长度
-        return serverParts.length > localParts.length;
-    }
-    
-    /**
      * 下载并更新资源
      */
     private void downloadAndUpdate(ServerVersionInfo serverVersionInfo) {

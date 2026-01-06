@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@drawable/blue_gradient_bg"
     tools:context=".LoginActivity">
 
     <LinearLayout
@@ -11,14 +11,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="20dp">
-
-        <ImageView
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:src="@mipmap/ic_launcher_round"
-            android:layout_gravity="center"
-            android:layout_marginTop="40dp"
-            android:layout_marginBottom="30dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -28,56 +20,34 @@
             android:textStyle="bold"
             android:textColor="#333333"
             android:layout_gravity="center"
-            android:layout_marginBottom="30dp" />
+            android:layout_marginTop="60dp"
+            android:layout_marginBottom="40dp" />
 
-        <LinearLayout
+        <EditText
+            android:id="@+id/et_username"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="15dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="用户名"
-                android:textSize="14sp"
-                android:textColor="#666666"
-                android:layout_marginBottom="5dp" />
-            <EditText
-                android:id="@+id/et_username"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:padding="10dp"
-                android:background="@drawable/edit_text_bg"
-                android:hint="请输入用户名"
-                android:textSize="16sp"
-                android:textColor="#333333"
-                android:textColorHint="#999999" />
-        </LinearLayout>
+            android:layout_height="50dp"
+            android:padding="15dp"
+            android:background="@drawable/edit_text_round_bg"
+            android:hint="输入QQ号"
+            android:textSize="16sp"
+            android:textColor="#333333"
+            android:textColorHint="#999999"
+            android:layout_marginBottom="15dp"
+            android:inputType="text" />
 
-        <LinearLayout
+        <EditText
+            android:id="@+id/et_password"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="15dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="密码"
-                android:textSize="14sp"
-                android:textColor="#666666"
-                android:layout_marginBottom="5dp" />
-            <EditText
-                android:id="@+id/et_password"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:padding="10dp"
-                android:background="@drawable/edit_text_bg"
-                android:hint="请输入密码"
-                android:textSize="16sp"
-                android:textColor="#333333"
-                android:textColorHint="#999999"
-                android:inputType="textPassword" />
-        </LinearLayout>
+            android:layout_height="50dp"
+            android:padding="15dp"
+            android:background="@drawable/edit_text_round_bg"
+            android:hint="输入QQ密码"
+            android:textSize="16sp"
+            android:textColor="#333333"
+            android:textColorHint="#999999"
+            android:inputType="textPassword"
+            android:layout_marginBottom="20dp" />
 
         <Button
             android:id="@+id/btn_login"
@@ -86,19 +56,7 @@
             android:text="登录"
             android:textSize="16sp"
             android:textColor="#FFFFFF"
-            android:background="@drawable/button_bg"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="15dp"
-            android:textAllCaps="false" />
-
-        <Button
-            android:id="@+id/btn_register"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:text="注册"
-            android:textSize="16sp"
-            android:textColor="#333333"
-            android:background="@drawable/button_outline_bg"
+            android:background="@drawable/button_round_bg"
             android:layout_marginBottom="20dp"
             android:textAllCaps="false" />
 
@@ -106,15 +64,102 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_gravity="center"
-            android:gravity="center">
+            android:gravity="center"
+            android:layout_marginBottom="60dp">
+            <CheckBox
+                android:id="@+id/cb_agreement"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="#999999"
+                android:layout_marginRight="5dp" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="其他登录方式："
-                android:textSize="14sp"
-                android:textColor="#666666" />
-            <!-- 可以添加第三方登录按钮，如微信、QQ等 -->
+                android:text="已阅读并同意服务协议及QQ隐私保护指引"
+                android:textSize="12sp"
+                android:textColor="#999999" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="20dp">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginRight="40dp">
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@mipmap/ic_launcher_round"
+                    android:layout_marginBottom="5dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="手机号登录"
+                    android:textSize="12sp"
+                    android:textColor="#666666" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginRight="40dp">
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@mipmap/ic_launcher_round"
+                    android:layout_marginBottom="5dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="其他方式登录"
+                    android:textSize="12sp"
+                    android:textColor="#666666" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginRight="40dp">
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@mipmap/ic_launcher_round"
+                    android:layout_marginBottom="5dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="注册"
+                    android:textSize="12sp"
+                    android:textColor="#666666" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@mipmap/ic_launcher_round"
+                    android:layout_marginBottom="5dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="更多"
+                    android:textSize="12sp"
+                    android:textColor="#666666" />
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>
