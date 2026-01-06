@@ -2,6 +2,43 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
+
+  redis:
+    # Redis数据库索引（默认为0）
+    database: 12
+    # Redis服务器地址
+    host: 1.94.131.16
+    # Redis服务器连接端口
+    port: 6379
+    # Redis服务器连接密码（默认为空）
+    password: Aa.147258
+    # 连接超时时间
+    timeout: 10s
+    lettuce:
+      pool:
+        # 连接池最大连接数
+        max-active: 200
+        # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: -1ms
+        # 连接池中的最大空闲连接
+        max-idle: 10
+        # 连接池中的最小空闲连接
+        min-idle: 0
+
+  rabbitmq:
+    host: 1.94.131.16 # RabbitMQ 服务器的主机地址
+    port: 5672 # RabbitMQ 服务器的端口号
+    username: itcast # RabbitMQ 的用户名
+    password: 123321 # RabbitMQ 的密码
+    virtual-host: / # RabbitMQ 的虚拟主机
+    connection - timeout: 5000 # 设置连接超时时间为5秒，可根据需求调整
+    template:
+      retry:
+        enabled: true # 开启超时重试机制
+        initial - interval: 5000ms # 失败后的初始等待时间为5秒，可调整
+        multiplier: 1 # 失败后下次等待时长倍数，下次等待时长 = initial - interval * multiplier
+        max - attempts: 3 # 最大重试次数为3次，可调整
+
   datasource:
     url: jdbc:mysql://1.94.131.16:3306/vue_multi_page?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&characterSetResults=utf8&allowPublicKeyRetrieval=true
     username: remote_user

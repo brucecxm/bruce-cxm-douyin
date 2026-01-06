@@ -21,6 +21,12 @@
             <artifactId>douyin_model</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <!-- Swagger 2.x 依赖 -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-boot-starter</artifactId>
+            <version>3.0.0</version>
+        </dependency>
 
         <!-- 添加对douyin-dao-service模块的依赖 -->
         <dependency>
