@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>布鲁斯陈的简历</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #111;
+      --muted: #6e6e73;
+      --accent: #0071e3;
+      --card-bg: #fafafa;
+      --radius: 20px;
+      --shadow: 0 4px 30px rgba(0, 0, 0, 0.06);
+      font-size: 16px;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      transition: 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+    }
+
+    .profile {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      font-size: 26px;
+      font-weight: 700;
+      background: #f2f2f7;
+      color: #333;
+    }
+
+    .name {
+      font-size: 22px;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .meta {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* 联系方式 */
+    .chip {
+      display: inline-block;
+      padding: 6px 12px;
+      background: #f5f5f7;
+      border-radius: 999px;
+      font-size: 13px;
+      color: #444;
+      margin: 4px 6px 4px 0;
+    }
+
+    .chip a {
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    h2 {
+      font-size: 20px;
+      margin: 0 0 16px;
+      font-weight: 600;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin: 8px 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+      list-style: none;
+    }
+
+    ul li {
+      position: relative;
+      padding-left: 28px;
+      margin: 10px 0;
+      transition: all 0.3s ease;
+    }
+
+    ul li::before {
+      content: '✨';
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    ul li:hover {
+      transform: translateX(8px);
+      color: var(--accent);
+    }
+
+    ul li:hover::before {
+      transform: scale(1.2) rotate(10deg);
+    }
+
+    /* 为不同能力添加不同图标 */
+    ul li:nth-child(1)::before {
+      content: '💻';
+    }
+
+    ul li:nth-child(2)::before {
+      content: '📊';
+    }
+
+    ul li:nth-child(3)::before {
+      content: '🗄️';
+    }
+
+    ul li:nth-child(4)::before {
+      content: '🐳';
+    }
+
+    ul li:nth-child(5)::before {
+      content: '⚡';
+    }
+
+    ul li:nth-child(6)::before {
+      content: '🚀';
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* 标签 */
+    .tag {
+      display: inline-block;
+      padding: 6px 10px;
+      background: #f2f2f7;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #555;
+      margin: 4px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tag::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 113, 227, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .tag:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(135deg, #f0f4ff, #e8f0ff);
+      color: var(--accent);
+      box-shadow: 0 4px 12px rgba(0, 113, 227, 0.15);
+    }
+
+    .tag:hover::before {
+      left: 100%;
+    }
+
+    /* 时间线 */
+    .timeline {
+      border-left: 3px solid #e5e5ea;
+      padding-left: 16px;
+      margin-left: 6px;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding: 12px 0;
+    }
+
+    .timeline-item::before {
+      content: "";
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      position: absolute;
+      left: -22px;
+      top: 18px;
+    }
+
+    /* 响应式 */
+    @media (min-width: 900px) {
+      .container {
+        grid-template-columns: 320px 1fr;
+      }
+    }
+
+    /* 体验链接容器样式 */
+    .experience-links {
+      position: absolute;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+      padding: 16px;
+      margin-top: 10px;
+      z-index: 100;
+      min-width: 220px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px) scale(0.95);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+    }
+
+    .experience-links::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: 24px;
+      width: 16px;
+      height: 16px;
+      background: white;
+      transform: rotate(45deg);
+      box-shadow: -2px -2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .experience-links.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+
+    /* 体验链接样式 */
+    .experience-links a {
+      display: flex;
+      align-items: center;
+      color: #444;
+      text-decoration: none;
+      padding: 10px 14px;
+      margin: 4px 0;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 400;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 链接悬停效果 */
+    .experience-links a::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 113, 227, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .experience-links a:hover::before {
+      left: 100%;
+    }
+
+    .experience-links a:hover {
+      background: linear-gradient(135deg, #f8f9ff, #f0f4ff);
+      color: var(--accent);
+      transform: translateX(8px);
+      box-shadow: 0 4px 12px rgba(0, 113, 227, 0.15);
+    }
+
+    /* 链接图标 */
+    .experience-links a::after {
+      content: '↗';
+      margin-left: auto;
+      opacity: 0;
+      transform: translateX(-5px);
+      transition: all 0.25s ease;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .experience-links a:hover::after {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* 链接标题 */
+    .experience-links::first-line {
+      font-weight: 600;
+      color: #222;
+      margin-bottom: 8px;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- PDF导出按钮 -->
+  <div style="text-align: center; margin-bottom: 20px;">
+    <button id="export-pdf-btn" class="tag"
+      style="cursor: pointer; padding: 10px 20px; font-size: 14px; font-weight: 500;">
+      📄 导出为PDF
+    </button>
+  </div>
+  <div class="container">
+
+    <aside class="card">
+      <div class="profile">
+        <div class="avatar">陈</div>
+        <div>
+          <h1 class="name">陈雪明</h1>
+          <div class="meta">网络工程 | 本科 （2021.9 - 2025.6）</div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <div class="chip">📞 173-7955-7174</div>
+        <div class="chip">✉️ 2945090920@qq.com</div>
+        <div class="chip"><a href="https://blog.csdn.net/a2945090920?type=blog" target="_blank">CSDN 博客</a></div>
+        <div class="chip"><a href="https://github.com/brucecxm" target="_blank">GitHub</a></div>
+      </div>
+
+      <h2 style="margin-top:24px;">技能概览</h2>
+      <div class="tag">Java</div>
+      <div class="tag">Spring Boot</div>
+      <div class="tag">Spring Cloud</div>
+      <div class="tag">Redis</div>
+      <div class="tag">MySQL / Oracle</div>
+      <div class="tag">Kafka</div>
+      <div class="tag">ElasticSearch</div>
+      <div class="tag">Docker</div>
+      <div class="tag">SkyWalking</div>
+      <div class="tag">JMeter</div>
+      <div class="tag">Vue / Angular</div>
+
+      <h2 style="margin-top:24px;">教育经历</h2>
+      <div class="muted">西安财经大学 — 网络工程</div>
+      <div class="muted" style="margin-top:4px;">2021.9 - 2025.6</div>
+
+      <h2 style="margin-top:24px;">自我评价</h2>
+      <div class="muted">具备全栈开发能力，能够独立完成项目的设计、开发、测试、部署和上线。</div>
+      <div class="muted">具备多种渠道的开发经验，包括但不限于移动应用、Web应用、小程序等。</div>
+      <div class="muted">学习能力很强，能够很快的适应新业务和掌握新技术，熟练应用AI快速开发项目。</div>
+    </aside>
+
+    <main>
+
+      <section class="card">
+        <h2>实习/工作经历</h2>
+        <div class="timeline">
+
+          <div class="timeline-item">
+            <h3>浩鲸云计算科技股份有限公司 — 全栈开发</h3>
+            <div class="muted">2024.8 - 2025.1 ｜ 中国移动渠道管理平台 / 和帮手App</div>
+            <div style="margin: 8px 0;">
+              <a href="https://spring.io/projects/spring-boot" target="_blank" class="tag">Spring Boot</a>
+              <a href="https://www.mysql.com/" target="_blank" class="tag">MySQL</a>
+              <a href="https://redis.io/" target="_blank" class="tag">Redis</a>
+              <a href="https://angular.io/" target="_blank" class="tag">Angular</a>
+            </div>
+            <ul>
+              <li>在渠道系统及和帮手APP新增 “每日一练” 与 “AI 智训” 功能：前者为中国移动员工提供日常碎片化试题练习入口；后者通过 AI 分析员工学习短板，定向推送针对性训练内容</li>
+              <li>参与酬金功能甩扣环节的开发，实现了一套严谨的酬金帅扣计算逻辑和一套完整的回溯系统，给移动员工的酬金发放提供了有力保障。</li>
+              <li>利用微服务架构使用EasyExcel替代原先的POI对渠道资料导出功能进行优化，极大提高了渠道资料的导出速度。</li>
+            </ul>
+          </div>
+
+          <div class="timeline-item">
+            <h3>神州融信云科技股份有限公司 — 全栈开发岗</h3>
+            <div class="muted">2025.2 - 至今 ｜ 融信云电子银行
+              <button class="tag experience-tag" onclick="toggleExperienceLinks(this)"
+                style="cursor: pointer; padding: 6px 10px; margin-left: 10px; background: #f2f2f7; border: none; border-radius: 8px; font-size: 13px; color: #555; transition: all 0.3s ease;">
+                体验地址
+              </button>
+              <div class="experience-links">
+                <a href="https://ent.wuhaicb.com/fpaas_bucket/97054965_prod/h5/22000001-1.0.0.14/html/index.html#/login"
+                  target="_blank">个人网银</a>
+                <a href="https://mybank.urbank.com.cn/fpaas_bucket/43603805_prod/h5/22000001-1.0.0.5/html/index.html#/login"
+                  target="_blank">企业法人</a>
+                <a href="https://www.xinhuibank.com/fpaas_bucket/85687711_prod/h5/41000001-1.0.0.6/html/index.html#/home"
+                  target="_blank">门户网站</a>
+                <a href="https://www.wuhaicb.com/app/czdownload.html" target="_blank">个人手机</a>
+              </div>
+            </div>
+            <ul>
+              <li>解决服务台用户反馈的问题，包括但不限于同名转账异常处理、个人/企业客户签约异常处理、历史遗留问题处理等</li>
+              <li>迁入行接口的适配，根据迁入行提供的接口文档与本系统的接口文档进行对接，利用前置系统完成接口间的参数转换和数据映射，完成网银系统和银行核心系统的对接。</li>
+              <li>参与代码、需求、功能评审，基于项目参与经验与认知，输出评估结论与优化建议。</li>
+              <li>前端功能的开发和维护，将前端工程打包成H5资源包到Minio文件服务器，不同渠道侧可以通过接口调用获取H5资源包从而实现前端功能实时更新。</li>
+            </ul>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>项目经历</h2>
+
+        <h3>中国移动渠道集中管理平台 — 全栈开发</h3>
+        <div class="muted">2024.8 - 2025.1</div>
+        <div style="margin: 8px 0;">
+          <a href="https://spring.io/projects/spring-boot" target="_blank" class="tag">Spring Boot</a>
+          <a href="https://spring.io/projects/spring-cloud" target="_blank" class="tag">Spring Cloud</a>
+          <a href="https://redis.io/" target="_blank" class="tag">Redis</a>
+          <a href="https://www.mysql.com/" target="_blank" class="tag">MySQL</a>
+        </div>
+        <ul>
+          <li>基于微服务拆分渠道资料导出功能，提高性能与可维护性。</li>
+          <li>独立完成 AI 智讯考试模块与接口联调。</li>
+        </ul>
+
+        <h3 style="margin-top:20px;">融信云电子银行 — 全栈开发岗</h3>
+        <div class="muted">2025.2 - 至今
+        </div>
+        <div style="margin: 8px 0;">
+          <a href="https://spring.io/projects/spring-boot" target="_blank" class="tag">Spring</a>
+          <a href="https://www.oracle.com/database/" target="_blank" class="tag">MySQL</a>
+          <a href="https://kafka.apache.org/" target="_blank" class="tag">Athena</a>
+          <a href="https://www.docker.com/" target="_blank" class="tag">Vue2</a>
+        </div>
+        <div class="muted" style="margin-top:8px; font-weight:600; color:#111;">项目描述：</div>
+        <div class="muted">
+          "融信云电子银行"包含个人/企业网银、个人/企业手机网银、门户网站、微信公众号、移动展业、内管系统，网银应用采用微服务架构，其通过ESB系统及前置系统等与银行核心系统完成交易处理与数据交互。
+        </div>
+        <div class="muted" style="margin-top:8px; font-weight:600; color:#111;">项目职责：</div>
+        <ul>
+          <li>
+            负责转账模块开发与性能优化，针对跨行转账高峰期响应延迟问题，分析接口调用链路，设计高并发架构（支持500笔/秒并发），实现数据库索引优化（新增转账流水表索引）与缓存策略（Redis缓存行号信息），使平均响应时间从800ms降至300ms。
+          </li>
+        </ul>
+
+        <h3 style="margin-top:20px;">仿抖音短视频（个人项目）</h3>
+        <div class="muted">2023.9 - 至今
+          <button class="tag experience-tag" onclick="toggleExperienceLinks(this)"
+            style="cursor: pointer; padding: 6px 10px; margin-left: 10px; background: #f2f2f7; border: none; border-radius: 8px; font-size: 13px; color: #555; transition: all 0.3s ease;">
+            体验地址
+          </button>
+          <div class="experience-links">
+            <a href="http://www.brucecxm.xyz:8001/" target="_blank">抖音短视频体验</a>
+            <a href="http://1.94.131.16:9001/browser/douyin/app%2Fapp-debug.apk(1).1" target="_blank">下载APP安装包</a>
+          </div>
+        </div>
+        <div style="margin: 8px 0;">
+          <a href="https://spring.io/projects/spring-boot" target="_blank" class="tag">Spring Boot</a>
+          <a href="https://kafka.apache.org/" target="_blank" class="tag">Kafka</a>
+          <a href="https://redis.io/" target="_blank" class="tag">Redis</a>
+          <a href="https://min.io/" target="_blank" class="tag">MinIO</a>
+          <a href="https://vuejs.org/" target="_blank" class="tag">Vue.js</a>
+        </div>
+        <ul>
+          <li>实现短视频核心功能：播放、点赞、评论、聊天、商品购买等。</li>
+          <li>KafkaStream 统计交互行为，Redis 缓存加速响应。</li>
+          <li>使用 MinIO 作为视频/图片存储系统。</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2>能力亮点</h2>
+        <ul>
+          <li>熟练掌握 Java 后端，具备完整微服务项目经验。</li>
+          <li>擅长数据库优化（索引/SQL重写/结构化设计）。</li>
+          <li>熟悉 Redis 缓存体系、雪崩/穿透/击穿处理。</li>
+          <li>熟练部署各种环境，包括 Docker 容器化部署与 SkyWalking 运维系统搭建。</li>
+          <li>熟悉使用 JMeter 进行高并发测试，能够设计合理的测试场景并分析性能瓶颈。</li>
+          <li>具备独立设计、开发、联调与上线能力。</li>
+        </ul>
+      </section>
+
+    </main>
+  </div>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    // 切换体验链接显示/隐藏
+    function toggleExperienceLinks(button) {
+      const linksContainer = button.nextElementSibling;
+      linksContainer.classList.toggle('show');
+    }
+
+    // 点击页面其他地方隐藏体验链接
+    document.addEventListener('click', function (e) {
+      if (!e.target.classList.contains('experience-tag') && !e.target.closest('.experience-links')) {
+        const allLinksContainers = document.querySelectorAll('.experience-links');
+        allLinksContainers.forEach(container => {
+          container.classList.remove('show');
+        });
+      }
+    });
+
+    // PDF导出功能
+    document.getElementById('export-pdf-btn').addEventListener('click', async function () {
+      // 创建PDF文档
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      // 获取页面内容
+      const container = document.querySelector('.container');
+      const originalStyle = {
+        transform: container.style.transform,
+        transition: container.style.transition,
+        boxShadow: container.style.boxShadow
+      };
+
+      // 临时移除动画效果，确保正确渲染
+      container.style.transform = 'none';
+      container.style.transition = 'none';
+      container.style.boxShadow = 'none';
+
+      // 隐藏导出按钮
+      this.style.display = 'none';
+
+      // 使用html2canvas将HTML转换为Canvas
+      try {
+        const canvas = await html2canvas(container, {
+          scale: 1.2, // 进一步降低分辨率，减少文字截断问题
+          useCORS: true, // 允许跨域图片
+          logging: false,
+          backgroundColor: '#ffffff',
+          windowWidth: container.scrollWidth,
+          windowHeight: container.scrollHeight
+        });
+
+        // 计算PDF页面大小和缩放比例
+        const imgData = canvas.toDataURL('image/jpeg', 0.9); // 提高图片质量，补偿降低的分辨率
+        const imgWidth = 210; // A4宽度（mm）
+        const pageHeight = 297; // A4高度（mm）
+        const margin = 15; // 增加边距，避免内容太靠近边缘
+        const contentWidth = imgWidth - 2 * margin;
+        const contentHeight = pageHeight - 2 * margin; // 可用内容高度
+        const imgHeight = (canvas.height * contentWidth) / canvas.width;
+
+        // 计算总页数
+        const totalPages = Math.ceil(imgHeight / contentHeight);
+
+        // 逐页添加内容，确保每页完整显示
+        for (let i = 0; i < totalPages; i++) {
+          if (i > 0) {
+            pdf.addPage();
+          }
+
+          const yOffset = -i * contentHeight;
+          pdf.addImage(imgData, 'JPEG', margin, margin + yOffset, contentWidth, imgHeight);
+        }
+
+        // 保存PDF文件
+        pdf.save('陈雪明_简历.pdf');
+      } catch (error) {
+        console.error('PDF导出失败:', error);
+        alert('PDF导出失败，请重试！');
+      } finally {
+        // 恢复原始样式和显示导出按钮
+        Object.assign(container.style, originalStyle);
+        this.style.display = 'inline-block';
+      }
+    });
+  </script>
+
+</body>
+
+</html>
