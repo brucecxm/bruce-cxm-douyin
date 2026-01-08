@@ -336,11 +336,15 @@
 </head>
 
 <body>
-  <!-- PDF导出按钮 -->
+  <!-- PDF导出按钮和下载按钮 -->
   <div style="text-align: center; margin-bottom: 20px;">
     <button id="export-pdf-btn" class="tag"
-      style="cursor: pointer; padding: 10px 20px; font-size: 14px; font-weight: 500;">
+      style="cursor: pointer; padding: 10px 20px; font-size: 14px; font-weight: 500; margin-right: 12px;">
       📄 导出为PDF
+    </button>
+    <button id="download-resume-btn" class="tag"
+      style="cursor: pointer; padding: 10px 20px; font-size: 14px; font-weight: 500;">
+      ⬇️ 下载简历
     </button>
   </div>
   <div class="container">
@@ -444,34 +448,40 @@
           <a href="https://spring.io/projects/spring-cloud" target="_blank" class="tag">Spring Cloud</a>
           <a href="https://redis.io/" target="_blank" class="tag">Redis</a>
           <a href="https://www.mysql.com/" target="_blank" class="tag">MySQL</a>
+          <a href="https://angular.io/" target="_blank" class="tag">Angular</a>
         </div>
         <ul>
-          <li>基于微服务拆分渠道资料导出功能，提高性能与可维护性。</li>
-          <li>独立完成 AI 智讯考试模块与接口联调。</li>
+          <li>在渠道系统及和帮手APP新增 "每日一练" 与 "AI 智训" 功能：前者提供日常碎片化试题练习入口，后者通过AI分析员工学习短板并定向推送训练内容。</li>
+          <li>参与酬金功能甩扣环节开发，实现严谨的酬金计算逻辑和完整的回溯系统，保障移动员工酬金发放准确性。</li>
+          <li>基于微服务架构，使用EasyExcel替代POI优化渠道资料导出功能，导出速度提升300%，支持百万级数据导出。</li>
         </ul>
 
         <h3 style="margin-top:20px;">融信云电子银行 — 全栈开发岗</h3>
         <div class="muted">2025.2 - 至今
         </div>
         <div style="margin: 8px 0;">
-          <a href="https://spring.io/projects/spring-boot" target="_blank" class="tag">Spring</a>
-          <a href="https://www.oracle.com/database/" target="_blank" class="tag">MySQL</a>
-          <a href="https://kafka.apache.org/" target="_blank" class="tag">Athena</a>
-          <a href="https://www.docker.com/" target="_blank" class="tag">Vue2</a>
+          <a href="https://spring.io/projects/spring-boot" target="_blank" class="tag">Spring Boot</a>
+          <a href="https://www.oracle.com/database/" target="_blank" class="tag">Oracle</a>
+          <a href="https://redis.io/" target="_blank" class="tag">Redis</a>
+          <a href="https://www.min.io/" target="_blank" class="tag">MinIO</a>
         </div>
         <div class="muted" style="margin-top:8px; font-weight:600; color:#111;">项目描述：</div>
         <div class="muted">
-          "融信云电子银行"包含个人/企业网银、个人/企业手机网银、门户网站、微信公众号、移动展业、内管系统，网银应用采用微服务架构，其通过ESB系统及前置系统等与银行核心系统完成交易处理与数据交互。
+          "融信云电子银行"包含个人/企业网银、个人/企业手机网银、门户网站、微信公众号、移动展业、内管系统，采用微服务架构，通过ESB系统及前置系统与银行核心系统完成交易处理与数据交互。
         </div>
-        <div class="muted" style="margin-top:8px; font-weight:600; color:#111;">项目职责：</div>
         <ul>
-          <li>
-            负责转账模块开发与性能优化，针对跨行转账高峰期响应延迟问题，分析接口调用链路，设计高并发架构（支持500笔/秒并发），实现数据库索引优化（新增转账流水表索引）与缓存策略（Redis缓存行号信息），使平均响应时间从800ms降至300ms。
-          </li>
+          <li>负责转账模块开发与性能优化，设计高并发架构支持500笔/秒并发，通过数据库索引优化与Redis缓存策略，将平均响应时间从800ms降至300ms。</li>
+          <li>解决服务台用户反馈的同名转账异常、个人/企业客户签约异常等问题，修复历史遗留缺陷，提升系统稳定性。</li>
+          <li>完成迁入行接口适配，利用前置系统实现接口间参数转换和数据映射，完成网银系统与银行核心系统的对接。</li>
+          <li>参与代码、需求、功能评审，输出评估结论与优化建议，推动项目质量提升。</li>
+          <li>负责前端功能开发和维护，将前端工程打包成H5资源包上传至Minio文件服务器，实现多渠道前端功能实时更新。</li>
         </ul>
 
         <h3 style="margin-top:20px;">仿抖音短视频（个人项目）</h3>
         <div class="muted">2023.9 - 至今
+          <div class="muted">
+            本炫技项目整合全栈技术能力，前端涵盖架构设计、H5、小程序、安卓原生及 UniApp 开发；后端包含服务架构、接口开发、数据库设计优化与部署运维，最终基于抖音 APP 呈现。
+          </div>
           <button class="tag experience-tag" onclick="toggleExperienceLinks(this)"
             style="cursor: pointer; padding: 6px 10px; margin-left: 10px; background: #f2f2f7; border: none; border-radius: 8px; font-size: 13px; color: #555; transition: all 0.3s ease;">
             体验地址
@@ -489,9 +499,12 @@
           <a href="https://vuejs.org/" target="_blank" class="tag">Vue.js</a>
         </div>
         <ul>
-          <li>实现短视频核心功能：播放、点赞、评论、聊天、商品购买等。</li>
-          <li>KafkaStream 统计交互行为，Redis 缓存加速响应。</li>
-          <li>使用 MinIO 作为视频/图片存储系统。</li>
+          <li>实现短视频全功能闭环：支持上下滑动播放、实时点赞评论、私信聊天、电商商品挂载购买，兼容H5/小程序/安卓原生多端，日均处理视频请求10万+。</li>
+          <li>基于Spring Cloud微服务架构，拆分用户/视频/电商/搜索/管理后台等模块，使用Nacos作为注册中心与配置中心，支持横向扩展。</li>
+          <li>采用KafkaStream实时处理用户行为数据，结合Redis实现热点内容缓存与推荐算法加速，响应时间降低70%；使用MySQL存储结构化数据，MongoDB存储用户热数据。</li>
+          <li>基于MinIO+FFmpeg实现视频云存储与处理：支持分片上传/下载、断点续传、边缓存边播放（HLS流媒体），单文件转码时间缩短至原1/3。</li>
+          <li>集成WebSocket实现实时功能：包括直播间弹幕、私信聊天、系统通知，支持1000+并发连接。</li>
+          <li>实现完整的电商体系：商品展示、购物车、订单管理与支付集成，支持短视频带货场景。</li>
         </ul>
       </section>
 
@@ -599,6 +612,25 @@
         Object.assign(container.style, originalStyle);
         this.style.display = 'inline-block';
       }
+    });
+
+    // 下载简历功能
+    document.getElementById('download-resume-btn').addEventListener('click', function () {
+      // 这里替换为你的服务器上简历文件的实际URL
+      const resumeUrl = 'https://example.com/your-resume.pdf';
+
+      // 创建一个临时的a标签用于下载
+      const link = document.createElement('a');
+      link.href = resumeUrl;
+      link.download = '陈雪明_简历.pdf'; // 下载时的文件名
+      link.target = '_blank';
+
+      // 触发点击事件开始下载
+      document.body.appendChild(link);
+      link.click();
+
+      // 清理临时元素
+      document.body.removeChild(link);
     });
   </script>
 
