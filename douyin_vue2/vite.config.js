@@ -50,7 +50,7 @@ export default defineConfig(({ mode }) => {
       proxy: {},
       watch: {
         // 监听时忽略 node_modules 和 dist（避免无意义的文件监控消耗内存）
-        ignored: ['**/node_modules/**', '**/dist/**'],
+        ignored: ['**/node_modules/**', '**/dist/**']
       }
     }
   };
@@ -84,7 +84,7 @@ export default defineConfig(({ mode }) => {
         ...commonConfig.server,
         proxy: {
           '/api': {
-            target: 'http://localhost:7456',
+            target: 'http://localhost:7400',
             // target: 'https://116.196.98.171:9430',
             changeOrigin: true,
             ws: true, // ✅ 加上这行支持 WebSocket 代理

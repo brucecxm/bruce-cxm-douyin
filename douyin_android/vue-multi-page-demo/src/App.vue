@@ -1,26 +1,37 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app">
+    <router-view />
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
   name: 'App',
-  components: {
-    HelloWorld
+  data() {
+    return {
+      touchStartTime: 0,
+      touchStartY: 0,
+      touchEndTime: 0,
+      touchEndY: 0,
+      isScrolling: false,
+      scrollThreshold: 300,
+      displacementThreshold: 10
+    };
+  },
+  mounted() {
+    // 设置CSS属性
+    document.body.style.touchAction = 'pan-y';
+    document.body.style.overflow = 'hidden';
+    document.body.style.overflowY = 'scroll';
+    document.body.style.webkitOverflowScrolling = 'touch';
   }
-}
+};
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
 </style>

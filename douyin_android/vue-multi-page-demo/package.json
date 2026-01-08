@@ -3,22 +3,29 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "dev": "vite",
+    "build": "vite build",
+    "build:prod": "vite build --mode production",
+    "build:dev": "vite build --mode development",
+    "lint": "eslint --fix src/**/*.{js,vue}",
+    "format": "prettier --write src/**/*.{js,vue,ts,json,css,scss,html}"
   },
   "dependencies": {
-    "core-js": "^3.8.3",
-    "vue": "^3.2.13"
+    "vue": "^2.7.16",
+    "vue-router": "^3.6.5",
+    "vuex": "^3.6.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.16",
-    "@babel/eslint-parser": "^7.12.16",
-    "@vue/cli-plugin-babel": "~5.0.0",
-    "@vue/cli-plugin-eslint": "~5.0.0",
-    "@vue/cli-service": "~5.0.0",
-    "eslint": "^7.32.0",
-    "eslint-plugin-vue": "^8.0.3"
+    "@babel/core": "^7.27.2",
+    "@babel/eslint-parser": "^7.27.1",
+    "@vitejs/plugin-vue2": "^1.1.2",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.0",
+    "eslint-plugin-vue": "^7.20.0",
+    "prettier": "^3.5.3",
+    "terser": "^5.14.2",
+    "vite": "^3.2.11"
   },
   "eslintConfig": {
     "root": true,
@@ -26,8 +33,9 @@
       "node": true
     },
     "extends": [
-      "plugin:vue/vue3-essential",
-      "eslint:recommended"
+      "plugin:vue/essential",
+      "eslint:recommended",
+      "prettier"
     ],
     "parserOptions": {
       "parser": "@babel/eslint-parser"
@@ -40,6 +48,6 @@
     "> 1%",
     "last 2 versions",
     "not dead",
-    "not ie 11"
+    "ie >= 11"
   ]
 }

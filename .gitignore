@@ -12,6 +12,9 @@ target/
 
 **/node_modules/
 
+**/package-lock.json
+
+
 /douyin_admin_vue3/node_modules/
 
 /douyin_node_backend/node_modules/

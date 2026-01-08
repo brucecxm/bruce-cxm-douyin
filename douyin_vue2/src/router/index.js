@@ -255,6 +255,106 @@ const routes = [
     component: () => import('../views/search/searchdetail.vue')
   },
   {
+    path: '/newshop',
+    name: 'NewShopIndex',
+    component: () => import('../views/index/App.vue')
+  },
+  {
+    path: '/newshop/page1',
+    name: 'NewShopPage1',
+    component: () => import('../views/page1/App.vue')
+  },
+  {
+    path: '/newshop/page2',
+    name: 'NewShopPage2',
+    component: () => import('../views/page2/App.vue')
+  },
+  {
+    path: '/newshop/login',
+    name: 'NewShopLogin',
+    component: () => import('../views/login/App.vue')
+  },
+  {
+    path: '/newshop/register',
+    name: 'NewShopRegister',
+    component: () => import('../views/register/App.vue')
+  },
+  {
+    path: '/newshop/categories',
+    name: 'NewShopCategories',
+    component: () => import('../views/categories/App.vue')
+  },
+  {
+    path: '/newshop/address',
+    name: 'NewShopAddress',
+    component: () => import('../views/address/App.vue')
+  },
+  {
+    path: '/newshop/detail',
+    name: 'NewShopDetail',
+    component: () => import('../views/detail/App.vue')
+  },
+  {
+    path: '/newshop/publish',
+    name: 'NewShopPublish',
+    component: () => import('../views/publish/App.vue')
+  },
+  {
+    path: '/newshop/profile',
+    name: 'NewShopProfile',
+    component: () => import('../views/profile/App.vue')
+  },
+  {
+    path: '/newshop/search',
+    name: 'NewShopSearch',
+    component: () => import('../views/search/App.vue')
+  },
+  {
+    path: '/newshop/orders',
+    name: 'NewShopOrders',
+    component: () => import('../views/orders/App.vue')
+  },
+  {
+    path: '/newshop/orderDetail',
+    name: 'NewShopOrderDetail',
+    component: () => import('../views/orderDetail/App.vue')
+  },
+  {
+    path: '/newshop/favorites',
+    name: 'NewShopFavorites',
+    component: () => import('../views/favorites/App.vue')
+  },
+  {
+    path: '/newshop/messages',
+    name: 'NewShopMessages',
+    component: () => import('../views/messages/App.vue')
+  },
+  {
+    path: '/newshop/chat',
+    name: 'NewShopChat',
+    component: () => import('../views/chat/App.vue')
+  },
+  {
+    path: '/newshop/myProducts',
+    name: 'NewShopMyProducts',
+    component: () => import('../views/myProducts/App.vue')
+  },
+  {
+    path: '/newshop/settings',
+    name: 'NewShopSettings',
+    component: () => import('../views/settings/App.vue')
+  },
+  {
+    path: '/newshop/cart',
+    name: 'NewShopCart',
+    component: () => import('../views/cart/App.vue')
+  },
+  {
+    path: '/newshop/websocket-test',
+    name: 'NewShopWebSocketTest',
+    component: () => import('../views/websocket-test/App.vue')
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('../views/NotFound.vue')

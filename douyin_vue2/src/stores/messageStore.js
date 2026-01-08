@@ -64,7 +64,7 @@ const actions = {
     try {
       commit('SET_SOCKET_STATUS', 'connecting');
       const socket = new WebSocket(
-        process.env.VUE_APP_WS_URL || 'ws://localhost:8080/ws'
+        import.meta.env.VITE_APP_WS_URL || 'ws://localhost:8080/ws'
       );
 
       socket.onopen = () => {
