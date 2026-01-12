@@ -91,7 +91,7 @@ export default {
       this.checkLoginAndGo('/me');
     },
     goshop() {
-      this.checkLoginAndGo('/shop');
+      this.checkLoginAndGo('/newshop');
     },
     goxiaoxi() {
       this.checkLoginAndGo('/xiaoxi');
@@ -100,7 +100,12 @@ export default {
       this.checkLoginAndGo('/shangchuan');
     },
     gohome() {
-      this.$router.push('/');
+      // 如果当前在newshop前缀的路由下，则跳转到/newshop，否则跳转到/
+      if (this.$route.path.startsWith('/newshop')) {
+        this.$router.push('/newshop');
+      } else {
+        this.$router.push('/');
+      }
     }
   },
   // 添加mounted钩子，根据当前路由初始化选中状态
@@ -109,8 +114,11 @@ export default {
     const path = this.$route.path;
     if (path === '/') {
       this.selected = 'home';
-    } else if (path === '/shop') {
+    } else if (path === '/shop' || path === '/newshop') {
       this.selected = 'shop';
+    } else if (path.startsWith('/newshop/')) {
+      // 处理/newshop/xxx这样的子路径
+      this.selected = 'home';
     } else if (path === '/shangchuan') {
       this.selected = 'add';
     } else if (path === '/xiaoxi') {
@@ -133,14 +141,19 @@ export default {
 }
 
 .footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
   width: 100%;
   height: 5vh;
+  min-height: 50px;
   background-color: black;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   transition: background-color 0.3s ease;
+  z-index: 1000;
 }
 
 .footer.light-theme {

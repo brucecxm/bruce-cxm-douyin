@@ -8,9 +8,38 @@
       </div>
     </header>
 
+    <!-- 顶部菜单栏 -->
+    <div class="top-menu">
+      <div class="menu-item active" @click="goToHome">
+        <i class="menu-icon">🏠</i>
+        <span class="menu-text">首页</span>
+      </div>
+      <div class="menu-item" @click="goToCategories">
+        <i class="menu-icon">📋</i>
+        <span class="menu-text">分类</span>
+      </div>
+      <div class="menu-item" @click="goToPublish">
+        <i class="menu-icon">+</i>
+        <span class="menu-text">发布</span>
+      </div>
+      <div class="menu-item" @click="goToMessages">
+        <i class="menu-icon">💬</i>
+        <span class="menu-text">消息</span>
+      </div>
+      <div class="menu-item" @click="goToProfile">
+        <i class="menu-icon">👤</i>
+        <span class="menu-text">我的</span>
+      </div>
+    </div>
+
     <!-- 分类导航 -->
     <div class="category-nav">
-      <div class="category-item" v-for="category in categories" :key="category.id" @click="filterByCategory(category.id)">
+      <div
+        class="category-item"
+        v-for="category in categories"
+        :key="category.id"
+        @click="filterByCategory(category.id)"
+      >
         <div class="category-icon">{{ category.icon }}</div>
         <div class="category-name">{{ category.name }}</div>
       </div>
@@ -18,9 +47,14 @@
 
     <!-- 商品列表 -->
     <main class="product-list">
-      <div class="product-item" v-for="product in products" :key="product.id" @click="goToDetail(product.id)">
+      <div
+        class="product-item"
+        v-for="product in products"
+        :key="product.id"
+        @click="goToDetail(product.id)"
+      >
         <div class="product-image">
-          <img :src="product.image" :alt="product.title">
+          <img :src="product.image" :alt="product.title" />
         </div>
         <div class="product-info">
           <h3 class="product-title">{{ product.title }}</h3>
@@ -31,38 +65,22 @@
       </div>
     </main>
 
-    <!-- 底部导航栏 -->
-    <footer class="bottom-nav">
-      <div class="nav-item active" @click="goToHome">
-        <i class="nav-icon">🏠</i>
-        <span class="nav-text">首页</span>
-      </div>
-      <div class="nav-item" @click="goToCategories">
-        <i class="nav-icon">📋</i>
-        <span class="nav-text">分类</span>
-      </div>
-      <div class="nav-item publish-btn" @click="goToPublish">
-        <i class="nav-icon">+</i>
-      </div>
-      <div class="nav-item" @click="goToMessages">
-        <i class="nav-icon">💬</i>
-        <span class="nav-text">消息</span>
-      </div>
-      <div class="nav-item" @click="goToProfile">
-        <i class="nav-icon">👤</i>
-        <span class="nav-text">我的</span>
-      </div>
-    </footer>
+    <!-- 底部导航 -->
+    <footer-vue></footer-vue>
   </div>
 </template>
 
 <script>
-import nativeUtils from '../../utils/nativeUtils'
-import routerUtils from '../../utils/routerUtils'
-import { get } from '../../utils/apiUtils'
+import nativeUtils from '../../utils/nativeUtils';
+import routerUtils from '../../utils/routerUtils';
+import { get } from '../../utils/apiUtils';
+import footerVue from '../../components/footer.vue';
 
 export default {
   name: 'HomePage',
+  components: {
+    footerVue
+  },
   data() {
     return {
       // 静态分类数据
@@ -78,65 +96,70 @@ export default {
       ],
       // 动态商品数据
       products: []
-    }
+    };
   },
   mounted() {
     // 页面加载时设置标题
-    nativeUtils.setTitleBar('二手交易 - 首页')
+    nativeUtils.setTitleBar('二手交易 - 首页');
     // 调用API获取商品列表
-    this.fetchProducts()
+    this.fetchProducts();
   },
   methods: {
     // 获取商品列表API
     async fetchProducts() {
       try {
         // 显示加载提示
-        nativeUtils.showLoading('加载中...')
-        
+        nativeUtils.showLoading('加载中...');
+
         // 调用真实API获取商品列表
-        const response = await get('/product')
-        
+        const response = await get('/product');
+
         // 检查API响应
         if (response.code === 0 && response.data) {
           // API请求成功
-          this.products = response.data.map(product => ({
+          this.products = response.data.map((product) => ({
             id: product.id,
             title: product.title,
             price: product.price,
             location: product.location || '未知',
-            time: product.createdAt ? this.formatTime(product.createdAt) : '未知',
-            image: product.images && product.images.length > 0 ? product.images[0] : 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
-          }))
+            time: product.createdAt
+              ? this.formatTime(product.createdAt)
+              : '未知',
+            image:
+              product.images && product.images.length > 0
+                ? product.images[0]
+                : 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
+          }));
         } else {
           // API返回数据格式不正确，使用mock数据
-          console.warn('API返回数据格式不正确，使用mock数据')
-          this.loadMockProducts()
+          console.warn('API返回数据格式不正确，使用mock数据');
+          this.loadMockProducts();
         }
       } catch (error) {
-        console.error('获取商品列表失败:', error)
+        console.error('获取商品列表失败:', error);
         // API请求失败，使用mock数据
-        this.loadMockProducts()
+        this.loadMockProducts();
       } finally {
         // 隐藏加载提示
-        nativeUtils.hideLoading()
+        nativeUtils.hideLoading();
       }
     },
-    
+
     // 加载mock商品数据
     loadMockProducts() {
       // 尝试从localStorage获取数据
-      const localStorageData = localStorage.getItem('products')
+      const localStorageData = localStorage.getItem('products');
       if (localStorageData) {
         try {
-          const products = JSON.parse(localStorageData)
-          this.products = products
-          nativeUtils.showToast('使用本地缓存数据', 1500)
-          return
+          const products = JSON.parse(localStorageData);
+          this.products = products;
+          nativeUtils.showToast('使用本地缓存数据', 1500);
+          return;
         } catch (error) {
-          console.error('解析本地数据失败:', error)
+          console.error('解析本地数据失败:', error);
         }
       }
-      
+
       // 使用默认mock数据
       this.products = [
         {
@@ -145,7 +168,8 @@ export default {
           price: 5999,
           location: '北京 朝阳区',
           time: '2小时前',
-          image: 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
+          image:
+            'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
         },
         {
           id: 2,
@@ -153,7 +177,8 @@ export default {
           price: 12999,
           location: '上海 浦东新区',
           time: '5小时前',
-          image: 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
+          image:
+            'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
         },
         {
           id: 3,
@@ -161,7 +186,8 @@ export default {
           price: 1899,
           location: '广州 天河区',
           time: '1天前',
-          image: 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
+          image:
+            'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
         },
         {
           id: 4,
@@ -169,7 +195,8 @@ export default {
           price: 2599,
           location: '深圳 南山区',
           time: '2天前',
-          image: 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
+          image:
+            'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
         },
         {
           id: 5,
@@ -177,7 +204,8 @@ export default {
           price: 3999,
           location: '杭州 西湖区',
           time: '3天前',
-          image: 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
+          image:
+            'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
         },
         {
           id: 6,
@@ -185,103 +213,111 @@ export default {
           price: 6999,
           location: '成都 高新区',
           time: '5天前',
-          image: 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
+          image:
+            'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
         }
-      ]
-      
+      ];
+
       // 保存到localStorage
       try {
-        localStorage.setItem('products', JSON.stringify(this.products))
+        localStorage.setItem('products', JSON.stringify(this.products));
       } catch (error) {
-        console.error('保存mock数据到localStorage失败:', error)
+        console.error('保存mock数据到localStorage失败:', error);
       }
-      
-      nativeUtils.showToast('使用默认数据', 1500)
+
+      nativeUtils.showToast('使用默认数据', 1500);
     },
     // 格式化时间
     formatTime(timeString) {
-      const date = new Date(timeString)
-      const now = new Date()
-      const diff = now - date
-      
-      const minutes = Math.floor(diff / (1000 * 60))
-      const hours = Math.floor(diff / (1000 * 60 * 60))
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-      
+      const date = new Date(timeString);
+      const now = new Date();
+      const diff = now - date;
+
+      const minutes = Math.floor(diff / (1000 * 60));
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
       if (minutes < 60) {
-        return `${minutes}分钟前`
+        return `${minutes}分钟前`;
       } else if (hours < 24) {
-        return `${hours}小时前`
+        return `${hours}小时前`;
       } else {
-        return `${days}天前`
+        return `${days}天前`;
       }
     },
     // 跳转到搜索页
     goToSearch() {
-      routerUtils.navigateTo('/search.html')
+      routerUtils.navigateTo('/search.html');
     },
     // 跳转到商品详情页
     goToDetail(productId) {
-      routerUtils.navigateTo(`/detail.html?id=${productId}`)
+      routerUtils.navigateTo(`/detail.html?id=${productId}`);
     },
     // 跳转到发布页
     goToPublish() {
-      routerUtils.navigateTo('/publish.html')
+      routerUtils.navigateTo('/publish.html');
     },
     // 跳转到个人中心
     goToProfile() {
-      routerUtils.navigateTo('/profile.html')
+      routerUtils.navigateTo('/profile.html');
     },
     // 跳转到首页
     goToHome() {
-      routerUtils.navigateTo('/index.html')
+      routerUtils.navigateTo('/index.html');
     },
     // 跳转到分类页
     goToCategories() {
-      console.log('跳转到分类页')
+      console.log('跳转到分类页');
       // 实际项目中跳转到分类页面
     },
     // 跳转到消息页
     goToMessages() {
-      routerUtils.navigateTo('/messages.html')
+      routerUtils.navigateTo('/messages.html');
     },
     // 按分类筛选商品
     async filterByCategory(categoryId) {
-      console.log('筛选分类:', categoryId)
+      console.log('筛选分类:', categoryId);
       try {
         // 显示加载提示
-        nativeUtils.showLoading('加载中...')
-        
+        nativeUtils.showLoading('加载中...');
+
         // 调用API获取对应分类的商品
-        const categoryName = this.categories.find(cat => cat.id === categoryId).name
-        const response = await get(`/product/category/${categoryName}`)
-        
+        const categoryName = this.categories.find(
+          (cat) => cat.id === categoryId
+        ).name;
+        const response = await get(`/product/category/${categoryName}`);
+
         // 检查API响应
         if (response.code === 0 && response.data) {
           // API请求成功
-          this.products = response.data.map(product => ({
+          this.products = response.data.map((product) => ({
             id: product.id,
             title: product.title,
             price: product.price,
             location: product.location || '未知',
-            time: product.createdAt ? this.formatTime(product.createdAt) : '未知',
-            image: product.images && product.images.length > 0 ? product.images[0] : 'https://via.placeholder.com/200x200?text=商品图片'
-          }))
+            time: product.createdAt
+              ? this.formatTime(product.createdAt)
+              : '未知',
+            image:
+              product.images && product.images.length > 0
+                ? product.images[0]
+                : 'https://via.placeholder.com/200x200?text=商品图片'
+          }));
         } else {
           // API返回数据格式不正确
-          console.warn('API返回数据格式不正确')
-          nativeUtils.showToast('获取分类商品失败', 1500)
+          console.warn('API返回数据格式不正确');
+          nativeUtils.showToast('获取分类商品失败', 1500);
         }
       } catch (error) {
-        console.error('获取分类商品失败:', error)
-        nativeUtils.showToast('获取分类商品失败', 1500)
+        console.error('获取分类商品失败:', error);
+        nativeUtils.showToast('获取分类商品失败', 1500);
       } finally {
         // 隐藏加载提示
-        nativeUtils.hideLoading()
+        nativeUtils.hideLoading();
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -352,6 +388,7 @@ export default {
 .product-list {
   flex: 1;
   padding: 10px;
+  padding-bottom: 70px; /* 增加底部间距，避免被固定的footer遮挡 */
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
@@ -416,66 +453,50 @@ export default {
   color: #ccc;
 }
 
-/* 底部导航栏 */
-.bottom-nav {
+/* 顶部菜单栏 */
+.top-menu {
   display: flex;
   justify-content: space-around;
   align-items: center;
   background-color: white;
-  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
   padding: 10px 0;
   position: sticky;
-  bottom: 0;
-  height: 60px;
+  top: 54px; /* 与顶部搜索栏高度匹配 */
+  z-index: 90;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.nav-item {
+.menu-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
-  padding: 5px;
-  color: #999;
-  flex: 1;
-}
-
-.nav-item.active {
-  color: #ff4400;
-}
-
-.nav-icon {
-  font-size: 24px;
-  margin-bottom: 3px;
-}
-
-.nav-text {
-  font-size: 12px;
-}
-
-/* 发布按钮样式 */
-.publish-btn {
-  position: relative;
-  top: -20px;
-  width: 50px;
-  height: 50px;
-  background-color: #ff4400;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  box-shadow: 0 2px 8px rgba(255, 68, 0, 0.3);
-  flex: 0;
-}
-
-.publish-btn .nav-icon {
-  font-size: 28px;
-  margin-bottom: 0;
-}
-
-.publish-btn:hover {
-  background-color: #ff5500;
-  transform: scale(1.05);
+  padding: 8px 15px;
+  color: #666;
   transition: all 0.2s ease;
+  flex: 1;
+  max-width: 80px;
+}
+
+.menu-item:hover {
+  color: #42b983;
+  background-color: rgba(66, 185, 131, 0.05);
+  border-radius: 8px;
+}
+
+.menu-item.active {
+  color: #42b983;
+  font-weight: bold;
+}
+
+.menu-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.menu-text {
+  font-size: 12px;
+  line-height: 1.2;
 }
 </style>

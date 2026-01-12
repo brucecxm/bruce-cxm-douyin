@@ -33,7 +33,8 @@ function handleUrl(url) {
  */
 function handleHeaders(customHeaders = {}) {
   // 获取本地存储的token
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const token =
+    localStorage.getItem('token') || sessionStorage.getItem('token');
 
   // 基础请求头
   const headers = {
@@ -103,8 +104,16 @@ export async function request(url, method = 'GET', data = {}, config = {}) {
     const response = await fetch(fullUrl, {
       method: method,
       headers: finalHeaders,
-      body: data instanceof FormData ? data : (requestData ? JSON.stringify(requestData) : undefined),
-      credentials: config.withCredentials || defaultConfig.withCredentials ? 'include' : 'same-origin'
+      body:
+        data instanceof FormData
+          ? data
+          : requestData
+            ? JSON.stringify(requestData)
+            : undefined,
+      credentials:
+        config.withCredentials || defaultConfig.withCredentials
+          ? 'include'
+          : 'same-origin'
     });
 
     // 检查HTTP状态码
@@ -115,11 +124,19 @@ export async function request(url, method = 'GET', data = {}, config = {}) {
     // 解析响应体
     let responseData = {};
     try {
-      responseData = await response.json();
-      console.log('请求成功，原始返回数据:', responseData);
+      // 检查响应体是否为空
+      const text = await response.text();
+      if (text) {
+        responseData = JSON.parse(text);
+        console.log('请求成功，原始返回数据:', responseData);
+      } else {
+        console.log('请求成功，响应体为空');
+        responseData = {}; // 响应体为空时返回空对象
+      }
     } catch (e) {
       console.error('解析响应体失败:', e);
-      throw new Error('解析响应体失败');
+      // 不再抛出错误，返回空对象，让业务层处理
+      responseData = {};
     }
 
     // 直接返回原始响应数据
