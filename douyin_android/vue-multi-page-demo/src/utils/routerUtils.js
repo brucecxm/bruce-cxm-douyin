@@ -1,5 +1,29 @@
 // 页面跳转工具类
 
+// 新添加的页面路径列表
+const newShopPages = [
+  '/index',
+  '/page1',
+  '/page2',
+  '/login',
+  '/register',
+  '/categories',
+  '/address',
+  '/detail',
+  '/publish',
+  '/profile',
+  '/search',
+  '/orders',
+  '/orderDetail',
+  '/favorites',
+  '/messages',
+  '/chat',
+  '/myProducts',
+  '/settings',
+  '/cart',
+  '/websocket-test'
+];
+
 /**
  * 跳转到指定页面
  * @param {string} url - 目标页面URL
@@ -8,10 +32,33 @@
  */
 export function navigateTo(url, params = {}, options = {}) {
   const { replace = false, target = '_self', native = false } = options;
-  
+
+  // 移除.html后缀，适配Vue Router路由
+  const routerUrl = url.replace(/\.html$/, '');
+
+  // 检查是否需要添加/newshop前缀
+  let finalUrl = routerUrl;
+  const pathWithoutParams = routerUrl.split('?')[0];
+  if (newShopPages.includes(pathWithoutParams)) {
+    // 添加/newshop前缀
+    finalUrl = `/newshop${routerUrl}`;
+  }
+
   // 构建完整URL
-  const fullUrl = buildUrl(url, params);
-  
+  const fullUrl = buildUrl(finalUrl, params);
+
+  // 尝试使用Vue Router进行单页跳转
+  if (window.Vue && window.Vue.prototype && window.Vue.prototype.$router) {
+    const router = window.Vue.prototype.$router;
+    console.log('使用Vue Router跳转:', fullUrl);
+    if (replace) {
+      router.replace(fullUrl);
+    } else {
+      router.push(fullUrl);
+    }
+    return;
+  }
+
   if (native && window.Android && window.Android.navigateTo) {
     // 调用原生跳转
     try {

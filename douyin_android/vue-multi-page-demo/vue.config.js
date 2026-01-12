@@ -68,9 +68,15 @@ module.exports = defineConfig({
   },
   pages: {
     index: {
-      entry: 'src/pages/index/main.js',
+      entry: 'src/pages/douyin/main.js',
       template: 'public/index.html',
       filename: 'index.html',
+      title: '抖音'
+    },
+    originalIndex: {
+      entry: 'src/pages/index/main.js',
+      template: 'public/index.html',
+      filename: 'original-index.html',
       title: '首页'
     },
     page1: {
@@ -186,19 +192,14 @@ module.exports = defineConfig({
       template: 'public/index.html',
       filename: 'websocket-test.html',
       title: 'WebSocket测试'
-    },
-    douyin: {
-      entry: 'src/pages/douyin/main.js',
-      template: 'public/index.html',
-      filename: 'douyin.html',
-      title: '抖音'
     }
   },
   configureWebpack: {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, 'src/pages/douyin'),
-        '@root': path.resolve(__dirname, 'src')
+        '@root': path.resolve(__dirname, 'src'),
+        '@douyin': path.resolve(__dirname, 'src/pages/douyin')
       },
       fallback: {
         'net': false,
@@ -211,7 +212,9 @@ module.exports = defineConfig({
         apply: (compiler) => {
           compiler.hooks.afterEmit.tap('GenerateRouteConfig', () => {
             const routes = [
-              { path: '/index', file: 'index.html', title: '首页' },
+              { path: '/', file: 'index.html', title: '抖音' },
+              { path: '/index', file: 'index.html', title: '抖音' },
+              { path: '/original-index', file: 'original-index.html', title: '首页' },
               { path: '/page1', file: 'page1.html', title: '页面1' },
               { path: '/page2', file: 'page2.html', title: '页面2' },
               { path: '/login', file: 'login.html', title: '登录' },
@@ -230,8 +233,7 @@ module.exports = defineConfig({
               { path: '/myProducts', file: 'myProducts.html', title: '我的发布' },
               { path: '/settings', file: 'settings.html', title: '设置' },
               { path: '/cart', file: 'cart.html', title: '购物车' },
-              { path: '/websocket-test', file: 'websocket-test.html', title: 'WebSocket测试' },
-              { path: '/douyin', file: 'douyin.html', title: '抖音' }
+              { path: '/websocket-test', file: 'websocket-test.html', title: 'WebSocket测试' }
             ]
 
             const routeConfigPath = path.join(compiler.outputPath, 'routes.json')

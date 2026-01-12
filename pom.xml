@@ -6,7 +6,6 @@
 <packaging>pom</packaging>
     <modules>
         <module>douyin_service</module>
-        <module>douyin_feign</module>
         <module>douyin_eureka</module>
         <module>douyin_gateway</module>
         <module>douyin_basic</module>

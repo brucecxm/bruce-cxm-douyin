@@ -1,7 +1,17 @@
 [
   {
+    "path": "/",
+    "file": "index.html",
+    "title": "抖音"
+  },
+  {
     "path": "/index",
     "file": "index.html",
+    "title": "抖音"
+  },
+  {
+    "path": "/original-index",
+    "file": "original-index.html",
     "title": "首页"
   },
   {
@@ -98,10 +108,5 @@
     "path": "/websocket-test",
     "file": "websocket-test.html",
     "title": "WebSocket测试"
-  },
-  {
-    "path": "/douyin",
-    "file": "douyin.html",
-    "title": "抖音"
   }
 ]

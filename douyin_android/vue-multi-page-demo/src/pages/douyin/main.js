@@ -7,6 +7,7 @@ import InfiniteScroll from 'vue-infinite-scroll';
 import './assets/base.css';
 import './assets/css/theme.css';
 import { Constant } from './constants/dict';
+import { initVersionCheck } from '@root/utils/versionManager';
 Vue.config.productionTip = false;
 Vue.use(InfiniteScroll);
 Vue.use(ElementUI);
@@ -18,11 +19,20 @@ if ('Notification' in window) {
     console.log('通知权限:', permission);
   });
 }
-import store from './stores';
+import store from '@/stores';
 export const eventBus = new Vue();
 
 new Vue({
   router,
   store, // 挂载 Vuex store
-  render: (h) => h(App)
+  render: (h) => h(App),
+  // 注册 Android 原生方法的调用接口
+  mounted() {
+    if (window.Android) {
+      Vue.prototype.$android = window.Android
+    }
+
+    // 初始化版本检查
+    initVersionCheck()
+  }
 }).$mount('#app');

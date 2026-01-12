@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkvue_multi_page_demo"]=self["webpackChunkvue_multi_page_demo"]||[]).push([[2656],{92656:function(e,t,r){r.r(t),r.d(t,{default:function(){return d}});var u=function(){var e=this,t=e._self._c;return t("iframe",{attrs:{src:e.detairurl,width:"600",height:"400",frameborder:"0"}})},a=[],l={data(){return{detairurl:"https://www.baidu.com"}},methods:{}},n=l,i=r(845),s=(0,i.A)(n,u,a,!1,null,null,null),d=s.exports}}]);
+//# sourceMappingURL=2656.dcb33082.js.map

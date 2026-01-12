@@ -1,7 +1,7 @@
 // API调用工具类
 
 // API基础URL
-const BASE_URL = process.env.VUE_APP_API_BASE_URL || '/api';
+const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || '/api';
 
 // 默认请求配置
 const defaultConfig = {

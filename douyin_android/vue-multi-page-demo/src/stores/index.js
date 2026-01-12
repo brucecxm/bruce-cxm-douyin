@@ -1,22 +1,27 @@
+// store/index.js
 import Vue from 'vue';
 import Vuex from 'vuex';
+
+import ad from './adStore';
+import message from './messageStore';
+import token from './token';
+import videoStore from './uploadVideo';
+import userInfo from './userInfo';
+import videoInfo from './videoInfo';
+import auth from './auth';
+import testDataMap from './testDataMap'; // 新增引入
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  state: {
-    // 全局状态
-  },
-  mutations: {
-    // 全局mutations
-  },
-  actions: {
-    // 全局actions
-  },
-  getters: {
-    // 全局getters
-  },
   modules: {
-    // 模块配置
+    ad,
+    auth,
+    message,
+    token,
+    videoStore,
+    userInfo,
+    videoInfo,
+    testDataMap // 新增模块
   }
 });

@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkvue_multi_page_demo"]=self["webpackChunkvue_multi_page_demo"]||[]).push([[4081],{14081:function(e,u,l){l.r(u);var n,t,a=l(845),p={},s=(0,a.A)(p,n,t,!1,null,null,null);u["default"]=s.exports}}]);
+//# sourceMappingURL=4081.10ee98f1.js.map
