@@ -98,5 +98,10 @@
     "path": "/websocket-test",
     "file": "websocket-test.html",
     "title": "WebSocket测试"
+  },
+  {
+    "path": "/douyin",
+    "file": "douyin.html",
+    "title": "抖音"
   }
 ]

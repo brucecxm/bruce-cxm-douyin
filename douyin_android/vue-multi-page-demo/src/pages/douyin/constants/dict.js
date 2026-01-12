@@ -1,0 +1,28 @@
+// src/constants/dict.js
+export const Constant = Object.freeze({
+  Type: 'Type',
+  videoType: 'videoType',
+  contentId: 'contentId',
+  contentType: 'contentType',
+  comment: 'comment',
+  fatherId: 'fatherId',
+  type: 'type',
+  videoId: 'videoId',
+  userId: 'userId',
+  videoUrl: 'videoUrl',
+  videoContent: 'videoContent',
+  userName: 'userName',
+  userAvatar: 'userAvatar',
+  music: 'music',
+  musicAvatar: 'musicAvatar',
+  likeNum: 'likeNum',
+  commentNum: 'commentNum',
+  collectNum: 'collectNum',
+  shareNum: 'shareNum',
+  musicId: 'musicId',
+  userInfo: 'userInfo',
+  videoPageList: 'videoPageList',
+  total: 'total',
+  page: 'page',
+  limit: 'limit'
+});

@@ -9,7 +9,8 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@douyin': fileURLToPath(new URL('./src/pages/douyin', import.meta.url))
     }
   },
   server: {

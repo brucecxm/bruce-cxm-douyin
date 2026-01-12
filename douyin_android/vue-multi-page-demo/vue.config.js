@@ -49,6 +49,7 @@ function copyDir(srcDir, destDir) {
 
 module.exports = defineConfig({
   transpileDependencies: true,
+  lintOnSave: false,
   devServer: {
     proxy: {
       '/api': {
@@ -185,9 +186,26 @@ module.exports = defineConfig({
       template: 'public/index.html',
       filename: 'websocket-test.html',
       title: 'WebSocket测试'
+    },
+    douyin: {
+      entry: 'src/pages/douyin/main.js',
+      template: 'public/index.html',
+      filename: 'douyin.html',
+      title: '抖音'
     }
   },
   configureWebpack: {
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, 'src/pages/douyin'),
+        '@root': path.resolve(__dirname, 'src')
+      },
+      fallback: {
+        'net': false,
+        'tls': false,
+        'fs': false
+      }
+    },
     plugins: [
       {
         apply: (compiler) => {
@@ -212,7 +230,8 @@ module.exports = defineConfig({
               { path: '/myProducts', file: 'myProducts.html', title: '我的发布' },
               { path: '/settings', file: 'settings.html', title: '设置' },
               { path: '/cart', file: 'cart.html', title: '购物车' },
-              { path: '/websocket-test', file: 'websocket-test.html', title: 'WebSocket测试' }
+              { path: '/websocket-test', file: 'websocket-test.html', title: 'WebSocket测试' },
+              { path: '/douyin', file: 'douyin.html', title: '抖音' }
             ]
 
             const routeConfigPath = path.join(compiler.outputPath, 'routes.json')
