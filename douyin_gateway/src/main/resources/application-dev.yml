@@ -41,7 +41,7 @@ redis:
   # Redis数据库索引（默认为0）
   database: 12
   # Redis服务器地址
-  host: 127.0.0.1
+  host: 1.94.131.16
   # Redis服务器连接端口
   port: 6379
   # Redis服务器连接密码（默认为空）
@@ -62,4 +62,4 @@ redis:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:10086/eureka # Eureka服务器地址
+      defaultZone: http://1.94.131.16:10086/eureka # Eureka服务器地址
