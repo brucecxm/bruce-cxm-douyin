@@ -1,6 +1,9 @@
 spring:
   profiles:
     active: dev # 生产环境
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
 server:
   port: 9573
