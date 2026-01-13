@@ -142,7 +142,6 @@ export default {
   align-items: center;
   transition: background-color 0.3s ease;
 }
-
 .footer.light-theme {
   background-color: white;
 }

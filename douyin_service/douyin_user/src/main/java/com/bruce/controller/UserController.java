@@ -30,6 +30,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import com.bruce.monitor.BloomFilterMonitor;
 import org.redisson.api.RBloomFilter;
@@ -62,6 +63,13 @@ public class UserController extends ApiController {
 
     @Autowired
     private BloomFilterMonitor bloomFilterMonitor;
+
+    // 布隆过滤器配置
+    @Value("${bloom-filter.warmup-enabled:true}")
+    private boolean bloomFilterWarmupEnabled;
+
+    @Value("${bloom-filter.require-warmup:true}")
+    private boolean bloomFilterRequireWarmup;
     @Autowired
     private RedisUtil redisUtil;
 
@@ -420,24 +428,25 @@ public class UserController extends ApiController {
     // 生成布隆过滤器并序列化存储到 Redis），服务启动时直接加载 Redis 中的快照数据，无需实时预热；
     // 同时在业务侧通过binlog 增量同步（如 Canal 监听用户表变更），将新增/删除的用户ID实时同步到布隆过滤器。
     @GetMapping("/userInfo")
-    public Result<UserInfo> userInfo(@RequestParam Map<String, Object> params) {
+        public Result<UserInfo> userInfo(@RequestParam Map<String, Object> params) {
         String pageStr = String.valueOf(params.getOrDefault("page", ""));
         String pageSizeStr = String.valueOf(params.getOrDefault("pageSize", ""));
         // String userId = String.valueOf(params.getOrDefault("userId", ""));
 
         String userId = String.valueOf(params.getOrDefault("userId", ""));
-//todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
-//todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
-//todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
-//todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
-//todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
+        if (userId.isEmpty()) {
+            userId = String.valueOf(StpUtil.getLoginId());
+        }
+        // todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
+        // todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
+        // todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
+        // todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
+        // todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
 
-
-
-//        // 1. 非空校验（空字符串或空白字符）
-//        if (userId.trim().isEmpty()) {
-//            return Result.error("用户ID不能为空");
-//        }
+        // // 1. 非空校验（空字符串或空白字符）
+        // if (userId.trim().isEmpty()) {
+        // return Result.error("用户ID不能为空");
+        // }
 
         // 2. 格式校验（是否为纯数字，避免非数字ID穿透）
         if (!userId.matches("^\\d+$")) {
@@ -452,9 +461,9 @@ public class UserController extends ApiController {
             return Result.error("用户ID格式错误，请输入有效的数字ID");
         }
 
-//        if (userIdLongcan <= 0 || userIdLongcan > 1000000000L) { // 假设业务中用户ID最大为10亿
-//            return Result.error("用户ID超出合法范围（1-1000000000）");
-//        }
+        // if (userIdLongcan <= 0 || userIdLongcan > 1000000000L) { // 假设业务中用户ID最大为10亿
+        // return Result.error("用户ID超出合法范围（1-1000000000）");
+        // }
 
         // 4. 业务规则校验（拦截已知的非法ID，如恶意构造的特殊值）
         if (userIdLongcan == 999999999L || userIdLongcan == 123456789L) { // 示例：拦截特定非法ID
@@ -487,32 +496,42 @@ public class UserController extends ApiController {
         } else {
             // 方案1: 布隆过滤器 (type=bloom)
             if ("bloom".equals(type)) {
-                    // 检查布隆过滤器预热是否完成
+                // 检查是否需要布隆过滤器预热完成才能使用
+                if (bloomFilterRequireWarmup) {
                     boolean isWarmupCompleted = bloomFilterMonitor.isWarmupCompleted();
 
-                    // 预热完成前：布隆过滤器返回不存在也需要查库验证，避免误判
-                    // 预热完成后：布隆过滤器返回不存在则可以直接返回（假阴性概率极低）
+                    // 如果需要预热且未完成，则返回错误或降级处理
                     if (!isWarmupCompleted) {
-                        log.debug("布隆过滤器预热未完成，即使布隆过滤器返回不存在，也继续查询数据库");
-
-                        // 在预热未完成时，同时应用空值缓存策略
-                        try {
-                            String emptyValue = stringRedisTemplate.opsForValue().get(emptyKey);
-                            if ("null".equals(emptyValue)) {
-                                log.debug("空值缓存命中，用户ID {} 不存在", userIdLong);
-                                return Result.error("用户不存在");
-                            }
-                        } catch (Exception e) {
-                            log.error("读取空值缓存失败，降级查询数据库", e);
-                        }
-                    } else if (!userBloomFilter.contains(userIdLong)) {
-                        // 预热完成后，布隆过滤器返回不存在，则用户几乎肯定不存在
-                        log.debug("布隆过滤器预热已完成，用户ID {} 不在布隆过滤器中，直接返回不存在", userIdLong);
-                        return Result.error("用户不存在");
+                        log.warn("布隆过滤器预热未完成，当前配置要求预热完成后才能使用，请求将被拒绝");
+                        return Result.error("布隆过滤器服务暂不可用，请稍后再试");
                     }
                 }
+                // 检查布隆过滤器预热是否完成
+                boolean isWarmupCompleted = bloomFilterMonitor.isWarmupCompleted();
 
-                try {
+                // 预热完成前：布隆过滤器返回不存在也需要查库验证，避免误判
+                // 预热完成后：布隆过滤器返回不存在则可以直接返回（假阴性概率极低）
+                if (!isWarmupCompleted) {
+                    log.debug("布隆过滤器预热未完成，即使布隆过滤器返回不存在，也继续查询数据库");
+
+                    // 在预热未完成时，同时应用空值缓存策略
+                    try {
+                        String emptyValue = stringRedisTemplate.opsForValue().get(emptyKey);
+                        if ("null".equals(emptyValue)) {
+                            log.debug("空值缓存命中，用户ID {} 不存在", userIdLong);
+                            return Result.error("用户不存在");
+                        }
+                    } catch (Exception e) {
+                        log.error("读取空值缓存失败，降级查询数据库", e);
+                    }
+                } else if (!userBloomFilter.contains(userIdLong)) {
+                    // 预热完成后，布隆过滤器返回不存在，则用户几乎肯定不存在
+                    log.debug("布隆过滤器预热已完成，用户ID {} 不在布隆过滤器中，直接返回不存在", userIdLong);
+                    return Result.error("用户不存在");
+                }
+            }
+
+            try {
                 String userJson = stringRedisTemplate.opsForValue().get(key);
                 if (userJson != null) {
                     user = objectMapper.readValue(userJson, User.class);
@@ -576,12 +595,14 @@ public class UserController extends ApiController {
                                 } else {
                                     // 空值缓存不存在，且获取锁失败，说明可能是并发查询，尝试直接查询数据库兜底
                                     log.debug("获取锁失败，尝试直接查询数据库兜底，用户ID: {}", userIdLong);
-                                    user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getId, userIdLong));
+                                    user = userService
+                                            .getOne(new LambdaQueryWrapper<User>().eq(User::getId, userIdLong));
                                     // 如果兜底查询到数据，更新缓存
                                     if (user != null) {
                                         try {
                                             String userJsonStr = objectMapper.writeValueAsString(user);
-                                            stringRedisTemplate.opsForValue().set(key, userJsonStr, 10, TimeUnit.MINUTES);
+                                            stringRedisTemplate.opsForValue().set(key, userJsonStr, 10,
+                                                    TimeUnit.MINUTES);
                                             // 将存在的用户ID添加到布隆过滤器
                                             if (!userBloomFilter.contains(userIdLong)) {
                                                 userBloomFilter.add(userIdLong);

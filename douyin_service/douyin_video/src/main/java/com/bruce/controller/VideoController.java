@@ -18,7 +18,6 @@ import com.bruce.service.*;
 import com.bruce.vo.VideoVO;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
-import io.swagger.annotations.*;
 import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
@@ -41,7 +40,6 @@ import java.util.*;
  * @author makejava
  * @since 2024-06-25 13:03:23
  */
-@Api(tags = "视频接口") // 给 Controller 标注一个分类
 @RestController
 @RequestMapping("/video")
 public class VideoController extends ApiController {
@@ -81,19 +79,9 @@ public class VideoController extends ApiController {
     @Resource
     private CommentService commentService;
 
-    @ApiOperation(value = "上传视频的接口", notes = "将视频上传到文件服务器")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = " file,", value = "文件", required = true, dataType = "MultipartFile", paramType = "query"),
-            @ApiImplicitParam(name = " params", value = "map类存了哪些", required = true, dataType = "Map", paramType = "query")
-    })
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "删除成功"),
-            @ApiResponse(code = 404, message = "用户不存在"),
-            @ApiResponse(code = 500, message = "服务器内部错误")
-    })
     @PostMapping("/upvideo")
     public ResponseEntity<?> upvideo(
-            @ApiParam(value = "文件", required = true) @RequestParam("file") MultipartFile file,
+            @RequestParam("file") MultipartFile file,
             @RequestParam Map<String, String> params) {
         StpUtil.checkLogin(); // 检查是否登录（自动从请求头拿 token，去 Redis 查）
         Object loginId = StpUtil.getLoginId(); // 获取当前登录用户 ID
@@ -438,14 +426,6 @@ public class VideoController extends ApiController {
 
         return ResponseEntity.ok(response);
     }
-
-
-
-
-
-
-
-
 
     // 点赞请求对象
     static class LikeRequest {

@@ -19,12 +19,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
-        <!-- Swagger 2.x 依赖 -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-boot-starter</artifactId>
-            <version>3.0.0</version>
-        </dependency>
+
 <!--        &lt;!&ndash; 视频转码库 &ndash;&gt;-->
 <!--        <dependency>-->
 <!--            <groupId>ws.schild</groupId>-->

@@ -46,7 +46,6 @@ public class RedisConfig extends CachingConfigurerSupport implements Application
     @Value("${spring.redis.port:6379}")
     private int port;
 
-
     @Value("${spring.redis.database:12}")
     private int database;
 
@@ -58,6 +57,14 @@ public class RedisConfig extends CachingConfigurerSupport implements Application
 
     @Autowired
     private BloomFilterMonitor bloomFilterMonitor;
+
+    // 布隆过滤器预热开关配置
+    @Value("${bloom-filter.warmup-enabled:true}")
+    private boolean bloomFilterWarmupEnabled;
+
+    // 是否需要预热完成后才能使用布隆过滤器
+    @Value("${bloom-filter.require-warmup:true}")
+    private boolean bloomFilterRequireWarmup;
 
     // 获取布隆过滤器预热状态（保持向后兼容）
     public static boolean isBloomFilterWarmedUp() {
@@ -138,12 +145,6 @@ public class RedisConfig extends CachingConfigurerSupport implements Application
         return Redisson.create(config);
     }
 
-
-
-
-
-
-
     /**
      * 初始化用户ID布隆过滤器
      * 用于缓存穿透防护，提前过滤不存在的用户ID
@@ -222,10 +223,16 @@ public class RedisConfig extends CachingConfigurerSupport implements Application
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         try {
-            // 获取userBloomFilter bean并触发异步预热
-            RBloomFilter<Long> userBloomFilter = event.getApplicationContext().getBean("userBloomFilter",
-                    RBloomFilter.class);
-            warmupBloomFilter(userBloomFilter);
+            // 根据配置决定是否触发布隆过滤器预热
+            if (bloomFilterWarmupEnabled) {
+                // 获取userBloomFilter bean并触发异步预热
+                RBloomFilter<Long> userBloomFilter = event.getApplicationContext().getBean("userBloomFilter",
+                        RBloomFilter.class);
+                warmupBloomFilter(userBloomFilter);
+                log.info("布隆过滤器预热功能已开启，预热将在后台异步执行");
+            } else {
+                log.info("布隆过滤器预热功能已关闭");
+            }
         } catch (Exception e) {
             log.error("触发布隆过滤器异步预热失败", e);
         }

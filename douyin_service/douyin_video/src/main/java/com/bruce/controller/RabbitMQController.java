@@ -1,8 +1,6 @@
 package com.bruce.controller;
 
 import com.bruce.dto.LikeMessage;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
@@ -15,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@Api(tags = "RabbitMQ操作接口")
 @RestController
 @RequestMapping("/rabbitmq")
 public class RabbitMQController {
@@ -31,7 +28,6 @@ public class RabbitMQController {
      * @param message    消息内容
      * @return 响应结果
      */
-    @ApiOperation(value = "发送简单消息", notes = "向指定交换机和路由键发送简单文本消息")
     @PostMapping("/send/simple")
     public ResponseEntity<Map<String, Object>> sendSimpleMessage(
             @RequestParam String exchange,
@@ -59,7 +55,6 @@ public class RabbitMQController {
      * @param message    消息内容
      * @return 响应结果
      */
-    @ApiOperation(value = "发送持久化消息", notes = "向指定交换机和路由键发送持久化消息")
     @PostMapping("/send/persistent")
     public ResponseEntity<Map<String, Object>> sendPersistentMessage(
             @RequestParam String exchange,
@@ -90,7 +85,6 @@ public class RabbitMQController {
      * @param likeMessage 点赞消息对象
      * @return 响应结果
      */
-    @ApiOperation(value = "发送对象消息", notes = "向指定交换机和路由键发送对象消息")
     @PostMapping("/send/object")
     public ResponseEntity<Map<String, Object>> sendObjectMessage(
             @RequestParam String exchange,
@@ -118,7 +112,6 @@ public class RabbitMQController {
      * @param message    消息内容
      * @return 响应结果
      */
-    @ApiOperation(value = "发送带回调的消息", notes = "向指定交换机和路由键发送带确认回调的消息")
     @PostMapping("/send/with-callback")
     public ResponseEntity<Map<String, Object>> sendMessageWithCallback(
             @RequestParam String exchange,
@@ -148,7 +141,6 @@ public class RabbitMQController {
      * @param messages   消息列表
      * @return 响应结果
      */
-    @ApiOperation(value = "发送批量消息", notes = "向指定交换机和路由键发送批量消息")
     @PostMapping("/send/batch")
     public ResponseEntity<Map<String, Object>> sendBatchMessages(
             @RequestParam String exchange,
@@ -176,7 +168,6 @@ public class RabbitMQController {
      * 
      * @return 响应结果
      */
-    @ApiOperation(value = "获取RabbitMQ连接状态", notes = "检查RabbitMQ连接是否正常")
     @GetMapping("/status")
     public ResponseEntity<Map<String, Object>> getRabbitMQStatus() {
         Map<String, Object> response = new HashMap<>();

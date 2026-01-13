@@ -409,6 +409,9 @@ export default {
 .homecontain {
   overflow-x: hidden;
   /* 禁止水平滚动 */
+  height: 100vh;
+  position: relative;
+  /* 设置高度为100%视口高度 */
 }
 .danmubox {
   position: absolute;

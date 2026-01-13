@@ -105,6 +105,13 @@ eureka:
     service-url:
       #      defaultZone: http://127.0.0.1:10086/eureka  # Eureka 服务注册中心的地址
       defaultZone: http://1.94.131.16:8080/eureka # Eureka 服务注册中心的地址
+
+# 布隆过滤器配置
+bloom-filter:
+  # 是否开启布隆过滤器预热
+  warmup-enabled: false
+  # 预热完成后才允许使用布隆过滤器相关接口
+  require-warmup: false
 #    registerWithEureka: false
 #    fetchRegistry: false
 #    enabled: false

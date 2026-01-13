@@ -62,4 +62,4 @@ redis:
 eureka:
   client:
     service-url:
-      defaultZone: http://1.94.131.16:10086/eureka # Eureka服务器地址
+      defaultZone: http://1.94.131.16:8080/eureka # Eureka服务器地址
