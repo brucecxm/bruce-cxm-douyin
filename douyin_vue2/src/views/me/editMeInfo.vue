@@ -81,18 +81,18 @@
       </div>
 
       <div class="edit-content">
-        <textarea 
-          v-if="currentEdit === 'bio'" 
-          v-model="editValue" 
-          class="bio-input" 
+        <textarea
+          v-if="currentEdit === 'bio'"
+          v-model="editValue"
+          class="bio-input"
           placeholder="介绍喜好、个性或@你的亲友"
           maxlength="100"
           rows="6"
         ></textarea>
-        <input 
-          v-else 
-          v-model="editValue" 
-          class="edit-input" 
+        <input
+          v-else
+          v-model="editValue"
+          class="edit-input"
           :placeholder="getPlaceholder(currentEdit)"
           ref="editInput"
         />
@@ -108,24 +108,40 @@
         <div class="nav-title">选择地区</div>
         <div class="nav-right"></div>
       </div>
-      
+
       <div class="location-content">
         <div class="location-item" @click="selectLocation('')">暂不设置</div>
         <div class="location-section">
           <div class="section-title">当前位置</div>
-          <div class="location-item" @click="selectLocation('陕西:西安')">陕西:西安</div>
+          <div class="location-item" @click="selectLocation('陕西:西安')">
+            陕西:西安
+          </div>
         </div>
         <div class="location-section">
           <div class="section-title">其他地区</div>
           <div class="location-group">
             <div class="location-letter">A</div>
-            <div class="location-item" @click="selectLocation('安道尔')">安道尔</div>
-            <div class="location-item" @click="selectLocation('奥地利')">奥地利</div>
-            <div class="location-item" @click="selectLocation('澳大利亚')">澳大利亚</div>
-            <div class="location-item" @click="selectLocation('阿尔巴尼亚')">阿尔巴尼亚</div>
-            <div class="location-item" @click="selectLocation('阿尔及利亚')">阿尔及利亚</div>
-            <div class="location-item" @click="selectLocation('爱尔兰')">爱尔兰</div>
-            <div class="location-item" @click="selectLocation('安哥拉')">安哥拉</div>
+            <div class="location-item" @click="selectLocation('安道尔')">
+              安道尔
+            </div>
+            <div class="location-item" @click="selectLocation('奥地利')">
+              奥地利
+            </div>
+            <div class="location-item" @click="selectLocation('澳大利亚')">
+              澳大利亚
+            </div>
+            <div class="location-item" @click="selectLocation('阿尔巴尼亚')">
+              阿尔巴尼亚
+            </div>
+            <div class="location-item" @click="selectLocation('阿尔及利亚')">
+              阿尔及利亚
+            </div>
+            <div class="location-item" @click="selectLocation('爱尔兰')">
+              爱尔兰
+            </div>
+            <div class="location-item" @click="selectLocation('安哥拉')">
+              安哥拉
+            </div>
           </div>
         </div>
       </div>
@@ -138,8 +154,8 @@
           <div class="dialog-title">选择性别</div>
         </div>
         <div class="dialog-content">
-          <div 
-            v-for="gender in ['男', '女', '不展示']" 
+          <div
+            v-for="gender in ['男', '女', '不展示']"
             :key="gender"
             class="dialog-option"
             :class="{ active: userInfo.gender === gender }"
@@ -149,8 +165,15 @@
           </div>
         </div>
         <div class="dialog-footer">
-          <button class="dialog-btn cancel-btn" @click="genderDialogVisible = false">取消</button>
-          <button class="dialog-btn confirm-btn" @click="confirmGender">确定</button>
+          <button
+            class="dialog-btn cancel-btn"
+            @click="genderDialogVisible = false"
+          >
+            取消
+          </button>
+          <button class="dialog-btn confirm-btn" @click="confirmGender">
+            确定
+          </button>
         </div>
       </div>
     </div>
@@ -166,8 +189,15 @@
           <div class="date-picker-placeholder">日期选择器</div>
         </div>
         <div class="dialog-footer">
-          <button class="dialog-btn cancel-btn" @click="birthdayDialogVisible = false">取消</button>
-          <button class="dialog-btn confirm-btn" @click="confirmBirthday">确定</button>
+          <button
+            class="dialog-btn cancel-btn"
+            @click="birthdayDialogVisible = false"
+          >
+            取消
+          </button>
+          <button class="dialog-btn confirm-btn" @click="confirmBirthday">
+            确定
+          </button>
         </div>
       </div>
     </div>
@@ -252,25 +282,25 @@ export default {
       } else {
         this.userInfo[this.currentEdit] = this.editValue;
       }
-      
+
       try {
         // 字段映射：前端字段名 -> 后端User.java字段名
         const fieldMap = {
-          name: 'nickname',     // 前端name对应后端nickname
-          bio: 'myIntro',       // 前端bio对应后端myIntro
-          location: 'city',     // 前端location对应后端city
-          douyin: 'username'    // 前端douyin对应后端username
+          name: 'nickname', // 前端name对应后端nickname
+          bio: 'myIntro', // 前端bio对应后端myIntro
+          location: 'city', // 前端location对应后端city
+          douyin: 'username' // 前端douyin对应后端username
         };
-        
+
         // 只传递必要的字段，而不是整个对象
         const updateData = {
           id: this.userInfo.id // 确保有用户ID
         };
-        
+
         // 根据映射关系设置正确的后端字段名
         const backendField = fieldMap[this.currentEdit] || this.currentEdit;
         updateData[backendField] = this.editValue;
-        
+
         // 调用后端API更新用户信息
         const response = await updateUserInfo(updateData);
         if (response.code === 0) {
@@ -278,7 +308,7 @@ export default {
           const editedField = this.currentEdit; // 保存当前编辑的字段
           this.currentEdit = '';
           this.editValue = '';
-          
+
           // 保存成功后跳转到简介页
           this.goToProfile();
         } else {
@@ -302,13 +332,13 @@ export default {
     async confirmGender() {
       if (this.tempGender !== '') {
         this.userInfo.gender = this.tempGender;
-        
+
         try {
           const updateData = {
             id: this.userInfo.id,
             gender: this.tempGender
           };
-          
+
           const response = await updateUserInfo(updateData);
           if (response.code === 0) {
             this.$message.success('修改成功');
@@ -327,13 +357,13 @@ export default {
     // 选择地区
     async selectLocation(location) {
       this.userInfo.city = location || '';
-      
+
       try {
         const updateData = {
           id: this.userInfo.id,
           city: location
         };
-        
+
         const response = await updateUserInfo(updateData);
         if (response.code === 0) {
           this.$message.success('修改成功');
@@ -341,7 +371,7 @@ export default {
       } catch (error) {
         console.error('更新地区失败:', error);
       }
-      
+
       this.showLocationSelect = false;
     }
   }
@@ -357,7 +387,9 @@ export default {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
   background-color: #f5f5f5;
 }
 

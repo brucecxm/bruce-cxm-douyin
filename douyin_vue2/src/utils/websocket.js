@@ -61,7 +61,10 @@ class WebSocketUtil {
 
       // 设置WebSocket事件监听器
       this.browserWebSocket.onopen = () => {
-        this.handleWebSocketEvent({ type: 'open', message: 'WebSocket连接成功' });
+        this.handleWebSocketEvent({
+          type: 'open',
+          message: 'WebSocket连接成功'
+        });
       };
 
       this.browserWebSocket.onmessage = (event) => {
@@ -69,7 +72,10 @@ class WebSocketUtil {
       };
 
       this.browserWebSocket.onerror = () => {
-        this.handleWebSocketEvent({ type: 'error', message: 'WebSocket连接错误' });
+        this.handleWebSocketEvent({
+          type: 'error',
+          message: 'WebSocket连接错误'
+        });
       };
 
       this.browserWebSocket.onclose = (event) => {
@@ -117,7 +123,10 @@ class WebSocketUtil {
    */
   disconnectBrowserWebSocket() {
     try {
-      if (this.browserWebSocket && this.browserWebSocket.readyState === WebSocket.OPEN) {
+      if (
+        this.browserWebSocket &&
+        this.browserWebSocket.readyState === WebSocket.OPEN
+      ) {
         this.browserWebSocket.close(1000, '主动关闭连接');
       }
       this.browserWebSocket = null;
@@ -161,13 +170,22 @@ class WebSocketUtil {
    */
   sendBrowserWebSocketMessage(message) {
     try {
-      if (this.browserWebSocket && this.browserWebSocket.readyState === WebSocket.OPEN) {
+      if (
+        this.browserWebSocket &&
+        this.browserWebSocket.readyState === WebSocket.OPEN
+      ) {
         this.browserWebSocket.send(message);
         // 模拟发送成功事件
-        this.handleWebSocketEvent({ type: 'sendSuccess', message: '消息发送成功' });
+        this.handleWebSocketEvent({
+          type: 'sendSuccess',
+          message: '消息发送成功'
+        });
         return true;
       } else {
-        this.handleWebSocketEvent({ type: 'sendError', message: 'WebSocket未连接' });
+        this.handleWebSocketEvent({
+          type: 'sendError',
+          message: 'WebSocket未连接'
+        });
         return false;
       }
     } catch (error) {

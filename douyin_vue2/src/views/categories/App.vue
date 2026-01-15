@@ -7,14 +7,14 @@
         <span class="search-placeholder">搜索你想要的商品</span>
       </div>
     </header>
-    
+
     <!-- 分类内容区域 -->
     <div class="categories-content">
       <!-- 左侧主分类 -->
       <div class="main-categories">
-        <div 
-          class="main-category-item" 
-          v-for="category in mainCategories" 
+        <div
+          class="main-category-item"
+          v-for="category in mainCategories"
           :key="category.id"
           :class="{ active: activeMainCategory === category.id }"
           @click="selectMainCategory(category.id)"
@@ -22,15 +22,19 @@
           {{ category.name }}
         </div>
       </div>
-      
+
       <!-- 右侧子分类 -->
       <div class="sub-categories">
-        <div class="sub-category-section" v-for="section in currentSubCategories" :key="section.name">
+        <div
+          class="sub-category-section"
+          v-for="section in currentSubCategories"
+          :key="section.name"
+        >
           <div class="section-title">{{ section.name }}</div>
           <div class="sub-category-grid">
-            <div 
-              class="sub-category-item" 
-              v-for="sub in section.subcategories" 
+            <div
+              class="sub-category-item"
+              v-for="sub in section.subcategories"
               :key="sub.id"
               @click="goToCategoryProducts(sub.id, sub.name)"
             >
@@ -41,7 +45,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- 底部导航栏 -->
     <footer class="bottom-nav">
       <div class="nav-item" @click="goToHome">
@@ -68,8 +72,8 @@
 </template>
 
 <script>
-import nativeUtils from '../../utils/nativeUtils'
-import routerUtils from '../../utils/routerUtils'
+import nativeUtils from '../../utils/nativeUtils';
+import routerUtils from '../../utils/routerUtils';
 
 export default {
   name: 'CategoriesApp',
@@ -93,8 +97,8 @@ export default {
       // 静态子分类数据
       subCategories: {
         1: [
-          { 
-            name: '手机', 
+          {
+            name: '手机',
             subcategories: [
               { id: 101, name: 'iPhone', icon: '📱' },
               { id: 102, name: '华为', icon: '📱' },
@@ -105,8 +109,8 @@ export default {
               { id: 107, name: '其他品牌', icon: '📱' }
             ]
           },
-          { 
-            name: '数码配件', 
+          {
+            name: '数码配件',
             subcategories: [
               { id: 111, name: '耳机', icon: '🎧' },
               { id: 112, name: '手机壳', icon: '📱' },
@@ -116,8 +120,8 @@ export default {
               { id: 116, name: '贴膜', icon: '📱' }
             ]
           },
-          { 
-            name: '相机', 
+          {
+            name: '相机',
             subcategories: [
               { id: 121, name: '单反相机', icon: '📷' },
               { id: 122, name: '微单相机', icon: '📷' },
@@ -127,8 +131,8 @@ export default {
           }
         ],
         2: [
-          { 
-            name: '笔记本电脑', 
+          {
+            name: '笔记本电脑',
             subcategories: [
               { id: 201, name: 'MacBook', icon: '💻' },
               { id: 202, name: 'ThinkPad', icon: '💻' },
@@ -138,8 +142,8 @@ export default {
               { id: 206, name: '其他', icon: '💻' }
             ]
           },
-          { 
-            name: '平板', 
+          {
+            name: '平板',
             subcategories: [
               { id: 211, name: 'iPad', icon: '📱' },
               { id: 212, name: '华为平板', icon: '📱' },
@@ -147,8 +151,8 @@ export default {
               { id: 214, name: '其他平板', icon: '📱' }
             ]
           },
-          { 
-            name: '办公设备', 
+          {
+            name: '办公设备',
             subcategories: [
               { id: 221, name: '显示器', icon: '🖥️' },
               { id: 222, name: '键盘', icon: '⌨️' },
@@ -158,8 +162,8 @@ export default {
           }
         ],
         3: [
-          { 
-            name: '大家电', 
+          {
+            name: '大家电',
             subcategories: [
               { id: 301, name: '电视', icon: '📺' },
               { id: 302, name: '冰箱', icon: '🧊' },
@@ -168,8 +172,8 @@ export default {
               { id: 305, name: '热水器', icon: '🚿' }
             ]
           },
-          { 
-            name: '生活电器', 
+          {
+            name: '生活电器',
             subcategories: [
               { id: 311, name: '微波炉', icon: '🥘' },
               { id: 312, name: '烤箱', icon: '🍕' },
@@ -181,62 +185,64 @@ export default {
         ]
       },
       activeMainCategory: 1
-    }
+    };
   },
   mounted() {
     // 页面加载时设置标题
-    nativeUtils.setTitleBar('二手交易 - 分类')
+    nativeUtils.setTitleBar('二手交易 - 分类');
   },
   computed: {
     // 当前选中主分类下的子分类
     currentSubCategories() {
-      return this.subCategories[this.activeMainCategory] || []
+      return this.subCategories[this.activeMainCategory] || [];
     }
   },
   methods: {
     // 跳转到搜索页
     goToSearch() {
-      routerUtils.navigateTo('/search.html')
+      routerUtils.navigateTo('/search.html');
     },
-    
+
     // 选择主分类
     selectMainCategory(categoryId) {
-      this.activeMainCategory = categoryId
+      this.activeMainCategory = categoryId;
     },
-    
+
     // 跳转到分类商品列表
     goToCategoryProducts(subCategoryId, subCategoryName) {
-      console.log(`跳转到${subCategoryName}商品列表，ID:${subCategoryId}`)
+      console.log(`跳转到${subCategoryName}商品列表，ID:${subCategoryId}`);
       // 实际项目中跳转到分类商品页面
-      routerUtils.navigateTo(`/search.html?category=${subCategoryId}&keyword=${subCategoryName}`)
+      routerUtils.navigateTo(
+        `/search.html?category=${subCategoryId}&keyword=${subCategoryName}`
+      );
     },
-    
+
     // 跳转到首页
     goToHome() {
-      routerUtils.navigateTo('/index.html')
+      routerUtils.navigateTo('/index.html');
     },
-    
+
     // 跳转到分类页
     goToCategories() {
       // 已经在分类页，无需跳转
     },
-    
+
     // 跳转到发布页
     goToPublish() {
-      routerUtils.navigateTo('/publish.html')
+      routerUtils.navigateTo('/publish.html');
     },
-    
+
     // 跳转到消息页
     goToMessages() {
-      routerUtils.navigateTo('/messages.html')
+      routerUtils.navigateTo('/messages.html');
     },
-    
+
     // 跳转到个人中心
     goToProfile() {
-      routerUtils.navigateTo('/profile.html')
+      routerUtils.navigateTo('/profile.html');
     }
   }
-}
+};
 </script>
 
 <style scoped>

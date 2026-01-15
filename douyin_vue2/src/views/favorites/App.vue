@@ -6,7 +6,11 @@
         <i class="back-icon">←</i>
       </div>
       <div class="header-title">我的收藏</div>
-      <div class="header-right" @click="manageFavorites" v-if="activeFilter !== 'recent'">
+      <div
+        class="header-right"
+        @click="manageFavorites"
+        v-if="activeFilter !== 'recent'"
+      >
         <span class="manage-btn">管理</span>
       </div>
     </header>
@@ -15,16 +19,24 @@
     <div class="filter-tabs">
       <div class="tab-item active" @click="switchFilter('all')">全部</div>
       <div class="tab-item" @click="switchFilter('recent')">最近浏览</div>
-      <div class="tab-item" @click="switchFilter('price_asc')">价格从低到高</div>
-      <div class="tab-item" @click="switchFilter('price_desc')">价格从高到低</div>
+      <div class="tab-item" @click="switchFilter('price_asc')">
+        价格从低到高
+      </div>
+      <div class="tab-item" @click="switchFilter('price_desc')">
+        价格从高到低
+      </div>
     </div>
 
     <!-- 收藏商品列表 -->
     <div class="favorites-list">
       <div class="product-item" v-for="product in favorites" :key="product.id">
         <div class="product-image" @click="goToDetail(product.id)">
-          <img :src="product.image" :alt="product.title">
-          <div class="favorite-btn" :class="{ active: activeFilter !== 'recent' }" @click.stop="toggleFavorite(product.id)">
+          <img :src="product.image" :alt="product.title" />
+          <div
+            class="favorite-btn"
+            :class="{ active: activeFilter !== 'recent' }"
+            @click.stop="toggleFavorite(product.id)"
+          >
             {{ activeFilter === 'recent' ? '🤍' : '❤️' }}
           </div>
         </div>
@@ -36,8 +48,15 @@
             <div class="product-time">{{ product.time }}</div>
           </div>
         </div>
-        <div class="product-actions" v-if="isManaging && activeFilter !== 'recent'">
-          <div class="checkbox" :class="{ checked: selectedProducts.includes(product.id) }" @click.stop="toggleSelect(product.id)">
+        <div
+          class="product-actions"
+          v-if="isManaging && activeFilter !== 'recent'"
+        >
+          <div
+            class="checkbox"
+            :class="{ checked: selectedProducts.includes(product.id) }"
+            @click.stop="toggleSelect(product.id)"
+          >
             <span v-if="selectedProducts.includes(product.id)">✓</span>
           </div>
         </div>
@@ -47,23 +66,31 @@
     <!-- 管理操作栏 -->
     <footer class="management-bar" v-if="isManaging">
       <div class="select-all">
-        <div class="checkbox" :class="{ checked: isAllSelected }" @click="toggleSelectAll">
+        <div
+          class="checkbox"
+          :class="{ checked: isAllSelected }"
+          @click="toggleSelectAll"
+        >
           <span v-if="isAllSelected">✓</span>
         </div>
         <span class="select-text">全选</span>
       </div>
       <div class="action-buttons">
-        <button class="action-btn delete-btn" @click="deleteSelected">删除</button>
-        <button class="action-btn share-btn" @click="shareSelected">分享</button>
+        <button class="action-btn delete-btn" @click="deleteSelected">
+          删除
+        </button>
+        <button class="action-btn share-btn" @click="shareSelected">
+          分享
+        </button>
       </div>
     </footer>
   </div>
 </template>
 
 <script>
-import nativeUtils from '../../utils/nativeUtils'
-import routerUtils from '../../utils/routerUtils'
-import { get, post, del } from '../../utils/apiUtils'
+import nativeUtils from '../../utils/nativeUtils';
+import routerUtils from '../../utils/routerUtils';
+import { get, post, del } from '../../utils/apiUtils';
 
 export default {
   name: 'FavoritesPage',
@@ -76,194 +103,204 @@ export default {
       originalFavorites: [], // 用于筛选的原始数据
       recentViews: [], // 最近浏览记录
       isLoadingRecent: false // 加载状态
-    }
+    };
   },
   computed: {
     isAllSelected() {
-      return this.selectedProducts.length === this.favorites.length && this.favorites.length > 0
+      return (
+        this.selectedProducts.length === this.favorites.length &&
+        this.favorites.length > 0
+      );
     }
   },
   mounted() {
     // 设置页面标题
-    nativeUtils.setTitleBar('我的收藏')
+    nativeUtils.setTitleBar('我的收藏');
     // 加载收藏数据
-    this.loadFavorites()
+    this.loadFavorites();
     // 加载最近浏览记录
-    this.loadRecentViews()
+    this.loadRecentViews();
   },
   methods: {
     // 从API加载收藏数据
     loadFavorites() {
       try {
-        nativeUtils.showLoading('加载中...')
-        
+        nativeUtils.showLoading('加载中...');
+
         // 获取当前用户信息
-        const userInfo = localStorage.getItem('user')
+        const userInfo = localStorage.getItem('user');
         if (userInfo) {
-          const user = JSON.parse(userInfo)
-          const userId = user.id
-          
+          const user = JSON.parse(userInfo);
+          const userId = user.id;
+
           // 调用API获取收藏列表
           get(`/favorite/user/${userId}`)
-            .then(response => {
+            .then((response) => {
               if (response.code === 0) {
                 // API请求成功，转换数据格式
-                this.originalFavorites = response.data.map(favorite => ({
+                this.originalFavorites = response.data.map((favorite) => ({
                   id: favorite.product.id,
                   title: favorite.product.title,
                   desc: favorite.product.description || '暂无描述',
                   price: favorite.product.price,
                   time: this.formatTime(favorite.createdAt),
-                  image: favorite.product.images && favorite.product.images.length > 0 ? favorite.product.images[0] : 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200',
+                  image:
+                    favorite.product.images &&
+                    favorite.product.images.length > 0
+                      ? favorite.product.images[0]
+                      : 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200',
                   createdAt: new Date(favorite.createdAt).getTime()
-                }))
+                }));
               } else {
                 // API请求失败，使用空数组
-                this.originalFavorites = []
+                this.originalFavorites = [];
               }
               // 初始筛选
-              this.applyFilter()
-              nativeUtils.hideLoading()
+              this.applyFilter();
+              nativeUtils.hideLoading();
             })
-            .catch(error => {
-              console.error('加载收藏数据失败:', error)
-              this.originalFavorites = []
-              this.favorites = []
-              nativeUtils.hideLoading()
-            })
+            .catch((error) => {
+              console.error('加载收藏数据失败:', error);
+              this.originalFavorites = [];
+              this.favorites = [];
+              nativeUtils.hideLoading();
+            });
         } else {
           // 用户未登录，跳转登录页
-          nativeUtils.hideLoading()
-          nativeUtils.showToast('请先登录', 1500)
+          nativeUtils.hideLoading();
+          nativeUtils.showToast('请先登录', 1500);
           setTimeout(() => {
-            routerUtils.navigateTo('/login.html')
-          }, 1500)
+            routerUtils.navigateTo('/login.html');
+          }, 1500);
         }
       } catch (error) {
-        console.error('加载收藏数据失败:', error)
-        this.originalFavorites = []
-        this.favorites = []
-        nativeUtils.hideLoading()
+        console.error('加载收藏数据失败:', error);
+        this.originalFavorites = [];
+        this.favorites = [];
+        nativeUtils.hideLoading();
       }
     },
-    
+
     // 加载最近浏览记录
     async loadRecentViews() {
       try {
-        this.isLoadingRecent = true
-        
+        this.isLoadingRecent = true;
+
         // 获取当前用户信息
-        const userInfo = localStorage.getItem('user')
+        const userInfo = localStorage.getItem('user');
         if (!userInfo) {
-          this.isLoadingRecent = false
-          return
+          this.isLoadingRecent = false;
+          return;
         }
-        
-        const user = JSON.parse(userInfo)
-        const userId = user.id
-        
+
+        const user = JSON.parse(userInfo);
+        const userId = user.id;
+
         // 调用API获取最近浏览记录
-        const response = await get(`/recent-view/${userId}`)
-        
+        const response = await get(`/recent-view/${userId}`);
+
         if (response.code === 0) {
           // API请求成功，转换数据格式
-          this.recentViews = response.data.map(view => ({
+          this.recentViews = response.data.map((view) => ({
             id: view.product.id,
             title: view.product.title,
             desc: view.product.description || '暂无描述',
             price: view.product.price,
             time: this.formatTime(view.viewedAt),
-            image: view.product.images && view.product.images.length > 0 ? view.product.images[0] : 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200',
+            image:
+              view.product.images && view.product.images.length > 0
+                ? view.product.images[0]
+                : 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200',
             createdAt: new Date(view.viewedAt).getTime()
-          }))
+          }));
         } else {
           // API请求失败，使用空数组
-          this.recentViews = []
+          this.recentViews = [];
         }
       } catch (error) {
-        console.error('加载最近浏览记录失败:', error)
-        this.recentViews = []
+        console.error('加载最近浏览记录失败:', error);
+        this.recentViews = [];
       } finally {
-        this.isLoadingRecent = false
+        this.isLoadingRecent = false;
       }
     },
-    
+
     // 格式化时间
     formatTime(dateString) {
-      const now = new Date()
-      const date = new Date(dateString)
-      const diff = now - date
-      const minutes = Math.floor(diff / (1000 * 60))
-      const hours = Math.floor(diff / (1000 * 60 * 60))
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-      
+      const now = new Date();
+      const date = new Date(dateString);
+      const diff = now - date;
+      const minutes = Math.floor(diff / (1000 * 60));
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
       if (minutes < 60) {
-        return `${minutes}分钟前`
+        return `${minutes}分钟前`;
       } else if (hours < 24) {
-        return `${hours}小时前`
+        return `${hours}小时前`;
       } else {
-        return `${days}天前`
+        return `${days}天前`;
       }
     },
-    
+
     // 返回上一页
     goBack() {
-      routerUtils.navigateBack(1)
+      routerUtils.navigateBack(1);
     },
-    
+
     // 切换管理模式
     manageFavorites() {
-      this.isManaging = !this.isManaging
-      this.selectedProducts = []
+      this.isManaging = !this.isManaging;
+      this.selectedProducts = [];
     },
-    
+
     // 切换筛选条件
     switchFilter(filter) {
-      this.activeFilter = filter
-      this.applyFilter()
+      this.activeFilter = filter;
+      this.applyFilter();
     },
-    
+
     // 应用筛选条件
     applyFilter() {
       // 如果是最近浏览，直接显示最近浏览记录
       if (this.activeFilter === 'recent') {
         // 确保最近浏览记录已经加载
         if (this.recentViews.length === 0 && !this.isLoadingRecent) {
-          this.loadRecentViews()
+          this.loadRecentViews();
         }
-        this.favorites = [...this.recentViews]
+        this.favorites = [...this.recentViews];
       } else {
         // 否则显示收藏记录，并应用排序
-        let filtered = [...this.originalFavorites]
-        
+        let filtered = [...this.originalFavorites];
+
         switch (this.activeFilter) {
           case 'price_asc':
             // 按价格从低到高排序
-            filtered.sort((a, b) => a.price - b.price)
-            break
+            filtered.sort((a, b) => a.price - b.price);
+            break;
           case 'price_desc':
             // 按价格从高到低排序
-            filtered.sort((a, b) => b.price - a.price)
-            break
+            filtered.sort((a, b) => b.price - a.price);
+            break;
           default:
             // 全部，按创建时间排序
-            filtered.sort((a, b) => b.createdAt - a.createdAt)
+            filtered.sort((a, b) => b.createdAt - a.createdAt);
         }
-        
-        this.favorites = filtered
+
+        this.favorites = filtered;
       }
     },
-    
+
     // 切换收藏状态
     toggleFavorite(productId) {
       // 获取当前用户信息
-      const userInfo = localStorage.getItem('user')
+      const userInfo = localStorage.getItem('user');
       if (userInfo) {
-        const user = JSON.parse(userInfo)
-        const userId = user.id
-        
-        nativeUtils.showLoading('处理中...')
-        
+        const user = JSON.parse(userInfo);
+        const userId = user.id;
+
+        nativeUtils.showLoading('处理中...');
+
         // 检查当前是否在最近浏览标签下
         if (this.activeFilter === 'recent') {
           // 如果是最近浏览，添加收藏
@@ -271,123 +308,131 @@ export default {
             userId: userId,
             productId: productId
           })
-          .then(response => {
-            nativeUtils.hideLoading()
-            if (response.code === 0) {
-              nativeUtils.showToast('收藏成功', 1500)
-              // 重新加载收藏列表
-              this.loadFavorites()
-            } else {
-              nativeUtils.showToast(response.message || '收藏失败', 1500)
-            }
-          })
-          .catch(error => {
-            console.error('收藏失败:', error)
-            nativeUtils.hideLoading()
-            nativeUtils.showToast('收藏失败，请重试', 1500)
-          })
+            .then((response) => {
+              nativeUtils.hideLoading();
+              if (response.code === 0) {
+                nativeUtils.showToast('收藏成功', 1500);
+                // 重新加载收藏列表
+                this.loadFavorites();
+              } else {
+                nativeUtils.showToast(response.message || '收藏失败', 1500);
+              }
+            })
+            .catch((error) => {
+              console.error('收藏失败:', error);
+              nativeUtils.hideLoading();
+              nativeUtils.showToast('收藏失败，请重试', 1500);
+            });
         } else {
           // 否则取消收藏
           del(`/favorite?userId=${userId}&productId=${productId}`)
-            .then(response => {
+            .then((response) => {
               if (response.code === 0) {
                 // 重新加载收藏列表
-                this.loadFavorites()
-                nativeUtils.showToast('已取消收藏', 1500)
+                this.loadFavorites();
+                nativeUtils.showToast('已取消收藏', 1500);
               } else {
-                nativeUtils.hideLoading()
-                nativeUtils.showToast(response.message || '取消收藏失败', 1500)
+                nativeUtils.hideLoading();
+                nativeUtils.showToast(response.message || '取消收藏失败', 1500);
               }
             })
-            .catch(error => {
-              console.error('取消收藏失败:', error)
-              nativeUtils.hideLoading()
-              nativeUtils.showToast('取消收藏失败，请重试', 1500)
-            })
+            .catch((error) => {
+              console.error('取消收藏失败:', error);
+              nativeUtils.hideLoading();
+              nativeUtils.showToast('取消收藏失败，请重试', 1500);
+            });
         }
       }
     },
-    
+
     // 跳转到商品详情页
     goToDetail(productId) {
-      routerUtils.navigateTo(`/detail.html?id=${productId}`)
+      routerUtils.navigateTo(`/detail.html?id=${productId}`);
     },
-    
+
     // 切换商品选择状态
     toggleSelect(productId) {
-      const index = this.selectedProducts.indexOf(productId)
+      const index = this.selectedProducts.indexOf(productId);
       if (index > -1) {
-        this.selectedProducts.splice(index, 1)
+        this.selectedProducts.splice(index, 1);
       } else {
-        this.selectedProducts.push(productId)
+        this.selectedProducts.push(productId);
       }
     },
-    
+
     // 切换全选状态
     toggleSelectAll() {
       if (this.isAllSelected) {
-        this.selectedProducts = []
+        this.selectedProducts = [];
       } else {
-        this.selectedProducts = this.favorites.map(product => product.id)
+        this.selectedProducts = this.favorites.map((product) => product.id);
       }
     },
-    
+
     // 删除选中的商品
     deleteSelected() {
       if (this.selectedProducts.length === 0) {
-        nativeUtils.showToast('请选择要删除的商品', 1500)
-        return
+        nativeUtils.showToast('请选择要删除的商品', 1500);
+        return;
       }
-      
+
       // 获取当前用户信息
-      const userInfo = localStorage.getItem('user')
+      const userInfo = localStorage.getItem('user');
       if (userInfo) {
-        const user = JSON.parse(userInfo)
-        const userId = user.id
-        
-        nativeUtils.showLoading('删除中...')
-        
+        const user = JSON.parse(userInfo);
+        const userId = user.id;
+
+        nativeUtils.showLoading('删除中...');
+
         // 批量删除收藏
-        const deletePromises = this.selectedProducts.map(productId => {
-          return del(`/favorite?userId=${userId}&productId=${productId}`)
-        })
-        
+        const deletePromises = this.selectedProducts.map((productId) => {
+          return del(`/favorite?userId=${userId}&productId=${productId}`);
+        });
+
         Promise.all(deletePromises)
-          .then(responses => {
+          .then((responses) => {
             // 检查所有请求是否都成功
-            const allSuccess = responses.every(response => response.code === 0)
+            const allSuccess = responses.every(
+              (response) => response.code === 0
+            );
             if (allSuccess) {
               // 重新加载收藏列表
-              this.loadFavorites()
-              nativeUtils.showToast(`删除了${this.selectedProducts.length}个商品`, 1500)
+              this.loadFavorites();
+              nativeUtils.showToast(
+                `删除了${this.selectedProducts.length}个商品`,
+                1500
+              );
             } else {
-              nativeUtils.hideLoading()
-              nativeUtils.showToast('部分商品删除失败', 1500)
+              nativeUtils.hideLoading();
+              nativeUtils.showToast('部分商品删除失败', 1500);
             }
-            this.selectedProducts = []
-            this.isManaging = false
+            this.selectedProducts = [];
+            this.isManaging = false;
           })
-          .catch(error => {
-            console.error('批量删除收藏失败:', error)
-            nativeUtils.hideLoading()
-            nativeUtils.showToast('删除失败，请重试', 1500)
-          })
+          .catch((error) => {
+            console.error('批量删除收藏失败:', error);
+            nativeUtils.hideLoading();
+            nativeUtils.showToast('删除失败，请重试', 1500);
+          });
       }
     },
-    
+
     // 分享选中的商品
     shareSelected() {
       if (this.selectedProducts.length === 0) {
-        nativeUtils.showToast('请选择要分享的商品', 1500)
-        return
+        nativeUtils.showToast('请选择要分享的商品', 1500);
+        return;
       }
-      
+
       // 实际开发中可以调用分享API
-      nativeUtils.showToast(`分享了${this.selectedProducts.length}个商品`, 1500)
-      this.selectedProducts = []
+      nativeUtils.showToast(
+        `分享了${this.selectedProducts.length}个商品`,
+        1500
+      );
+      this.selectedProducts = [];
     }
   }
-}
+};
 </script>
 
 <style scoped>

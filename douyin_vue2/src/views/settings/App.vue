@@ -53,7 +53,11 @@
           <div class="setting-icon">🔔</div>
           <div class="setting-text">消息通知</div>
           <div class="toggle-switch">
-            <input type="checkbox" class="toggle-checkbox" v-model="settings.notifications">
+            <input
+              type="checkbox"
+              class="toggle-checkbox"
+              v-model="settings.notifications"
+            />
             <div class="toggle-slider"></div>
           </div>
         </div>
@@ -61,7 +65,11 @@
           <div class="setting-icon">📢</div>
           <div class="setting-text">系统通知</div>
           <div class="toggle-switch">
-            <input type="checkbox" class="toggle-checkbox" v-model="settings.systemNotifications">
+            <input
+              type="checkbox"
+              class="toggle-checkbox"
+              v-model="settings.systemNotifications"
+            />
             <div class="toggle-slider"></div>
           </div>
         </div>
@@ -104,8 +112,8 @@
 </template>
 
 <script>
-import nativeUtils from '../../utils/nativeUtils'
-import routerUtils from '../../utils/routerUtils'
+import nativeUtils from '../../utils/nativeUtils';
+import routerUtils from '../../utils/routerUtils';
 
 export default {
   name: 'SettingsPage',
@@ -120,138 +128,138 @@ export default {
       },
       cacheSize: '23.5MB',
       appVersion: '1.0.0'
-    }
+    };
   },
   mounted() {
     // 设置页面标题
-    nativeUtils.setTitleBar('设置')
+    nativeUtils.setTitleBar('设置');
     // 加载用户信息
-    this.loadUserInfo()
+    this.loadUserInfo();
     // 加载设置
-    this.loadSettings()
+    this.loadSettings();
   },
   methods: {
     // 从localStorage加载用户信息
     loadUserInfo() {
       try {
-        const userStr = localStorage.getItem('user')
+        const userStr = localStorage.getItem('user');
         if (userStr) {
-          const user = JSON.parse(userStr)
+          const user = JSON.parse(userStr);
           this.userInfo = {
             ...user,
             phone: user.phone ? this.formatPhone(user.phone) : '未绑定'
-          }
+          };
         }
       } catch (error) {
-        console.error('加载用户信息失败:', error)
+        console.error('加载用户信息失败:', error);
       }
     },
-    
+
     // 格式化手机号显示
     formatPhone(phone) {
-      return phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
+      return phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
     },
-    
+
     // 加载设置
     loadSettings() {
       try {
-        const settingsStr = localStorage.getItem('settings')
+        const settingsStr = localStorage.getItem('settings');
         if (settingsStr) {
-          this.settings = JSON.parse(settingsStr)
+          this.settings = JSON.parse(settingsStr);
         }
       } catch (error) {
-        console.error('加载设置失败:', error)
+        console.error('加载设置失败:', error);
       }
     },
-    
+
     // 保存设置
     saveSettings() {
       try {
-        localStorage.setItem('settings', JSON.stringify(this.settings))
-        nativeUtils.showToast('设置已保存', 1500)
+        localStorage.setItem('settings', JSON.stringify(this.settings));
+        nativeUtils.showToast('设置已保存', 1500);
       } catch (error) {
-        console.error('保存设置失败:', error)
+        console.error('保存设置失败:', error);
       }
     },
-    
+
     // 返回上一页
     goBack() {
-      routerUtils.navigateBack(1)
+      routerUtils.navigateBack(1);
     },
-    
+
     // 跳转到账号与安全页面
     goToAccountSecurity() {
-      nativeUtils.showToast('账号与安全页面开发中', 1500)
+      nativeUtils.showToast('账号与安全页面开发中', 1500);
     },
-    
+
     // 跳转到绑定手机页面
     goToBindPhone() {
-      nativeUtils.showToast('绑定手机页面开发中', 1500)
+      nativeUtils.showToast('绑定手机页面开发中', 1500);
     },
-    
+
     // 跳转到修改密码页面
     goToChangePassword() {
-      nativeUtils.showToast('修改密码页面开发中', 1500)
+      nativeUtils.showToast('修改密码页面开发中', 1500);
     },
-    
+
     // 跳转到隐私设置页面
     goToPrivacy() {
-      nativeUtils.showToast('隐私设置页面开发中', 1500)
+      nativeUtils.showToast('隐私设置页面开发中', 1500);
     },
-    
+
     // 跳转到黑名单页面
     goToBlacklist() {
-      nativeUtils.showToast('黑名单页面开发中', 1500)
+      nativeUtils.showToast('黑名单页面开发中', 1500);
     },
-    
+
     // 跳转到语言设置页面
     goToLanguage() {
-      nativeUtils.showToast('语言设置页面开发中', 1500)
+      nativeUtils.showToast('语言设置页面开发中', 1500);
     },
-    
+
     // 清除缓存
     goToClearCache() {
       if (confirm('确定要清除缓存吗？')) {
         // 模拟清除缓存
-        nativeUtils.showLoading('清除中...')
+        nativeUtils.showLoading('清除中...');
         setTimeout(() => {
-          this.cacheSize = '0MB'
-          nativeUtils.hideLoading()
-          nativeUtils.showToast('缓存已清除', 1500)
-        }, 1000)
+          this.cacheSize = '0MB';
+          nativeUtils.hideLoading();
+          nativeUtils.showToast('缓存已清除', 1500);
+        }, 1000);
       }
     },
-    
+
     // 跳转到关于我们页面
     goToAbout() {
-      nativeUtils.showToast('关于我们页面开发中', 1500)
+      nativeUtils.showToast('关于我们页面开发中', 1500);
     },
-    
+
     // 跳转到WebSocket测试页面
     goToWebSocketTest() {
-      routerUtils.navigateTo('/websocket-test.html')
+      routerUtils.navigateTo('/websocket-test.html');
     },
-    
+
     // 退出登录
     logout() {
       if (confirm('确定要退出登录吗？')) {
         try {
           // 清除localStorage数据
-          localStorage.removeItem('user')
-          localStorage.removeItem('token')
-          localStorage.removeItem('cart')
-          localStorage.removeItem('favorites')
-          
+          localStorage.removeItem('user');
+          localStorage.removeItem('token');
+          localStorage.removeItem('cart');
+          localStorage.removeItem('favorites');
+
           // 跳转到登录页面
-          routerUtils.navigateTo('/login.html')
+          routerUtils.navigateTo('/login.html');
         } catch (error) {
-          console.error('退出登录失败:', error)
-          routerUtils.navigateTo('/login.html')
+          console.error('退出登录失败:', error);
+          routerUtils.navigateTo('/login.html');
         }
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -363,19 +371,19 @@ export default {
   right: 0;
   bottom: 0;
   background-color: #ccc;
-  transition: .4s;
+  transition: 0.4s;
   border-radius: 20px;
 }
 
 .toggle-slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 16px;
   width: 16px;
   left: 2px;
   bottom: 2px;
   background-color: white;
-  transition: .4s;
+  transition: 0.4s;
   border-radius: 50%;
 }
 

@@ -562,7 +562,8 @@ export default {
   gap: 15px;
 }
 
-.scan-icon, .cart-icon {
+.scan-icon,
+.cart-icon {
   font-size: 20px;
   cursor: pointer;
 }

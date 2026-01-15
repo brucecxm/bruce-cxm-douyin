@@ -4,66 +4,66 @@
       <h2>登录二手市场</h2>
       <p>买卖闲置，就上二手市场</p>
     </div>
-    
+
     <div class="login-tabs">
-      <div 
-        class="tab-item" 
+      <div
+        class="tab-item"
         :class="{ active: loginType === 'phone' }"
         @click="loginType = 'phone'"
       >
         手机号登录
       </div>
-      <div 
-        class="tab-item" 
+      <div
+        class="tab-item"
         :class="{ active: loginType === 'password' }"
         @click="loginType = 'password'"
       >
         密码登录
       </div>
     </div>
-    
+
     <form @submit.prevent="handleLogin">
       <div class="form-group">
-        <input 
-          type="tel" 
-          v-if="loginType === 'phone'" 
-          v-model="phone" 
-          placeholder="请输入手机号" 
+        <input
+          type="tel"
+          v-if="loginType === 'phone'"
+          v-model="phone"
+          placeholder="请输入手机号"
           required
           maxlength="11"
-        >
-        <input 
-          type="text" 
-          v-else 
-          v-model="username" 
-          placeholder="请输入用户名或手机号" 
+        />
+        <input
+          type="text"
+          v-else
+          v-model="username"
+          placeholder="请输入用户名或手机号"
           required
-        >
+        />
       </div>
-      
+
       <div class="form-group">
         <div class="password-input" v-if="loginType === 'password'">
-          <input 
-            :type="showPassword ? 'text' : 'password'" 
-            v-model="password" 
-            placeholder="请输入密码" 
+          <input
+            :type="showPassword ? 'text' : 'password'"
+            v-model="password"
+            placeholder="请输入密码"
             required
-          >
+          />
           <span class="toggle-password" @click="showPassword = !showPassword">
             {{ showPassword ? '隐藏' : '显示' }}
           </span>
         </div>
         <div class="code-input" v-else>
-          <input 
-            type="text" 
-            v-model="code" 
-            placeholder="请输入验证码" 
+          <input
+            type="text"
+            v-model="code"
+            placeholder="请输入验证码"
             required
             maxlength="6"
-          >
-          <button 
-            type="button" 
-            class="get-code-btn" 
+          />
+          <button
+            type="button"
+            class="get-code-btn"
             :disabled="countdown > 0"
             @click="getCode"
           >
@@ -71,13 +71,13 @@
           </button>
         </div>
       </div>
-      
+
       <div class="forgot-password" v-if="loginType === 'password'">
         <a href="#" @click.prevent="handleForgotPassword">忘记密码？</a>
       </div>
-      
+
       <button type="submit" class="login-btn">登录</button>
-      
+
       <div class="other-login">
         <p>其他登录方式</p>
         <div class="login-icons">
@@ -86,7 +86,7 @@
           <span class="icon weibo">微博</span>
         </div>
       </div>
-      
+
       <div class="register-link">
         <span>还没有账号？</span>
         <a href="#" @click.prevent="handleRegister">立即注册</a>
@@ -96,9 +96,9 @@
 </template>
 
 <script>
-import routerUtils from '../../utils/routerUtils'
-import nativeUtils from '../../utils/nativeUtils'
-import { post } from '../../utils/apiUtils'
+import routerUtils from '../../utils/routerUtils';
+import nativeUtils from '../../utils/nativeUtils';
+import { post } from '../../utils/apiUtils';
 
 export default {
   name: 'LoginApp',
@@ -111,7 +111,7 @@ export default {
       username: '',
       password: '',
       showPassword: false
-    }
+    };
   },
   mounted() {
     // 页面加载完成后隐藏标题栏
@@ -125,130 +125,130 @@ export default {
       if (this.loginType === 'phone') {
         // 手机号登录验证
         if (!/^1[3-9]\d{9}$/.test(this.phone)) {
-          nativeUtils.showToast('请输入正确的手机号', 1500)
-          return
+          nativeUtils.showToast('请输入正确的手机号', 1500);
+          return;
         }
         if (!this.code || this.code.length !== 6) {
-          nativeUtils.showToast('请输入6位验证码', 1500)
-          return
+          nativeUtils.showToast('请输入6位验证码', 1500);
+          return;
         }
-        
+
         // 调用手机号登录API
         try {
-          nativeUtils.showLoading('登录中...')
+          nativeUtils.showLoading('登录中...');
           const response = await post('/user/login/phone', {
             phone: this.phone,
             code: this.code
-          })
-          
+          });
+
           if (response.code === 0) {
             // 请求成功
-            nativeUtils.hideLoading()
-            nativeUtils.showToast('登录成功', 1500)
-            
+            nativeUtils.hideLoading();
+            nativeUtils.showToast('登录成功', 1500);
+
             // 保存用户信息和token
-            const data = response.data
-            localStorage.setItem('user', JSON.stringify(data.user))
-            localStorage.setItem('token', data.token || '')
-            
+            const data = response.data;
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('token', data.token || '');
+
             // 跳转到主页
-            routerUtils.navigateTo('/index.html')
+            routerUtils.navigateTo('/index.html');
           } else {
             // 请求失败
-            nativeUtils.hideLoading()
-            nativeUtils.showToast(response.message || '登录失败', 1500)
+            nativeUtils.hideLoading();
+            nativeUtils.showToast(response.message || '登录失败', 1500);
           }
         } catch (error) {
-          console.error('登录失败:', error)
-          nativeUtils.hideLoading()
-          nativeUtils.showToast(error.message || '登录失败', 1500)
+          console.error('登录失败:', error);
+          nativeUtils.hideLoading();
+          nativeUtils.showToast(error.message || '登录失败', 1500);
         }
       } else {
         // 密码登录验证
         if (!this.username.trim()) {
-          nativeUtils.showToast('请输入用户名', 1500)
-          return
+          nativeUtils.showToast('请输入用户名', 1500);
+          return;
         }
         if (!this.password || this.password.length < 6) {
-          nativeUtils.showToast('密码不能少于6位', 1500)
-          return
+          nativeUtils.showToast('密码不能少于6位', 1500);
+          return;
         }
-        
+
         try {
           // 真实登录API调用
-          nativeUtils.showLoading('登录中...')
+          nativeUtils.showLoading('登录中...');
           const response = await post('/user/login', {
             username: this.username,
             password: this.password
-          })
-          
+          });
+
           // 处理后端返回的原始数据
           if (response.code === 0) {
             // 请求成功
-            nativeUtils.hideLoading()
-            nativeUtils.showToast('登录成功', 1500)
-            
+            nativeUtils.hideLoading();
+            nativeUtils.showToast('登录成功', 1500);
+
             // 保存用户信息和token
-            const data = response.data
-            localStorage.setItem('user', JSON.stringify(data.user))
-            localStorage.setItem('token', data.token || '')
-            
+            const data = response.data;
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('token', data.token || '');
+
             // 跳转到主页
-            routerUtils.navigateTo('/index.html')
+            routerUtils.navigateTo('/index.html');
           } else {
             // 请求失败
-            nativeUtils.hideLoading()
-            nativeUtils.showToast(response.message || '登录失败', 1500)
+            nativeUtils.hideLoading();
+            nativeUtils.showToast(response.message || '登录失败', 1500);
           }
         } catch (error) {
-          console.error('登录失败:', error)
-          nativeUtils.hideLoading()
-          nativeUtils.showToast(error.message || '登录失败', 1500)
+          console.error('登录失败:', error);
+          nativeUtils.hideLoading();
+          nativeUtils.showToast(error.message || '登录失败', 1500);
         }
       }
     },
-    
+
     async getCode() {
       if (!/^1[3-9]\d{9}$/.test(this.phone)) {
-        nativeUtils.showToast('请输入正确的手机号', 1500)
-        return
+        nativeUtils.showToast('请输入正确的手机号', 1500);
+        return;
       }
-      
+
       try {
         // 调用获取验证码API
         const response = await post('/user/sendCode', {
           phone: this.phone
-        })
-        
+        });
+
         if (response.code === 0) {
-          nativeUtils.showToast('验证码已发送，请注意查收', 1500)
+          nativeUtils.showToast('验证码已发送，请注意查收', 1500);
           // 开始倒计时
-          this.countdown = 60
+          this.countdown = 60;
           const timer = setInterval(() => {
-            this.countdown--
+            this.countdown--;
             if (this.countdown <= 0) {
-              clearInterval(timer)
+              clearInterval(timer);
             }
-          }, 1000)
+          }, 1000);
         } else {
-          nativeUtils.showToast(response.message || '发送失败', 1500)
+          nativeUtils.showToast(response.message || '发送失败', 1500);
         }
       } catch (error) {
-        console.error('发送验证码失败:', error)
-        nativeUtils.showToast('发送失败，请稍后重试', 1500)
+        console.error('发送验证码失败:', error);
+        nativeUtils.showToast('发送失败，请稍后重试', 1500);
       }
     },
-    
+
     handleForgotPassword() {
-      nativeUtils.showToast('忘记密码功能开发中', 1500)
+      nativeUtils.showToast('忘记密码功能开发中', 1500);
     },
-    
+
     handleRegister() {
       // 跳转到注册页面
-      routerUtils.navigateTo('/register.html')
+      routerUtils.navigateTo('/register.html');
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -324,13 +324,15 @@ input:focus {
   border-color: #ff4400;
 }
 
-.password-input, .code-input {
+.password-input,
+.code-input {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.password-input input, .code-input input {
+.password-input input,
+.code-input input {
   flex: 1;
   padding-right: 100px;
 }
@@ -406,7 +408,8 @@ input:focus {
   position: relative;
 }
 
-.other-login p::before, .other-login p::after {
+.other-login p::before,
+.other-login p::after {
   content: '';
   position: absolute;
   top: 50%;

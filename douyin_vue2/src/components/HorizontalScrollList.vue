@@ -1,10 +1,18 @@
 <template>
   <div class="scroll-container" :style="containerStyle">
     <div class="scroll-content" :style="contentStyle">
-      <div class="user-item" v-for="(user, index) in users" :key="index" :style="getUserItemStyle(user, index)" @click="handleUserClick(user, index)">
+      <div
+        class="user-item"
+        v-for="(user, index) in users"
+        :key="index"
+        :style="getUserItemStyle(user, index)"
+        @click="handleUserClick(user, index)"
+      >
         <img :src="user.avatar" class="avatar" :style="avatarStyle" />
         <div class="name" :style="nameStyle">{{ user.name }}</div>
-        <div v-if="user.heat" class="heat" :style="heatStyle">🔥 {{ user.heat }}</div>
+        <div v-if="user.heat" class="heat" :style="heatStyle">
+          🔥 {{ user.heat }}
+        </div>
       </div>
     </div>
   </div>

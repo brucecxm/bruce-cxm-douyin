@@ -141,12 +141,21 @@ export default {
     this.videoId = this.$route.query.video || '';
     this.videoThumbnail = this.$route.query.photo || '';
 
+    console.log('路由参数:', this.$route.query);
+    console.log('获取到的 videoId:', this.videoId);
+    console.log(
+      '当前 Vuex videoStore 所有视频:',
+      this.$store.state.videoStore.videos
+    );
+
     if (this.videoThumbnail) {
       console.log('视频缩略图 URL:', this.videoThumbnail);
     } else {
       if (this.videoId) {
-        // 通过 Vuex getter 获取视频数据
-        const videoData = this.$store.getters['video/getVideo'](this.videoId);
+        // 通过 Vuex getter 获取视频数据，使用正确的模块名 videoStore
+        const videoData = this.$store.getters['videoStore/getVideo'](
+          this.videoId
+        );
         if (videoData) {
           this.videoData = videoData;
           this.videoURL = videoData.url; // 直接使用 URL，无需重新创建
@@ -158,6 +167,13 @@ export default {
           }
         } else {
           console.error('找不到视频数据，ID:', this.videoId);
+          console.error(
+            '当前 Vuex 中存在的视频ID:',
+            Object.keys(this.$store.state.videoStore.videos)
+          );
+          // 尝试从 state 中直接获取，用于调试
+          const directVideo = this.$store.state.videoStore.videos[this.videoId];
+          console.error('直接从 state 获取:', directVideo);
           // 这里可以添加错误处理逻辑，例如显示提示或跳转
         }
       } else {
@@ -192,30 +208,30 @@ export default {
     openSettings() {
       console.log('进入高级设置');
     },
+    // 将Base64字符串转换为Blob对象
+    base64ToBlob(base64, mimeType) {
+      const byteCharacters = atob(base64.split(',')[1]);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      return new Blob([byteArray], { type: mimeType });
+    },
     async publishPost() {
       if (this.loading) return;
       if (!this.title) return console.log('请输入想法内容');
-      if (!this.videoThumbnail && !this.videoData)
-        return console.log('请上传视频');
+
+      // 检查是否有内容可以发布
+      if (!this.videoThumbnail && !this.videoData) {
+        return console.log('请上传图片或视频');
+      }
 
       this.loading = true;
 
       try {
         // 创建FormData对象
         const formData = new FormData();
-
-        // 添加视频文件
-        if (this.videoData && this.videoData.blob) {
-          // 使用原始文件名或生成一个唯一文件名
-          const fileName = `video_${Date.now()}.mp4`;
-          formData.append('videoFile', this.videoData.blob, fileName);
-        }
-
-        // 添加视频缩略图
-        if (this.videoThumbnail) {
-          // 假设this.videoThumbnail也是一个Blob或File对象
-          formData.append('thumbnail', this.videoThumbnail);
-        }
 
         // 添加其他表单字段
         formData.append('userId', this.userId);
@@ -225,21 +241,67 @@ export default {
         formData.append('privacy', this.selectedPrivacy || '公开');
         formData.append('createdAt', new Date().toISOString());
 
-        // 添加视频元数据
-        if (this.videoData && this.videoData.metadata) {
-          formData.append('metadata', JSON.stringify(this.videoData.metadata));
+        // 检查是视频还是图片上传
+        if (this.videoData && this.videoData.blob) {
+          // 视频上传
+          // 添加视频文件
+          const fileName =
+            this.videoData.metadata?.name || `video_${Date.now()}.mp4`;
+          formData.append('videoFile', this.videoData.blob, fileName);
+
+          // 添加视频缩略图
+          if (this.videoThumbnail) {
+            if (
+              typeof this.videoThumbnail === 'string' &&
+              this.videoThumbnail.startsWith('data:')
+            ) {
+              // 将Base64字符串转换为Blob对象
+              const thumbnailBlob = this.base64ToBlob(
+                this.videoThumbnail,
+                'image/jpeg'
+              );
+              formData.append('thumbnail', thumbnailBlob, 'thumbnail.jpg');
+            } else {
+              // 如果已经是Blob或File对象，直接添加
+              formData.append('thumbnail', this.videoThumbnail);
+            }
+          }
+
+          // 添加视频元数据
+          if (this.videoData.metadata) {
+            formData.append(
+              'metadata',
+              JSON.stringify(this.videoData.metadata)
+            );
+          }
+        } else {
+          // 图片上传
+          if (this.videoThumbnail) {
+            let imageBlob;
+            let fileName;
+
+            if (
+              typeof this.videoThumbnail === 'string' &&
+              this.videoThumbnail.startsWith('data:')
+            ) {
+              // 将Base64字符串转换为Blob对象
+              const mimeType = this.videoThumbnail.split(';')[0].split(':')[1];
+              imageBlob = this.base64ToBlob(this.videoThumbnail, mimeType);
+              fileName = `image_${Date.now()}.${mimeType.split('/')[1]}`;
+            } else {
+              // 如果已经是Blob或File对象，直接使用
+              imageBlob = this.videoThumbnail;
+              fileName = imageBlob.name || `image_${Date.now()}.jpg`;
+            }
+
+            // 添加图片文件
+            formData.append('videoFile', imageBlob, fileName);
+          }
         }
 
-        // 设置请求头，注意不要手动设置Content-Type，让浏览器自动设置
-        const config = {
-          headers: {
-            'Content-Type': 'multipart/form-data' // 实际上这里应该由浏览器自动设置
-          }
-        };
-
-        // 发送请求
-        const res = await axios.post('/api/video/publish', formData, config);
-        console.log('发布成功！');
+        // 发送请求，不手动设置Content-Type，让浏览器自动设置
+        const res = await axios.post('/api/video/publish', formData);
+        console.log('发布成功！', res.data);
 
         // 重置表单或执行其他操作
         this.resetForm();
@@ -248,7 +310,12 @@ export default {
         console.log('发布失败，请稍后重试');
       } finally {
         this.loading = false;
-        this.$router.push('/'); // 发布成功后跳转到首页
+        // 发布成功后跳转到首页，并清除Vuex中的视频数据
+        if (this.videoId) {
+          this.$store.dispatch('videoStore/removeVideo', this.videoId);
+          console.log('已清除Vuex中的视频数据');
+        }
+        this.$router.push('/');
       }
     }
   }

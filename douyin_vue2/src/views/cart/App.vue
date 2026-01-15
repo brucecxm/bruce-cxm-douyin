@@ -19,27 +19,50 @@
         <div class="empty-text">购物车是空的</div>
         <button class="go-shopping-btn" @click="goToIndex">去逛逛</button>
       </div>
-      
+
       <!-- 购物车商品列表 -->
       <div class="cart-items" v-else>
         <div class="cart-item" v-for="item in cartItems" :key="item.id">
           <div class="item-checkbox">
-            <input type="checkbox" v-model="item.selected">
+            <input type="checkbox" v-model="item.selected" />
           </div>
           <div class="item-image">
-            <img :src="item.image" :alt="item.title" @click="goToDetail(item.id)">
+            <img
+              :src="item.image"
+              :alt="item.title"
+              @click="goToDetail(item.id)"
+            />
           </div>
           <div class="item-info">
-            <div class="item-title" @click="goToDetail(item.id)">{{ item.title }}</div>
+            <div class="item-title" @click="goToDetail(item.id)">
+              {{ item.title }}
+            </div>
             <div class="item-tags">
-              <span class="tag" v-for="tag in item.tags" :key="tag">{{ tag }}</span>
+              <span class="tag" v-for="tag in item.tags" :key="tag">{{
+                tag
+              }}</span>
             </div>
             <div class="item-price">¥{{ item.price }}</div>
             <div class="item-actions">
               <div class="quantity-control">
-                <button class="quantity-btn minus" @click="decreaseQuantity(item)">-</button>
-                <input type="number" class="quantity-input" v-model.number="item.quantity" min="1">
-                <button class="quantity-btn plus" @click="increaseQuantity(item)">+</button>
+                <button
+                  class="quantity-btn minus"
+                  @click="decreaseQuantity(item)"
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  class="quantity-input"
+                  v-model.number="item.quantity"
+                  min="1"
+                />
+                <button
+                  class="quantity-btn plus"
+                  @click="increaseQuantity(item)"
+                >
+                  +
+                </button>
               </div>
               <button class="delete-btn" @click="removeItem(item)">删除</button>
             </div>
@@ -51,7 +74,7 @@
     <!-- 底部结算栏 -->
     <footer class="cart-footer" v-if="cartItems.length > 0">
       <div class="select-all">
-        <input type="checkbox" v-model="selectAll">
+        <input type="checkbox" v-model="selectAll" />
         <span class="select-all-text">全选</span>
       </div>
       <div class="total-section">
@@ -66,8 +89,8 @@
 </template>
 
 <script>
-import nativeUtils from '../../utils/nativeUtils'
-import routerUtils from '../../utils/routerUtils'
+import nativeUtils from '../../utils/nativeUtils';
+import routerUtils from '../../utils/routerUtils';
 
 export default {
   name: 'CartPage',
@@ -75,120 +98,120 @@ export default {
     return {
       cartItems: [],
       selectAll: false
-    }
+    };
   },
   computed: {
     // 总价格
     totalPrice() {
       return this.cartItems
-        .filter(item => item.selected)
-        .reduce((total, item) => total + (item.price * item.quantity), 0)
-        .toFixed(2)
+        .filter((item) => item.selected)
+        .reduce((total, item) => total + item.price * item.quantity, 0)
+        .toFixed(2);
     },
     // 选中商品数量
     selectedCount() {
-      return this.cartItems.filter(item => item.selected).length
+      return this.cartItems.filter((item) => item.selected).length;
     }
   },
   mounted() {
     // 页面加载时设置标题
-    nativeUtils.setTitleBar('购物车')
+    nativeUtils.setTitleBar('购物车');
     // 加载购物车数据
-    this.loadCartItems()
+    this.loadCartItems();
   },
   watch: {
     // 监听购物车数据变化，保存到本地存储
     cartItems: {
       deep: true,
       handler(newVal) {
-        localStorage.setItem('cart', JSON.stringify(newVal))
+        localStorage.setItem('cart', JSON.stringify(newVal));
       }
     },
     // 监听全选状态变化
     selectAll(newVal) {
-      this.cartItems.forEach(item => {
-        item.selected = newVal
-      })
+      this.cartItems.forEach((item) => {
+        item.selected = newVal;
+      });
     }
   },
   methods: {
     // 加载购物车数据
     loadCartItems() {
       try {
-        const cartStr = localStorage.getItem('cart')
+        const cartStr = localStorage.getItem('cart');
         if (cartStr) {
-          this.cartItems = JSON.parse(cartStr).map(item => ({
+          this.cartItems = JSON.parse(cartStr).map((item) => ({
             ...item,
             selected: true // 默认选中
-          }))
+          }));
         }
       } catch (error) {
-        console.error('加载购物车失败:', error)
-        nativeUtils.showToast('加载购物车失败', 1500)
+        console.error('加载购物车失败:', error);
+        nativeUtils.showToast('加载购物车失败', 1500);
       }
     },
-    
+
     // 返回上一页
     goBack() {
-      routerUtils.navigateBack(1)
+      routerUtils.navigateBack(1);
     },
-    
+
     // 跳转到首页
     goToIndex() {
-      routerUtils.navigateTo('/index.html')
+      routerUtils.navigateTo('/index.html');
     },
-    
+
     // 跳转到商品详情
     goToDetail(productId) {
-      routerUtils.navigateTo(`/detail.html?id=${productId}`)
+      routerUtils.navigateTo(`/detail.html?id=${productId}`);
     },
-    
+
     // 增加商品数量
     increaseQuantity(item) {
-      item.quantity++
+      item.quantity++;
     },
-    
+
     // 减少商品数量
     decreaseQuantity(item) {
       if (item.quantity > 1) {
-        item.quantity--
+        item.quantity--;
       }
     },
-    
+
     // 删除商品
     removeItem(item) {
-      const index = this.cartItems.findIndex(i => i.id === item.id)
+      const index = this.cartItems.findIndex((i) => i.id === item.id);
       if (index > -1) {
-        this.cartItems.splice(index, 1)
-        nativeUtils.showToast('已删除', 1500)
+        this.cartItems.splice(index, 1);
+        nativeUtils.showToast('已删除', 1500);
       }
     },
-    
+
     // 清空购物车
     clearCart() {
-      if (this.cartItems.length === 0) return
-      
+      if (this.cartItems.length === 0) return;
+
       if (confirm('确定要清空购物车吗？')) {
-        this.cartItems = []
-        localStorage.removeItem('cart')
-        this.selectAll = false
-        nativeUtils.showToast('购物车已清空', 1500)
+        this.cartItems = [];
+        localStorage.removeItem('cart');
+        this.selectAll = false;
+        nativeUtils.showToast('购物车已清空', 1500);
       }
     },
-    
+
     // 结算
     checkout() {
-      const selectedItems = this.cartItems.filter(item => item.selected)
+      const selectedItems = this.cartItems.filter((item) => item.selected);
       if (selectedItems.length === 0) {
-        nativeUtils.showToast('请选择要结算的商品', 1500)
-        return
+        nativeUtils.showToast('请选择要结算的商品', 1500);
+        return;
       }
-      
+
       // 实际项目中替换为真实结算逻辑
-      nativeUtils.showToast('结算功能开发中', 1500)
+      nativeUtils.showToast('结算功能开发中', 1500);
     }
   }
-}
+};
 </script>
 
 <style scoped>

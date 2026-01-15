@@ -7,7 +7,14 @@
       </div>
       <div class="search-input-group">
         <i class="search-icon">🔍</i>
-        <input type="text" class="search-input" v-model="searchQuery" placeholder="搜索你想要的商品" @input="handleSearchInput" @keyup.enter="performSearch">
+        <input
+          type="text"
+          class="search-input"
+          v-model="searchQuery"
+          placeholder="搜索你想要的商品"
+          @input="handleSearchInput"
+          @keyup.enter="performSearch"
+        />
         <div class="clear-btn" v-if="searchQuery" @click="clearSearch">×</div>
       </div>
       <div class="header-right" @click="performSearch">
@@ -23,10 +30,17 @@
         <div class="history-section" v-if="searchHistory.length">
           <div class="section-header">
             <h3 class="section-title">搜索历史</h3>
-            <div class="clear-history" @click="clearSearchHistory">清除历史</div>
+            <div class="clear-history" @click="clearSearchHistory">
+              清除历史
+            </div>
           </div>
           <div class="history-tags">
-            <span class="history-tag" v-for="item in searchHistory" :key="item" @click="searchByKeyword(item)">
+            <span
+              class="history-tag"
+              v-for="item in searchHistory"
+              :key="item"
+              @click="searchByKeyword(item)"
+            >
               {{ item }}
             </span>
           </div>
@@ -36,7 +50,12 @@
         <div class="hot-section">
           <h3 class="section-title">热门搜索</h3>
           <div class="hot-tags">
-            <span class="hot-tag" v-for="(item, index) in hotSearch" :key="item" @click="searchByKeyword(item)">
+            <span
+              class="hot-tag"
+              v-for="(item, index) in hotSearch"
+              :key="item"
+              @click="searchByKeyword(item)"
+            >
               <span class="tag-rank">{{ index + 1 }}</span>
               {{ item }}
             </span>
@@ -53,14 +72,28 @@
             <div class="filter-item">
               <span class="filter-label">价格范围：</span>
               <div class="price-filter">
-                <input type="number" class="price-input" v-model.number="priceFilter.min" placeholder="最低价">
+                <input
+                  type="number"
+                  class="price-input"
+                  v-model.number="priceFilter.min"
+                  placeholder="最低价"
+                />
                 <span class="price-separator">-</span>
-                <input type="number" class="price-input" v-model.number="priceFilter.max" placeholder="最高价">
-                <button class="apply-filter-btn" @click="applyFilters">确定</button>
-                <button class="reset-filter-btn" @click="resetFilters">重置</button>
+                <input
+                  type="number"
+                  class="price-input"
+                  v-model.number="priceFilter.max"
+                  placeholder="最高价"
+                />
+                <button class="apply-filter-btn" @click="applyFilters">
+                  确定
+                </button>
+                <button class="reset-filter-btn" @click="resetFilters">
+                  重置
+                </button>
               </div>
             </div>
-            
+
             <div class="filter-item">
               <span class="filter-label">位置：</span>
               <div class="location-filter">
@@ -75,21 +108,46 @@
               </div>
             </div>
           </div>
-          
+
           <!-- 排序选项 -->
           <div class="sort-options">
-            <span class="sort-option" :class="{ active: sortBy === 'default' }" @click="changeSort('default')">默认排序</span>
-            <span class="sort-option" :class="{ active: sortBy === 'price_asc' }" @click="changeSort('price_asc')">价格从低到高</span>
-            <span class="sort-option" :class="{ active: sortBy === 'price_desc' }" @click="changeSort('price_desc')">价格从高到低</span>
-            <span class="sort-option" :class="{ active: sortBy === 'time' }" @click="changeSort('time')">最新发布</span>
+            <span
+              class="sort-option"
+              :class="{ active: sortBy === 'default' }"
+              @click="changeSort('default')"
+            >默认排序</span
+            >
+            <span
+              class="sort-option"
+              :class="{ active: sortBy === 'price_asc' }"
+              @click="changeSort('price_asc')"
+            >价格从低到高</span
+            >
+            <span
+              class="sort-option"
+              :class="{ active: sortBy === 'price_desc' }"
+              @click="changeSort('price_desc')"
+            >价格从高到低</span
+            >
+            <span
+              class="sort-option"
+              :class="{ active: sortBy === 'time' }"
+              @click="changeSort('time')"
+            >最新发布</span
+            >
           </div>
         </div>
 
         <!-- 搜索结果列表 -->
         <div class="results-list">
-          <div class="product-item" v-for="product in searchResults" :key="product.id" @click="goToDetail(product.id)">
+          <div
+            class="product-item"
+            v-for="product in searchResults"
+            :key="product.id"
+            @click="goToDetail(product.id)"
+          >
             <div class="product-image">
-              <img :src="product.image" :alt="product.title">
+              <img :src="product.image" :alt="product.title" />
             </div>
             <div class="product-info">
               <h3 class="product-title">{{ product.title }}</h3>
@@ -100,12 +158,14 @@
               </p>
             </div>
           </div>
-          
+
           <!-- 无搜索结果时显示 -->
           <div class="no-results" v-if="searchResults.length === 0">
             <div class="no-results-icon">🔍</div>
             <div class="no-results-text">没有找到匹配的商品</div>
-            <button class="try-again-btn" @click="clearSearchFilters">换个关键词试试</button>
+            <button class="try-again-btn" @click="clearSearchFilters">
+              换个关键词试试
+            </button>
           </div>
         </div>
       </div>
@@ -114,9 +174,9 @@
 </template>
 
 <script>
-import nativeUtils from '../../utils/nativeUtils'
-import routerUtils from '../../utils/routerUtils'
-import { get } from '../../utils/apiUtils'
+import nativeUtils from '../../utils/nativeUtils';
+import routerUtils from '../../utils/routerUtils';
+import { get } from '../../utils/apiUtils';
 
 export default {
   name: 'SearchPage',
@@ -131,7 +191,15 @@ export default {
       // 搜索历史
       searchHistory: ['iPhone', 'MacBook', 'AirPods', '小米手机', '华为手表'],
       // 热门搜索
-      hotSearch: ['iPhone 13', 'MacBook Pro', 'AirPods Pro', '小米13', '华为Mate50', '索尼耳机', '任天堂Switch'],
+      hotSearch: [
+        'iPhone 13',
+        'MacBook Pro',
+        'AirPods Pro',
+        '小米13',
+        '华为Mate50',
+        '索尼耳机',
+        '任天堂Switch'
+      ],
       // 排序方式
       sortBy: 'default',
       // 筛选条件
@@ -140,19 +208,19 @@ export default {
         max: null
       },
       locationFilter: ''
-    }
+    };
   },
   mounted() {
     // 页面加载时设置标题
-    nativeUtils.setTitleBar('搜索')
-    
+    nativeUtils.setTitleBar('搜索');
+
     // 解析URL参数
-    this.parseUrlParams()
+    this.parseUrlParams();
   },
   methods: {
     // 返回上一页
     goBack() {
-      routerUtils.navigateBack(1)
+      routerUtils.navigateBack(1);
     },
     // 处理搜索输入
     handleSearchInput() {
@@ -161,203 +229,216 @@ export default {
       //   this.performSearch()
       // }
     },
-    
+
     // 解析URL参数
     parseUrlParams() {
-      const urlParams = new URLSearchParams(window.location.search)
-      const categoryId = urlParams.get('category')
-      const keyword = urlParams.get('keyword')
-      
+      const urlParams = new URLSearchParams(window.location.search);
+      const categoryId = urlParams.get('category');
+      const keyword = urlParams.get('keyword');
+
       if (categoryId) {
         // 分类搜索
-        this.searchQuery = keyword || ''
-        this.performSearch()
+        this.searchQuery = keyword || '';
+        this.performSearch();
       }
     },
     // 执行搜索
     async performSearch() {
       // 检查URL参数中是否有分类ID
-      const urlParams = new URLSearchParams(window.location.search)
-      const hasCategory = urlParams.get('category')
-      
+      const urlParams = new URLSearchParams(window.location.search);
+      const hasCategory = urlParams.get('category');
+
       // 如果没有分类且没有搜索关键词，提示用户
       if (!hasCategory && !this.searchQuery.trim()) {
-        nativeUtils.showToast('请输入搜索关键词', 1500)
-        return
+        nativeUtils.showToast('请输入搜索关键词', 1500);
+        return;
       }
-      
+
       // 显示加载提示
-      nativeUtils.showLoading('搜索中...')
-      
+      nativeUtils.showLoading('搜索中...');
+
       try {
         // 调用API获取搜索结果
-        const response = await get(`/product/search?keyword=${encodeURIComponent(this.searchQuery)}`)
-        
+        const response = await get(
+          `/product/search?keyword=${encodeURIComponent(this.searchQuery)}`
+        );
+
         // 隐藏加载提示
-        nativeUtils.hideLoading()
-        
+        nativeUtils.hideLoading();
+
         // 如果有搜索关键词，保存到搜索历史
         if (this.searchQuery.trim()) {
-          this.saveToSearchHistory(this.searchQuery)
+          this.saveToSearchHistory(this.searchQuery);
         }
-        
+
         // 检查API响应
         if (response.code === 0 && response.data) {
           // API请求成功，处理数据
-          this.originalSearchResults = response.data.map(product => ({
+          this.originalSearchResults = response.data.map((product) => ({
             id: product.id,
             title: product.title,
             price: product.price,
             location: product.location || '未知',
-            time: product.createdAt ? this.formatTime(product.createdAt) : '未知',
-            image: product.images && product.images.length > 0 ? product.images[0] : 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
-          }))
+            time: product.createdAt
+              ? this.formatTime(product.createdAt)
+              : '未知',
+            image:
+              product.images && product.images.length > 0
+                ? product.images[0]
+                : 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
+          }));
           // 应用筛选条件
-          this.applyFilters()
+          this.applyFilters();
         } else {
           // API返回数据格式不正确
-          console.warn('API返回数据格式不正确')
-          nativeUtils.showToast('搜索失败，请重试', 1500)
-          this.originalSearchResults = []
-          this.searchResults = []
+          console.warn('API返回数据格式不正确');
+          nativeUtils.showToast('搜索失败，请重试', 1500);
+          this.originalSearchResults = [];
+          this.searchResults = [];
         }
       } catch (error) {
-        console.error('搜索失败:', error)
-        nativeUtils.hideLoading()
-        nativeUtils.showToast('搜索失败，请重试', 1500)
-        this.originalSearchResults = []
-        this.searchResults = []
+        console.error('搜索失败:', error);
+        nativeUtils.hideLoading();
+        nativeUtils.showToast('搜索失败，请重试', 1500);
+        this.originalSearchResults = [];
+        this.searchResults = [];
       }
     },
-    
+
     // 应用筛选条件
     applyFilters() {
       // 从原始搜索结果开始筛选
-      let filteredResults = [...this.originalSearchResults]
-      
+      let filteredResults = [...this.originalSearchResults];
+
       // 价格筛选
       if (this.priceFilter.min !== null && this.priceFilter.min > 0) {
-        filteredResults = filteredResults.filter(product => product.price >= this.priceFilter.min)
+        filteredResults = filteredResults.filter(
+          (product) => product.price >= this.priceFilter.min
+        );
       }
       if (this.priceFilter.max !== null && this.priceFilter.max > 0) {
-        filteredResults = filteredResults.filter(product => product.price <= this.priceFilter.max)
+        filteredResults = filteredResults.filter(
+          (product) => product.price <= this.priceFilter.max
+        );
       }
-      
+
       // 位置筛选
       if (this.locationFilter) {
-        filteredResults = filteredResults.filter(product => product.location === this.locationFilter)
+        filteredResults = filteredResults.filter(
+          (product) => product.location === this.locationFilter
+        );
       }
-      
+
       // 保存筛选结果
-      this.searchResults = filteredResults
-      
+      this.searchResults = filteredResults;
+
       // 应用排序
-      this.changeSort(this.sortBy)
+      this.changeSort(this.sortBy);
     },
-    
+
     // 重置筛选条件
     resetFilters() {
       this.priceFilter = {
         min: null,
         max: null
-      }
-      this.locationFilter = ''
-      this.applyFilters()
+      };
+      this.locationFilter = '';
+      this.applyFilters();
     },
-    
+
     // 清除所有搜索和筛选条件
     clearSearchFilters() {
-      this.searchQuery = ''
-      this.searchResults = []
-      this.originalSearchResults = []
-      this.resetFilters()
+      this.searchQuery = '';
+      this.searchResults = [];
+      this.originalSearchResults = [];
+      this.resetFilters();
     },
     // 按关键词搜索
     searchByKeyword(keyword) {
-      this.searchQuery = keyword
-      this.performSearch()
+      this.searchQuery = keyword;
+      this.performSearch();
     },
     // 清除搜索
     clearSearch() {
-      this.searchQuery = ''
-      this.searchResults = []
+      this.searchQuery = '';
+      this.searchResults = [];
     },
     // 保存搜索历史
     saveToSearchHistory(keyword) {
       // 去重
-      const index = this.searchHistory.indexOf(keyword)
+      const index = this.searchHistory.indexOf(keyword);
       if (index > -1) {
-        this.searchHistory.splice(index, 1)
+        this.searchHistory.splice(index, 1);
       }
       // 添加到开头
-      this.searchHistory.unshift(keyword)
+      this.searchHistory.unshift(keyword);
       // 限制最多保存10条
       if (this.searchHistory.length > 10) {
-        this.searchHistory.pop()
+        this.searchHistory.pop();
       }
     },
     // 清除搜索历史
     clearSearchHistory() {
-      this.searchHistory = []
+      this.searchHistory = [];
     },
     // 排序搜索结果
     changeSort(sortType) {
-      this.sortBy = sortType
+      this.sortBy = sortType;
       // 根据排序类型排序搜索结果
       switch (sortType) {
         case 'price_asc':
-          this.searchResults.sort((a, b) => a.price - b.price)
-          break
+          this.searchResults.sort((a, b) => a.price - b.price);
+          break;
         case 'price_desc':
-          this.searchResults.sort((a, b) => b.price - a.price)
-          break
+          this.searchResults.sort((a, b) => b.price - a.price);
+          break;
         case 'time':
           // 这里简化处理，实际应根据时间戳排序
           this.searchResults.sort((a, b) => {
-            const timeA = this.getTimeValue(a.time)
-            const timeB = this.getTimeValue(b.time)
-            return timeB - timeA
-          })
-          break
+            const timeA = this.getTimeValue(a.time);
+            const timeB = this.getTimeValue(b.time);
+            return timeB - timeA;
+          });
+          break;
         default:
           // 默认排序，恢复原始顺序
           // 注意：不能调用performSearch()，否则会导致无限循环
-          this.searchResults = [...this.originalSearchResults]
+          this.searchResults = [...this.originalSearchResults];
       }
     },
     // 将时间字符串转换为数值（简化处理）
     getTimeValue(timeStr) {
       if (timeStr.includes('小时前')) {
-        return parseInt(timeStr)
+        return parseInt(timeStr);
       } else if (timeStr.includes('天前')) {
-        return parseInt(timeStr) * 24
+        return parseInt(timeStr) * 24;
       }
-      return 0
+      return 0;
     },
     // 跳转到商品详情页
     goToDetail(productId) {
-      routerUtils.navigateTo(`/detail.html?id=${productId}`)
+      routerUtils.navigateTo(`/detail.html?id=${productId}`);
     },
     // 格式化时间
     formatTime(timeString) {
-      const date = new Date(timeString)
-      const now = new Date()
-      const diff = now - date
-      
-      const minutes = Math.floor(diff / (1000 * 60))
-      const hours = Math.floor(diff / (1000 * 60 * 60))
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-      
+      const date = new Date(timeString);
+      const now = new Date();
+      const diff = now - date;
+
+      const minutes = Math.floor(diff / (1000 * 60));
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
       if (minutes < 60) {
-        return `${minutes}分钟前`
+        return `${minutes}分钟前`;
       } else if (hours < 24) {
-        return `${hours}小时前`
+        return `${hours}小时前`;
       } else {
-        return `${days}天前`
+        return `${days}天前`;
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -584,7 +665,8 @@ export default {
   color: #999;
 }
 
-.apply-filter-btn, .reset-filter-btn {
+.apply-filter-btn,
+.reset-filter-btn {
   margin-left: 10px;
   padding: 6px 15px;
   border: none;

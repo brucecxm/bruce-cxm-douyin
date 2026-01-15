@@ -14,13 +14,24 @@
     <!-- 聊天内容区域 -->
     <div class="chat-content">
       <!-- 聊天记录 -->
-      <div class="message-group" v-for="(group, index) in messageGroups" :key="index">
+      <div
+        class="message-group"
+        v-for="(group, index) in messageGroups"
+        :key="index"
+      >
         <div class="date-divider">{{ group.date }}</div>
-        <div class="message-item" v-for="message in group.messages" :key="message.id">
+        <div
+          class="message-item"
+          v-for="message in group.messages"
+          :key="message.id"
+        >
           <!-- 对方消息 -->
           <div class="message-other" v-if="!message.isMine">
             <div class="avatar">
-              <img :src="chatInfo.sender.avatar" :alt="chatInfo.sender.nickname">
+              <img
+                :src="chatInfo.sender.avatar"
+                :alt="chatInfo.sender.nickname"
+              />
             </div>
             <div class="message-bubble-other">
               <div class="message-text">{{ message.content }}</div>
@@ -34,7 +45,7 @@
               <div class="message-time">{{ message.time }}</div>
             </div>
             <div class="avatar">
-              <img :src="myInfo.avatar" :alt="myInfo.nickname">
+              <img :src="myInfo.avatar" :alt="myInfo.nickname" />
             </div>
           </div>
         </div>
@@ -44,7 +55,7 @@
     <!-- 商品信息卡片 -->
     <div class="product-card" @click="goToProductDetail">
       <div class="product-image">
-        <img :src="chatInfo.product.image" :alt="chatInfo.product.title">
+        <img :src="chatInfo.product.image" :alt="chatInfo.product.title" />
       </div>
       <div class="product-info">
         <div class="product-title">{{ chatInfo.product.title }}</div>
@@ -61,7 +72,13 @@
         <div class="toolbar-item">📎</div>
       </div>
       <div class="input-group">
-        <input type="text" class="chat-input" v-model="inputMessage" placeholder="输入消息..." @keyup.enter="sendMessage">
+        <input
+          type="text"
+          class="chat-input"
+          v-model="inputMessage"
+          placeholder="输入消息..."
+          @keyup.enter="sendMessage"
+        />
         <button class="send-btn" @click="sendMessage">发送</button>
       </div>
     </footer>
@@ -69,8 +86,8 @@
 </template>
 
 <script>
-import { post, get } from '../../utils/apiUtils'
-import nativeUtils from '../../utils/nativeUtils'
+import { post, get } from '../../utils/apiUtils';
+import nativeUtils from '../../utils/nativeUtils';
 
 export default {
   name: 'ChatPage',
@@ -80,7 +97,9 @@ export default {
       myInfo: {
         id: parseInt(localStorage.getItem('userId')) || 25,
         nickname: localStorage.getItem('userNickname') || '我',
-        avatar: localStorage.getItem('userAvatar') || 'https://via.placeholder.com/50x50?text=MyAvatar'
+        avatar:
+          localStorage.getItem('userAvatar') ||
+          'https://via.placeholder.com/50x50?text=MyAvatar'
       },
       chatInfo: {
         userId: '',
@@ -103,156 +122,173 @@ export default {
       // WebSocket相关
       stompClient: null,
       webSocketConnected: false
-    }
+    };
   },
   mounted() {
     // 从URL获取参数
-    this.parseUrlParams()
+    this.parseUrlParams();
     // 初始化数据并获取聊天记录
-    this.initAndFetch()
+    this.initAndFetch();
     // 连接WebSocket
-    this.connectWebSocket()
+    this.connectWebSocket();
   },
   beforeUnmount() {
     // 断开WebSocket连接
-    this.disconnectWebSocket()
+    this.disconnectWebSocket();
   },
   methods: {
     // 解析URL参数
     parseUrlParams() {
-      const urlParams = new URLSearchParams(window.location.search)
-      this.chatInfo.userId = urlParams.get('userId') || ''
-      this.chatInfo.chatId = urlParams.get('chatId') || ''
-      this.chatInfo.productId = urlParams.get('productId') || ''
-      console.log('解析到的参数:', { userId: this.chatInfo.userId, chatId: this.chatInfo.chatId, productId: this.chatInfo.productId })
+      const urlParams = new URLSearchParams(window.location.search);
+      this.chatInfo.userId = urlParams.get('userId') || '';
+      this.chatInfo.chatId = urlParams.get('chatId') || '';
+      this.chatInfo.productId = urlParams.get('productId') || '';
+      console.log('解析到的参数:', {
+        userId: this.chatInfo.userId,
+        chatId: this.chatInfo.chatId,
+        productId: this.chatInfo.productId
+      });
     },
-    
+
     // 初始化数据并获取聊天记录（确保顺序）
     async initAndFetch() {
       try {
-        await this.initChatData()
-        await this.fetchChatMessages()
+        await this.initChatData();
+        await this.fetchChatMessages();
       } catch (error) {
-        console.error('初始化和获取聊天记录失败:', error)
+        console.error('初始化和获取聊天记录失败:', error);
       }
     },
-    
+
     // 连接WebSocket
     connectWebSocket() {
       // 引入SockJS和STOMP.js
-      const script = document.createElement('script')
-      script.src = 'https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js'
+      const script = document.createElement('script');
+      script.src =
+        'https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js';
       script.onload = () => {
-        const stompScript = document.createElement('script')
-        stompScript.src = 'https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js'
+        const stompScript = document.createElement('script');
+        stompScript.src =
+          'https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js';
         stompScript.onload = () => {
-          this.initWebSocket()
-        }
-        document.head.appendChild(stompScript)
-      }
-      document.head.appendChild(script)
+          this.initWebSocket();
+        };
+        document.head.appendChild(stompScript);
+      };
+      document.head.appendChild(script);
     },
-    
+
     // 初始化WebSocket连接
     initWebSocket() {
-      const SockJS = window.SockJS
-      const Stomp = window.Stomp
-      
+      const SockJS = window.SockJS;
+      const Stomp = window.Stomp;
+
       if (SockJS && Stomp) {
         // 创建SockJS连接，使用正确的代理路径
-        const socket = new SockJS('/ws')
+        const socket = new SockJS('/ws');
         // 创建STOMP客户端
-        this.stompClient = Stomp.over(socket)
-        
+        this.stompClient = Stomp.over(socket);
+
         // 连接STOMP服务器
-        this.stompClient.connect({}, (frame) => {
-          console.log('WebSocket连接成功:', frame)
-          this.webSocketConnected = true
-          
-          // 订阅消息主题
-          this.stompClient.subscribe(`/topic/messages/${this.myInfo.id}`, (message) => {
-            const newMessage = JSON.parse(message.body)
-            console.log('收到新消息:', newMessage)
-            // 刷新聊天记录
-            this.fetchChatMessages()
-          })
-        }, (error) => {
-          console.error('WebSocket连接失败:', error)
-          this.webSocketConnected = false
-          // 尝试重新连接（5秒后）
-          setTimeout(() => this.connectWebSocket(), 5000)
-        })
+        this.stompClient.connect(
+          {},
+          (frame) => {
+            console.log('WebSocket连接成功:', frame);
+            this.webSocketConnected = true;
+
+            // 订阅消息主题
+            this.stompClient.subscribe(
+              `/topic/messages/${this.myInfo.id}`,
+              (message) => {
+                const newMessage = JSON.parse(message.body);
+                console.log('收到新消息:', newMessage);
+                // 刷新聊天记录
+                this.fetchChatMessages();
+              }
+            );
+          },
+          (error) => {
+            console.error('WebSocket连接失败:', error);
+            this.webSocketConnected = false;
+            // 尝试重新连接（5秒后）
+            setTimeout(() => this.connectWebSocket(), 5000);
+          }
+        );
       }
     },
-    
+
     // 断开WebSocket连接
     disconnectWebSocket() {
       if (this.stompClient && this.stompClient.connected) {
-        this.stompClient.disconnect()
-        console.log('WebSocket连接已断开')
-        this.webSocketConnected = false
+        this.stompClient.disconnect();
+        console.log('WebSocket连接已断开');
+        this.webSocketConnected = false;
       }
     },
-    
+
     // 初始化聊天数据
     async initChatData() {
       try {
         // 获取当前用户信息（实际项目中从localStorage或API获取）
-        const userStr = localStorage.getItem('user')
+        const userStr = localStorage.getItem('user');
         if (userStr) {
-          const user = JSON.parse(userStr)
-          this.myInfo.id = user.id
-          this.myInfo.nickname = user.nickname
-          this.myInfo.avatar = user.avatar || this.myInfo.avatar
+          const user = JSON.parse(userStr);
+          this.myInfo.id = user.id;
+          this.myInfo.nickname = user.nickname;
+          this.myInfo.avatar = user.avatar || this.myInfo.avatar;
         }
-        
+
         // 确保对方用户ID类型正确
-        const receiverId = Number(this.chatInfo.userId)
-        
+        const receiverId = Number(this.chatInfo.userId);
+
         // 从API获取对方用户信息
         if (receiverId) {
           try {
-            const response = await get(`/user/${receiverId}`)
+            const response = await get(`/user/${receiverId}`);
             if (response.code === 0 && response.data) {
               this.chatInfo.sender = {
                 id: response.data.id,
                 nickname: response.data.nickname,
-                avatar: response.data.avatar || `https://via.placeholder.com/50x50?text=User${receiverId}`
-              }
+                avatar:
+                  response.data.avatar ||
+                  `https://via.placeholder.com/50x50?text=User${receiverId}`
+              };
             }
           } catch (error) {
-            console.error('获取对方用户信息失败:', error)
+            console.error('获取对方用户信息失败:', error);
             // 如果获取失败，使用默认值
             this.chatInfo.sender = {
               id: receiverId,
               nickname: `用户${receiverId}`,
               avatar: `https://via.placeholder.com/50x50?text=User${receiverId}`
-            }
+            };
           }
         }
-        
+
         // 从API获取商品信息
         if (this.chatInfo.productId) {
-          const productId = Number(this.chatInfo.productId)
+          const productId = Number(this.chatInfo.productId);
           try {
-            const response = await get(`/product/${productId}`)
+            const response = await get(`/product/${productId}`);
             if (response.code === 0 && response.data) {
               this.chatInfo.product = {
                 id: response.data.id,
                 title: response.data.title,
                 price: response.data.price,
-                image: response.data.image || `https://via.placeholder.com/80x80?text=Product${productId}`
-              }
+                image:
+                  response.data.image ||
+                  `https://via.placeholder.com/80x80?text=Product${productId}`
+              };
             }
           } catch (error) {
-            console.error('获取商品信息失败:', error)
+            console.error('获取商品信息失败:', error);
             // 如果获取失败，使用默认值
             this.chatInfo.product = {
               id: productId,
               title: `商品${productId}`,
               price: 0,
               image: `https://via.placeholder.com/80x80?text=Product${productId}`
-            }
+            };
           }
         } else {
           // 如果没有商品ID，使用默认商品信息
@@ -260,175 +296,190 @@ export default {
             id: 0,
             title: '未知商品',
             price: 0,
-            image: `https://via.placeholder.com/80x80?text=Product`
-          }
+            image: 'https://via.placeholder.com/80x80?text=Product'
+          };
         }
       } catch (error) {
-        console.error('初始化聊天数据失败:', error)
-        nativeUtils.showToast('初始化聊天数据失败', 1500)
+        console.error('初始化聊天数据失败:', error);
+        nativeUtils.showToast('初始化聊天数据失败', 1500);
       }
     },
-    
+
     // 获取聊天记录
     async fetchChatMessages() {
       try {
-        this.loading = true
-        
+        this.loading = true;
+
         // 验证必填参数
         if (!this.myInfo.id || !this.chatInfo.userId) {
-          console.error('缺少必要参数:', { myInfoId: this.myInfo.id, userId: this.chatInfo.userId })
-          nativeUtils.showToast('无法获取聊天记录，缺少必要参数', 1500)
+          console.error('缺少必要参数:', {
+            myInfoId: this.myInfo.id,
+            userId: this.chatInfo.userId
+          });
+          nativeUtils.showToast('无法获取聊天记录，缺少必要参数', 1500);
           // 清空消息列表，不再使用模拟数据
-          this.messageGroups = []
-          return
+          this.messageGroups = [];
+          return;
         }
-        
+
         // 确保参数类型正确，转换为Number类型
-        const userId1 = Number(this.myInfo.id)
-        const userId2 = Number(this.chatInfo.userId)
-        
+        const userId1 = Number(this.myInfo.id);
+        const userId2 = Number(this.chatInfo.userId);
+
         // 调用真实API获取聊天记录
-        const response = await get(`/message/chat`, {
+        const response = await get('/message/chat', {
           userId1: userId1,
           userId2: userId2
-        })
-        
+        });
+
         if (response.code === 0 && response.data) {
-          this.processMessages(response.data)
+          this.processMessages(response.data);
         } else {
-          nativeUtils.showToast('获取聊天记录失败', 1500)
+          nativeUtils.showToast('获取聊天记录失败', 1500);
           // 清空消息列表，不再使用模拟数据
-          this.messageGroups = []
+          this.messageGroups = [];
         }
       } catch (error) {
-        console.error('获取聊天记录失败:', error)
-        nativeUtils.showToast('获取聊天记录失败', 1500)
+        console.error('获取聊天记录失败:', error);
+        nativeUtils.showToast('获取聊天记录失败', 1500);
         // 清空消息列表，不再使用模拟数据
-        this.messageGroups = []
+        this.messageGroups = [];
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
-    
+
     // 滚动到底部
     scrollToBottom() {
       setTimeout(() => {
-        const chatContent = document.querySelector('.chat-content')
+        const chatContent = document.querySelector('.chat-content');
         if (chatContent) {
-          chatContent.scrollTop = chatContent.scrollHeight
+          chatContent.scrollTop = chatContent.scrollHeight;
         }
-      }, 100)
+      }, 100);
     },
-    
+
     // 处理聊天记录，按日期分组
     processMessages(messages) {
       if (!messages || messages.length === 0) {
         // 没有消息时显示空列表，不再使用模拟数据
-        this.messageGroups = []
-        return
+        this.messageGroups = [];
+        return;
       }
-      
+
       // 按日期分组
       const groupedMessages = messages.reduce((groups, message) => {
-        const date = new Date(message.createdAt).toLocaleDateString('zh-CN')
+        const date = new Date(message.createdAt).toLocaleDateString('zh-CN');
         if (!groups[date]) {
-          groups[date] = []
+          groups[date] = [];
         }
-        
+
         const messageItem = {
           id: message.id,
           content: message.content,
-          time: new Date(message.createdAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+          time: new Date(message.createdAt).toLocaleTimeString('zh-CN', {
+            hour: '2-digit',
+            minute: '2-digit'
+          }),
           isMine: message.sender.id === this.myInfo.id
-        }
-        
-        groups[date].push(messageItem)
-        return groups
-      }, {})
-      
+        };
+
+        groups[date].push(messageItem);
+        return groups;
+      }, {});
+
       // 转换为数组格式
-      this.messageGroups = Object.entries(groupedMessages).map(([date, messages]) => ({
-        date,
-        messages
-      }))
-      
+      this.messageGroups = Object.entries(groupedMessages).map(
+        ([date, messages]) => ({
+          date,
+          messages
+        })
+      );
+
       // 滚动到底部，显示最新消息
-      this.scrollToBottom()
+      this.scrollToBottom();
     },
-    
+
     // 返回上一页
     goBack() {
-      window.history.back()
+      window.history.back();
     },
-    
+
     // 显示更多选项
     showMore() {
-      nativeUtils.showToast('更多功能开发中', 1500)
+      nativeUtils.showToast('更多功能开发中', 1500);
     },
-    
+
     // 跳转到商品详情
     goToProductDetail() {
-      window.location.href = `/detail.html?id=${this.chatInfo.product.id}`
+      window.location.href = `/detail.html?id=${this.chatInfo.product.id}`;
     },
-    
+
     // 发送消息
     sendMessage() {
-      if (!this.inputMessage.trim()) return
-      
+      if (!this.inputMessage.trim()) return;
+
       // 验证必填参数
       if (!this.myInfo.id || !this.chatInfo.userId) {
-        console.error('缺少必要参数:', { myInfoId: this.myInfo.id, userId: this.chatInfo.userId })
-        nativeUtils.showToast('无法发送消息，缺少必要参数', 1500)
-        return
+        console.error('缺少必要参数:', {
+          myInfoId: this.myInfo.id,
+          userId: this.chatInfo.userId
+        });
+        nativeUtils.showToast('无法发送消息，缺少必要参数', 1500);
+        return;
       }
-      
+
       try {
         // 确保参数类型正确，转换为Number类型
-        const senderId = Number(this.myInfo.id)
-        const receiverId = Number(this.chatInfo.userId)
-        const messageContent = this.inputMessage.trim()
-        
+        const senderId = Number(this.myInfo.id);
+        const receiverId = Number(this.chatInfo.userId);
+        const messageContent = this.inputMessage.trim();
+
         const messageRequest = {
           senderId: senderId,
           receiverId: receiverId,
           content: messageContent
-        }
-        
+        };
+
         if (this.webSocketConnected && this.stompClient) {
           // 使用WebSocket发送消息
-          this.stompClient.send('/app/message/send', {}, JSON.stringify(messageRequest))
+          this.stompClient.send(
+            '/app/message/send',
+            {},
+            JSON.stringify(messageRequest)
+          );
           // 清空输入框
-          this.inputMessage = ''
+          this.inputMessage = '';
         } else {
           // 降级使用HTTP POST请求
-          this.sendHttpRequest(messageRequest)
+          this.sendHttpRequest(messageRequest);
         }
       } catch (error) {
-        console.error('发送消息失败:', error)
-        nativeUtils.showToast('发送消息失败', 1500)
+        console.error('发送消息失败:', error);
+        nativeUtils.showToast('发送消息失败', 1500);
       }
     },
-    
+
     // 使用HTTP请求发送消息（降级方案）
     async sendHttpRequest(messageRequest) {
       try {
-        const response = await post('/message', messageRequest)
-        
+        const response = await post('/message', messageRequest);
+
         if (response.code === 0) {
           // 清空输入框
-          this.inputMessage = ''
+          this.inputMessage = '';
           // 刷新聊天记录，确保获取到最新消息（包括对方可能发送的）
-          await this.fetchChatMessages()
+          await this.fetchChatMessages();
         } else {
-          nativeUtils.showToast('发送消息失败', 1500)
+          nativeUtils.showToast('发送消息失败', 1500);
         }
       } catch (error) {
-        console.error('发送HTTP请求失败:', error)
-        nativeUtils.showToast('发送消息失败', 1500)
+        console.error('发送HTTP请求失败:', error);
+        nativeUtils.showToast('发送消息失败', 1500);
       }
-    },
+    }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -452,7 +503,8 @@ export default {
   z-index: 100;
 }
 
-.back-icon, .more-icon {
+.back-icon,
+.more-icon {
   font-size: 20px;
   color: #333;
   cursor: pointer;

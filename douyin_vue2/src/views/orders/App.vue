@@ -20,7 +20,12 @@
 
     <!-- 订单列表 -->
     <div class="orders-list">
-      <div class="order-item" v-for="order in orders" :key="order.id" @click="goToOrderDetail(order.id)">
+      <div
+        class="order-item"
+        v-for="order in orders"
+        :key="order.id"
+        @click="goToOrderDetail(order.id)"
+      >
         <!-- 订单头部 -->
         <div class="order-header">
           <div class="order-status">{{ order.statusText }}</div>
@@ -31,12 +36,14 @@
         <div class="order-products">
           <div class="product-item">
             <div class="product-image">
-              <img :src="order.product.image" :alt="order.product.title">
+              <img :src="order.product.image" :alt="order.product.title" />
             </div>
             <div class="product-info">
               <div class="product-title">{{ order.product.title }}</div>
               <div class="product-specs">{{ order.product.specs }}</div>
-              <div class="product-price">¥{{ order.product.price }} × {{ order.product.quantity }}</div>
+              <div class="product-price">
+                ¥{{ order.product.price }} × {{ order.product.quantity }}
+              </div>
             </div>
           </div>
         </div>
@@ -49,11 +56,41 @@
 
         <!-- 订单操作 -->
         <div class="order-actions">
-          <button class="action-btn secondary" v-if="order.status === 'pending_payment'" @click.stop="cancelOrder(order.id)">取消订单</button>
-          <button class="action-btn primary" v-if="order.status === 'pending_payment'" @click.stop="payOrder(order.id)">立即付款</button>
-          <button class="action-btn primary" v-if="order.status === 'pending_receipt'" @click.stop="confirmReceipt(order.id)">确认收货</button>
-          <button class="action-btn secondary" v-if="order.status === 'completed'" @click.stop="viewLogistics(order.id)">查看物流</button>
-          <button class="action-btn primary" v-if="order.status === 'completed'" @click.stop="leaveComment(order.id)">评价</button>
+          <button
+            class="action-btn secondary"
+            v-if="order.status === 'pending_payment'"
+            @click.stop="cancelOrder(order.id)"
+          >
+            取消订单
+          </button>
+          <button
+            class="action-btn primary"
+            v-if="order.status === 'pending_payment'"
+            @click.stop="payOrder(order.id)"
+          >
+            立即付款
+          </button>
+          <button
+            class="action-btn primary"
+            v-if="order.status === 'pending_receipt'"
+            @click.stop="confirmReceipt(order.id)"
+          >
+            确认收货
+          </button>
+          <button
+            class="action-btn secondary"
+            v-if="order.status === 'completed'"
+            @click.stop="viewLogistics(order.id)"
+          >
+            查看物流
+          </button>
+          <button
+            class="action-btn primary"
+            v-if="order.status === 'completed'"
+            @click.stop="leaveComment(order.id)"
+          >
+            评价
+          </button>
         </div>
       </div>
     </div>
@@ -61,9 +98,9 @@
 </template>
 
 <script>
-import nativeUtils from '../../utils/nativeUtils'
-import routerUtils from '../../utils/routerUtils'
-import { get, put } from '../../utils/apiUtils'
+import nativeUtils from '../../utils/nativeUtils';
+import routerUtils from '../../utils/routerUtils';
+import { get, put } from '../../utils/apiUtils';
 
 export default {
   name: 'OrdersPage',
@@ -72,83 +109,89 @@ export default {
       activeTab: 'all',
       orders: [],
       originalOrders: [] // 用于筛选的原始数据
-    }
+    };
   },
   mounted() {
     // 设置页面标题
-    nativeUtils.setTitleBar('我的订单')
+    nativeUtils.setTitleBar('我的订单');
     // 加载订单数据
-    this.loadOrders()
+    this.loadOrders();
   },
   methods: {
     // 从API或localStorage加载订单数据
     loadOrders() {
       try {
-        nativeUtils.showLoading('加载中...')
-        
+        nativeUtils.showLoading('加载中...');
+
         // 获取当前用户信息
-        const userInfo = localStorage.getItem('user')
+        const userInfo = localStorage.getItem('user');
         if (userInfo) {
-          const user = JSON.parse(userInfo)
-          const userId = user.id
-          
+          const user = JSON.parse(userInfo);
+          const userId = user.id;
+
           // 尝试从API获取数据
           get(`/order/user/${userId}`)
-            .then(response => {
+            .then((response) => {
               if (response.code === 0) {
                 // API请求成功
-                this.originalOrders = response.data.map(order => ({
+                this.originalOrders = response.data.map((order) => ({
                   ...order,
                   statusText: this.getStatusText(order.status),
                   product: {
                     ...order.product,
-                    image: order.product.images && order.product.images.length > 0 ? order.product.images[0] : 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
+                    image:
+                      order.product.images && order.product.images.length > 0
+                        ? order.product.images[0]
+                        : 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
                   }
-                }))
+                }));
                 // 保存到localStorage
-                localStorage.setItem('orders', JSON.stringify(this.originalOrders))
-                this.applyFilter()
+                localStorage.setItem(
+                  'orders',
+                  JSON.stringify(this.originalOrders)
+                );
+                this.applyFilter();
               } else {
                 // API请求失败，使用localStorage数据
-                this.loadFromLocalStorage()
+                this.loadFromLocalStorage();
               }
-              nativeUtils.hideLoading()
+              nativeUtils.hideLoading();
             })
-            .catch(error => {
-              console.error('加载订单失败:', error)
+            .catch((error) => {
+              console.error('加载订单失败:', error);
               // API请求失败，使用localStorage数据
-              this.loadFromLocalStorage()
-              nativeUtils.hideLoading()
-            })
+              this.loadFromLocalStorage();
+              nativeUtils.hideLoading();
+            });
         } else {
           // 用户未登录，跳转登录页
-          nativeUtils.hideLoading()
-          nativeUtils.showToast('请先登录', 1500)
+          nativeUtils.hideLoading();
+          nativeUtils.showToast('请先登录', 1500);
           setTimeout(() => {
-            routerUtils.navigateTo('/login.html')
-          }, 1500)
+            routerUtils.navigateTo('/login.html');
+          }, 1500);
         }
       } catch (error) {
-        console.error('加载订单失败:', error)
-        this.loadFromLocalStorage()
-        nativeUtils.hideLoading()
+        console.error('加载订单失败:', error);
+        this.loadFromLocalStorage();
+        nativeUtils.hideLoading();
       }
     },
-    
+
     // 从localStorage加载订单数据
     loadFromLocalStorage() {
       try {
-        const ordersStr = localStorage.getItem('orders')
+        const ordersStr = localStorage.getItem('orders');
         if (ordersStr) {
-          this.originalOrders = JSON.parse(ordersStr)
-          this.applyFilter()
-          nativeUtils.showToast('使用本地缓存数据', 1500)
-          return
+          this.originalOrders = JSON.parse(ordersStr);
+          this.applyFilter();
+          nativeUtils.showToast('使用本地缓存数据', 1500);
+          return;
         }
       } catch (error) {
-        console.error('解析本地数据失败:', error)
+        console.error('解析本地数据失败:', error);
       }
-      
+
       // 使用默认mock数据
       this.originalOrders = [
         {
@@ -163,7 +206,8 @@ export default {
             specs: '颜色: 远峰蓝 | 内存: 256GB',
             price: 5999,
             quantity: 1,
-            image: 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
+            image:
+              'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
           }
         },
         {
@@ -178,7 +222,8 @@ export default {
             specs: '版本: 国行',
             price: 1899,
             quantity: 1,
-            image: 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
+            image:
+              'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
           }
         },
         {
@@ -193,7 +238,8 @@ export default {
             specs: '颜色: 黑色 | 内存: 12GB+256GB',
             price: 3999,
             quantity: 1,
-            image: 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
+            image:
+              'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
           }
         },
         {
@@ -208,162 +254,179 @@ export default {
             specs: '颜色: 黑色',
             price: 2599,
             quantity: 1,
-            image: 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
+            image:
+              'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200'
           }
         }
-      ]
-      
+      ];
+
       // 保存到localStorage
       try {
-        localStorage.setItem('orders', JSON.stringify(this.originalOrders))
+        localStorage.setItem('orders', JSON.stringify(this.originalOrders));
       } catch (error) {
-        console.error('保存订单数据失败:', error)
+        console.error('保存订单数据失败:', error);
       }
-      
-      this.applyFilter()
-      nativeUtils.showToast('使用默认数据', 1500)
+
+      this.applyFilter();
+      nativeUtils.showToast('使用默认数据', 1500);
     },
-    
+
     // 应用筛选条件
     applyFilter() {
-      let filtered = [...this.originalOrders]
-      
+      let filtered = [...this.originalOrders];
+
       switch (this.activeTab) {
         case 'pending_payment':
-          filtered = filtered.filter(order => order.status === 'pending_payment')
-          break
+          filtered = filtered.filter(
+          (order) => order.status === 'pending_payment'
+        );
+          break;
         case 'pending_shipping':
-          filtered = filtered.filter(order => order.status === 'pending_shipping')
-          break
+          filtered = filtered.filter(
+          (order) => order.status === 'pending_shipping'
+        );
+          break;
         case 'pending_receipt':
-          filtered = filtered.filter(order => order.status === 'pending_receipt')
-          break
+          filtered = filtered.filter(
+          (order) => order.status === 'pending_receipt'
+        );
+          break;
         case 'completed':
-          filtered = filtered.filter(order => order.status === 'completed')
-          break
+          filtered = filtered.filter((order) => order.status === 'completed');
+          break;
         case 'cancelled':
-          filtered = filtered.filter(order => order.status === 'cancelled')
-          break
+          filtered = filtered.filter((order) => order.status === 'cancelled');
+          break;
         default:
           // 全部
-          break
+          break;
       }
-      
-      this.orders = filtered
+
+      this.orders = filtered;
     },
-    
+
     // 返回上一页
     goBack() {
-      routerUtils.navigateBack(1)
+      routerUtils.navigateBack(1);
     },
-    
+
     // 获取订单状态文本
     getStatusText(status) {
       const statusMap = {
-        'pending_payment': '待付款',
-        'pending_shipping': '待发货',
-        'pending_receipt': '待收货',
-        'completed': '已完成',
-        'cancelled': '已取消'
-      }
-      return statusMap[status] || '未知状态'
+        pending_payment: '待付款',
+        pending_shipping: '待发货',
+        pending_receipt: '待收货',
+        completed: '已完成',
+        cancelled: '已取消'
+      };
+      return statusMap[status] || '未知状态';
     },
-    
+
     // 切换筛选标签
     switchTab(tab) {
-      this.activeTab = tab
-      this.applyFilter()
+      this.activeTab = tab;
+      this.applyFilter();
     },
-    
+
     // 跳转到订单详情页
     goToOrderDetail(orderId) {
-      routerUtils.navigateTo(`/orderDetail.html?id=${orderId}`)
+      routerUtils.navigateTo(`/orderDetail.html?id=${orderId}`);
     },
-    
+
     // 取消订单
     cancelOrder(orderId) {
       if (confirm('确定要取消这个订单吗？')) {
         // 调用API取消订单
-        nativeUtils.showLoading('取消中...')
+        nativeUtils.showLoading('取消中...');
         put(`/order/${orderId}/status?status=cancelled`)
-          .then(response => {
+          .then((response) => {
             if (response.code === 0) {
               // API请求成功
               // 更新本地数据
-              const order = this.originalOrders.find(item => item.id === orderId)
+              const order = this.originalOrders.find(
+                (item) => item.id === orderId
+              );
               if (order) {
-                order.status = 'cancelled'
-                order.statusText = this.getStatusText('cancelled')
+                order.status = 'cancelled';
+                order.statusText = this.getStatusText('cancelled');
                 // 保存到localStorage
-                localStorage.setItem('orders', JSON.stringify(this.originalOrders))
+                localStorage.setItem(
+                  'orders',
+                  JSON.stringify(this.originalOrders)
+                );
                 // 重新应用筛选
-                this.applyFilter()
+                this.applyFilter();
               }
-              nativeUtils.hideLoading()
-              nativeUtils.showToast('订单已取消', 1500)
+              nativeUtils.hideLoading();
+              nativeUtils.showToast('订单已取消', 1500);
             } else {
-              nativeUtils.hideLoading()
-              nativeUtils.showToast(response.message || '取消失败', 1500)
+              nativeUtils.hideLoading();
+              nativeUtils.showToast(response.message || '取消失败', 1500);
             }
           })
-          .catch(error => {
-            console.error('取消订单失败:', error)
-            nativeUtils.hideLoading()
-            nativeUtils.showToast('取消失败，请重试', 1500)
-          })
+          .catch((error) => {
+            console.error('取消订单失败:', error);
+            nativeUtils.hideLoading();
+            nativeUtils.showToast('取消失败，请重试', 1500);
+          });
       }
     },
-    
+
     // 立即付款
     payOrder() {
-      nativeUtils.showToast('立即付款功能开发中', 1500)
+      nativeUtils.showToast('立即付款功能开发中', 1500);
     },
-    
+
     // 确认收货
     confirmReceipt(orderId) {
       if (confirm('确定要确认收货吗？')) {
         // 调用API确认收货
-        nativeUtils.showLoading('确认中...')
+        nativeUtils.showLoading('确认中...');
         put(`/order/${orderId}/status?status=completed`)
-          .then(response => {
+          .then((response) => {
             if (response.code === 0) {
               // API请求成功
               // 更新本地数据
-              const order = this.originalOrders.find(item => item.id === orderId)
+              const order = this.originalOrders.find(
+                (item) => item.id === orderId
+              );
               if (order) {
-                order.status = 'completed'
-                order.statusText = this.getStatusText('completed')
+                order.status = 'completed';
+                order.statusText = this.getStatusText('completed');
                 // 保存到localStorage
-                localStorage.setItem('orders', JSON.stringify(this.originalOrders))
+                localStorage.setItem(
+                  'orders',
+                  JSON.stringify(this.originalOrders)
+                );
                 // 重新应用筛选
-                this.applyFilter()
+                this.applyFilter();
               }
-              nativeUtils.hideLoading()
-              nativeUtils.showToast('已确认收货', 1500)
+              nativeUtils.hideLoading();
+              nativeUtils.showToast('已确认收货', 1500);
             } else {
-              nativeUtils.hideLoading()
-              nativeUtils.showToast(response.message || '确认失败', 1500)
+              nativeUtils.hideLoading();
+              nativeUtils.showToast(response.message || '确认失败', 1500);
             }
           })
-          .catch(error => {
-            console.error('确认收货失败:', error)
-            nativeUtils.hideLoading()
-            nativeUtils.showToast('确认失败，请重试', 1500)
-          })
+          .catch((error) => {
+            console.error('确认收货失败:', error);
+            nativeUtils.hideLoading();
+            nativeUtils.showToast('确认失败，请重试', 1500);
+          });
       }
     },
-    
+
     // 查看物流
     viewLogistics() {
-      nativeUtils.showToast('查看物流功能开发中', 1500)
+      nativeUtils.showToast('查看物流功能开发中', 1500);
     },
-    
+
     // 评价
     leaveComment() {
-      nativeUtils.showToast('评价功能开发中', 1500)
+      nativeUtils.showToast('评价功能开发中', 1500);
     }
   }
-}
+};
 </script>
 
 <style scoped>

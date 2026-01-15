@@ -39,7 +39,8 @@ export async function checkForUpdates() {
     const localVersion = getLocalVersion();
 
     // 比较版本
-    const isNewVersion = compareVersions(serverVersionInfo.version, localVersion) > 0;
+    const isNewVersion =
+      compareVersions(serverVersionInfo.version, localVersion) > 0;
 
     if (isNewVersion) {
       console.log('发现新版本:', serverVersionInfo.version);
@@ -77,7 +78,7 @@ export function initVersionCheck() {
   //   window.addEventListener('load', async () => {
   //     await checkForUpdates();
   //   });
-  // 
+  //
   //   // 定期检查版本（可选）
   //   setInterval(() => {
   //     checkForUpdates();

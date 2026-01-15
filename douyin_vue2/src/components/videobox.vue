@@ -32,11 +32,14 @@
         <videoarticle-vue :video-data="videoboxdata[index]"></videoarticle-vue>
       </div>
 
-      <!-- 视频播放 -->
+      <!-- 媒体播放：根据URL扩展名判断显示视频或图片 -->
       <video
+        v-if="
+          isVideoUrl(videoboxdata[index].videoUrl || videoboxdata[index].url)
+        "
         ref="videos"
         class="videoone"
-        :src="videoboxdata[index].videoUrl"
+        :src="videoboxdata[index].videoUrl || videoboxdata[index].url"
         preload="true"
         loop
         x5-video-player-type="h5-page"
@@ -47,6 +50,14 @@
       >
         <p>您的浏览器不支持 video 标签。</p>
       </video>
+      <!-- 图片显示 -->
+      <img
+        v-else
+        class="videoone"
+        :src="videoboxdata[index].videoUrl || videoboxdata[index].url"
+        alt="图片内容"
+        @click="handleImageClick(index)"
+      />
     </div>
   </div>
 </template>
@@ -172,18 +183,75 @@ export default {
       }, 300);
     },
 
+    // 根据URL判断文件类型
+    isVideoUrl(url) {
+      if (!url) return true; // 默认视为视频
+      const videoExtensions = [
+        '.mp4',
+        '.mov',
+        '.avi',
+        '.wmv',
+        '.flv',
+        '.mkv',
+        '.webm'
+      ];
+      const imageExtensions = [
+        '.jpg',
+        '.jpeg',
+        '.png',
+        '.gif',
+        '.webp',
+        '.bmp'
+      ];
+
+      // 转换为小写进行比较
+      const lowerUrl = url.toLowerCase();
+
+      // 检查是否包含视频扩展名
+      const isVideo = videoExtensions.some((ext) => lowerUrl.endsWith(ext));
+      // 检查是否包含图片扩展名
+      const isImage = imageExtensions.some((ext) => lowerUrl.endsWith(ext));
+
+      // 如果既不是视频也不是图片，默认视为视频
+      return isVideo || !isImage;
+    },
+
+    // 图片点击事件处理
+    handleImageClick(index) {
+      console.log('图片点击', index, this.videoboxdata[index]);
+      // 可以添加图片放大查看等功能
+    },
+
     updateVideoPlayback() {
       const containerHeight = this.$el.clientHeight;
       const threshold = 0.9;
 
-      // 确保 $refs.videos 是数组
+      // 确保 $refs.videos 是数组且存在
       if (!this.$refs.videos) return;
       const videos = Array.isArray(this.$refs.videos)
         ? this.$refs.videos
         : [this.$refs.videos];
 
       videos.forEach((video, index) => {
-        if (!video || !this.boxes[index]) return;
+        // 确保视频元素有效
+        if (
+          !video ||
+          !video.play ||
+          !this.boxes[index] ||
+          !this.videoboxdata[index]
+        ) {
+          return;
+        }
+
+        // 根据URL判断是否为视频，视频需要自动播放控制，图片不需要
+        const mediaUrl =
+          this.videoboxdata[index].videoUrl || this.videoboxdata[index].url;
+        const isVideo = this.isVideoUrl(mediaUrl);
+
+        // 如果不是视频，不需要播放控制
+        if (!isVideo) {
+          return;
+        }
 
         const box = this.boxes[index];
         const boxTop = box.top;
@@ -194,7 +262,10 @@ export default {
         const visibleRatio = visibleHeight / (this.boxHeight * 0.1);
 
         if (visibleRatio >= threshold) {
-          video.play();
+          // 添加错误处理，避免播放失败导致的控制台错误
+          video.play().catch((error) => {
+            console.log('视频播放失败:', error);
+          });
         } else {
           video.pause();
         }
@@ -240,7 +311,7 @@ export default {
       this.updateBoxesPosition();
     },
 
-    // 修改 drag 方法，添加速度检测
+    // 修改 drag 方法，添加速度检测和性能优化
     drag(event) {
       if (this.isDragging) {
         const startDragTime = this.dragStartTime || Date.now();
@@ -267,7 +338,8 @@ export default {
 
         this.currentY = newY;
         this.updateBoxesPosition();
-        this.updateVideoPlayback();
+        // 优化：只在拖动结束时调用updateVideoPlayback，减少性能消耗
+        // this.updateVideoPlayback();
         this.debounceLoadVideos();
       }
     },

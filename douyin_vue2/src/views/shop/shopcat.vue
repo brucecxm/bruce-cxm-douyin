@@ -66,7 +66,7 @@ export default {
         const res = await request.get('/shop/shoppingCart/list');
         if (res.code === 200 && res.data) {
           // 处理购物车数据，确保字段名匹配
-          this.cartItems = res.data.map(item => ({
+          this.cartItems = res.data.map((item) => ({
             id: item.id,
             image: item.image || 'https://img.yzcdn.cn/vant/apple-1.jpg',
             title: item.name || '商品名称',
@@ -83,7 +83,7 @@ export default {
         this.$toast('加载购物车失败，请重试');
       }
     },
-    
+
     // 增加商品数量
     async increaseQty(item) {
       try {
@@ -97,11 +97,11 @@ export default {
         this.$toast('操作失败，请重试');
       }
     },
-    
+
     // 减少商品数量
     async decreaseQty(item) {
       if (item.number <= 1) return;
-      
+
       try {
         item.number--;
         item.quantity = item.number; // 同步更新显示字段
@@ -113,16 +113,16 @@ export default {
         this.$toast('操作失败，请重试');
       }
     },
-    
+
     // 手动输入数量
     async onQtyInput(item) {
       if (item.quantity < 1 || isNaN(item.quantity)) {
         item.quantity = 1;
       }
-      
+
       // 转换为整数
       item.quantity = parseInt(item.quantity);
-      
+
       try {
         item.number = item.quantity;
         await this.updateCartItem(item);
@@ -133,7 +133,7 @@ export default {
         this.$toast('操作失败，请重试');
       }
     },
-    
+
     // 更新购物车商品
     async updateCartItem(item) {
       try {
@@ -141,9 +141,12 @@ export default {
           id: item.id,
           number: item.number
         };
-        
-        const res = await request.post('/shop/shoppingCart/updateNumber', updateData);
-        
+
+        const res = await request.post(
+          '/shop/shoppingCart/updateNumber',
+          updateData
+        );
+
         if (res.code !== 200) {
           throw new Error('更新失败');
         }
@@ -152,17 +155,17 @@ export default {
         throw error;
       }
     },
-    
+
     // 删除购物车商品
     async removeItem(id) {
       try {
         // 显示确认对话框
-        if (!await this.$confirm('确定要从购物车中删除该商品吗？')) {
+        if (!(await this.$confirm('确定要从购物车中删除该商品吗？'))) {
           return;
         }
-        
+
         const res = await request.delete(`/shop/shoppingCart/delete/${id}`);
-        
+
         if (res.code === 200) {
           this.cartItems = this.cartItems.filter((item) => item.id !== id);
           this.$toast(res.msg || '删除成功');
@@ -174,23 +177,23 @@ export default {
         this.$toast(error.message || '删除失败，请重试');
       }
     },
-    
+
     // 去结算
     checkout() {
       if (this.cartItems.length === 0) {
         this.$toast('购物车为空，请先添加商品');
         return;
       }
-      
+
       // 构建订单数据
       const orderData = {
         cartItems: this.cartItems,
         totalPrice: this.totalPrice
       };
-      
+
       // 将订单数据存储到localStorage，方便订单页面获取
       localStorage.setItem('orderData', JSON.stringify(orderData));
-      
+
       // 跳转到订单页面，确保路径与路由配置一致
       this.$router.push('/shop/order');
     }

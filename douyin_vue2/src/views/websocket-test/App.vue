@@ -5,14 +5,14 @@
 </template>
 
 <script>
-import WebSocketTest from './websocket-test.vue'
+import WebSocketTest from './websocket-test.vue';
 
 export default {
   name: 'App',
   components: {
     WebSocketTest
   }
-}
+};
 </script>
 
 <style>

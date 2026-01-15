@@ -20,10 +20,17 @@
 
     <!-- 聊天消息列表 -->
     <div class="chat-list" v-if="activeTab === 'chat'">
-      <div class="message-item" v-for="message in chatMessages" :key="message.id" @click="goToChat(message.id, message.sender.id)">
+      <div
+        class="message-item"
+        v-for="message in chatMessages"
+        :key="message.id"
+        @click="goToChat(message.id, message.sender.id)"
+      >
         <div class="sender-avatar">
-          <img :src="message.sender.avatar" :alt="message.sender.nickname">
-          <div class="unread-badge" v-if="message.unreadCount > 0">{{ message.unreadCount }}</div>
+          <img :src="message.sender.avatar" :alt="message.sender.nickname" />
+          <div class="unread-badge" v-if="message.unreadCount > 0">
+            {{ message.unreadCount }}
+          </div>
         </div>
         <div class="message-content">
           <div class="message-header">
@@ -49,7 +56,11 @@
 
     <!-- 系统消息列表 -->
     <div class="system-list" v-else-if="activeTab === 'system'">
-      <div class="system-item" v-for="system in systemMessages" :key="system.id">
+      <div
+        class="system-item"
+        v-for="system in systemMessages"
+        :key="system.id"
+      >
         <div class="system-icon">📢</div>
         <div class="system-content">
           <div class="system-title">{{ system.title }}</div>
@@ -62,9 +73,9 @@
 </template>
 
 <script>
-import nativeUtils from '../../utils/nativeUtils'
-import routerUtils from '../../utils/routerUtils'
-import { get } from '../../utils/apiUtils'
+import nativeUtils from '../../utils/nativeUtils';
+import routerUtils from '../../utils/routerUtils';
+import { get } from '../../utils/apiUtils';
 
 export default {
   name: 'MessagesPage',
@@ -76,135 +87,135 @@ export default {
       systemMessages: [],
       userId: parseInt(localStorage.getItem('userId')) || 25,
       pollingTimer: null // 轮询定时器
-    }
+    };
   },
   mounted() {
     // 设置页面标题
-    nativeUtils.setTitleBar('消息')
+    nativeUtils.setTitleBar('消息');
     // 加载消息数据
-    this.loadMessages()
+    this.loadMessages();
     // 启动轮询获取新消息（每5秒一次）
-    this.startPolling()
+    this.startPolling();
   },
   beforeUnmount() {
     // 清除轮询定时器
-    this.stopPolling()
+    this.stopPolling();
   },
   methods: {
     // 从API加载消息数据
     async loadMessages() {
       try {
         // 加载聊天消息
-        await this.loadChatMessages()
-        
+        await this.loadChatMessages();
+
         // 加载通知消息
-        await this.loadNotices()
-        
+        await this.loadNotices();
+
         // 加载系统消息
-        await this.loadSystemMessages()
+        await this.loadSystemMessages();
       } catch (error) {
-        console.error('加载消息数据失败:', error)
+        console.error('加载消息数据失败:', error);
         // 初始化空数据
-        this.chatMessages = []
-        this.notices = []
-        this.systemMessages = []
+        this.chatMessages = [];
+        this.notices = [];
+        this.systemMessages = [];
       }
     },
-    
+
     // 加载聊天消息
     async loadChatMessages() {
       try {
         // 调用API获取聊天消息列表
-        const response = await get('/message/user/' + this.userId)
-        
+        const response = await get('/message/user/' + this.userId);
+
         if (response.code === 0 && response.data) {
-          this.chatMessages = response.data
+          this.chatMessages = response.data;
         } else {
           // 如果API调用失败，使用空列表
-          this.chatMessages = []
+          this.chatMessages = [];
         }
       } catch (error) {
-        console.error('加载聊天消息失败:', error)
+        console.error('加载聊天消息失败:', error);
         // 使用空列表
-        this.chatMessages = []
+        this.chatMessages = [];
       }
     },
-    
+
     // 加载通知消息
     async loadNotices() {
       try {
         // 调用API获取通知消息列表
-        const response = await get('/notice/user/' + this.userId)
-        
+        const response = await get('/notice/user/' + this.userId);
+
         if (response.code === 0 && response.data) {
-          this.notices = response.data
+          this.notices = response.data;
         } else {
           // 如果API调用失败，使用空列表
-          this.notices = []
+          this.notices = [];
         }
       } catch (error) {
-        console.error('加载通知消息失败:', error)
+        console.error('加载通知消息失败:', error);
         // 使用空列表
-        this.notices = []
+        this.notices = [];
       }
     },
-    
+
     // 加载系统消息
     async loadSystemMessages() {
       try {
         // 调用API获取系统消息列表
-        const response = await get('/system-message')
-        
+        const response = await get('/system-message');
+
         if (response.code === 0 && response.data) {
-          this.systemMessages = response.data
+          this.systemMessages = response.data;
         } else {
           // 如果API调用失败，使用空列表
-          this.systemMessages = []
+          this.systemMessages = [];
         }
       } catch (error) {
-        console.error('加载系统消息失败:', error)
+        console.error('加载系统消息失败:', error);
         // 使用空列表
-        this.systemMessages = []
+        this.systemMessages = [];
       }
     },
-    
+
     // 启动轮询获取新消息
     startPolling() {
       this.pollingTimer = setInterval(() => {
-        this.loadChatMessages()
-      }, 5000) // 每5秒轮询一次
+        this.loadChatMessages();
+      }, 5000); // 每5秒轮询一次
     },
-    
+
     // 停止轮询
     stopPolling() {
       if (this.pollingTimer) {
-        clearInterval(this.pollingTimer)
-        this.pollingTimer = null
+        clearInterval(this.pollingTimer);
+        this.pollingTimer = null;
       }
     },
-    
+
     // 返回上一页
     goBack() {
-      routerUtils.navigateBack(1)
+      routerUtils.navigateBack(1);
     },
-    
+
     // 切换消息标签
     switchTab(tab) {
-      this.activeTab = tab
+      this.activeTab = tab;
     },
-    
+
     // 跳转到聊天页面
     async goToChat(chatId, userId) {
       // 标记该聊天消息为已读
-      const message = this.chatMessages.find(item => item.id === chatId)
+      const message = this.chatMessages.find((item) => item.id === chatId);
       if (message) {
-        message.unreadCount = 0
+        message.unreadCount = 0;
       }
       // 跳转到聊天页面
-      routerUtils.navigateTo(`/chat.html?chatId=${chatId}&userId=${userId}`)
+      routerUtils.navigateTo(`/chat.html?chatId=${chatId}&userId=${userId}`);
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -226,7 +237,8 @@ export default {
   z-index: 100;
 }
 
-.back-icon, .more-icon {
+.back-icon,
+.more-icon {
   font-size: 20px;
   color: #333;
   cursor: pointer;
@@ -273,11 +285,15 @@ export default {
 }
 
 /* 聊天消息列表 */
-.chat-list, .notice-list, .system-list {
+.chat-list,
+.notice-list,
+.system-list {
   padding: 10px;
 }
 
-.message-item, .notice-item, .system-item {
+.message-item,
+.notice-item,
+.system-item {
   background-color: white;
   border-radius: 10px;
   margin-bottom: 10px;

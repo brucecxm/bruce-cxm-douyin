@@ -28,7 +28,7 @@ const actions = {
   async setTestDataAsync({ commit }, payload) {
     try {
       // 模拟异步操作
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       commit('SET_TEST_DATA', payload);
       return true;
     } catch (error) {
@@ -38,20 +38,21 @@ const actions = {
   },
   // 异步删除数据
   async removeTestDataAsync({ commit }, key) {
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 300));
     commit('REMOVE_TEST_DATA', key);
   }
 };
 
 const getters = {
   // 获取指定key的数据
-  getTestData: state => key => state.data[key],
+  getTestData: (state) => (key) => state.data[key],
   // 获取所有测试数据
-  getAllTestData: state => state.data,
+  getAllTestData: (state) => state.data,
   // 判断key是否存在
-  hasTestData: state => key => Object.prototype.hasOwnProperty.call(state.data, key),
+  hasTestData: (state) => (key) =>
+    Object.prototype.hasOwnProperty.call(state.data, key),
   // 获取数据总数
-  getTestDataCount: state => Object.keys(state.data).length
+  getTestDataCount: (state) => Object.keys(state.data).length
 };
 
 export default {

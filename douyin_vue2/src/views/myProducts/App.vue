@@ -23,8 +23,10 @@
     <div class="products-list">
       <div class="product-item" v-for="product in products" :key="product.id">
         <div class="product-image" @click="goToDetail(product.id)">
-          <img :src="product.image" :alt="product.title">
-          <div class="product-status-tag" :class="product.status">{{ product.statusText }}</div>
+          <img :src="product.image" :alt="product.title" />
+          <div class="product-status-tag" :class="product.status">
+            {{ product.statusText }}
+          </div>
         </div>
         <div class="product-info" @click="goToDetail(product.id)">
           <div class="product-title">{{ product.title }}</div>
@@ -37,10 +39,34 @@
           <div class="product-time">{{ product.publishTime }}</div>
         </div>
         <div class="product-actions">
-          <button class="action-btn primary" v-if="product.status === 'onsale'" @click.stop="editProduct(product.id)">编辑</button>
-          <button class="action-btn secondary" v-if="product.status === 'onsale'" @click.stop="offlineProduct(product.id)">下架</button>
-          <button class="action-btn primary" v-if="product.status === 'offline'" @click.stop="onlineProduct(product.id)">上架</button>
-          <button class="action-btn secondary" v-if="product.status === 'offline'" @click.stop="deleteProduct(product.id)">删除</button>
+          <button
+            class="action-btn primary"
+            v-if="product.status === 'onsale'"
+            @click.stop="editProduct(product.id)"
+          >
+            编辑
+          </button>
+          <button
+            class="action-btn secondary"
+            v-if="product.status === 'onsale'"
+            @click.stop="offlineProduct(product.id)"
+          >
+            下架
+          </button>
+          <button
+            class="action-btn primary"
+            v-if="product.status === 'offline'"
+            @click.stop="onlineProduct(product.id)"
+          >
+            上架
+          </button>
+          <button
+            class="action-btn secondary"
+            v-if="product.status === 'offline'"
+            @click.stop="deleteProduct(product.id)"
+          >
+            删除
+          </button>
         </div>
       </div>
     </div>
@@ -48,9 +74,9 @@
 </template>
 
 <script>
-import nativeUtils from '../../utils/nativeUtils'
-import routerUtils from '../../utils/routerUtils'
-import { get } from '../../utils/apiUtils'
+import nativeUtils from '../../utils/nativeUtils';
+import routerUtils from '../../utils/routerUtils';
+import { get } from '../../utils/apiUtils';
 
 export default {
   name: 'MyProductsPage',
@@ -59,77 +85,85 @@ export default {
       activeTab: 'all',
       products: [],
       originalProducts: [] // 用于筛选的原始数据
-    }
+    };
   },
   mounted() {
     // 设置页面标题
-    nativeUtils.setTitleBar('我发布的商品')
+    nativeUtils.setTitleBar('我发布的商品');
     // 加载商品数据
-    this.loadProducts()
+    this.loadProducts();
   },
   methods: {
     // 从API或localStorage加载商品数据
     loadProducts() {
       try {
-        nativeUtils.showLoading('加载中...')
-        
+        nativeUtils.showLoading('加载中...');
+
         // 获取当前用户信息
-        const userInfo = localStorage.getItem('user')
+        const userInfo = localStorage.getItem('user');
         if (userInfo) {
-          const user = JSON.parse(userInfo)
-          const userId = user.id
-          
+          const user = JSON.parse(userInfo);
+          const userId = user.id;
+
           // 尝试从API获取数据
           get(`/product/user/${userId}`)
-            .then(response => {
+            .then((response) => {
               if (response.code === 0) {
                 // API请求成功，转换数据格式以适配前端
-                this.originalProducts = response.data.map(product => ({
+                this.originalProducts = response.data.map((product) => ({
                   id: product.id,
                   title: product.title,
                   price: product.price,
                   publishTime: product.createdAt,
-                  image: product.images && product.images.length > 0 ? product.images[0] : 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200',
+                  image:
+                    product.images && product.images.length > 0
+                      ? product.images[0]
+                      : 'https://gips1.baidu.com/it/u=1025173963,4205445645&fm=3028&app=3028&f=JPEG&fmt=auto?w=3200&h=3200',
                   views: Math.floor(Math.random() * 200) + 10,
                   chats: Math.floor(Math.random() * 30) + 5,
                   favorites: Math.floor(Math.random() * 20) + 2,
                   status: product.status || 'onsale',
-                  statusText: product.status === 'onsale' ? '在售' : product.status === 'sold' ? '已卖出' : '已下架'
-                }))
-                this.applyFilter()
+                  statusText:
+                    product.status === 'onsale'
+                      ? '在售'
+                      : product.status === 'sold'
+                        ? '已卖出'
+                        : '已下架'
+                }));
+                this.applyFilter();
               } else {
                 // API请求失败，使用localStorage数据
-                this.loadFromLocalStorage()
+                this.loadFromLocalStorage();
               }
-              nativeUtils.hideLoading()
+              nativeUtils.hideLoading();
             })
-            .catch(error => {
-              console.error('加载商品失败:', error)
+            .catch((error) => {
+              console.error('加载商品失败:', error);
               // API请求失败，使用localStorage数据
-              this.loadFromLocalStorage()
-              nativeUtils.hideLoading()
-            })
+              this.loadFromLocalStorage();
+              nativeUtils.hideLoading();
+            });
         } else {
           // 用户未登录，跳转登录页
-          nativeUtils.hideLoading()
-          nativeUtils.showToast('请先登录', 1500)
+          nativeUtils.hideLoading();
+          nativeUtils.showToast('请先登录', 1500);
           setTimeout(() => {
-            routerUtils.navigateTo('/login.html')
-          }, 1500)
+            routerUtils.navigateTo('/login.html');
+          }, 1500);
         }
       } catch (error) {
-        console.error('加载商品失败:', error)
-        this.loadFromLocalStorage()
-        nativeUtils.hideLoading()
+        console.error('加载商品失败:', error);
+        this.loadFromLocalStorage();
+        nativeUtils.hideLoading();
       }
     },
-    
+
     // 从localStorage加载商品数据
     loadFromLocalStorage() {
       try {
-        const productsStr = localStorage.getItem('myProducts')
+        const productsStr = localStorage.getItem('myProducts');
         if (productsStr) {
-          this.originalProducts = JSON.parse(productsStr)
+          this.originalProducts = JSON.parse(productsStr);
         } else {
           // 如果没有数据，使用默认数据
           this.originalProducts = [
@@ -181,96 +215,104 @@ export default {
               status: 'offline',
               statusText: '已下架'
             }
-          ]
+          ];
           // 保存到localStorage
-          localStorage.setItem('myProducts', JSON.stringify(this.originalProducts))
+          localStorage.setItem(
+            'myProducts',
+            JSON.stringify(this.originalProducts)
+          );
         }
-        this.applyFilter()
+        this.applyFilter();
       } catch (error) {
-        console.error('加载本地商品数据失败:', error)
-        this.originalProducts = []
-        this.products = []
+        console.error('加载本地商品数据失败:', error);
+        this.originalProducts = [];
+        this.products = [];
       }
     },
-    
+
     // 应用筛选条件
     applyFilter() {
-      let filtered = [...this.originalProducts]
-      
+      let filtered = [...this.originalProducts];
+
       switch (this.activeTab) {
         case 'onsale':
-          filtered = filtered.filter(product => product.status === 'onsale')
-          break
+          filtered = filtered.filter((product) => product.status === 'onsale');
+          break;
         case 'sold':
-          filtered = filtered.filter(product => product.status === 'sold')
-          break
+          filtered = filtered.filter((product) => product.status === 'sold');
+          break;
         case 'offline':
-          filtered = filtered.filter(product => product.status === 'offline')
-          break
+          filtered = filtered.filter((product) => product.status === 'offline');
+          break;
         default:
           // 全部
-          break
+          break;
       }
-      
-      this.products = filtered
+
+      this.products = filtered;
     },
-    
+
     // 返回上一页
     goBack() {
-      routerUtils.navigateBack(1)
+      routerUtils.navigateBack(1);
     },
-    
+
     // 跳转到发布页面
     goToPublish() {
-      routerUtils.navigateTo('/publish.html')
+      routerUtils.navigateTo('/publish.html');
     },
-    
+
     // 切换筛选标签
     switchTab(tab) {
-      this.activeTab = tab
-      this.applyFilter()
+      this.activeTab = tab;
+      this.applyFilter();
     },
-    
+
     // 跳转到商品详情页
     goToDetail(productId) {
-      routerUtils.navigateTo(`/detail.html?id=${productId}`)
+      routerUtils.navigateTo(`/detail.html?id=${productId}`);
     },
-    
+
     // 编辑商品
     editProduct(productId) {
-      routerUtils.navigateTo(`/publish.html?id=${productId}`)
+      routerUtils.navigateTo(`/publish.html?id=${productId}`);
     },
-    
+
     // 下架商品
     offlineProduct(productId) {
       if (confirm('确定要下架这个商品吗？')) {
-        this.updateProductStatus(productId, 'offline')
+        this.updateProductStatus(productId, 'offline');
       }
     },
-    
+
     // 上架商品
     onlineProduct(productId) {
       if (confirm('确定要上架这个商品吗？')) {
-        this.updateProductStatus(productId, 'onsale')
+        this.updateProductStatus(productId, 'onsale');
       }
     },
-    
+
     // 删除商品
     deleteProduct(productId) {
       if (confirm('确定要删除这个商品吗？删除后不可恢复。')) {
         // 从原始数据中删除
-        const index = this.originalProducts.findIndex(item => item.id === productId)
+        const index = this.originalProducts.findIndex(
+          (item) => item.id === productId
+        );
         if (index > -1) {
-          this.originalProducts.splice(index, 1)
+          this.originalProducts.splice(index, 1);
           // 保存到localStorage
-          localStorage.setItem('myProducts', JSON.stringify(this.originalProducts))
+          localStorage.setItem(
+            'myProducts',
+            JSON.stringify(this.originalProducts)
+          );
           // 重新应用筛选
-          this.applyFilter()
-          nativeUtils.showToast('商品已删除', 1500)
+          this.applyFilter();
+          nativeUtils.showToast('商品已删除', 1500);
         }
       }
     },
-    
+
     // 更新商品状态
     updateProductStatus(productId, status) {
       try {
@@ -278,24 +320,34 @@ export default {
         // 模拟API请求
         setTimeout(() => {
           // 更新本地数据
-          const product = this.originalProducts.find(item => item.id === productId)
+          const product = this.originalProducts.find(
+            (item) => item.id === productId
+          );
           if (product) {
-            product.status = status
-            product.statusText = status === 'onsale' ? '在售' : status === 'sold' ? '已卖出' : '已下架'
+            product.status = status;
+            product.statusText =
+              status === 'onsale'
+                ? '在售'
+                : status === 'sold'
+                  ? '已卖出'
+                  : '已下架';
             // 保存到localStorage
-            localStorage.setItem('myProducts', JSON.stringify(this.originalProducts))
+            localStorage.setItem(
+              'myProducts',
+              JSON.stringify(this.originalProducts)
+            );
             // 重新应用筛选
-            this.applyFilter()
-            nativeUtils.showToast('商品状态已更新', 1500)
+            this.applyFilter();
+            nativeUtils.showToast('商品状态已更新', 1500);
           }
-        }, 500)
+        }, 500);
       } catch (error) {
-        console.error('更新商品状态失败:', error)
-        nativeUtils.showToast('操作失败，请重试', 1500)
+        console.error('更新商品状态失败:', error);
+        nativeUtils.showToast('操作失败，请重试', 1500);
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -317,7 +369,8 @@ export default {
   z-index: 100;
 }
 
-.back-icon, .publish-icon {
+.back-icon,
+.publish-icon {
   font-size: 20px;
   color: #333;
   cursor: pointer;

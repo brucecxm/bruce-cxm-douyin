@@ -138,20 +138,24 @@ public class VideoController extends ApiController {
         System.out.println(StpUtil.isLogin());
 
         String videoId = String.valueOf(idService.SnowflakeGen());
-        InputStream in = videoFile.getInputStream();
         String osName = System.getProperty("os.name").toLowerCase();
         System.out.println("当前操作系统: " + osName);
-        String url = fileStorageService.uploadVideoFile("videostore", fileName, in);
         String minio = "/minio";
         LambdaQueryWrapper<DcSystem> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(DcSystem::getSysName, "ngrok");
         DcSystem ngrok = dcSystemService.getOne(queryWrapper);
-        // 假设原URL存储在变量中
-        if (!osName.contains("windows")) {
-            url = url.replace("http://192.168.200.130:9000", ngrok.getSysValue() + minio);
+
+        // 获取文件内容类型，用于判断是视频还是图片
+        String contentType = videoFile.getContentType();
+
+        // 使用try-with-resources语句，确保输入流自动关闭
+        String url;
+        try (InputStream in = videoFile.getInputStream()) {
+            // 使用用户提供的MinIO bucket: douyin
+            url = fileStorageService.uploadVideoFile("douyin", fileName, in);
         }
+
         // 获取登录用户ID
-        // 方法1：使用安全的类型转换F
         Long userId = null;
         if (userIdObj instanceof Long) {
             userId = (Long) userIdObj;
@@ -164,13 +168,31 @@ public class VideoController extends ApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Collections.singletonMap("code", 401));
         }
+
         Video video = new Video();
         video.setVideoId(idService.SnowflakeGen());
         video.setUrl(url);
-        video.setType(1);
-        video.setTitle(title); // 使用前端传入的标题
-        video.setContent(""); // 设置适当的内容
+
+        // 根据文件类型设置视频类型：1=视频，2=图片
+        int type = contentType.startsWith("image/") ? 2 : 1;
+        video.setType(type);
+
+        video.setTitle(title);
+        video.setContent("");
         video.setUserId(userId);
+
+        // 处理缩略图上传
+        if (thumbnail != null && !thumbnail.isEmpty()) {
+            String thumbnailFileName = "thumbnail_" + video.getVideoId() + "_" + System.currentTimeMillis() + ".jpg";
+            try (InputStream thumbnailIn = thumbnail.getInputStream()) {
+                String thumbnailUrl = fileStorageService.uploadVideoFile("douyin", thumbnailFileName, thumbnailIn);
+                video.setCover(thumbnailUrl);
+            }
+        } else if (type == 2) {
+            // 图片类型，封面为图片本身
+            video.setCover(url);
+        }
+
         videoService.save(video);
         return ResponseEntity.ok(Collections.singletonMap("code", 200));
     }

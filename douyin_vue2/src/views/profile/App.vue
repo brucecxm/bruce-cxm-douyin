@@ -11,7 +11,7 @@
     <!-- 用户信息卡片 -->
     <div class="user-card" @click="goToEditProfile">
       <div class="user-avatar">
-        <img :src="userInfo.avatar" :alt="userInfo.nickname">
+        <img :src="userInfo.avatar" :alt="userInfo.nickname" />
       </div>
       <div class="user-info">
         <div class="user-nickname">{{ userInfo.nickname }}</div>
@@ -94,9 +94,9 @@
           <div class="function-arrow">→</div>
         </div>
         <div class="function-item" @click="logout">
-          <div class="function-icon" style="color: #ff4444;">🚪</div>
-          <div class="function-text" style="color: #ff4444;">退出登录</div>
-          <div class="function-arrow" style="color: #ff4444;">→</div>
+          <div class="function-icon" style="color: #ff4444">🚪</div>
+          <div class="function-text" style="color: #ff4444">退出登录</div>
+          <div class="function-arrow" style="color: #ff4444">→</div>
         </div>
       </div>
     </div>
@@ -109,8 +109,8 @@
 </template>
 
 <script>
-import nativeUtils from '../../utils/nativeUtils'
-import routerUtils from '../../utils/routerUtils'
+import nativeUtils from '../../utils/nativeUtils';
+import routerUtils from '../../utils/routerUtils';
 
 export default {
   name: 'ProfilePage',
@@ -132,119 +132,123 @@ export default {
       },
       // 应用版本
       appVersion: 'v1.0.0'
-    }
+    };
   },
   mounted() {
     // 页面加载时设置标题
-    nativeUtils.setTitleBar('个人中心')
+    nativeUtils.setTitleBar('个人中心');
     // 从localStorage获取用户信息
-    this.getUserInfoFromStorage()
+    this.getUserInfoFromStorage();
     // 获取购物车数据
-    this.updateCartCount()
+    this.updateCartCount();
   },
   methods: {
     // 从localStorage获取用户信息
     getUserInfoFromStorage() {
       try {
-        const userStr = localStorage.getItem('user')
+        const userStr = localStorage.getItem('user');
         if (userStr) {
-          const user = JSON.parse(userStr)
+          const user = JSON.parse(userStr);
           this.userInfo = {
-            avatar: user.avatar || 'https://via.placeholder.com/100x100?text=Avatar',
+            avatar:
+              user.avatar || 'https://via.placeholder.com/100x100?text=Avatar',
             nickname: user.nickname || '二手交易用户',
             phone: user.phone || '138****8888'
-          }
+          };
         }
       } catch (error) {
-        console.error('从localStorage获取用户信息失败:', error)
+        console.error('从localStorage获取用户信息失败:', error);
       }
     },
-    
+
     // 更新购物车数量
     updateCartCount() {
       try {
-        const cartStr = localStorage.getItem('cart')
+        const cartStr = localStorage.getItem('cart');
         if (cartStr) {
-          const cart = JSON.parse(cartStr)
+          const cart = JSON.parse(cartStr);
           // 计算购物车商品总数量
-          this.stats.cart = cart.reduce((total, item) => total + item.quantity, 0)
+          this.stats.cart = cart.reduce(
+            (total, item) => total + item.quantity,
+            0
+          );
         } else {
-          this.stats.cart = 0
+          this.stats.cart = 0;
         }
       } catch (error) {
-        console.error('获取购物车数据失败:', error)
-        this.stats.cart = 0
+        console.error('获取购物车数据失败:', error);
+        this.stats.cart = 0;
       }
     },
-    
+
     // 跳转到设置页面
     goToSettings() {
-      routerUtils.navigateTo('/settings.html')
+      routerUtils.navigateTo('/settings.html');
     },
-    
+
     // 跳转到编辑个人资料页面
     goToEditProfile() {
-      nativeUtils.showToast('编辑个人资料页面开发中', 1500)
+      nativeUtils.showToast('编辑个人资料页面开发中', 1500);
     },
-    
+
     // 跳转到我的商品页面
     goToMyProducts() {
-      routerUtils.navigateTo('/myProducts.html')
+      routerUtils.navigateTo('/myProducts.html');
     },
-    
+
     // 跳转到我的订单页面
     goToMyOrders() {
-      routerUtils.navigateTo('/orders.html')
+      routerUtils.navigateTo('/orders.html');
     },
-    
+
     // 跳转到我的收藏页面
     goToFavorites() {
-      routerUtils.navigateTo('/favorites.html')
+      routerUtils.navigateTo('/favorites.html');
     },
-    
+
     // 跳转到我的消息页面
     goToMessages() {
-      routerUtils.navigateTo('/messages.html')
+      routerUtils.navigateTo('/messages.html');
     },
-    
+
     // 跳转到购物车页面
     goToCart() {
-      routerUtils.navigateTo('/cart.html')
+      routerUtils.navigateTo('/cart.html');
     },
-    
+
     // 跳转到收货地址页面
     goToAddressBook() {
-      routerUtils.navigateTo('/address.html')
+      routerUtils.navigateTo('/address.html');
     },
-    
+
     // 跳转到客服中心
     goToCustomerService() {
-      nativeUtils.showToast('客服中心开发中', 1500)
+      nativeUtils.showToast('客服中心开发中', 1500);
     },
-    
+
     // 跳转到帮助中心
     goToHelpCenter() {
-      nativeUtils.showToast('帮助中心开发中', 1500)
+      nativeUtils.showToast('帮助中心开发中', 1500);
     },
-    
+
     // 退出登录
     logout() {
-      nativeUtils.showLoading('退出中...')
+      nativeUtils.showLoading('退出中...');
       setTimeout(() => {
         // 清除localStorage中的用户信息和token
-        localStorage.removeItem('user')
-        localStorage.removeItem('token')
-        localStorage.removeItem('userId')
-        localStorage.removeItem('userNickname')
-        localStorage.removeItem('userAvatar')
-        
-        nativeUtils.hideLoading()
-        nativeUtils.showToast('已退出登录', 1500)
-        routerUtils.navigateTo('/login.html')
-      }, 1500)
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('userNickname');
+        localStorage.removeItem('userAvatar');
+
+        nativeUtils.hideLoading();
+        nativeUtils.showToast('已退出登录', 1500);
+        routerUtils.navigateTo('/login.html');
+      }, 1500);
     }
   }
-}
+};
 </script>
 
 <style scoped>

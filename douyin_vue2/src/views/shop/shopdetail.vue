@@ -146,7 +146,7 @@ export default {
         // 获取商品详情（使用searchForDish接口，因为这是现有可用的接口）
         // 这里假设商品名称和ID相关联，可以根据实际情况调整
         const res = await searchForDish(this.productId.toString());
-        
+
         if (res.code === 200 && res.data) {
           const productData = res.data;
           // 映射商品数据
@@ -162,10 +162,12 @@ export default {
               <p>更多详细信息请咨询客服。</p>
             `
           };
-          
+
           // 设置商品图片
-          this.images = productData.image ? [productData.image] : ['https://img.yzcdn.cn/vant/apple-1.jpg'];
-          
+          this.images = productData.image
+            ? [productData.image]
+            : ['https://img.yzcdn.cn/vant/apple-1.jpg'];
+
           // 设置店铺信息
           this.shop = {
             avatar: productData.shopImg || 'https://img.yzcdn.cn/vant/cat.jpeg',
@@ -176,19 +178,18 @@ export default {
           // 如果接口调用失败，使用默认数据
           this.setDefaultProductData();
         }
-        
+
         // 设置商品选项（这里应该从后端获取，暂时使用静态数据）
         this.productOptions = {
           colors: ['红色', '蓝色', '绿色'],
           sizes: ['S', 'M', 'L', 'XL']
         };
-        
       } catch (error) {
         console.error('加载商品数据失败:', error);
         this.setDefaultProductData();
       }
     },
-    
+
     // 设置默认商品数据
     setDefaultProductData() {
       this.product = {
@@ -214,7 +215,7 @@ export default {
         description: '品质保证，7天无理由退换货'
       };
     },
-    
+
     // 加载购物车数量
     async loadCartCount() {
       try {
@@ -225,7 +226,7 @@ export default {
         console.error('加载购物车数量失败:', error);
       }
     },
-    
+
     // 打开弹窗选择规格
     openOptionPopup(actionType) {
       this.actionType = actionType;
@@ -238,12 +239,12 @@ export default {
         this.selectedOptions.size = this.productOptions.sizes[0];
       }
     },
-    
+
     // 购买按钮点击
     buyNow() {
       this.openOptionPopup('buy');
     },
-    
+
     // 加入购物车按钮点击
     addToCart() {
       this.openOptionPopup('cart');
@@ -258,16 +259,16 @@ export default {
     selectOption(type, value) {
       this.selectedOptions[type] = value;
     },
-    
+
     // 确认购买
     confirmBuy() {
       if (!this.selectedOptions.color || !this.selectedOptions.size) {
         this.$toast('请选择颜色和尺码');
         return;
       }
-      
+
       this.showBuyPopup = false;
-      
+
       // 跳转到订单页面，携带选择参数
       this.$router.push({
         path: '/order',
@@ -280,14 +281,14 @@ export default {
         }
       });
     },
-    
+
     // 确认加入购物车
     async confirmAddCar() {
       if (!this.selectedOptions.color || !this.selectedOptions.size) {
         this.$toast('请选择颜色和尺码');
         return;
       }
-      
+
       try {
         // 构建购物车数据
         const cartData = {
@@ -298,10 +299,10 @@ export default {
           number: 1,
           amount: this.product.priceDiscount
         };
-        
+
         // 调用添加到购物车的接口
         const res = await request.post('/shop/shoppingCart/add', cartData);
-        
+
         if (res.code === 200) {
           this.showBuyPopup = false;
           this.cartCount++;
@@ -314,12 +315,12 @@ export default {
         this.$toast('加入购物车失败，请重试');
       }
     },
-    
+
     // 跳转到店铺页面
     goShop() {
       this.$router.push('/store');
     },
-    
+
     // 跳转到购物车页面
     goCart() {
       this.$router.push('/shopcat');

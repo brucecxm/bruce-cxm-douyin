@@ -55,15 +55,13 @@
       v-show="false"
       ref="fileInput"
       type="file"
-      accept="image/*"
+      accept="image/*, video/*"
       @change="handleFileChange"
     />
 
     <!-- 摄像头预览 & Canvas -->
-    <video
-ref="video"
-autoplay playsinline muted
-class="video-preview"></video>
+    <video ref="video" autoplay playsinline
+muted class="video-preview"></video>
     <canvas ref="canvas" style="display: none"></canvas>
 
     <!-- 拍照结果 -->
@@ -148,6 +146,7 @@ export default {
       photo: '',
       videoURL: '',
       input: '',
+      currentVideoId: '',
       // 长按／短按检测
       pressTimer: null,
       pressThreshold: 500,
@@ -220,17 +219,36 @@ export default {
     onBtnClick({ index, item }) {
       if (item.text === '下一步') {
         if (this.photo) {
-          {
-            this.$router.push({
-              path: '/shangchuandetail',
-              query: { photo: this.photo }
-            });
-          }
-        } else {
           this.$router.push({
             path: '/shangchuandetail',
-            query: { video: this.currentVideoId }
+            query: { photo: this.photo }
           });
+        } else if (this.currentVideoId) {
+          // 检查Vuex中是否已经有该视频数据
+          const videoData = this.$store.getters['videoStore/getVideo'](
+            this.currentVideoId
+          );
+          if (videoData) {
+            this.$router.push({
+              path: '/shangchuandetail',
+              query: { video: this.currentVideoId }
+            });
+          } else {
+            // 视频数据尚未准备好，显示提示
+            console.warn('视频数据尚未准备好，请稍候再试');
+            // 尝试直接从state中获取
+            const directVideo =
+              this.$store.state.videoStore.videos[this.currentVideoId];
+            if (directVideo) {
+              // 如果state中已有数据，可能是getter有问题，直接跳转
+              this.$router.push({
+                path: '/shangchuandetail',
+                query: { video: this.currentVideoId }
+              });
+            }
+          }
+        } else {
+          console.error('没有可发布的内容');
         }
       }
     },
@@ -242,9 +260,32 @@ export default {
     handleFileChange(e) {
       const file = e.target.files[0];
       if (file) {
-        const reader = new FileReader();
-        reader.onload = (ev) => console.log(ev.target.result);
-        reader.readAsDataURL(file);
+        this.bottomNav = false;
+        if (file.type.startsWith('image/')) {
+          // 处理图片文件
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            this.photo = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        } else if (file.type.startsWith('video/')) {
+          // 处理视频文件
+          const videoId = `video_${Date.now()}`;
+          // 使用Vuex存储视频数据
+          this.$store.dispatch('videoStore/addVideo', {
+            videoId,
+            blob: file,
+            metadata: {
+              duration: 0, // 可以通过视频元素获取真实时长
+              size: file.size,
+              type: file.type,
+              name: file.name
+            }
+          });
+          // 创建视频URL用于预览
+          this.videoURL = URL.createObjectURL(file);
+          this.currentVideoId = videoId;
+        }
       }
     },
     // 拍照与录像区交互
@@ -341,8 +382,8 @@ export default {
         const blob = new Blob(this.recordChunks, { type: 'video/mp4' });
         const videoId = `video_${Date.now()}`;
 
-        // 通过 Vuex action 保存视频
-        this.$store.dispatch('video/addVideo', {
+        // 通过 Vuex action 保存视频，使用正确的模块名 videoStore
+        this.$store.dispatch('videoStore/addVideo', {
           videoId,
           blob,
           metadata: {
@@ -354,8 +395,8 @@ export default {
 
         // 立即打印 Vuex 当前状态，检查是否写入成功
         console.log(
-          '当前 Vuex video 模块内容:',
-          this.$store.state.video.videos
+          '当前 Vuex videoStore 模块内容:',
+          this.$store.state.videoStore.videos
         );
         console.log('存入 videoId:', videoId);
 

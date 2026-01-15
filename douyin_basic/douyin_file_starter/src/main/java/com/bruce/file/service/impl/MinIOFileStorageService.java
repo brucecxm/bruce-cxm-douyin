@@ -68,8 +68,8 @@ public class MinIOFileStorageService implements FileStorageService {
             PutObjectArgs putObjectArgs = PutObjectArgs.builder()
                     .bucket(minIOConfigProperties.getBucket())
                     .object(filePath)
-                    //视频常用 MP4 类型；根据实际格式调整
-                    .contentType("video/mp4")
+                    // 根据文件扩展名动态设置内容类型
+                    .contentType(detectContentType(filename))
                     // 传入流长度为 -1，并由 MinIO SDK 自动分片上传
                     .stream(inputStream, -1, 5 * 1024 * 1024)
                     .build();
@@ -86,6 +86,41 @@ public class MinIOFileStorageService implements FileStorageService {
         } catch (Exception ex) {
             log.error("minio put video error.", ex);
             throw new RuntimeException("上传视频失败", ex);
+        }
+    }
+    
+    /**
+     * 根据文件名检测文件类型
+     */
+    private String detectContentType(String filename) {
+        String extension = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
+        switch (extension) {
+            // 图片类型
+            case "jpg":
+            case "jpeg":
+                return "image/jpeg";
+            case "png":
+                return "image/png";
+            case "gif":
+                return "image/gif";
+            case "webp":
+                return "image/webp";
+            // 视频类型
+            case "mp4":
+                return "video/mp4";
+            case "mov":
+                return "video/quicktime";
+            case "avi":
+                return "video/x-msvideo";
+            case "wmv":
+                return "video/x-ms-wmv";
+            case "flv":
+                return "video/x-flv";
+            case "mkv":
+                return "video/x-matroska";
+            // 默认类型
+            default:
+                return "application/octet-stream";
         }
     }
 

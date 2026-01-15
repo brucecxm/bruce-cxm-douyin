@@ -19,14 +19,39 @@
         <div class="status-desc">{{ order.statusDesc }}</div>
       </div>
       <div class="status-actions">
-        <button class="action-btn primary" v-if="order.status === 'pending_payment'" @click="payOrder">立即付款</button>
-        <button class="action-btn primary" v-if="order.status === 'pending_receipt'" @click="confirmReceipt">确认收货</button>
-        <button class="action-btn secondary" v-if="order.status === 'completed'" @click="viewLogistics">查看物流</button>
+        <button
+          class="action-btn primary"
+          v-if="order.status === 'pending_payment'"
+          @click="payOrder"
+        >
+          立即付款
+        </button>
+        <button
+          class="action-btn primary"
+          v-if="order.status === 'pending_receipt'"
+          @click="confirmReceipt"
+        >
+          确认收货
+        </button>
+        <button
+          class="action-btn secondary"
+          v-if="order.status === 'completed'"
+          @click="viewLogistics"
+        >
+          查看物流
+        </button>
       </div>
     </div>
 
     <!-- 物流信息 -->
-    <div class="logistics-section" v-if="order.status === 'pending_shipping' || order.status === 'pending_receipt' || order.status === 'completed'">
+    <div
+      class="logistics-section"
+      v-if="
+        order.status === 'pending_shipping' ||
+          order.status === 'pending_receipt' ||
+          order.status === 'completed'
+      "
+    >
       <div class="section-title">物流信息</div>
       <div class="logistics-content">
         <div class="logistics-item">
@@ -36,7 +61,11 @@
             <div class="logistics-desc">{{ order.logistics.latestDesc }}</div>
           </div>
         </div>
-        <div class="logistics-item" v-for="(item, index) in order.logistics.history" :key="index">
+        <div
+          class="logistics-item"
+          v-for="(item, index) in order.logistics.history"
+          :key="index"
+        >
           <div class="logistics-dot"></div>
           <div class="logistics-info">
             <div class="logistics-time">{{ item.time }}</div>
@@ -51,12 +80,14 @@
       <div class="section-title">商品信息</div>
       <div class="product-item" @click="goToProductDetail(order.product.id)">
         <div class="product-image">
-          <img :src="order.product.image" :alt="order.product.title">
+          <img :src="order.product.image" :alt="order.product.title" />
         </div>
         <div class="product-info">
           <div class="product-title">{{ order.product.title }}</div>
           <div class="product-specs">{{ order.product.specs }}</div>
-          <div class="product-price">¥{{ order.product.price }} × {{ order.product.quantity }}</div>
+          <div class="product-price">
+            ¥{{ order.product.price }} × {{ order.product.quantity }}
+          </div>
         </div>
       </div>
     </div>
@@ -89,11 +120,11 @@
         <div class="address-icon">📍</div>
         <div class="address-info">
           <div class="address-name-phone">
-            {{ order.address.receiver || order.address.name || '未设置收货人' }} 
+            {{ order.address.receiver || order.address.name || '未设置收货人' }}
             {{ order.address.phone || '未设置手机号' }}
           </div>
           <div class="address-detail">
-            {{ order.address.province || '' }} {{ order.address.city || '' }} 
+            {{ order.address.province || '' }} {{ order.address.city || '' }}
             {{ order.address.district || '' }} {{ order.address.detail || '' }}
           </div>
         </div>
@@ -105,7 +136,9 @@
       <div class="section-title">价格明细</div>
       <div class="price-item">
         <div class="price-label">商品总价</div>
-        <div class="price-value">¥{{ order.product.price * order.product.quantity }}</div>
+        <div class="price-value">
+          ¥{{ order.product.price * order.product.quantity }}
+        </div>
       </div>
       <div class="price-item">
         <div class="price-label">运费</div>
@@ -122,21 +155,64 @@
     </div>
 
     <!-- 底部操作栏 -->
-    <footer class="bottom-actions" v-if="order.status === 'pending_payment' || order.status === 'pending_receipt' || order.status === 'completed'">
-      <button class="action-btn secondary" v-if="order.status === 'pending_payment'" @click="cancelOrder">取消订单</button>
-      <button class="action-btn primary" v-if="order.status === 'pending_payment'" @click="payOrder">立即付款</button>
-      <button class="action-btn secondary" v-if="order.status === 'pending_receipt'" @click="contactSeller">联系卖家</button>
-      <button class="action-btn primary" v-if="order.status === 'pending_receipt'" @click="confirmReceipt">确认收货</button>
-      <button class="action-btn secondary" v-if="order.status === 'completed'" @click="contactSeller">联系卖家</button>
-      <button class="action-btn primary" v-if="order.status === 'completed'" @click="leaveComment">评价</button>
+    <footer
+      class="bottom-actions"
+      v-if="
+        order.status === 'pending_payment' ||
+          order.status === 'pending_receipt' ||
+          order.status === 'completed'
+      "
+    >
+      <button
+        class="action-btn secondary"
+        v-if="order.status === 'pending_payment'"
+        @click="cancelOrder"
+      >
+        取消订单
+      </button>
+      <button
+        class="action-btn primary"
+        v-if="order.status === 'pending_payment'"
+        @click="payOrder"
+      >
+        立即付款
+      </button>
+      <button
+        class="action-btn secondary"
+        v-if="order.status === 'pending_receipt'"
+        @click="contactSeller"
+      >
+        联系卖家
+      </button>
+      <button
+        class="action-btn primary"
+        v-if="order.status === 'pending_receipt'"
+        @click="confirmReceipt"
+      >
+        确认收货
+      </button>
+      <button
+        class="action-btn secondary"
+        v-if="order.status === 'completed'"
+        @click="contactSeller"
+      >
+        联系卖家
+      </button>
+      <button
+        class="action-btn primary"
+        v-if="order.status === 'completed'"
+        @click="leaveComment"
+      >
+        评价
+      </button>
     </footer>
   </div>
 </template>
 
 <script>
-import nativeUtils from '../../utils/nativeUtils'
-import routerUtils from '../../utils/routerUtils'
-import { get } from '../../utils/apiUtils'
+import nativeUtils from '../../utils/nativeUtils';
+import routerUtils from '../../utils/routerUtils';
+import { get } from '../../utils/apiUtils';
 
 export default {
   name: 'OrderDetailPage',
@@ -151,112 +227,120 @@ export default {
         logistics: {}
       },
       orderId: ''
-    }
+    };
   },
   mounted() {
     // 设置页面标题
-    nativeUtils.setTitleBar('订单详情')
+    nativeUtils.setTitleBar('订单详情');
     // 获取URL参数中的订单ID
-    this.orderId = this.getUrlParam('id')
+    this.orderId = this.getUrlParam('id');
     // 加载订单详情
-    this.loadOrderDetail()
+    this.loadOrderDetail();
   },
   methods: {
     // 从URL中获取参数
     getUrlParam(name) {
-      const urlParams = new URLSearchParams(window.location.search)
-      return urlParams.get(name)
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
     },
-    
+
     // 从API或localStorage加载订单详情
     loadOrderDetail() {
       if (!this.orderId) {
-        nativeUtils.showToast('订单ID无效', 1500)
-        routerUtils.navigateBack(1)
-        return
+        nativeUtils.showToast('订单ID无效', 1500);
+        routerUtils.navigateBack(1);
+        return;
       }
-      
+
       try {
-        nativeUtils.showLoading('加载中...')
-        
+        nativeUtils.showLoading('加载中...');
+
         // 尝试从API获取数据
         get(`/order/${this.orderId}`)
-          .then(response => {
+          .then((response) => {
             if (response.code === 0) {
               // API请求成功
-              let orderData = response.data
+              let orderData = response.data;
               // 添加必要的属性
-              orderData.statusText = this.getStatusText(orderData.status)
-              orderData.statusDesc = this.getStatusDesc(orderData.status)
+              orderData.statusText = this.getStatusText(orderData.status);
+              orderData.statusDesc = this.getStatusDesc(orderData.status);
               // 确保product、address、logistics属性存在
-              orderData.product = orderData.product || {}
-              orderData.address = orderData.address || {}
-              orderData.logistics = orderData.logistics || {}
-              
+              orderData.product = orderData.product || {};
+              orderData.address = orderData.address || {};
+              orderData.logistics = orderData.logistics || {};
+
               // 处理地址字段映射，确保前端需要的字段存在
               if (orderData.address) {
                 // 统一地址字段名，处理可能的字段差异
-                orderData.address.name = orderData.address.receiver || orderData.address.name || ''
-                orderData.address.phone = orderData.address.phone || ''
-                orderData.address.province = orderData.address.province || ''
-                orderData.address.city = orderData.address.city || ''
-                orderData.address.district = orderData.address.district || ''
-                orderData.address.detail = orderData.address.detail || ''
+                orderData.address.name =
+                  orderData.address.receiver || orderData.address.name || '';
+                orderData.address.phone = orderData.address.phone || '';
+                orderData.address.province = orderData.address.province || '';
+                orderData.address.city = orderData.address.city || '';
+                orderData.address.district = orderData.address.district || '';
+                orderData.address.detail = orderData.address.detail || '';
               }
-              
+
               // 处理物流信息
               if (orderData.logistics) {
-                orderData.logistics.latestTime = orderData.logistics.latestTime || ''
-                orderData.logistics.latestDesc = orderData.logistics.latestDesc || ''
-                orderData.logistics.history = orderData.logistics.history || []
+                orderData.logistics.latestTime =
+                  orderData.logistics.latestTime || '';
+                orderData.logistics.latestDesc =
+                  orderData.logistics.latestDesc || '';
+                orderData.logistics.history = orderData.logistics.history || [];
               }
-              
+
               // 处理商品信息
               if (orderData.product) {
-                orderData.product.id = orderData.product.id || ''
-                orderData.product.title = orderData.product.title || ''
-                orderData.product.specs = orderData.product.specs || ''
-                orderData.product.price = orderData.product.price || 0
-                orderData.product.quantity = orderData.product.quantity || 1
-                orderData.product.image = orderData.product.image || 'https://via.placeholder.com/150x150?text=商品图片'
+                orderData.product.id = orderData.product.id || '';
+                orderData.product.title = orderData.product.title || '';
+                orderData.product.specs = orderData.product.specs || '';
+                orderData.product.price = orderData.product.price || 0;
+                orderData.product.quantity = orderData.product.quantity || 1;
+                orderData.product.image =
+                  orderData.product.image ||
+                  'https://via.placeholder.com/150x150?text=商品图片';
               }
-              
+
               // 处理订单信息
-              orderData.orderNo = orderData.orderNo || `20251225${String(orderData.id || this.orderId).padStart(6, '0')}`
-              orderData.createTime = orderData.createTime || ''
-              orderData.payTime = orderData.payTime || ''
-              orderData.shippingFee = orderData.shippingFee || 0
-              orderData.discount = orderData.discount || 0
-              orderData.totalAmount = orderData.totalAmount || 0
-              orderData.paymentMethod = orderData.paymentMethod || '未选择支付方式'
-              
-              this.order = orderData
+              orderData.orderNo =
+                orderData.orderNo ||
+                `20251225${String(orderData.id || this.orderId).padStart(6, '0')}`;
+              orderData.createTime = orderData.createTime || '';
+              orderData.payTime = orderData.payTime || '';
+              orderData.shippingFee = orderData.shippingFee || 0;
+              orderData.discount = orderData.discount || 0;
+              orderData.totalAmount = orderData.totalAmount || 0;
+              orderData.paymentMethod =
+                orderData.paymentMethod || '未选择支付方式';
+
+              this.order = orderData;
             } else {
               // API请求失败，使用localStorage数据
-              this.loadFromLocalStorage()
+              this.loadFromLocalStorage();
             }
-            nativeUtils.hideLoading()
+            nativeUtils.hideLoading();
           })
-          .catch(error => {
-            console.error('加载订单详情失败:', error)
+          .catch((error) => {
+            console.error('加载订单详情失败:', error);
             // API请求失败，使用localStorage数据
-            this.loadFromLocalStorage()
-            nativeUtils.hideLoading()
-          })
+            this.loadFromLocalStorage();
+            nativeUtils.hideLoading();
+          });
       } catch (error) {
-        console.error('加载订单详情失败:', error)
-        this.loadFromLocalStorage()
-        nativeUtils.hideLoading()
+        console.error('加载订单详情失败:', error);
+        this.loadFromLocalStorage();
+        nativeUtils.hideLoading();
       }
     },
-    
+
     // 从localStorage加载订单详情
     loadFromLocalStorage() {
       try {
-        const ordersStr = localStorage.getItem('orders')
+        const ordersStr = localStorage.getItem('orders');
         if (ordersStr) {
-          const orders = JSON.parse(ordersStr)
-          const foundOrder = orders.find(order => order.id == this.orderId)
+          const orders = JSON.parse(ordersStr);
+          const foundOrder = orders.find((order) => order.id == this.orderId);
           if (foundOrder) {
             // 补全订单详情信息
             this.order = {
@@ -290,15 +374,15 @@ export default {
                   }
                 ]
               }
-            }
-            nativeUtils.showToast('使用本地缓存数据', 1500)
-            return
+            };
+            nativeUtils.showToast('使用本地缓存数据', 1500);
+            return;
           }
         }
       } catch (error) {
-        console.error('解析本地数据失败:', error)
+        console.error('解析本地数据失败:', error);
       }
-      
+
       // 使用默认mock数据
       this.order = {
         id: this.orderId,
@@ -342,11 +426,11 @@ export default {
             }
           ]
         }
-      }
-      
-      nativeUtils.showToast('使用默认数据', 1500)
+      };
+
+      nativeUtils.showToast('使用默认数据', 1500);
     },
-    
+
     // 获取订单状态文本
     getStatusText(status) {
       const statusMap = {
@@ -355,10 +439,10 @@ export default {
         pending_receipt: '待收货',
         completed: '已完成',
         cancelled: '已取消'
-      }
-      return statusMap[status] || '未知状态'
+      };
+      return statusMap[status] || '未知状态';
     },
-    
+
     // 获取订单状态描述
     getStatusDesc(status) {
       const statusMap = {
@@ -367,73 +451,73 @@ export default {
         pending_receipt: '商品已发货，请注意查收',
         completed: '订单已完成，感谢您的购买',
         cancelled: '订单已取消'
-      }
-      return statusMap[status] || ''
+      };
+      return statusMap[status] || '';
     },
-    
+
     // 返回上一页
     goBack() {
-      routerUtils.navigateBack(1)
+      routerUtils.navigateBack(1);
     },
-    
+
     // 跳转到商品详情页
     goToProductDetail(productId) {
-      routerUtils.navigateTo(`/detail.html?id=${productId}`)
+      routerUtils.navigateTo(`/detail.html?id=${productId}`);
     },
-    
+
     // 立即付款
     payOrder() {
-      nativeUtils.showToast('立即付款功能开发中', 1500)
+      nativeUtils.showToast('立即付款功能开发中', 1500);
     },
-    
+
     // 取消订单
     cancelOrder() {
       if (confirm('确定要取消这个订单吗？')) {
         // 调用API取消订单
-        nativeUtils.showLoading('取消中...')
+        nativeUtils.showLoading('取消中...');
         setTimeout(() => {
           // 更新本地数据
-          this.order.status = 'cancelled'
-          this.order.statusText = '已取消'
-          this.order.statusDesc = this.getStatusDesc('cancelled')
-          nativeUtils.hideLoading()
-          nativeUtils.showToast('订单已取消', 1500)
-        }, 1000)
+          this.order.status = 'cancelled';
+          this.order.statusText = '已取消';
+          this.order.statusDesc = this.getStatusDesc('cancelled');
+          nativeUtils.hideLoading();
+          nativeUtils.showToast('订单已取消', 1500);
+        }, 1000);
       }
     },
-    
+
     // 确认收货
     confirmReceipt() {
       if (confirm('确定要确认收货吗？')) {
         // 调用API确认收货
-        nativeUtils.showLoading('确认中...')
+        nativeUtils.showLoading('确认中...');
         setTimeout(() => {
           // 更新本地数据
-          this.order.status = 'completed'
-          this.order.statusText = '已完成'
-          this.order.statusDesc = this.getStatusDesc('completed')
-          nativeUtils.hideLoading()
-          nativeUtils.showToast('已确认收货', 1500)
-        }, 1000)
+          this.order.status = 'completed';
+          this.order.statusText = '已完成';
+          this.order.statusDesc = this.getStatusDesc('completed');
+          nativeUtils.hideLoading();
+          nativeUtils.showToast('已确认收货', 1500);
+        }, 1000);
       }
     },
-    
+
     // 联系卖家
     contactSeller() {
-      nativeUtils.showToast('联系卖家功能开发中', 1500)
+      nativeUtils.showToast('联系卖家功能开发中', 1500);
     },
-    
+
     // 评价
     leaveComment() {
-      nativeUtils.showToast('评价功能开发中', 1500)
+      nativeUtils.showToast('评价功能开发中', 1500);
     },
-    
+
     // 查看物流
     viewLogistics() {
-      nativeUtils.showToast('查看物流功能开发中', 1500)
+      nativeUtils.showToast('查看物流功能开发中', 1500);
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -455,7 +539,8 @@ export default {
   z-index: 100;
 }
 
-.back-icon, .more-icon {
+.back-icon,
+.more-icon {
   font-size: 20px;
   color: #333;
   cursor: pointer;
@@ -631,7 +716,8 @@ export default {
 }
 
 /* 订单信息和收货信息 */
-.order-info-section, .address-section {
+.order-info-section,
+.address-section {
   background-color: white;
   margin: 0 15px 15px;
   border-radius: 10px;
