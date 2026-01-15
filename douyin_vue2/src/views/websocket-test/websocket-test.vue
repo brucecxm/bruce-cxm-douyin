@@ -143,7 +143,6 @@ export default {
       if (isAndroid) {
         // Android环境下，根据connectionType选择连接方式
         this.addLog('info', `使用Android ${this.connectionType === 'direct' ? '直接WebSocket' : 'SockJS'}连接`);
-        );
 
         try {
           let wsUrl;

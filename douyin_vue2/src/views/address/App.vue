@@ -336,7 +336,6 @@ export default {
           nativeUtils.hideLoading();
           nativeUtils.showToast(this.editingAddress ? '更新地址失败，请重试' : '添加地址失败，请重试', 1500);
         });
-        });
     },
 
     // 删除地址
