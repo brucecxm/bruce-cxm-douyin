@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+    <!-- 日志输出格式 -->
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"/>
+    <!-- 日志文件路径，使用服务名称作为子目录 -->
+    <property name="LOG_PATH" value="./logs/${spring.application.name}"/>
+    
+    <!-- 控制台输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    
+    <!-- 应用日志 -->
+    <appender name="APPLICATION_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${spring.application.name}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${spring.application.name}.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    
+    <!-- 错误日志 -->
+    <appender name="ERROR_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${spring.application.name}-error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${spring.application.name}-error.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+    
+    <!-- SQL日志配置 -->
+    <logger name="jdbc.sqlonly" level="DEBUG" />
+    <logger name="jdbc.sqltiming" level="DEBUG" />
+    <logger name="jdbc.audit" level="DEBUG" />
+    <logger name="jdbc.resultset" level="DEBUG" />
+    <logger name="jdbc.connection" level="DEBUG" />
+    
+    <!-- 关闭 Spring 的默认SQL日志，否则可能重复 -->
+    <logger name="org.springframework.jdbc.core" level="WARN" />
+    <logger name="org.springframework.jdbc.datasource" level="WARN" />
+    
+    <!-- Sa-Token 日志配置 -->
+    <logger name="cn.dev33" level="INFO"/>
+    
+    <!-- Redis日志配置 -->
+    <logger name="org.springframework.data.redis" level="INFO"/>
+    
+    <!-- 根日志配置 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="APPLICATION_LOG"/>
+        <appender-ref ref="ERROR_LOG"/>
+    </root>
+    
+    <!-- 应用包日志配置 -->
+    <logger name="com.bruce" level="INFO">
+        <appender-ref ref="APPLICATION_LOG"/>
+        <appender-ref ref="ERROR_LOG"/>
+    </logger>
+</configuration>
