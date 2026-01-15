@@ -212,7 +212,9 @@ export default {
         message.unreadCount = 0;
       }
       // 跳转到聊天页面
-      routerUtils.navigateTo(`/chat.html?chatId=${chatId}&userId=${userId}`);
+      routerUtils.navigateTo(
+        `/newshop/chat.html?chatId=${chatId}&userId=${userId}`
+      );
     }
   }
 };

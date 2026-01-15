@@ -183,7 +183,7 @@ export default {
 
     // 跳转到设置页面
     goToSettings() {
-      routerUtils.navigateTo('/settings.html');
+      routerUtils.navigateTo('/newshop/settings.html');
     },
 
     // 跳转到编辑个人资料页面
@@ -193,32 +193,32 @@ export default {
 
     // 跳转到我的商品页面
     goToMyProducts() {
-      routerUtils.navigateTo('/myProducts.html');
+      routerUtils.navigateTo('/newshop/myProducts.html');
     },
 
     // 跳转到我的订单页面
     goToMyOrders() {
-      routerUtils.navigateTo('/orders.html');
+      routerUtils.navigateTo('/newshop/orders.html');
     },
 
     // 跳转到我的收藏页面
     goToFavorites() {
-      routerUtils.navigateTo('/favorites.html');
+      routerUtils.navigateTo('/newshop/favorites.html');
     },
 
     // 跳转到我的消息页面
     goToMessages() {
-      routerUtils.navigateTo('/messages.html');
+      routerUtils.navigateTo('/newshop/messages.html');
     },
 
     // 跳转到购物车页面
     goToCart() {
-      routerUtils.navigateTo('/cart.html');
+      routerUtils.navigateTo('/newshop/cart.html');
     },
 
     // 跳转到收货地址页面
     goToAddressBook() {
-      routerUtils.navigateTo('/address.html');
+      routerUtils.navigateTo('/newshop/address.html');
     },
 
     // 跳转到客服中心
@@ -244,7 +244,7 @@ export default {
 
         nativeUtils.hideLoading();
         nativeUtils.showToast('已退出登录', 1500);
-        routerUtils.navigateTo('/login.html');
+        routerUtils.navigateTo('/newshop/login.html');
       }, 1500);
     }
   }

@@ -152,7 +152,7 @@ export default {
             localStorage.setItem('token', data.token || '');
 
             // 跳转到主页
-            routerUtils.navigateTo('/index.html');
+            routerUtils.navigateTo('/newshop/index.html');
           } else {
             // 请求失败
             nativeUtils.hideLoading();
@@ -194,7 +194,7 @@ export default {
             localStorage.setItem('token', data.token || '');
 
             // 跳转到主页
-            routerUtils.navigateTo('/index.html');
+            routerUtils.navigateTo('/newshop/index.html');
           } else {
             // 请求失败
             nativeUtils.hideLoading();
@@ -245,7 +245,7 @@ export default {
 
     handleRegister() {
       // 跳转到注册页面
-      routerUtils.navigateTo('/register.html');
+      routerUtils.navigateTo('/newshop/register.html');
     }
   }
 };

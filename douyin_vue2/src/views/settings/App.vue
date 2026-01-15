@@ -237,7 +237,7 @@ export default {
 
     // 跳转到WebSocket测试页面
     goToWebSocketTest() {
-      routerUtils.navigateTo('/websocket-test.html');
+      routerUtils.navigateTo('/newshop/websocket-test.html');
     },
 
     // 退出登录
@@ -251,10 +251,10 @@ export default {
           localStorage.removeItem('favorites');
 
           // 跳转到登录页面
-          routerUtils.navigateTo('/login.html');
+          routerUtils.navigateTo('/newshop/login.html');
         } catch (error) {
           console.error('退出登录失败:', error);
-          routerUtils.navigateTo('/login.html');
+          routerUtils.navigateTo('/newshop/login.html');
         }
       }
     }

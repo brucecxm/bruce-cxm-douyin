@@ -106,7 +106,7 @@ export default {
           const userId = user.id;
 
           // 尝试从API获取数据
-          get(`/product/user/${userId}`)
+          get(`/newshop/product/user/${userId}`)
             .then((response) => {
               if (response.code === 0) {
                 // API请求成功，转换数据格式以适配前端
@@ -148,7 +148,7 @@ export default {
           nativeUtils.hideLoading();
           nativeUtils.showToast('请先登录', 1500);
           setTimeout(() => {
-            routerUtils.navigateTo('/login.html');
+            routerUtils.navigateTo('/newshop/login.html');
           }, 1500);
         }
       } catch (error) {
@@ -259,7 +259,7 @@ export default {
 
     // 跳转到发布页面
     goToPublish() {
-      routerUtils.navigateTo('/publish.html');
+      routerUtils.navigateTo('/newshop/publish.html');
     },
 
     // 切换筛选标签

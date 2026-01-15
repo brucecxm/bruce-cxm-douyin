@@ -158,7 +158,7 @@ export default {
 
     // 跳转到首页
     goToIndex() {
-      routerUtils.navigateTo('/index.html');
+      routerUtils.navigateTo('/newshop/index.html');
     },
 
     // 跳转到商品详情

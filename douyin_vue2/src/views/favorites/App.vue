@@ -170,7 +170,7 @@ export default {
           nativeUtils.hideLoading();
           nativeUtils.showToast('请先登录', 1500);
           setTimeout(() => {
-            routerUtils.navigateTo('/login.html');
+            routerUtils.navigateTo('/newshop/login.html');
           }, 1500);
         }
       } catch (error) {

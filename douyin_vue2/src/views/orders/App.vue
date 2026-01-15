@@ -130,7 +130,7 @@ export default {
           const userId = user.id;
 
           // 尝试从API获取数据
-          get(`/order/user/${userId}`)
+          get(`/newshop/order/user/${userId}`)
             .then((response) => {
               if (response.code === 0) {
                 // API请求成功
@@ -168,7 +168,7 @@ export default {
           nativeUtils.hideLoading();
           nativeUtils.showToast('请先登录', 1500);
           setTimeout(() => {
-            routerUtils.navigateTo('/login.html');
+            routerUtils.navigateTo('/newshop/login.html');
           }, 1500);
         }
       } catch (error) {
@@ -330,7 +330,7 @@ export default {
 
     // 跳转到订单详情页
     goToOrderDetail(orderId) {
-      routerUtils.navigateTo(`/orderDetail.html?id=${orderId}`);
+      routerUtils.navigateTo(`/newshop/orderDetail.html?id=${orderId}`);
     },
 
     // 取消订单
@@ -338,7 +338,7 @@ export default {
       if (confirm('确定要取消这个订单吗？')) {
         // 调用API取消订单
         nativeUtils.showLoading('取消中...');
-        put(`/order/${orderId}/status?status=cancelled`)
+        put(`/newshop/order/${orderId}/status?status=cancelled`)
           .then((response) => {
             if (response.code === 0) {
               // API请求成功
@@ -382,7 +382,7 @@ export default {
       if (confirm('确定要确认收货吗？')) {
         // 调用API确认收货
         nativeUtils.showLoading('确认中...');
-        put(`/order/${orderId}/status?status=completed`)
+        put(`/newshop/order/${orderId}/status?status=completed`)
           .then((response) => {
             if (response.code === 0) {
               // API请求成功

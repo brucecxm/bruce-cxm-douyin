@@ -514,7 +514,7 @@ export default {
     // 获取卖家其他商品
     async fetchSellerOtherProducts(sellerId) {
       try {
-        const response = await get(`/product/user/${sellerId}`);
+        const response = await get(`/newshop/product/user/${sellerId}`);
         if (response.code === 0 && response.data) {
           // 过滤掉当前商品
           this.seller.otherProducts = response.data
@@ -576,7 +576,7 @@ export default {
         if (!userInfo) {
           nativeUtils.showToast('请先登录', 1500);
           setTimeout(() => {
-            routerUtils.navigateTo('/login.html');
+            routerUtils.navigateTo('/newshop/login.html');
           }, 1500);
           return;
         }
@@ -608,7 +608,7 @@ export default {
         if (!userInfo) {
           nativeUtils.showToast('请先登录', 1500);
           setTimeout(() => {
-            routerUtils.navigateTo('/login.html');
+            routerUtils.navigateTo('/newshop/login.html');
           }, 1500);
           return;
         }
@@ -641,13 +641,13 @@ export default {
         this.saveChatRecord();
         // 跳转到聊天页面，传递卖家ID和商品ID
         routerUtils.navigateTo(
-          `/chat.html?userId=${this.seller.id}&productId=${this.product.id}`
+          `/newshop/chat.html?userId=${this.seller.id}&productId=${this.product.id}`
         );
       } catch (error) {
         console.error('保存聊天记录失败:', error);
         // 即使保存失败，也跳转到聊天页面
         routerUtils.navigateTo(
-          `/chat.html?userId=${this.seller.id}&productId=${this.product.id}`
+          `/newshop/chat.html?userId=${this.seller.id}&productId=${this.product.id}`
         );
       }
     },
@@ -723,7 +723,7 @@ export default {
       if (!userInfo) {
         nativeUtils.showToast('请先登录', 1500);
         setTimeout(() => {
-          routerUtils.navigateTo('/login.html');
+          routerUtils.navigateTo('/newshop/login.html');
         }, 1500);
         return;
       }

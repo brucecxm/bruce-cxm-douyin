@@ -30,6 +30,12 @@ spring:
           uri: lb://DouyinVideoService
           predicates:
             - Path=/video/**,/music/**,/comment/**
+        - id: DouyinApiServer
+          uri: lb://API-SERVER
+          predicates:
+            - Path=/newshop/**
+          filters:
+            - RewritePath=/newshop/(?<segment>.*), /${segment}
 
       discovery:
         locator:

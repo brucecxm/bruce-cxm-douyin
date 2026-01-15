@@ -252,7 +252,7 @@ export default {
       // 如果用户未登录，跳转到登录页面
       nativeUtils.showToast('请先登录', 1500);
       setTimeout(() => {
-        routerUtils.navigateTo('/login.html');
+        routerUtils.navigateTo('/newshop/login.html');
       }, 1500);
     }
   },
@@ -331,7 +331,7 @@ export default {
           if (productId) {
             routerUtils.navigateTo(`/detail.html?id=${productId}`);
           } else {
-            routerUtils.navigateTo('/myProducts.html');
+            routerUtils.navigateTo('/newshop/myProducts.html');
           }
         } else {
           nativeUtils.hideLoading();
@@ -392,7 +392,10 @@ export default {
             formData.append('file', file);
 
             // 调用后端上传API
-            const response = await uploadFile('/product/upload', formData);
+            const response = await uploadFile(
+              '/newshop/product/upload',
+              formData
+            );
 
             if (response.code === 0) {
               // 上传成功，添加到图片列表

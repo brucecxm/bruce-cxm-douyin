@@ -200,7 +200,7 @@ export default {
   methods: {
     // 跳转到搜索页
     goToSearch() {
-      routerUtils.navigateTo('/search.html');
+      routerUtils.navigateTo('/newshop/search.html');
     },
 
     // 选择主分类
@@ -219,7 +219,7 @@ export default {
 
     // 跳转到首页
     goToHome() {
-      routerUtils.navigateTo('/index.html');
+      routerUtils.navigateTo('/newshop/index.html');
     },
 
     // 跳转到分类页
@@ -229,17 +229,17 @@ export default {
 
     // 跳转到发布页
     goToPublish() {
-      routerUtils.navigateTo('/publish.html');
+      routerUtils.navigateTo('/newshop/publish.html');
     },
 
     // 跳转到消息页
     goToMessages() {
-      routerUtils.navigateTo('/messages.html');
+      routerUtils.navigateTo('/newshop/messages.html');
     },
 
     // 跳转到个人中心
     goToProfile() {
-      routerUtils.navigateTo('/profile.html');
+      routerUtils.navigateTo('/newshop/profile.html');
     }
   }
 };

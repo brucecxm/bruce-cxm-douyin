@@ -112,7 +112,7 @@ export default {
         nativeUtils.showLoading('加载中...');
 
         // 调用真实API获取商品列表
-        const response = await get('/newshop/newshop/product');
+        const response = await get('/newshop/product');
 
         // 检查API响应
         if (response.code === 0 && response.data) {
@@ -247,7 +247,7 @@ export default {
     },
     // 跳转到搜索页
     goToSearch() {
-      routerUtils.navigateTo('/search.html');
+      routerUtils.navigateTo('/newshop/search.html');
     },
     // 跳转到商品详情页
     goToDetail(productId) {
@@ -255,15 +255,15 @@ export default {
     },
     // 跳转到发布页
     goToPublish() {
-      routerUtils.navigateTo('/publish.html');
+      routerUtils.navigateTo('/newshop/publish.html');
     },
     // 跳转到个人中心
     goToProfile() {
-      routerUtils.navigateTo('/profile.html');
+      routerUtils.navigateTo('/newshop/profile.html');
     },
     // 跳转到首页
     goToHome() {
-      routerUtils.navigateTo('/index.html');
+      routerUtils.navigateTo('/newshop/index.html');
     },
     // 跳转到分类页
     goToCategories() {
@@ -272,7 +272,7 @@ export default {
     },
     // 跳转到消息页
     goToMessages() {
-      routerUtils.navigateTo('/messages.html');
+      routerUtils.navigateTo('/newshop/messages.html');
     },
     // 按分类筛选商品
     async filterByCategory(categoryId) {

@@ -123,7 +123,7 @@ export default {
           nativeUtils.showToast('注册成功', 1500);
 
           // 跳转到登录页面
-          routerUtils.navigateTo('/login.html');
+          routerUtils.navigateTo('/newshop/login.html');
         } else {
           nativeUtils.hideLoading();
           nativeUtils.showToast(response.message || '注册失败', 1500);
@@ -143,7 +143,7 @@ export default {
     },
 
     handleLogin() {
-      routerUtils.navigateTo('/login.html');
+      routerUtils.navigateTo('/newshop/login.html');
     }
   }
 };
