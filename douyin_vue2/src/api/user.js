@@ -92,3 +92,13 @@ export const updateUserInfo = (userInfo) => {
     }
   });
 };
+
+// 分页查询所有用户
+export const getUserList = (page, pageSize) => {
+  //构建参数对象
+  const params = {
+    page: page,
+    pageSize: pageSize
+  };
+  return request.get('/user/list', { params });
+};

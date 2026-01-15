@@ -747,7 +747,9 @@ export default {
 
         if (response.code === 0 && response.data) {
           // 订单创建成功，跳转到订单详情页面
-          routerUtils.navigateTo(`/orderDetail.html?id=${response.data.id}`);
+          routerUtils.navigateTo(
+            `/newshop/orderDetail.html?id=${response.data.id}`
+          );
         } else {
           nativeUtils.showToast(response.message || '创建订单失败', 1500);
         }

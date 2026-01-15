@@ -467,7 +467,8 @@ export default {
 
     // 立即付款
     payOrder() {
-      nativeUtils.showToast('立即付款功能开发中', 1500);
+      // 跳转到转账页面，传递订单ID
+      routerUtils.navigateTo(`/newshop/transfer.html?orderId=${this.orderId}`);
     },
 
     // 取消订单

@@ -118,6 +118,30 @@ public class UserController extends ApiController {
         }
     }
 
+    // 分页查询所有用户
+    @GetMapping("/list")
+    public Result<Map<String, Object>> getUserList(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        try {
+            // 使用MyBatis Plus的分页功能查询所有用户
+            Page<User> pageQuery = new Page<>(page, pageSize);
+            IPage<User> userPage = userService.page(pageQuery);
+
+            // 构建响应数据
+            Map<String, Object> data = new HashMap<>();
+            data.put("records", userPage.getRecords());
+            data.put("total", userPage.getTotal());
+            data.put("size", userPage.getSize());
+            data.put("current", userPage.getCurrent());
+
+            return Result.success(data);
+        } catch (Exception e) {
+            log.error("查询用户列表失败", e);
+            return Result.error("查询失败，请稍后重试");
+        }
+    }
+
     @Autowired
     private FriendService friendService;
 

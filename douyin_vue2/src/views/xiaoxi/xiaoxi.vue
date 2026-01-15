@@ -134,7 +134,7 @@ import HorizontalScrollList from '@/components/HorizontalScrollList.vue';
 import UserInfo from '../../components/userInfo.vue';
 import caidan from '@/components/caidan.vue';
 import footerVue from '@/components/footer.vue';
-import { getFriendApi, getFriendApiDetail } from '@/api/user.js';
+import { getFriendApi, getFriendApiDetail, getUserList } from '@/api/user.js';
 
 export default {
   components: {
@@ -153,23 +153,8 @@ export default {
         right1: '@/assets/xiaoxi/header/xiaoxi_menu.png',
         right2: '@/assets/xiaoxi/header/xiaoxi_search.png'
       },
-      // 增加默认用户数据，确保初始页面不会空白
-      userinfos: [
-        {
-          username: '初始用户1',
-          status: '在线',
-          avatar:
-            'http://gips0.baidu.com/it/u=3560029307,576412274&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
-          height: '60px'
-        },
-        {
-          username: '初始用户2',
-          status: '离线',
-          avatar:
-            'http://gips0.baidu.com/it/u=3560029307,576412275&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280',
-          height: '60px'
-        }
-      ],
+      // 清除静态数据，改为从API获取
+      userinfos: [],
       topUsers: [],
       input: '',
       page: 1,
@@ -246,40 +231,45 @@ export default {
       this.loading = true;
       console.log('开始加载第', this.page, '页数据');
 
-      // 模拟异步请求延迟
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      try {
+        // 调用后端API获取所有用户数据，传递分页参数
+        const response = await getUserList(this.page, this.pageSize);
 
-      // 模拟总数据，30条 - 增加更多数据并确保用户名列有变化，便于观察
-      const totalData = [];
-      // 生成30条不同的用户数据
-      for (let i = 1; i <= 30; i++) {
-        totalData.push({
-          username: i <= 20 ? `用户${i}` : `访客${i - 20}`,
-          status: i % 3 === 0 ? '离线' : '在线',
-          avatar: `http://gips0.baidu.com/it/u=3560029307,${576412274 + i}&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280`,
-          height: '60px'
-        });
+        // 检查响应数据是否存在且有效
+        if (response && response.data && response.data.code === 200) {
+          // 从响应中获取分页用户列表数据
+          const pageData = response.data.data.records || [];
+
+          // 转换数据格式以适应前端需求
+          const formattedData = pageData.map((user) => ({
+            username: user.username || user.nickname || '未知用户',
+            status: '在线', // 这里可以根据后端返回的状态字段来设置
+            avatar: user.avatar || '默认头像地址',
+            userId: user.id,
+            height: '60px'
+          }));
+
+          console.log(`加载数据成功，数量: ${formattedData.length}`);
+
+          if (formattedData.length < this.pageSize) {
+            this.hasMore = false;
+            console.log('已加载全部数据');
+          }
+
+          // 将数据添加到列表
+          this.userinfos.push(...formattedData);
+          console.log('当前用户列表长度:', this.userinfos.length);
+
+          this.page += 1;
+        } else {
+          console.error('获取用户数据失败:', response);
+          this.hasMore = false;
+        }
+      } catch (error) {
+        console.error('加载用户列表失败:', error);
+      } finally {
+        this.loading = false;
       }
-
-      const start = (this.page - 1) * this.pageSize;
-      const end = this.page * this.pageSize;
-      const pageData = totalData.slice(start, end);
-
-      console.log(
-        `加载数据范围: ${start}-${end}，加载数量: ${pageData.length}`
-      );
-
-      if (pageData.length < this.pageSize) {
-        this.hasMore = false;
-        console.log('已加载全部数据');
-      }
-
-      // 确保数据正确添加到列表
-      this.userinfos.push(...pageData);
-      console.log('当前用户列表长度:', this.userinfos.length);
-
-      this.page += 1;
-      this.loading = false;
     },
 
     handleScroll(e) {

@@ -221,6 +221,7 @@ export default {
     return {
       fromUser: '',
       toUser: '',
+      orderId: '',
       amount: '',
       remark: '',
       password: '',
@@ -255,6 +256,10 @@ export default {
       this.$route.params.id ||
       this.$route.path.split('/').filter(Boolean).pop() ||
       '';
+
+    // 获取订单ID参数
+    this.orderId = this.$route.query.orderId || '';
+    console.log('订单ID:', this.orderId);
 
     const socket = new SockJS('http://localhost:7456/ws');
     this.stomp = Stomp.over(socket);
@@ -299,14 +304,15 @@ export default {
     },
 
     submitTransfer() {
-      const { fromUser, toUser, amount, password } = this;
+      const { fromUser, toUser, amount, password, orderId } = this;
       axios
         .post('/api/shop/transfer', null, {
           params: {
             fromUserId: fromUser,
             toUserId: toUser,
             amount,
-            password
+            password,
+            orderId: orderId // 传递订单ID
           }
         })
         .then((res) => {
