@@ -8,6 +8,11 @@ spring:
   boot:
     admin:
       context-path: /admin  # 设置Spring Boot Admin的上下文路径
+  cloud:
+    client:
+      hostname: localhost  # 强制注册主机名为localhost
+    inetutils:
+      preferred-networks: 127.0.0.1 # 优先使用本机回环地址
 
 # Spring Boot Admin服务器配置
 management:

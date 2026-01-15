@@ -2,6 +2,11 @@
 spring:
   profiles:
     active: dev  # 生产环境
+  cloud:
+    client:
+      hostname: localhost  # 强制注册主机名为localhost
+    inetutils:
+      preferred-networks: 127.0.0.1 # 优先使用本机回环地址
 
   tomcat:
     # 最大工作线程数，默认值为 200。这是核心配置
@@ -12,6 +17,11 @@ spring:
     accept-count: 100
     # 最大连接数，默认值为 10000
     max-connections: 10000
+
+eureka:
+  instance:
+    prefer-ip-address: true # 微服务注册时，优先使用IP地址，而不是主机名
+    instance-id: ${spring.cloud.client.ip-address}:${server.port} # 自定义实例ID为「IP:端口」，彻底告别随机字符串ID
 server:
   port: 7426
 

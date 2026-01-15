@@ -3,6 +3,16 @@ server:
 spring:
   profiles:
     active: dev  # 生产环境
+  cloud:
+    client:
+      hostname: localhost  # 强制注册主机名为localhost
+    inetutils:
+      preferred-networks: 127.0.0.1 # 优先使用本机回环地址
+
+eureka:
+  instance:
+    prefer-ip-address: true # 微服务注册时，优先使用IP地址，而不是主机名
+    instance-id: ${spring.cloud.client.ip-address}:${server.port} # 自定义实例ID为「IP:端口」，彻底告别随机字符串ID
 
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
