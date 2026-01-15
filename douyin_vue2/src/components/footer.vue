@@ -100,12 +100,14 @@ export default {
       this.checkLoginAndGo('/shangchuan');
     },
     gohome() {
-      // 如果当前在newshop前缀的路由下，则跳转到/newshop，否则跳转到/
-      if (this.$route.path.startsWith('/newshop')) {
-        this.$router.push('/newshop');
-      } else {
-        this.$router.push('/');
-      }
+      this.$router.push('/');
+
+      // // 如果当前在newshop前缀的路由下，则跳转到/newshop，否则跳转到/
+      // if (this.$route.path.startsWith('/newshop')) {
+      //   this.$router.push('/newshop');
+      // } else {
+      //   this.$router.push('/');
+      // }
     }
   },
   // 添加mounted钩子，根据当前路由初始化选中状态

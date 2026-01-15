@@ -112,7 +112,7 @@ export default {
         nativeUtils.showLoading('加载中...');
 
         // 调用真实API获取商品列表
-        const response = await get('/product');
+        const response = await get('/newshop/newshop/product');
 
         // 检查API响应
         if (response.code === 0 && response.data) {

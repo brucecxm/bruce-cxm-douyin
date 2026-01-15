@@ -327,7 +327,7 @@ export default {
         const userId2 = Number(this.chatInfo.userId);
 
         // 调用真实API获取聊天记录
-        const response = await get('/message/chat', {
+        const response = await get('/newshop/message/chat', {
           userId1: userId1,
           userId2: userId2
         });
@@ -463,7 +463,7 @@ export default {
     // 使用HTTP请求发送消息（降级方案）
     async sendHttpRequest(messageRequest) {
       try {
-        const response = await post('/message', messageRequest);
+        const response = await post('/newshop/message', messageRequest);
 
         if (response.code === 0) {
           // 清空输入框

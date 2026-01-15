@@ -111,7 +111,7 @@ export default {
       try {
         // 调用注册API
         nativeUtils.showLoading('注册中...');
-        const response = await post('/user/register', {
+        const response = await post('/newshop/user/register', {
           username: this.username,
           password: this.password,
           email: this.email,

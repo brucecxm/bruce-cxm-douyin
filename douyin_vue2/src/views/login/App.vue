@@ -136,7 +136,7 @@ export default {
         // 调用手机号登录API
         try {
           nativeUtils.showLoading('登录中...');
-          const response = await post('/user/login/phone', {
+          const response = await post('/newshop/user/login/phone', {
             phone: this.phone,
             code: this.code
           });
@@ -177,7 +177,7 @@ export default {
         try {
           // 真实登录API调用
           nativeUtils.showLoading('登录中...');
-          const response = await post('/user/login', {
+          const response = await post('/newshop/user/login', {
             username: this.username,
             password: this.password
           });
@@ -216,7 +216,7 @@ export default {
 
       try {
         // 调用获取验证码API
-        const response = await post('/user/sendCode', {
+        const response = await post('/newshop/user/sendCode', {
           phone: this.phone
         });
 

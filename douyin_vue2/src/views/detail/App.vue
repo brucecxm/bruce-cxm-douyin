@@ -441,7 +441,7 @@ export default {
         const userId = user.id;
 
         // 调用API添加浏览记录
-        await post('/recent-view', {
+        await post('/newshop/recent-view', {
           userId: userId,
           productId: productId
         });
@@ -585,7 +585,7 @@ export default {
         const userId = user.id;
 
         // 调用API收藏商品
-        const response = await post('/favorite', {
+        const response = await post('/newshop/favorite', {
           userId: userId,
           productId: this.product.id
         });
@@ -617,7 +617,7 @@ export default {
         const userId = user.id;
 
         // 调用API加入购物车
-        const response = await post('/cart', {
+        const response = await post('/newshop/cart', {
           userId: userId,
           productId: this.product.id,
           quantity: 1
@@ -743,7 +743,7 @@ export default {
         };
 
         // 调用API创建订单
-        const response = await post('/order', orderData);
+        const response = await post('/newshop/order', orderData);
 
         if (response.code === 0 && response.data) {
           // 订单创建成功，跳转到订单详情页面
@@ -784,7 +784,7 @@ export default {
         }
 
         // 调用真实API提交评论
-        const response = await post('/comments', {
+        const response = await post('/newshop/comments', {
           productId: this.product.id,
           userId: userId,
           rating: this.commentForm.rating,

@@ -317,7 +317,7 @@ export default {
           response = await put(`/product/${productId}`, productData);
         } else {
           // 发布新模式
-          response = await post('/product', productData);
+          response = await post('/newshop/product', productData);
         }
 
         if (response.code === 0) {

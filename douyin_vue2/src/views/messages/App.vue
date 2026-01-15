@@ -126,7 +126,7 @@ export default {
     async loadChatMessages() {
       try {
         // 调用API获取聊天消息列表
-        const response = await get('/message/user/' + this.userId);
+        const response = await get('/newshop/message/user/' + this.userId);
 
         if (response.code === 0 && response.data) {
           this.chatMessages = response.data;
@@ -145,7 +145,7 @@ export default {
     async loadNotices() {
       try {
         // 调用API获取通知消息列表
-        const response = await get('/notice/user/' + this.userId);
+        const response = await get('/newshop/notice/user/' + this.userId);
 
         if (response.code === 0 && response.data) {
           this.notices = response.data;
@@ -164,7 +164,7 @@ export default {
     async loadSystemMessages() {
       try {
         // 调用API获取系统消息列表
-        const response = await get('/system-message');
+        const response = await get('/newshop/system-message');
 
         if (response.code === 0 && response.data) {
           this.systemMessages = response.data;
