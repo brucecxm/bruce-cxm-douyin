@@ -239,7 +239,10 @@ export default {
       message: false,
       isDragging: false, // 是否正在拖动的标志
       startX: 0, // 拖动的起始X位置
+      startY: 0, // 拖动的起始Y位置
       currentX: 0, // 当前的X位置
+      dragStarted: false, // 是否已经开始拖动
+      dragDirection: null, // 拖动方向：horizontal 或 vertical
       boxWidth: 1000, // 每个box的宽度
       activeIndex: 0, // 默认高亮推荐项
       boxHeight: 95,
@@ -332,35 +335,63 @@ export default {
       this.go(index);
     },
     startDrag(event) {
-      //会影响到子组件事件的执行
-      // event.preventDefault(); // 阻止默认行为
       this.isDragging = true;
-      this.startX = this.getEventClientX(event) - this.currentX;
+      this.startX = this.getEventClientX(event);
+      this.startY = this.getEventClientY(event);
+      this.dragStarted = false;
+      this.dragDirection = null;
     },
     stopDrag() {
-      // event.preventDefault(); // 阻止默认行为
       this.isDragging = false;
-      this.updateBoxPositionBasedOnCurrentX();
+      if (this.dragDirection === 'horizontal') {
+        this.updateBoxPositionBasedOnCurrentX();
+      }
+      this.dragStarted = false;
+      this.dragDirection = null;
     },
     drag(event) {
       if (this.isDragging) {
-        let newX = this.getEventClientX(event) - this.startX;
-        newX = Math.max(
-          -(this.boxWidth * (this.boxes.length - 1)),
-          Math.min(newX, 0)
-        );
-        this.currentX = newX;
-        this.updateBoxesPosition();
+        const currentX = this.getEventClientX(event);
+        const currentY = this.getEventClientY(event);
+        const deltaX = currentX - this.startX;
+        const deltaY = currentY - this.startY;
 
-        // 计算当前索引并更新
-        const nearestIndex = Math.round(
-          Math.abs(this.currentX) / this.boxWidth
-        );
-        this.activeIndex = nearestIndex; // 更新 activeIndex
+        // 确定滑动方向
+        if (!this.dragDirection) {
+          // 只有当移动距离超过阈值时才确定方向
+          const threshold = 5;
+          if (Math.abs(deltaX) > threshold || Math.abs(deltaY) > threshold) {
+            this.dragDirection =
+              Math.abs(deltaX) > Math.abs(deltaY) ? 'horizontal' : 'vertical';
+            this.dragStarted = true;
+          }
+        }
 
-        // 将索引传递给子组件
-        this.$emit('update:index', nearestIndex);
+        // 只处理水平滑动
+        if (this.dragDirection === 'horizontal' && this.dragStarted) {
+          let newX = this.currentX + deltaX;
+          newX = Math.max(
+            -(this.boxWidth * (this.boxes.length - 1)),
+            Math.min(newX, 0)
+          );
+          this.currentX = newX;
+          this.updateBoxesPosition();
+
+          // 计算当前索引并更新
+          const nearestIndex = Math.round(
+            Math.abs(this.currentX) / this.boxWidth
+          );
+          this.activeIndex = nearestIndex; // 更新 activeIndex
+
+          // 将索引传递给子组件
+          this.$emit('update:index', nearestIndex);
+        }
       }
+    },
+    getEventClientY(event) {
+      return event.type.startsWith('touch')
+        ? event.touches[0].clientY
+        : event.clientY;
     },
     getEventClientX(event) {
       return event.type.startsWith('touch')

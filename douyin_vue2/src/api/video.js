@@ -26,12 +26,8 @@ export const getauthzzz = (userid, page = 1, size = 10) => {
   });
 };
 
-export const like = (contentId, type, contentType) => {
-  return request.post('/video/like', {
-    contentId,
-    type,
-    contentType
-  });
+export const like = (params) => {
+  return request.post('/video/like', params);
 };
 
 export const getcai = (params) => {

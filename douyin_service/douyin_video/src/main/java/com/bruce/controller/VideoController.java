@@ -234,6 +234,23 @@ public class VideoController extends ApiController {
         IPage<Video> videoPage = videoService.page(pageInfo, videoQueryWrapper);
         List<Video> videos = videoPage.getRecords();
         List<Map<String, Object>> result = new ArrayList<>();
+
+        // 获取当前登录用户ID
+        Long loginUserId = null;
+        try {
+            StpUtil.checkLogin();
+            Object userIdObj = StpUtil.getLoginId();
+            if (userIdObj instanceof Long) {
+                loginUserId = (Long) userIdObj;
+            } else if (userIdObj instanceof Integer) {
+                loginUserId = ((Integer) userIdObj).longValue();
+            } else if (userIdObj instanceof String) {
+                loginUserId = Long.parseLong((String) userIdObj);
+            }
+        } catch (NotLoginException e) {
+            // 用户未登录，loginUserId保持为null
+        }
+
         for (Video video : videos) {
             VideoVO vo = new VideoVO();
             BeanUtils.copyProperties(video, vo);
@@ -281,6 +298,23 @@ public class VideoController extends ApiController {
                     .eq(Favor::getCommentId, video.getVideoId());
             int shareCount = favorService.count(shareWrapper);
             vo.setShareNum((long) shareCount);
+
+            // 判断当前用户是否已点赞
+            boolean isLiked = false;
+            if (loginUserId != null) {
+                // 先从Redis查询点赞状态
+                Boolean redisLiked = redisTemplate.opsForSet().isMember(redisKey, loginUserId);
+                if (redisLiked != null) {
+                    isLiked = redisLiked;
+                } else {
+                    // Redis中没有，从数据库查询
+                    LambdaQueryWrapper<Favor> userLikeQuery = new LambdaQueryWrapper<Favor>()
+                            .eq(Favor::getCommentId, video.getVideoId())
+                            .eq(Favor::getUserId, loginUserId);
+                    isLiked = favorService.count(userLikeQuery) > 0;
+                }
+            }
+
             // 组装返回数据
             Map<String, Object> map = new HashMap<>();
             map.put(Constant.ApiParam.VIDEO_ID, vo.getVideoId());
@@ -296,6 +330,7 @@ public class VideoController extends ApiController {
             map.put(Constant.Stat.COLLECT_NUM, vo.getCollectNum());
             map.put(Constant.Stat.SHARE_NUM, vo.getShareNum());
             map.put(Constant.ApiParam.MUSIC_ID, vo.getMusicId());
+            map.put("isLiked", isLiked); // 添加是否点赞的标识
             result.add(map);
         }
         return result;

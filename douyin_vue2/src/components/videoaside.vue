@@ -63,8 +63,8 @@ export default {
   data() {
     return {
       userId: '1',
-      isLiked: false, // 控制是否已点赞
-      likeNum: this.videoData.likeNum, // 初始点赞数量
+      isLiked: this.videoData.isLiked || false, // 从videoData初始化点赞状态
+      likeNum: this.videoData.likeNum || 0, // 初始点赞数量
       isCollected: false, // 控制是否已收藏
       isCommentClicked: false, // 控制评论图标点击状态
       isShareClicked: false, // 控制分享图标点击状态
@@ -103,11 +103,29 @@ export default {
       this.behaviour('like');
 
       // 调用 API 或其他逻辑处理
+      console.log('videoDateOne:', this.videoDateOne);
+      console.log('videoId:', this.videoDateOne.videoId);
+      console.log('videoId type:', typeof this.videoDateOne.videoId);
+
+      // 确保contentId是一个数字，而不是对象
+      const contentId =
+        typeof this.videoDateOne.videoId === 'object'
+          ? Number(
+            this.videoDateOne.videoId.id ||
+                this.videoDateOne.videoId.videoId ||
+                0
+          )
+          : Number(this.videoDateOne.videoId);
+
       var params = {
         type: this.isLiked ? 'red' : 'nored',
         contentType: 'video',
-        contentId: this.videoDateOne.videoId
+        contentId: contentId
       };
+
+      console.log('发送的点赞参数:', params);
+      console.log('contentId type:', typeof params.contentId);
+
       like(params)
         .then((result) => {
           console.log('点赞成功:', result);

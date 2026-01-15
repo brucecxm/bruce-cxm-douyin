@@ -372,6 +372,10 @@ export default {
     isAtBottom() {
       const lastBox = this.boxes[this.boxes.length - 1];
       const containerHeight = this.$el.clientHeight;
+      // 确保lastBox存在，避免访问undefined的top属性
+      if (!lastBox) {
+        return false;
+      }
       return lastBox.top + this.boxHeight * 0.1 <= containerHeight;
     },
 

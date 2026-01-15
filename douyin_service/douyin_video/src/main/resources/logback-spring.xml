@@ -1,25 +1,111 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration>
-
+<configuration scan="true" scanPeriod="60 seconds">
+    <!-- 日志输出格式 -->
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"/>
+    <!-- 日志文件路径，统一输出到log文件夹，使用服务名称作为子目录 -->
+    <property name="LOG_PATH" value="./logs/${spring.application.name}"/>
+    <!-- 单个日志文件最大大小 -->
+    <property name="MAX_FILE_SIZE" value="100MB"/>
+    <!-- 日志文件保留天数 -->
+    <property name="MAX_HISTORY" value="30"/>
+    <!-- 日志总大小限制 -->
+    <property name="TOTAL_SIZE_CAP" value="2GB"/>
+    
     <!-- 控制台输出 -->
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
         </encoder>
     </appender>
-
-    <!-- 开启log4jdbc的SQL打印 -->
-    <logger name="jdbc.sqlonly" level="DEBUG" />
-    <logger name="jdbc.sqltiming" level="DEBUG" />
-    <logger name="jdbc.audit" level="DEBUG" />
-    <logger name="jdbc.resultset" level="DEBUG" />
-    <logger name="jdbc.connection" level="DEBUG" />
+    
+    <!-- 应用日志 - 按日期和大小滚动 -->
+    <appender name="APPLICATION_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${spring.application.name}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 日志文件名格式：服务名.日期.序号.gz -->
+            <fileNamePattern>${LOG_PATH}/${spring.application.name}.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <!-- 单个文件最大大小 -->
+            <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+            <!-- 保留天数 -->
+            <maxHistory>${MAX_HISTORY}</maxHistory>
+            <!-- 总大小限制 -->
+            <totalSizeCap>${TOTAL_SIZE_CAP}</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    
+    <!-- 错误日志 - 单独记录 -->
+    <appender name="ERROR_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${spring.application.name}-error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${spring.application.name}-error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+            <maxHistory>${MAX_HISTORY}</maxHistory>
+            <totalSizeCap>${TOTAL_SIZE_CAP}</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <!-- 只记录ERROR及以上级别 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+    
+    <!-- SQL日志 - 单独记录 -->
+    <appender name="SQL_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${spring.application.name}-sql.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${spring.application.name}-sql.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+            <maxHistory>${MAX_HISTORY}</maxHistory>
+            <totalSizeCap>${TOTAL_SIZE_CAP}</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    
+    <!-- 调整log4jdbc的SQL打印级别，减少日志输出 -->
+    <logger name="jdbc.sqlonly" level="INFO" additivity="false">
+        <appender-ref ref="SQL_LOG"/>
+    </logger>
+    <logger name="jdbc.sqltiming" level="INFO" additivity="false">
+        <appender-ref ref="SQL_LOG"/>
+    </logger>
+    <logger name="jdbc.audit" level="WARN" additivity="false">
+        <appender-ref ref="SQL_LOG"/>
+    </logger>
+    <logger name="jdbc.resultset" level="WARN" additivity="false">
+        <appender-ref ref="SQL_LOG"/>
+    </logger>
+    <logger name="jdbc.connection" level="WARN" additivity="false">
+        <appender-ref ref="SQL_LOG"/>
+    </logger>
 
     <!-- 关闭 Spring 的默认SQL日志，否则可能重复 -->
     <logger name="org.springframework.jdbc.core" level="WARN" />
     <logger name="org.springframework.jdbc.datasource" level="WARN" />
-
+    
+    <!-- Sa-Token 日志配置 -->
+    <logger name="cn.dev33" level="INFO"/>
+    
+    <!-- 根日志配置 -->
     <root level="INFO">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="APPLICATION_LOG"/>
+        <appender-ref ref="ERROR_LOG"/>
     </root>
+    
+    <!-- 应用包日志配置 -->
+    <logger name="com.bruce" level="INFO">
+        <appender-ref ref="APPLICATION_LOG"/>
+        <appender-ref ref="ERROR_LOG"/>
+    </logger>
 </configuration>

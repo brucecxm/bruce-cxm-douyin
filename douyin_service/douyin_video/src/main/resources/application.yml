@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: DouyinVideoService
   profiles:
     active: dev # 生产环境
   mvc:
@@ -6,7 +8,7 @@ spring:
       matching-strategy: ant_path_matcher
   cloud:
     client:
-      hostname: localhost  # 强制注册主机名为localhost
+      hostname: localhost # 强制注册主机名为localhost
     inetutils:
       preferred-networks: 127.0.0.1 # 优先使用本机回环地址
 
@@ -23,7 +25,7 @@ upload:
 
 mybatis:
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
 
 ############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
 sa-token:
@@ -40,18 +42,18 @@ sa-token:
   # token 风格（默认可取值：uuid、simple-uuid、random-32、random-64、random-128、tik）
   token-style: uuid
   # 是否输出操作日志
-  is-log: true
+  is-log: false
 
 logging:
   level:
     root: info
-    jdbc: debug
-    jdbc.sqlonly: debug
-    jdbc.sqltiming: debug
-    jdbc.audit: debug
-    jdbc.resultset: debug
-    jdbc.connection: debug
-    com.example.mapper: debug # 替换成你的 Mapper 包路径
+    jdbc: info
+    jdbc.sqlonly: info
+    jdbc.sqltiming: info
+    jdbc.audit: warn
+    jdbc.resultset: warn
+    jdbc.connection: warn
+    com.bruce: info # 应用包日志级别
 
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
