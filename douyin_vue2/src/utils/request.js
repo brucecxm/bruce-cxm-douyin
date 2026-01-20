@@ -37,7 +37,7 @@ instance.interceptors.response.use(
   (response) => {
     const res = response.data;
     if (res.code !== undefined) {
-      if (res.code !== 0) {
+      if (res.code !== 0 && res.code !== 200) {
         Message.error(res.message || '请求错误');
         return Promise.reject(new Error(res.message || '请求错误'));
       }

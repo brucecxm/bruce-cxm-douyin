@@ -315,6 +315,23 @@ public class VideoController extends ApiController {
                 }
             }
 
+            // 判断当前用户是否已收藏
+            boolean isCollected = false;
+            if (loginUserId != null) {
+                // 先从Redis查询收藏状态
+                String collectRedisKey = "collect:content:" + "video" + video.getVideoId();
+                Boolean redisCollected = redisTemplate.opsForSet().isMember(collectRedisKey, loginUserId);
+                if (redisCollected != null) {
+                    isCollected = redisCollected;
+                } else {
+                    // Redis中没有，从数据库查询
+                    LambdaQueryWrapper<Favor> userCollectQuery = new LambdaQueryWrapper<Favor>()
+                            .eq(Favor::getCommentId, video.getVideoId())
+                            .eq(Favor::getUserId, loginUserId);
+                    isCollected = favorService.count(userCollectQuery) > 0;
+                }
+            }
+
             // 组装返回数据
             Map<String, Object> map = new HashMap<>();
             map.put(Constant.ApiParam.VIDEO_ID, vo.getVideoId());
@@ -331,6 +348,7 @@ public class VideoController extends ApiController {
             map.put(Constant.Stat.SHARE_NUM, vo.getShareNum());
             map.put(Constant.ApiParam.MUSIC_ID, vo.getMusicId());
             map.put("isLiked", isLiked); // 添加是否点赞的标识
+            map.put("isCollected", isCollected); // 添加是否收藏的标识
             result.add(map);
         }
         return result;
@@ -405,22 +423,6 @@ public class VideoController extends ApiController {
         boolean success = false;
 
         if ("red".equals(type)) {
-            // 取消点赞操作
-            if (isLiked) {
-                // 将用户 ID 从 Redis 中移除，表示取消点赞
-                redisTemplate.opsForSet().remove(redisKey, userId);
-                // 将点赞数减 1
-                redisTemplate.opsForValue().decrement(redisKey + ":count", 1);
-                operation = "del";
-                resultMessage = contentType + "取消点赞成功";
-                success = true;
-            } else {
-                Map<String, Object> response = new HashMap<>();
-                response.put("code", 400);
-                response.put("message", "您尚未点赞");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
-        } else {
             // 点赞操作
             if (!isLiked) {
                 // 将用户 ID 存入 Redis，表示该用户已点赞
@@ -434,6 +436,22 @@ public class VideoController extends ApiController {
                 Map<String, Object> response = new HashMap<>();
                 response.put("code", 400);
                 response.put("message", "您已点赞");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+        } else {
+            // 取消点赞操作
+            if (isLiked) {
+                // 将用户 ID 从 Redis 中移除，表示取消点赞
+                redisTemplate.opsForSet().remove(redisKey, userId);
+                // 将点赞数减 1
+                redisTemplate.opsForValue().decrement(redisKey + ":count", 1);
+                operation = "del";
+                resultMessage = contentType + "取消点赞成功";
+                success = true;
+            } else {
+                Map<String, Object> response = new HashMap<>();
+                response.put("code", 400);
+                response.put("message", "您尚未点赞");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
         }
@@ -474,7 +492,129 @@ public class VideoController extends ApiController {
         // 返回统一格式的响应
         Map<String, Object> data = new HashMap<>();
         data.put("likeCount", likeCount);
-        data.put("isLiked", "red".equals(type) ? false : true);
+        data.put("isLiked", "red".equals(type) ? true : false);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("code", 200);
+        response.put("message", resultMessage);
+        response.put("data", data);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/collect")
+    public ResponseEntity<Map<String, Object>> collect(@RequestBody LikeRequest likeRequest) {
+        try {
+            StpUtil.checkLogin();
+        } catch (NotLoginException e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("code", 401);
+            response.put("message", "用户未登录");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        // 获取当前登录用户ID
+        Long userId = Long.valueOf(StpUtil.getLoginId().toString());
+
+        // 限流逻辑：每个用户每秒最多允许10次收藏操作
+        String rateLimitKey = "rate:limit:collect:" + userId;
+        long current = System.currentTimeMillis() / 1000;
+        redisTemplate.opsForHash().put(rateLimitKey, "last", current);
+        redisTemplate.expire(rateLimitKey, 1, java.util.concurrent.TimeUnit.SECONDS);
+        Long count = redisTemplate.opsForHash().increment(rateLimitKey, "count", 1);
+        if (count > 10) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("code", 429);
+            response.put("message", "收藏操作过于频繁，请稍后再试");
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(response);
+        }
+
+        // 从请求对象中获取参数
+        Long contentId = likeRequest.getContentId();
+        String type = likeRequest.getType();
+        String contentType = likeRequest.getContentType();
+
+        // 生成 Redis 键
+        String redisKey = "collect:content:" + contentType + contentId;
+        String batchKey = "collect:batch:" + contentType;
+
+        // 处理收藏和取消收藏逻辑
+        boolean isCollected = redisTemplate.opsForSet().isMember(redisKey, userId);
+        String operation;
+        String resultMessage;
+        boolean success = false;
+
+        if ("uncollect".equals(type)) {
+            // 取消收藏操作
+            if (isCollected) {
+                // 将用户 ID 从 Redis 中移除，表示取消收藏
+                redisTemplate.opsForSet().remove(redisKey, userId);
+                // 将收藏数减 1
+                redisTemplate.opsForValue().decrement(redisKey + ":count", 1);
+                operation = "del";
+                resultMessage = contentType + "取消收藏成功";
+                success = true;
+            } else {
+                Map<String, Object> response = new HashMap<>();
+                response.put("code", 400);
+                response.put("message", "您尚未收藏");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+        } else {
+            // 收藏操作
+            if (!isCollected) {
+                // 将用户 ID 存入 Redis，表示该用户已收藏
+                redisTemplate.opsForSet().add(redisKey, userId);
+                // 将收藏数加 1
+                redisTemplate.opsForValue().increment(redisKey + ":count", 1);
+                operation = "add";
+                resultMessage = contentType + "收藏成功";
+                success = true;
+            } else {
+                Map<String, Object> response = new HashMap<>();
+                response.put("code", 400);
+                response.put("message", "您已收藏");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+        }
+
+        // 优化：将收藏消息先存入Redis列表，而非直接发送到MQ
+        if (success) {
+            LikeMessage message = new LikeMessage(contentId, userId, operation, System.currentTimeMillis());
+            redisTemplate.opsForList().rightPush(batchKey, message);
+
+            // 检查是否达到批量发送阈值
+            Long size = redisTemplate.opsForList().size(batchKey);
+            if (size >= 100) { // 每100条消息批量发送一次
+                // 批量发送消息到MQ
+                List<LikeMessage> messages = redisTemplate.opsForList().range(batchKey, 0, 99);
+                if (messages != null && !messages.isEmpty()) {
+                    // 设置消息持久化
+                    rabbitTemplate.convertAndSend("like.exchange", "like.video", messages, msg -> {
+                        msg.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
+                        return msg;
+                    });
+                    // 删除已发送的消息
+                    redisTemplate.opsForList().trim(batchKey, 100, -1);
+                }
+            }
+        }
+
+        // 获取最新的收藏数
+        Integer collectCount = (Integer) redisTemplate.opsForValue().get(redisKey + ":count");
+        if (collectCount == null) {
+            // 如果Redis中没有收藏数，从数据库查询
+            LambdaQueryWrapper<Favor> collectQueryWrapper = new LambdaQueryWrapper<Favor>()
+                    .eq(Favor::getCommentId, contentId);
+            collectCount = favorService.count(collectQueryWrapper);
+            // 将查询结果存入Redis
+            redisTemplate.opsForValue().set(redisKey + ":count", collectCount);
+        }
+
+        // 返回统一格式的响应
+        Map<String, Object> data = new HashMap<>();
+        data.put("collectCount", collectCount);
+        data.put("isCollected", "uncollect".equals(type) ? false : true);
 
         Map<String, Object> response = new HashMap<>();
         response.put("code", 200);
