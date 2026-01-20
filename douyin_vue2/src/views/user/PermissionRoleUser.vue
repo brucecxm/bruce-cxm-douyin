@@ -4,10 +4,8 @@
     <el-card class="box-card" style="margin-bottom: 20px">
       <div slot="header" class="clearfix">
         <span>角色管理</span>
-        <el-button
-style="float: right"
-type="primary" @click="openRoleDialog()"
-        >新增角色</el-button
+        <el-button style="float: right" type="primary" @click="openRoleDialog()"
+          >新增角色</el-button
         >
       </div>
       <el-table :data="roleList" style="width: 100%">
@@ -21,13 +19,13 @@ type="primary" @click="openRoleDialog()"
               size="mini"
               type="danger"
               @click="deleteRole(scope.row.id)"
-            >删除</el-button
+              >删除</el-button
             >
             <el-button
               size="mini"
               type="success"
               @click="assignPermission(scope.row)"
-            >分配权限</el-button
+              >分配权限</el-button
             >
           </template>
         </el-table-column>
@@ -42,7 +40,7 @@ type="primary" @click="openRoleDialog()"
           style="float: right"
           type="primary"
           @click="openPermissionDialog()"
-        >新增权限</el-button
+          >新增权限</el-button
         >
       </div>
       <el-table :data="permissionList" style="width: 100%">
@@ -57,16 +55,14 @@ type="primary" @click="openRoleDialog()"
         <el-table-column prop="description" label="描述"></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button
-size="mini"
-@click="editPermission(scope.row)"
-            >编辑</el-button
+            <el-button size="mini" @click="editPermission(scope.row)"
+              >编辑</el-button
             >
             <el-button
               size="mini"
               type="danger"
               @click="deletePermission(scope.row.id)"
-            >删除</el-button
+              >删除</el-button
             >
           </template>
         </el-table-column>

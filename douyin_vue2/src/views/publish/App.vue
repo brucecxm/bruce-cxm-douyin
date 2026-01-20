@@ -154,7 +154,7 @@
               <span
                 v-if="formData.transactionMethod === method.value"
                 class="check-icon"
-              >✓</span
+                >✓</span
               >
             </div>
             <div class="method-text">{{ method.label }}</div>

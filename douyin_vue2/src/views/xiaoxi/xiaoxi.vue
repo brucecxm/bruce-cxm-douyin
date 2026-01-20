@@ -236,9 +236,9 @@ export default {
         const response = await getUserList(this.page, this.pageSize);
 
         // 检查响应数据是否存在且有效
-        if (response && response.data && response.data.code === 200) {
+        if (response && response.data && response.code === 0) {
           // 从响应中获取分页用户列表数据
-          const pageData = response.data.data.records || [];
+          const pageData = response.data.records || [];
 
           // 转换数据格式以适应前端需求
           const formattedData = pageData.map((user) => ({

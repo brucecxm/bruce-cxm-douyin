@@ -68,7 +68,7 @@
               v-for="i in 5"
               :key="i"
               :class="{ active: i <= Math.round(comments.averageRating) }"
-            >⭐</span
+              >⭐</span
             >
           </div>
         </div>
@@ -103,7 +103,7 @@
                 :key="i"
                 :class="{ active: i <= commentForm.rating }"
                 @click="setRating(i)"
-              >⭐</span
+                >⭐</span
               >
             </div>
           </div>
@@ -146,7 +146,7 @@
                 v-for="i in 5"
                 :key="i"
                 :class="{ active: i <= comment.rating }"
-              >⭐</span
+                >⭐</span
               >
             </div>
           </div>
@@ -177,9 +177,8 @@
           <div class="seller-rating">
             <span class="star">⭐</span>
             <span class="rating-text">{{ seller.rating }}分</span>
-            <span
-class="transaction-count"
-            >{{ seller.transactionCount }}笔交易</span
+            <span class="transaction-count"
+              >{{ seller.transactionCount }}笔交易</span
             >
           </div>
         </div>

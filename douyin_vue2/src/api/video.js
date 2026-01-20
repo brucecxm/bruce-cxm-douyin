@@ -30,6 +30,10 @@ export const like = (params) => {
   return request.post('/video/like', params);
 };
 
+export const collect = (params) => {
+  return request.post('/video/collect', params);
+};
+
 export const getcai = (params) => {
   return request.get('/dish/list', { params });
 };

@@ -19,7 +19,7 @@
             size="mini"
             type="success"
             @click="openAddDialog(scope.row.id)"
-          >添加好友</el-button
+            >添加好友</el-button
           >
         </template>
       </el-table-column>

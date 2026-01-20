@@ -2,8 +2,7 @@
   <div class="profile-page">
     <!-- 封面 -->
     <div class="cover">
-      <el-button class="change-cover-btn" type="primary"
-size="mini"
+      <el-button class="change-cover-btn" type="primary" size="mini"
         >更换封面</el-button
       >
     </div>

@@ -334,8 +334,8 @@ export default {
         case 1: // 评论
           // 导航到评论所在的视频
           this.$router.push(
-          `/videoDetail/${item.videoId || ''}?commentId=${item.id || ''}`
-        );
+            `/videoDetail/${item.videoId || ''}?commentId=${item.id || ''}`
+          );
           break;
         case 2: // 点赞
           // 导航到点赞的视频
@@ -362,9 +362,9 @@ export default {
             break;
           case 1:
             if (
-            !this.hasLoadedAllTabs.comments &&
+              !this.hasLoadedAllTabs.comments &&
               this.commentList.length === 0
-          ) {
+            ) {
               this.fetchComments(1);
             }
             break;

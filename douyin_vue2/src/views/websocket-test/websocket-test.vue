@@ -142,27 +142,44 @@ export default {
 
       if (isAndroid) {
         // Android环境下，根据connectionType选择连接方式
-        this.addLog('info', `使用Android ${this.connectionType === 'direct' ? '直接WebSocket' : 'SockJS'}连接`);
+        this.addLog(
+          'info',
+          `使用Android ${this.connectionType === 'direct' ? '直接WebSocket' : 'SockJS'}连接`
+        );
 
         try {
           let wsUrl;
           if (this.connectionType === 'direct') {
             // 直接WebSocket连接，使用/ws-direct端点
-            wsUrl = this.wsUrl.replace('/ws', '/ws-direct').replace('http://', 'ws://').replace('https://', 'wss://');
+            wsUrl = this.wsUrl
+              .replace('/ws', '/ws-direct')
+              .replace('http://', 'ws://')
+              .replace('https://', 'wss://');
             this.addLog('info', `直接WebSocket URL: ${wsUrl}`);
           } else {
             // SockJS连接，保持原逻辑
-            wsUrl = this.wsUrl.replace('http://', 'ws://').replace('https://', 'wss://');
+            wsUrl = this.wsUrl
+              .replace('http://', 'ws://')
+              .replace('https://', 'wss://');
             this.addLog('info', `SockJS URL: ${wsUrl}`);
           }
 
           // 使用Android原生WebSocket连接
-          const success = window.Android.connectWebSocket(wsUrl, 'websocketCallback');
+          const success = window.Android.connectWebSocket(
+            wsUrl,
+            'websocketCallback'
+          );
           if (success) {
             this.isConnected = true;
-            this.addLog('open', `Android ${this.connectionType === 'direct' ? '直接WebSocket' : 'SockJS'}连接成功`);
+            this.addLog(
+              'open',
+              `Android ${this.connectionType === 'direct' ? '直接WebSocket' : 'SockJS'}连接成功`
+            );
           } else {
-            this.addLog('error', `Android ${this.connectionType === 'direct' ? '直接WebSocket' : 'SockJS'}连接失败`);
+            this.addLog(
+              'error',
+              `Android ${this.connectionType === 'direct' ? '直接WebSocket' : 'SockJS'}连接失败`
+            );
           }
         } catch (error) {
           this.addLog('error', `Android WebSocket连接出错: ${error.message}`);

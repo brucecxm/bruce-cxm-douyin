@@ -158,7 +158,7 @@
               <img
                 :src="
                   item.shopImg ||
-                    'https://picsum.photos/seed/' + item.shopId + '/300/300'
+                  'https://picsum.photos/seed/' + item.shopId + '/300/300'
                 "
                 alt="商品图片"
               />

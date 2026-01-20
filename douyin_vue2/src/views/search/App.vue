@@ -115,25 +115,25 @@
               class="sort-option"
               :class="{ active: sortBy === 'default' }"
               @click="changeSort('default')"
-            >默认排序</span
+              >默认排序</span
             >
             <span
               class="sort-option"
               :class="{ active: sortBy === 'price_asc' }"
               @click="changeSort('price_asc')"
-            >价格从低到高</span
+              >价格从低到高</span
             >
             <span
               class="sort-option"
               :class="{ active: sortBy === 'price_desc' }"
               @click="changeSort('price_desc')"
-            >价格从高到低</span
+              >价格从高到低</span
             >
             <span
               class="sort-option"
               :class="{ active: sortBy === 'time' }"
               @click="changeSort('time')"
-            >最新发布</span
+              >最新发布</span
             >
           </div>
         </div>

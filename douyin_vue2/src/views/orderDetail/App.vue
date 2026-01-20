@@ -48,8 +48,8 @@
       class="logistics-section"
       v-if="
         order.status === 'pending_shipping' ||
-          order.status === 'pending_receipt' ||
-          order.status === 'completed'
+        order.status === 'pending_receipt' ||
+        order.status === 'completed'
       "
     >
       <div class="section-title">物流信息</div>
@@ -159,8 +159,8 @@
       class="bottom-actions"
       v-if="
         order.status === 'pending_payment' ||
-          order.status === 'pending_receipt' ||
-          order.status === 'completed'
+        order.status === 'pending_receipt' ||
+        order.status === 'completed'
       "
     >
       <button

@@ -32,7 +32,7 @@
       @click="toggleCollect"
       :class="{ collected: isCollected }"
     ></div>
-    <div class="num">{{ videoData.collectNum }}</div>
+    <div class="num">{{ collectNum }}</div>
 
     <!-- 分享 -->
     <div
@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import { like } from '@/api/video';
+import { like, collect } from '@/api/video';
 
 export default {
   props: {
@@ -65,7 +65,8 @@ export default {
       userId: '1',
       isLiked: this.videoData.isLiked || false, // 从videoData初始化点赞状态
       likeNum: this.videoData.likeNum || 0, // 初始点赞数量
-      isCollected: false, // 控制是否已收藏
+      isCollected: this.videoData.isCollected || false, // 从videoData初始化收藏状态
+      collectNum: this.videoData.collectNum || 0, // 初始收藏数量
       isCommentClicked: false, // 控制评论图标点击状态
       isShareClicked: false, // 控制分享图标点击状态
       videoDateOne: {}
@@ -111,10 +112,10 @@ export default {
       const contentId =
         typeof this.videoDateOne.videoId === 'object'
           ? Number(
-            this.videoDateOne.videoId.id ||
+              this.videoDateOne.videoId.id ||
                 this.videoDateOne.videoId.videoId ||
                 0
-          )
+            )
           : Number(this.videoDateOne.videoId);
 
       var params = {
@@ -137,7 +138,44 @@ export default {
 
     toggleCollect() {
       this.isCollected = !this.isCollected; // 切换收藏状态
+      if (this.isCollected) {
+        this.collectNum += 1; // 收藏时，收藏数量增加1
+      } else {
+        this.collectNum -= 1; // 取消收藏时，收藏数量减少1
+      }
       this.behaviour('collect');
+
+      // 调用 API 或其他逻辑处理
+      console.log('videoDateOne:', this.videoDateOne);
+      console.log('videoId:', this.videoDateOne.videoId);
+      console.log('videoId type:', typeof this.videoDateOne.videoId);
+
+      // 确保contentId是一个数字，而不是对象
+      const contentId =
+        typeof this.videoDateOne.videoId === 'object'
+          ? Number(
+              this.videoDateOne.videoId.id ||
+                this.videoDateOne.videoId.videoId ||
+                0
+            )
+          : Number(this.videoDateOne.videoId);
+
+      var params = {
+        type: this.isCollected ? 'collect' : 'uncollect',
+        contentType: 'video',
+        contentId: contentId
+      };
+
+      console.log('发送的收藏参数:', params);
+      console.log('contentId type:', typeof params.contentId);
+
+      collect(params)
+        .then((result) => {
+          console.log('收藏成功:', result);
+        })
+        .catch((error) => {
+          console.error('收藏出错:', error);
+        });
     },
     toggleShare() {
       // this.sharedState.commentVisible = true; 把这换成vuex

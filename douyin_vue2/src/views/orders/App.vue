@@ -278,18 +278,18 @@ export default {
       switch (this.activeTab) {
         case 'pending_payment':
           filtered = filtered.filter(
-          (order) => order.status === 'pending_payment'
-        );
+            (order) => order.status === 'pending_payment'
+          );
           break;
         case 'pending_shipping':
           filtered = filtered.filter(
-          (order) => order.status === 'pending_shipping'
-        );
+            (order) => order.status === 'pending_shipping'
+          );
           break;
         case 'pending_receipt':
           filtered = filtered.filter(
-          (order) => order.status === 'pending_receipt'
-        );
+            (order) => order.status === 'pending_receipt'
+          );
           break;
         case 'completed':
           filtered = filtered.filter((order) => order.status === 'completed');

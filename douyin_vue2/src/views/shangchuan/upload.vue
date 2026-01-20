@@ -37,13 +37,13 @@
             v-else-if="
               uploadedChunks.length > 0 && uploadedChunks.length < totalChunks
             "
-          >（已暂停）</span
+            >（已暂停）</span
           >
           <span
             v-else-if="
               uploadedChunks.length === totalChunks && progress === 100
             "
-          >（上传完成）</span
+            >（上传完成）</span
           >
         </div>
       </div>
@@ -55,14 +55,14 @@
           icon="el-icon-video-play"
           @click="startUpload"
           :disabled="!file || uploading"
-        >开始上传</el-button
+          >开始上传</el-button
         >
         <el-button
           type="warning"
           icon="el-icon-video-pause"
           @click="pauseUpload"
           :disabled="!uploading"
-        >暂停上传</el-button
+          >暂停上传</el-button
         >
         <el-button
           type="success"
@@ -71,14 +71,14 @@
           :disabled="
             uploading || !file || uploadedChunks.length === totalChunks
           "
-        >恢复上传</el-button
+          >恢复上传</el-button
         >
         <el-button
           type="danger"
           icon="el-icon-delete"
           @click="resetUpload"
           v-if="file"
-        >重置上传</el-button
+          >重置上传</el-button
         >
       </div>
     </el-card>

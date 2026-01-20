@@ -17,10 +17,7 @@
       </div>
 
       <div class="form-group">
-        <input
-type="email"
-v-model="email" placeholder="请输入邮箱"
-required />
+        <input type="email" v-model="email" placeholder="请输入邮箱" required />
       </div>
 
       <div class="form-group">
@@ -59,10 +56,8 @@ required />
       <div class="agreement">
         <input type="checkbox" id="agreement" v-model="agree" required />
         <label for="agreement">
-          我已阅读并同意<a
-href="#"
-@click.prevent="showAgreement"
-          >《用户协议》</a
+          我已阅读并同意<a href="#" @click.prevent="showAgreement"
+            >《用户协议》</a
           >和<a href="#" @click.prevent="showPrivacy">《隐私政策》</a>
         </label>
       </div>

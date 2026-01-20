@@ -144,10 +144,10 @@ export default {
         case '关注':
           this.userList = [];
           this.loadFollowList();
-        break;
+          break;
         case '粉丝':
           this.userList = [];
-        this.loadFansList();
+          this.loadFansList();
 
           break;
         case '朋友':

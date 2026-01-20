@@ -17,12 +17,10 @@
         style="width: 200px; margin: 0 10px"
         v-model="nameKeyword"
       ></el-input>
-      <el-button @click="initUserData" icon="el-icon-search"
-type="primary"
+      <el-button @click="initUserData" icon="el-icon-search" type="primary"
         >搜索</el-button
       >
-      <el-button @click="refreshTable" icon="el-icon-refresh"
-type="primary"
+      <el-button @click="refreshTable" icon="el-icon-refresh" type="primary"
         >刷新表格</el-button
       >
     </div>
