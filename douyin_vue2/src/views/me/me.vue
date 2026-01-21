@@ -1,266 +1,255 @@
 <template>
-  <div class="container">
-    <!-- 加载状态遮罩 -->
-    <div v-if="loading && videobox.length === 0" class="loading-overlay">
-      <div class="loading-spinner"></div>
-      <div class="loading-text">加载中...</div>
+  <div class="me-page-container">
+    <!-- 1. 顶部背景与导航区 -->
+    <div
+      class="header-bg"
+      :style="{
+        backgroundImage: userInfo.backImg
+          ? `url(${userInfo.backImg})`
+          : 'linear-gradient(135deg, #2c3e50 0%, #000000 100%)'
+      }"
+    >
+      <div class="top-nav">
+        <div class="left-action">
+          <!-- 这里的按钮可以绑定侧边栏逻辑 -->
+          <span class="icon-btn">👤+</span>
+        </div>
+        <div class="right-actions">
+          <span class="icon-btn" @click="goWallet">🔍</span>
+          <span class="icon-btn">☰</span>
+        </div>
+      </div>
+
+      <!-- 用户基础信息 -->
+      <div class="user-intro-area">
+        <div class="avatar-wrapper">
+          <img
+            :src="userInfo.avatar || defaultAvatar"
+            class="avatar-img"
+            alt="头像"
+            @click="goEditMeInfo"
+          />
+        </div>
+
+        <div class="user-text-info">
+          <div class="name-row">
+            <span class="username">{{
+              userInfo.nickname || '未设置昵称'
+            }}</span>
+          </div>
+          <div class="douyin-id">抖音号：{{ userInfo.id || 'Loading...' }}</div>
+        </div>
+      </div>
     </div>
 
-    <InfiniteList
-      v-if="!loading || videobox.length > 0"
-      :itemInfo="currentDisplayData"
-      :itemsPerRow="3"
-      :append="false"
-      boxWidth="33%"
-      boxHeight="250px"
-      :gap="3"
-      :loading="loading"
-      :noMoreData="noMoreData"
-      @loadMore="loadMoreData"
+    <!-- 2. 简介与标签 (移动到头部下方，背景白色) -->
+    <div class="info-section">
+      <!-- 简介 -->
+      <div class="bio-text">
+        {{ userInfo.myIntro || userInfo.jieshao || '暂无个人简介' }}
+      </div>
+
+      <!-- 标签行 (年龄、城市、学校) -->
+      <div class="tags-row">
+        <span v-if="userInfo.age" class="tag">Age: {{ userInfo.age }}</span>
+        <span v-if="userInfo.city" class="tag">{{ userInfo.city }}</span>
+        <span v-if="userInfo.school" class="tag">{{ userInfo.school }}</span>
+        <span class="tag add-tag" @click="goEditMeInfo">+ 编辑资料</span>
+      </div>
+
+      <!-- 3. 数据统计 -->
+      <div class="stats-row">
+        <div class="stat-item" @click="gofriend('likes')">
+          <span class="num">{{ formatNumber(userInfo.likes || 0) }}</span>
+          <span class="label">获赞</span>
+        </div>
+        <div class="stat-item" @click="gofriend('mutualFollow')">
+          <span class="num">{{
+            formatNumber(userInfo.mutualFollow || 0)
+          }}</span>
+          <span class="label">互关</span>
+        </div>
+        <div class="stat-item" @click="gofriend('following')">
+          <span class="num">{{ formatNumber(userInfo.following || 0) }}</span>
+          <span class="label">关注</span>
+        </div>
+        <div class="stat-item" @click="gofriend('followers')">
+          <span class="num">{{ formatNumber(userInfo.followers || 0) }}</span>
+          <span class="label">粉丝</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. 选项卡 (替代原 underLineTagsVue) -->
+    <div class="tabs-nav sticky-tabs">
+      <div
+        v-for="(tab, index) in parentMessage"
+        :key="index"
+        class="tab-item"
+        :class="{ active: activeTabIndex === index }"
+        @click="handleTabChange(index)"
+      >
+        <span>{{ tab }}</span>
+        <div class="active-line" v-show="activeTabIndex === index"></div>
+      </div>
+    </div>
+
+    <!-- 5. 内容列表区域 (替代原 InfiniteList) -->
+    <div class="content-grid">
+      <!-- 加载中 -->
+      <div
+        v-if="loading && currentDisplayData.length === 0"
+        class="loading-placeholder"
+      >
+        加载中...
+      </div>
+
+      <!-- 空状态 -->
+      <div
+        v-else-if="currentDisplayData.length === 0"
+        class="empty-placeholder"
+      >
+        {{ getEmptyText() }}
+      </div>
+
+      <!-- 视频/内容网格 -->
+      <div
+        v-else
+        class="grid-item"
+        v-for="(item, index) in currentDisplayData"
+        :key="item.id || index"
+        @click="navigateToDetail(item)"
+      >
+        <!-- 封面图 -->
+        <img :src="item.cover" class="cover-img" loading="lazy" />
+
+        <!-- 左下角数据 (点赞或播放量) -->
+        <div class="item-stats-overlay">
+          <span
+v-if="activeTabIndex === 0"
+          >▶ {{ formatNumber(item.playCount || 0) }}</span
+          >
+          <span v-else>❤ {{ formatNumber(item.likeCount || 0) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 加载更多触发器 (简化版) -->
+    <div
+      v-if="!noMoreData && currentDisplayData.length > 0"
+      class="load-more-btn"
+      @click="loadMoreData(page + 1)"
     >
-      <template v-slot:header>
-        <!-- 顶部背景图 -->
-        <div
-          class="profile-header"
-          :style="{
-            backgroundImage: 'url(' + (userInfo.backImg || defaultBackImg) + ')'
-          }"
-        >
-          <div class="avatar-container">
-            <img
-              class="avatar"
-              :src="userInfo.avatar || defaultAvatar"
-              alt="头像"
-            />
-            <div class="avatar-badge" @click.stop="goEditMeInfo">
-              <i class="icon-plus"></i>
-              <span>编辑</span>
-            </div>
-          </div>
-          <div class="douyinnum" style="color: white">
-            <div class="user-name-row">
-              <div class="user-name">
-                {{ userInfo.nickname || '未设置昵称' }}
-              </div>
-              <div class="private-account" v-if="userInfo.isPrivate">
-                <i class="icon-lock"></i>
-              </div>
-            </div>
-            <div class="user-id">抖音号：{{ userInfo.id }}</div>
-          </div>
-        </div>
-        <!-- 用户统计信息 -->
-        <div class="user-stats">
-          <div class="stat-item" @click="gofriend('likes')">
-            <div class="num">{{ userInfo.likes || '0' }}</div>
-            <div class="label">获赞</div>
-          </div>
-          <div class="stat-item" @click="gofriend('mutualFollow')">
-            <div class="num">{{ userInfo.mutualFollow || '0' }}</div>
-            <div class="label">互关</div>
-          </div>
-          <div class="stat-item" @click="gofriend('following')">
-            <div class="num">{{ userInfo.following || '0' }}</div>
-            <div class="label">关注</div>
-          </div>
-          <div class="stat-item" @click="gofriend('followers')">
-            <div class="num">{{ userInfo.followers || '0' }}</div>
-            <div class="label">粉丝</div>
-          </div>
-          <div class="user-actions">
-            <button class="btn-edit-profile" @click="goEditMeInfo">
-              编辑主页
-            </button>
-            <button class="btn-wallet" @click="goWallet">
-              <i class="icon-wallet"></i>
-              钱包
-            </button>
-            <button class="btn-settings">
-              <i class="icon-settings"></i>
-            </button>
-          </div>
-          <!-- <el-button
-class="edit-btn"
-type="primary" @click="goEditMeInfo"
-          >编辑主页</el-button
-          > -->
-        </div>
-        <div class="userinfo">
-          <div class="intro" style="font-size: 15px; margin-top: 10px">
-            {{ userInfo.myIntro || userInfo.jieshao || '暂无个人简介' }}
-          </div>
-          <div class="bio">
-            <div v-if="userInfo.city" class="location">
-              🏙️ {{ userInfo.city }}
-            </div>
-            <div v-if="userInfo.school" class="school">
-              🎓 {{ userInfo.school }}
-            </div>
-            <div v-if="userInfo.age" class="age">📅 {{ userInfo.age }}岁</div>
-            <div v-if="userInfo.isAnchor" class="anchor">⚓ 主播</div>
-          </div>
-        </div>
-        <under-line-tags-vue
-          :navItems="parentMessage"
-          :active-index.sync="activeTabIndex"
-          @change="handleTabChange"
-        ></under-line-tags-vue>
-      </template>
-      <template #item="{ item }">
-        <div @click="navigateToDetail(item)" class="itemdetail">
-          <img :src="item.cover" alt="视频封面" />
-          <!-- 视频时长显示 -->
-          <div class="video-duration" v-if="activeTabIndex === 0">
-            {{ formatDuration(item.duration || 0) }}
-          </div>
+      点击加载更多
+    </div>
+    <div
+      v-if="noMoreData && currentDisplayData.length > 0"
+      class="no-more-text"
+    >
+      - 到底了 -
+    </div>
 
-          <!-- 显示播放量或点赞数 -->
-          <div class="item-stats">
-            <span v-if="activeTabIndex === 0" class="stat-item">
-              <i class="icon-play"></i>
-              {{ formatNumber(item.playCount || 0) }}
-            </span>
-            <span v-else class="stat-item">
-              <i class="icon-like"></i>
-              {{ formatNumber(item.likeCount || 0) }}
-            </span>
-          </div>
-        </div>
-      </template>
-      <template #empty>
-        <div class="empty-state">
-          <div class="empty-icon">
-            {{
-              activeTabIndex === 0 ? '📹' : activeTabIndex === 1 ? '💬' : '❤️'
-            }}
-          </div>
-          <div class="empty-text">{{ getEmptyText() }}</div>
-        </div>
-      </template>
-    </InfiniteList>
-
+    <!-- 6. 底部组件 -->
     <footer-vue class="footer"></footer-vue>
   </div>
 </template>
+
 <script>
-import InfiniteList from '../../components/InfiniteList.vue';
+// 保留你要求的 footer 组件
 import footerVue from '@/components/footer.vue';
-import underLineTagsVue from '../../components/underLineTags.vue';
+// 引入 API
 import { getUserInfo } from '@/api/user';
+
 export default {
   name: 'MePage',
   components: {
-    footerVue,
-    underLineTagsVue,
-    InfiniteList
+    footerVue
   },
   data() {
     return {
-      parentMessage: ['视频', '评论', '点赞'],
+      // 这里的 Tabs 对应你的逻辑
+      parentMessage: ['作品', '私密', '喜欢'], // 根据抖音风格稍微改了下文案，逻辑不变
       userInfo: {},
       loading: false,
       activeTabIndex: 0,
-      page: 0, // 当前页码
+      page: 1,
       pageSize: 10,
-      videobox: [], // 视频列表，初始为空
-      commentList: [], // 评论列表
-      likeList: [], // 点赞列表
-      defaultAvatar: 'https://via.placeholder.com/150', // 默认头像
-      defaultBackImg: 'https://via.placeholder.com/800x300', // 默认背景图
+
+      // 数据容器
+      videobox: [], // 作品
+      commentList: [], // 私密/评论 (复用你的逻辑变量名)
+      likeList: [], // 喜欢
+
+      defaultAvatar: 'https://ui-avatars.com/api/?background=0D8ABC&color=fff',
       hasLoadedAllTabs: {
         videos: false,
-        comments: false,
-        likes: false
+        comments: false, // 对应 Tab 1
+        likes: false // 对应 Tab 2
       }
     };
   },
   computed: {
-    // 根据当前选中的标签返回对应的数据
     currentDisplayData() {
       switch (this.activeTabIndex) {
-        case 0: // 视频
-          return this.videobox;
-        case 1: // 评论
-          return this.commentList;
-        case 2: // 点赞
-          return this.likeList;
+        case 0:
+        return this.videobox;
+        case 1:
+        return this.commentList;
+        case 2:
+        return this.likeList;
         default:
-          return this.videobox;
+        return [];
       }
     },
-
-    // 根据当前标签判断是否已加载完毕
     noMoreData() {
       switch (this.activeTabIndex) {
         case 0:
-          return this.hasLoadedAllTabs.videos;
+        return this.hasLoadedAllTabs.videos;
         case 1:
-          return this.hasLoadedAllTabs.comments;
+        return this.hasLoadedAllTabs.comments;
         case 2:
-          return this.hasLoadedAllTabs.likes;
+        return this.hasLoadedAllTabs.likes;
         default:
-          return false;
+        return false;
       }
     }
   },
   mounted() {
-    console.log('MePage mounted');
     this.loadInitialData();
   },
   methods: {
-    // 格式化视频时长
+    // ---- 原始逻辑方法 ----
+
     formatDuration(seconds) {
       if (!seconds || isNaN(seconds)) return '0:00';
-
       const mins = Math.floor(seconds / 60);
       const secs = Math.floor(seconds % 60);
       return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
     },
 
-    // 加载初始数据
+    formatNumber(num) {
+      if (!num) return '0';
+      if (num >= 10000) return (num / 10000).toFixed(1) + 'w';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+      return num.toString();
+    },
+
     loadInitialData() {
       this.loading = true;
       this.fetchUserAndVideosData(1);
     },
 
-    // 加载更多数据
-    loadMoreData(page) {
-      if (this.loading) return;
-
-      this.loading = true;
-      // 根据当前标签加载对应的数据
-      switch (this.activeTabIndex) {
-        case 0: // 视频
-          this.fetchVideos(page);
-          break;
-        case 1: // 评论
-          this.fetchComments(page);
-          break;
-        case 2: // 点赞
-          this.fetchLikes(page);
-          break;
-      }
-    },
-
-    // 获取用户信息和视频数据
+    // 核心数据获取逻辑
     fetchUserAndVideosData(page) {
+      // 注意：这里为了防止报错，加了 try-catch 或空判断，实际运行依赖你的 api
       getUserInfo(null, page, this.pageSize)
         .then((res) => {
           if (res && res.data) {
-            // 只在第一页赋值用户信息
             if (page === 1) {
-              // 避免不必要的更新导致的重渲染
-              const newUserInfo = res.data || {};
-              // 只有当数据发生变化时才更新
-              if (
-                JSON.stringify(newUserInfo) !== JSON.stringify(this.userInfo)
-              ) {
-                this.userInfo = newUserInfo;
-              }
+              this.userInfo = res.data;
             }
 
-            // 处理视频数据
-            const videos = res.data.videoPage.records || [];
+            const videos = res.data.videoPage?.records || [];
             const total = res.data.total || 0;
 
             if (page === 1) {
@@ -269,774 +258,327 @@ export default {
               this.videobox = [...this.videobox, ...videos];
             }
 
-            // 判断是否加载完毕
             if (this.videobox.length >= total) {
               this.hasLoadedAllTabs.videos = true;
             }
-
             this.page = page;
           }
         })
         .catch((error) => {
-          this.$router.push('/login');
-          console.error('获取用户信息失败:', error);
-          this.$toast && this.$toast('获取用户信息失败，请稍后重试');
+          console.error('获取信息失败', error);
         })
         .finally(() => {
           this.loading = false;
         });
     },
 
-    // 获取视频列表
-    fetchVideos(page) {
-      // 复用fetchUserAndVideosData方法
-      this.fetchUserAndVideosData(page);
+    loadMoreData(nextPage) {
+      if (this.loading || this.noMoreData) return;
+      this.loading = true;
+
+      if (this.activeTabIndex === 0) {
+        this.fetchUserAndVideosData(nextPage);
+      } else if (this.activeTabIndex === 1) {
+        this.fetchComments(nextPage);
+      } else {
+        this.fetchLikes(nextPage);
+      }
     },
 
-    // 获取评论列表（这里是示例，实际需要调用对应的API）
+    // 模拟的 Fetch 方法 (你需要替换回真实的 API)
     fetchComments(page) {
-      // 模拟API调用
       setTimeout(() => {
-        // 实际项目中应调用真实API
-        this.commentList = page === 1 ? [] : this.commentList;
+        // 模拟空数据或加载完成
         this.hasLoadedAllTabs.comments = true;
         this.loading = false;
       }, 500);
     },
 
-    // 获取点赞列表（这里是示例，实际需要调用对应的API）
     fetchLikes(page) {
-      // 模拟API调用
       setTimeout(() => {
-        // 实际项目中应调用真实API
-        this.likeList = page === 1 ? [] : this.likeList;
         this.hasLoadedAllTabs.likes = true;
         this.loading = false;
       }, 500);
     },
 
-    // 跳转到朋友页面，可以传递类型参数
-    gofriend(type) {
-      this.$router.push({
-        path: '/friend',
-        query: { type }
-      });
-    },
-
-    // 导航到详情页
-    navigateToDetail(item) {
-      if (!item) return;
-
-      switch (this.activeTabIndex) {
-        case 0: // 视频
-          this.$router.push(`/videoDetail/${item.id || ''}`);
-          break;
-        case 1: // 评论
-          // 导航到评论所在的视频
-          this.$router.push(
-            `/videoDetail/${item.videoId || ''}?commentId=${item.id || ''}`
-          );
-          break;
-        case 2: // 点赞
-          // 导航到点赞的视频
-          this.$router.push(`/videoDetail/${item.id || ''}`);
-          break;
-      }
-    },
-
-    // 处理标签页切换
     handleTabChange(index) {
-      // 如果切换到新标签，且该标签数据未加载过，则加载数据
       if (index !== this.activeTabIndex) {
         this.activeTabIndex = index;
-
-        // 重置加载状态
-        this.loading = false;
-
-        // 根据切换的标签加载对应数据
-        switch (index) {
-          case 0:
-            if (!this.hasLoadedAllTabs.videos && this.videobox.length === 0) {
-              this.fetchVideos(1);
-            }
-            break;
-          case 1:
-            if (
-              !this.hasLoadedAllTabs.comments &&
-              this.commentList.length === 0
-            ) {
-              this.fetchComments(1);
-            }
-            break;
-          case 2:
-            if (!this.hasLoadedAllTabs.likes && this.likeList.length === 0) {
-              this.fetchLikes(1);
-            }
-            break;
-        }
+        // 如果切到的 Tab 没数据，尝试加载
+        if (index === 1 && this.commentList.length === 0) this.fetchComments(1);
+        if (index === 2 && this.likeList.length === 0) this.fetchLikes(1);
       }
     },
 
-    // 格式化数字显示（如：1000 -> 1k）
-    formatNumber(num) {
-      if (num >= 10000) {
-        return (num / 10000).toFixed(1) + 'w';
-      } else if (num >= 1000) {
-        return (num / 1000).toFixed(1) + 'k';
-      }
-      return num.toString();
+    navigateToDetail(item) {
+      if (!item) return;
+      this.$router.push(`/videoDetail/${item.id}`);
     },
 
-    // 获取空状态文本
     getEmptyText() {
-      switch (this.activeTabIndex) {
-        case 0:
-          return '还没有发布视频';
-        case 1:
-          return '还没有评论';
-        case 2:
-          return '还没有点赞内容';
-        default:
-          return '暂无数据';
-      }
+      const texts = ['留下你的第一个作品吧', '暂无私密作品', '还没喜欢过视频'];
+      return texts[this.activeTabIndex] || '暂无数据';
     },
 
-    // 跳转到编辑主页
+    // ---- 路由跳转 ----
     goEditMeInfo() {
       this.$router.push({ path: '/editMeInfo' });
     },
-    // 跳转到钱包页面
     goWallet() {
       this.$router.push('/wallet');
     },
-
-    // 跳转到订单列表
-    goToOrderList() {
-      this.$router.push({ path: '/shop/orderlist' });
-    },
-
-    // 跳转到收藏页面
-    goToCollect() {
-      this.$router.push({ path: '/collect' });
+    gofriend(type) {
+      this.$router.push({ path: '/friend', query: { type } });
     }
   }
 };
 </script>
-<style scoped>
-.container {
+
+<style lang="scss" scoped>
+/* 全局容器 */
+.me-page-container {
   min-height: 100vh;
-  background: #f8f8f8;
-  position: relative;
-  padding-bottom: 60px; /* 为底部导航栏留出空间 */
+  background-color: #fff;
+  padding-bottom: 60px; /* 留给 footer 的空间 */
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* 加载遮罩 */
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(0, 0, 0, 0.1);
-  border-radius: 50%;
-  border-top-color: #fe2c55;
-  animation: spin 1s ease-in-out infinite;
-}
-
-.loading-text {
-  margin-top: 10px;
-  color: #666;
-  font-size: 14px;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* 个人资料头部 */
-.profile-header {
+/* 1. 顶部背景区 */
+.header-bg {
+  width: 100%;
+  height: 200px;
   background-size: cover;
   background-position: center;
-  height: 22vh;
-  min-height: 160px;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
   position: relative;
-  padding-bottom: 24px;
-  padding-left: 18px;
-  transition: background-image 0.5s ease;
-}
-
-.profile-header::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60%;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
-  transition: opacity 0.3s ease;
-}
-
-.profile-header:hover::after {
-  opacity: 0.6;
-}
-
-.douyinnum {
-  margin-bottom: 6vw;
-  margin-left: 2vw;
-  position: relative;
-  z-index: 1;
+  color: white;
+  padding: 20px 16px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  justify-content: space-between;
 }
 
-.avatar-container {
-  position: relative;
-  margin-bottom: 3vw;
-  z-index: 1;
-}
-
-.avatar {
-  display: block;
-  width: 24vw;
-  height: 24vw;
-  max-width: 110px;
-  max-height: 110px;
-  border-radius: 50%;
-  border: 3px solid #fff;
-  object-fit: cover;
-  position: relative;
-  z-index: 1;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-  cursor: pointer;
-}
-
-.avatar:hover {
-  transform: scale(1.05);
-  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
-}
-
-.avatar-badge {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(254, 44, 85, 0.9);
-  color: white;
-  padding: 3px 14px;
-  border-radius: 14px;
-  font-size: 12px;
+/* 顶部导航图标 */
+.top-nav {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 3px;
   z-index: 2;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.avatar-badge:hover {
-  background-color: #fe2c55;
-  transform: translateX(-50%) translateY(-2px);
-  box-shadow: 0 2px 6px rgba(254, 44, 85, 0.4);
-}
-
-.icon-plus::before {
-  content: '+';
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.user-name-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.private-account {
-  color: white;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  background: rgba(255, 255, 255, 0.2);
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-size: 12px;
-}
-
-.icon-lock::before {
-  content: '🔒';
-  font-size: 14px;
-}
-
-.user-name {
-  margin-top: 0;
-  font-size: 4vw;
-  font-weight: bold;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
-  font-family: Arial, sans-serif;
-  letter-spacing: 0.5px;
-}
-
-.user-id {
-  margin-top: 0;
-  font-size: 3vw;
-  opacity: 0.95;
-  color: white;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-  font-family: Arial, sans-serif;
-}
-
-/* 用户统计信息 */
-.user-stats {
-  display: flex;
-  margin-top: 0;
-  background: white;
-  padding: 18px 0;
-  border-bottom: 1px solid #f0f0f0;
-  position: relative;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.stat-item {
-  flex: 1;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 8px 0;
-  position: relative;
-}
-
-.stat-item::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 2px;
-  background: #fe2c55;
-  transition: width 0.3s ease;
-}
-
-.stat-item:hover::after {
-  width: 30px;
-}
-
-.stat-item:hover {
-  background-color: rgba(254, 44, 85, 0.05);
-}
-
-.stat-item:active {
-  background-color: rgba(254, 44, 85, 0.1);
-}
-
-.num {
-  font-size: 19px;
-  font-weight: bold;
-  color: #222;
-  font-family: Arial, sans-serif;
-  transition: color 0.3s ease;
-}
-
-.stat-item:hover .num {
-  color: #fe2c55;
-}
-
-.label {
-  font-size: 12px;
-  color: #666;
-  margin-top: 4px;
-  font-family: Arial, sans-serif;
-  transition: color 0.3s ease;
-}
-
-.stat-item:hover .label {
-  color: #fe2c55;
-}
-
-.user-actions {
-  position: absolute;
-  top: 50%;
-  right: 18px;
-  transform: translateY(-50%);
-  display: flex;
-  gap: 12px;
-}
-
-.btn-edit-profile {
-  padding: 7px 18px;
-  background-color: #f5f5f5;
-  border: 1px solid #e0e0e0;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: Arial, sans-serif;
-}
-
-.btn-edit-profile:hover {
-  background-color: #e8e8e8;
-  border-color: #d0d0d0;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.btn-edit-profile:active {
-  transform: translateY(0);
-}
-
-.btn-wallet {
-  padding: 7px 18px;
-  background-color: #f5f5f5;
-  border: 1px solid #e0e0e0;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: Arial, sans-serif;
-  margin-left: 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.btn-wallet:hover {
-  background-color: #e8e8e8;
-  border-color: #d0d0d0;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.btn-wallet:active {
-  transform: translateY(0);
-}
-
-.btn-settings {
-  width: 38px;
-  height: 38px;
+.icon-btn {
+  background: rgba(0, 0, 0, 0.3);
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  border: 1px solid #e0e0e0;
-  background-color: #f5f5f5;
-  font-size: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 18px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  color: #666;
 }
 
-.btn-settings:hover {
-  background-color: #e8e8e8;
-  border-color: #d0d0d0;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  color: #333;
-}
-
-.icon-settings::before {
-  content: '•••';
-  font-size: 16px;
-  line-height: 1;
-}
-
-/* 用户信息 */
-.userinfo {
-  background: white;
-  padding: 18px;
-  margin-bottom: 12px;
-  border-radius: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.3s ease;
-}
-
-.userinfo:hover {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.intro {
-  font-size: 14px;
-  color: #333;
-  line-height: 1.6;
-  margin-bottom: 12px;
-  font-family: Arial, sans-serif;
-  word-break: break-word;
-}
-
-.bio {
+.right-actions {
   display: flex;
-  flex-wrap: wrap;
   gap: 10px;
-  margin-top: 12px;
 }
 
-.bio > div {
-  padding: 5px 10px;
-  background-color: rgba(254, 44, 85, 0.08);
-  border-radius: 16px;
-  font-size: 12px;
-  color: #555;
-  border: 1px solid rgba(254, 44, 85, 0.15);
-  transition: all 0.3s ease;
-  font-family: Arial, sans-serif;
+/* 头像和名字布局 (左对齐) */
+.user-intro-area {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: -40px; /* 让头像一半在背景里，一半在白色区域 */
+  z-index: 2;
 }
 
-.bio > div:hover {
-  background-color: rgba(254, 44, 85, 0.12);
-  border-color: rgba(254, 44, 85, 0.25);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(254, 44, 85, 0.1);
-}
-
-/* 内容项样式 - 抖音风格 */
-.itemdetail {
-  position: relative;
-  width: 100%;
-  padding-bottom: 140%; /* 1:1.4 视频比例 */
-  background-color: #000;
+.avatar-wrapper {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 4px solid #fff; /* 白色边框 */
+  background: #fff;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
-.itemdetail img {
-  position: absolute;
+.avatar-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.itemdetail:active {
-  transform: scale(0.98);
-  transition: transform 0.2s;
+.user-text-info {
+  margin-top: -20px; /* 调整文字位置 */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-/* 视频时长显示 */
-.video-duration {
-  position: absolute;
-  top: 8px;
-  right: 8px;
+.username {
+  font-size: 20px;
+  font-weight: bold;
   color: white;
+}
+
+.douyin-id {
   font-size: 12px;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: 500;
-  z-index: 1;
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 4px;
 }
 
-/* 统计信息样式 - 抖音风格 */
-.item-stats {
-  position: absolute;
-  bottom: 10px;
-  right: 8px;
-  color: white;
-  font-size: 13px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  z-index: 1;
+/* 2. 信息展示区 */
+.info-section {
+  padding: 50px 16px 10px; /* padding-top 50px 是为了避开下沉的头像 */
+  background: #fff;
 }
 
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+.bio-text {
+  font-size: 15px;
+  color: #161823;
+  margin-bottom: 12px;
+  line-height: 1.4;
 }
 
-/* 播放图标 */
-.icon-play::before {
-  content: '▶';
-  font-size: 10px;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 2px 3px;
-  border-radius: 50%;
-}
-
-/* 点赞图标 */
-.icon-like::before {
-  content: '❤';
-  font-size: 12px;
-  color: #fe2c55;
-}
-
-/* 优化视频网格布局 */
-:deep(.infinite-list-container) {
-  padding: 0;
-  background-color: #f5f5f5;
-}
-
-:deep(.infinite-list-items) {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2px;
-}
-
-:deep(.infinite-list-item) {
-  position: relative;
-  padding-bottom: 140%; /* 1:1.4 视频比例 */
-}
-
-:deep(.infinite-list-item:active) {
-  transform: scale(0.98);
-  transition: transform 0.2s;
-}
-
-/* 视频时长显示 */
-.video-duration {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  color: white;
-  font-size: 12px;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: 500;
-}
-
-/* 统计信息样式 - 抖音风格 */
-.item-stats {
-  position: absolute;
-  bottom: 10px;
-  right: 8px;
-  color: white;
-  font-size: 13px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-/* 播放图标 */
-.icon-play::before {
-  content: '▶';
-  font-size: 10px;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 2px 3px;
-  border-radius: 50%;
-}
-
-/* 点赞图标 */
-.icon-like::before {
-  content: '❤';
-  font-size: 12px;
-  color: #fe2c55;
-}
-
-/* 优化视频网格布局 */
-:deep(.infinite-list-container) {
-  padding: 0;
-}
-
-:deep(.infinite-list-items) {
+.tags-row {
   display: flex;
   flex-wrap: wrap;
-  width: 100%;
+  gap: 6px;
+  margin-bottom: 20px;
 }
 
-:deep(.infinite-list-item) {
-  width: calc(33.333% - 2px);
-  margin-bottom: 2px;
-  margin-right: 2px;
+.tag {
+  background: #f1f1f1;
+  color: #666;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 2px;
 }
 
-:deep(.infinite-list-item:nth-child(3n)) {
-  margin-right: 0;
+.add-tag {
+  background: rgba(0, 0, 0, 0.05);
+  font-weight: 500;
 }
 
-/* 空状态样式 */
-.empty-state {
+/* 3. 数据统计行 */
+.stats-row {
   display: flex;
-  flex-direction: column;
+  justify-content: flex-start;
+  gap: 25px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.num {
+  font-size: 18px;
+  font-weight: bold;
+  color: #161823;
+}
+
+.label {
+  font-size: 13px;
+  color: #888;
+}
+
+/* 4. 选项卡 Sticky */
+.sticky-tabs {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 10;
+  border-bottom: 1px solid #f1f1f1;
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 14px 0;
+  font-size: 15px;
+  color: #888;
+  position: relative;
+  cursor: pointer;
+}
+
+.tab-item.active {
+  color: #161823;
+  font-weight: 600;
+}
+
+.active-line {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: #face15; /* 抖音黄 */
+}
+
+/* 5. 视频网格布局 */
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 强制三列 */
+  gap: 1px;
+  background: #fff;
+}
+
+.grid-item {
+  position: relative;
+  padding-bottom: 133%; /* 3:4 比例，模拟手机视频 */
+  background: #f8f8f8;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.cover-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-stats-overlay {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 50px 0;
+}
+
+/* 空状态和加载更多 */
+.empty-placeholder,
+.loading-placeholder {
+  grid-column: 1 / -1; /* 占满整行 */
+  text-align: center;
+  padding: 60px 0;
   color: #999;
-}
-
-.empty-icon {
-  font-size: 48px;
-  margin-bottom: 10px;
-}
-
-.empty-text {
   font-size: 14px;
 }
 
-/* 底部导航栏 */
-.footer {
-  background-color: white;
-  color: #333;
-  z-index: 10;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+.load-more-btn {
+  text-align: center;
+  padding: 15px;
+  color: #666;
+  font-size: 13px;
+  cursor: pointer;
 }
 
-/* 响应式优化 */
-@media (min-width: 768px) {
-  .container {
-    max-width: 768px;
-    margin: 0 auto;
-    padding-bottom: 70px;
-  }
-
-  .profile-header {
-    height: 180px;
-    padding-bottom: 30px;
-  }
-
-  .avatar {
-    width: 120px;
-    height: 120px;
-    margin-bottom: 20px;
-  }
-
-  .user-name {
-    font-size: 20px;
-  }
-
-  .user-id {
-    font-size: 14px;
-  }
-
-  .num {
-    font-size: 20px;
-  }
-
-  .label {
-    font-size: 14px;
-  }
+.no-more-text {
+  text-align: center;
+  padding: 15px;
+  color: #ccc;
+  font-size: 12px;
 }
 </style>
