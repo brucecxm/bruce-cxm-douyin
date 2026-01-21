@@ -95,6 +95,19 @@
       </div>
     </div>
 
+    <!-- 音乐选择 -->
+    <div class="setting-section music-section">
+      <div class="section-label">选择音乐</div>
+      <div class="music-list">
+        <FlexibleButtonPanel
+          :items="musicItems"
+          :cols="3"
+          :gap="8"
+          @btnClick="onMusicClick"
+        />
+      </div>
+    </div>
+
     <!-- 添加标签 -->
     <div class="setting-section tags-section">
       <div class="section-label">添加标签</div>
@@ -128,7 +141,13 @@
 <script>
 import axios from 'axios';
 import FlexibleButtonPanel from '@/components/FlexibleButtonPanel.vue';
-import { getTopics, getLocations, getPrivacies } from '@/api/video.js';
+import {
+  getTopics,
+  getLocations,
+  getPrivacies,
+  getmumsic,
+  getMusicList
+} from '@/api/video.js';
 export default {
   components: { FlexibleButtonPanel },
   data() {
@@ -146,6 +165,11 @@ export default {
       videoData: '',
       loading: false,
       dataLoading: false,
+
+      // 音乐相关
+      musicItems: [],
+      selectedMusic: null,
+      musicLoading: false,
 
       // 从数据库获取的数据
       topicItems: [],
@@ -210,11 +234,13 @@ export default {
       this.dataLoading = true;
       try {
         // 并行获取所有数据
-        const [topicsRes, locationsRes, privaciesRes] = await Promise.all([
-          getTopics(),
-          getLocations(),
-          getPrivacies()
-        ]);
+        const [topicsRes, locationsRes, privaciesRes, musicRes] =
+          await Promise.all([
+            getTopics(),
+            getLocations(),
+            getPrivacies(),
+            getMusicList()
+          ]);
 
         // 处理话题数据
         if (topicsRes.data && Array.isArray(topicsRes.data)) {
@@ -258,6 +284,21 @@ export default {
             this.privacyItems[0].bold = true;
           }
         }
+
+        // 处理音乐数据
+        if (musicRes.data && Array.isArray(musicRes.data)) {
+          this.musicItems = musicRes.data.map((music) => ({
+            text: music.name,
+            bgColor: '#f5f5f5',
+            textColor: '#333',
+            borderRadius: 16,
+            padding: '8px 12px',
+            musicId: music.id.toString()
+          }));
+        } else {
+          // 如果没有获取到音乐数据，使用默认数据
+          this.initMusicData();
+        }
       } catch (error) {
         console.error('获取数据失败:', error);
         // 数据获取失败时使用默认数据
@@ -265,6 +306,61 @@ export default {
       } finally {
         this.dataLoading = false;
       }
+    },
+
+    // 初始化音乐数据（备用）
+    initMusicData() {
+      // 这里使用模拟音乐数据，实际项目中应该从后端API获取
+      this.musicItems = [
+        {
+          text: '热门音乐1',
+          bgColor: '#f5f5f5',
+          textColor: '#333',
+          borderRadius: 16,
+          padding: '8px 12px',
+          musicId: '1'
+        },
+        {
+          text: '热门音乐2',
+          bgColor: '#f5f5f5',
+          textColor: '#333',
+          borderRadius: 16,
+          padding: '8px 12px',
+          musicId: '2'
+        },
+        {
+          text: '热门音乐3',
+          bgColor: '#f5f5f5',
+          textColor: '#333',
+          borderRadius: 16,
+          padding: '8px 12px',
+          musicId: '3'
+        },
+        {
+          text: '热门音乐4',
+          bgColor: '#f5f5f5',
+          textColor: '#333',
+          borderRadius: 16,
+          padding: '8px 12px',
+          musicId: '4'
+        },
+        {
+          text: '热门音乐5',
+          bgColor: '#f5f5f5',
+          textColor: '#333',
+          borderRadius: 16,
+          padding: '8px 12px',
+          musicId: '5'
+        },
+        {
+          text: '热门音乐6',
+          bgColor: '#f5f5f5',
+          textColor: '#333',
+          borderRadius: 16,
+          padding: '8px 12px',
+          musicId: '6'
+        }
+      ];
     },
 
     // 设置默认数据
@@ -338,6 +434,57 @@ export default {
           padding: '10px 20px'
         }
       ];
+      // 默认音乐数据
+      this.musicItems = [
+        {
+          text: '热门音乐1',
+          bgColor: '#f5f5f5',
+          textColor: '#333',
+          borderRadius: 16,
+          padding: '8px 12px',
+          musicId: '1'
+        },
+        {
+          text: '热门音乐2',
+          bgColor: '#f5f5f5',
+          textColor: '#333',
+          borderRadius: 16,
+          padding: '8px 12px',
+          musicId: '2'
+        },
+        {
+          text: '热门音乐3',
+          bgColor: '#f5f5f5',
+          textColor: '#333',
+          borderRadius: 16,
+          padding: '8px 12px',
+          musicId: '3'
+        },
+        {
+          text: '热门音乐4',
+          bgColor: '#f5f5f5',
+          textColor: '#333',
+          borderRadius: 16,
+          padding: '8px 12px',
+          musicId: '4'
+        },
+        {
+          text: '热门音乐5',
+          bgColor: '#f5f5f5',
+          textColor: '#333',
+          borderRadius: 16,
+          padding: '8px 12px',
+          musicId: '5'
+        },
+        {
+          text: '热门音乐6',
+          bgColor: '#f5f5f5',
+          textColor: '#333',
+          borderRadius: 16,
+          padding: '8px 12px',
+          musicId: '6'
+        }
+      ];
     },
 
     onBtnClick({ index, item }) {
@@ -379,6 +526,20 @@ export default {
       // 更新选中状态
       this.locationItems = this.locationItems.map((location, i) => ({
         ...location,
+        bgColor: i === index ? '#ff2c55' : '#f5f5f5',
+        textColor: i === index ? '#fff' : '#333',
+        selected: i === index
+      }));
+    },
+
+    // 音乐选择事件处理
+    onMusicClick({ item, index }) {
+      this.selectedMusic = item;
+      console.log('点击音乐：', item.text, item.musicId);
+
+      // 更新选中状态
+      this.musicItems = this.musicItems.map((music, i) => ({
+        ...music,
         bgColor: i === index ? '#ff2c55' : '#f5f5f5',
         textColor: i === index ? '#fff' : '#333',
         selected: i === index
@@ -432,6 +593,8 @@ export default {
         formData.append('topic', this.selectedTopic || '');
         formData.append('location', this.selectedLocation || '');
         formData.append('privacy', this.selectedPrivacy || '公开');
+        formData.append('musicId', this.selectedMusic?.musicId || '');
+        formData.append('musicName', this.selectedMusic?.text || '');
         formData.append('createdAt', new Date().toISOString());
 
         // 检查是视频还是图片上传
@@ -519,6 +682,7 @@ export default {
       this.selectedTopic = null;
       this.selectedLocation = null;
       this.selectedPrivacy = '公开';
+      this.selectedMusic = null;
       this.videoThumbnail = '';
       this.videoURL = '';
       this.videoData = '';
