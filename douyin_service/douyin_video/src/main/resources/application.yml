@@ -25,7 +25,7 @@ upload:
 
 mybatis:
   configuration:
-    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
 
 ############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
 sa-token:
@@ -47,13 +47,15 @@ sa-token:
 logging:
   level:
     root: info
-    jdbc: info
-    jdbc.sqlonly: info
-    jdbc.sqltiming: info
-    jdbc.audit: warn
-    jdbc.resultset: warn
-    jdbc.connection: warn
-    com.bruce: info # 应用包日志级别
+    jdbc: debug
+    jdbc.sqlonly: debug
+    jdbc.sqltiming: debug
+    jdbc.audit: debug
+    jdbc.resultset: debug
+    jdbc.connection: debug
+    com.bruce: debug # 应用包日志级别
+    org.mybatis: DEBUG
+    java.sql: DEBUG
 
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

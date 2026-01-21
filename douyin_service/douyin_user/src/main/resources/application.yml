@@ -45,13 +45,15 @@ sa-token:
 logging:
   level:
     root: info
-    jdbc: info
-    jdbc.sqlonly: info
-    jdbc.sqltiming: info
-    jdbc.audit: warn
-    jdbc.resultset: warn
-    jdbc.connection: warn
-    com.bruce: info
+    jdbc: debug
+    jdbc.sqlonly: debug
+    jdbc.sqltiming: debug
+    jdbc.audit: debug
+    jdbc.resultset: debug
+    jdbc.connection: debug
+    com.bruce: debug
+    org.mybatis: DEBUG
+    java.sql: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 

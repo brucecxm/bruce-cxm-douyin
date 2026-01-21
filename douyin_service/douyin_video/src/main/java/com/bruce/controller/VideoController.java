@@ -229,7 +229,6 @@ public class VideoController extends ApiController {
         Page<Video> pageInfo = new Page<>(page, size);
         // LambdaQueryWrapper 用于 Video 表查询
         LambdaQueryWrapper<Video> videoQueryWrapper = new LambdaQueryWrapper<Video>()
-                .eq(Video::getType, videoType)
                 .orderByDesc(Video::getVideoId);
         IPage<Video> videoPage = videoService.page(pageInfo, videoQueryWrapper);
         List<Video> videos = videoPage.getRecords();

@@ -61,6 +61,18 @@ sa-token:
   # 是否输出操作日志
   is-log: true
 
+# MyBatis配置
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+
+logging:
+  level:
+    com.bruce: DEBUG
+    org.mybatis: DEBUG
+    java.sql: DEBUG
+    jdbc: DEBUG
+
 minio:
   accessKey: minio
   secretKey: minio123

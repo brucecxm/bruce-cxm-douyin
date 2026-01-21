@@ -89,9 +89,19 @@
         <appender-ref ref="SQL_LOG"/>
     </logger>
     
-    <!-- 关闭 Spring 的默认SQL日志，否则可能重复 -->
-    <logger name="org.springframework.jdbc.core" level="WARN" />
-    <logger name="org.springframework.jdbc.datasource" level="WARN" />
+    <!-- MyBatis日志配置 -->
+    <logger name="com.bruce" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="SQL_LOG"/>
+    </logger>
+    <logger name="org.mybatis" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="SQL_LOG"/>
+    </logger>
+    <logger name="java.sql" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="SQL_LOG"/>
+    </logger>
     
     <!-- Sa-Token 日志配置 -->
     <logger name="cn.dev33" level="INFO"/>

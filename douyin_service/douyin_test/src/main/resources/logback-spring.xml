@@ -42,12 +42,54 @@
         </filter>
     </appender>
     
+    <!-- SQL日志 -->
+    <appender name="SQL_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${spring.application.name}-sql.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${spring.application.name}-sql.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    
     <!-- SQL日志配置 -->
-    <logger name="jdbc.sqlonly" level="DEBUG" />
-    <logger name="jdbc.sqltiming" level="DEBUG" />
-    <logger name="jdbc.audit" level="DEBUG" />
-    <logger name="jdbc.resultset" level="DEBUG" />
-    <logger name="jdbc.connection" level="DEBUG" />
+    <logger name="jdbc.sqlonly" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="SQL_LOG"/>
+    </logger>
+    <logger name="jdbc.sqltiming" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="SQL_LOG"/>
+    </logger>
+    <logger name="jdbc.audit" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="SQL_LOG"/>
+    </logger>
+    <logger name="jdbc.resultset" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="SQL_LOG"/>
+    </logger>
+    <logger name="jdbc.connection" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="SQL_LOG"/>
+    </logger>
+    
+    <!-- MyBatis日志配置 -->
+    <logger name="com.bruce" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="SQL_LOG"/>
+    </logger>
+    <logger name="org.mybatis" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="SQL_LOG"/>
+    </logger>
+    <logger name="java.sql" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="SQL_LOG"/>
+    </logger>
     
     <!-- 关闭 Spring 的默认SQL日志，否则可能重复 -->
     <logger name="org.springframework.jdbc.core" level="WARN" />

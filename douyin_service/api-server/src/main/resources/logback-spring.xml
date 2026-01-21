@@ -95,7 +95,12 @@
     
     <!-- JPA日志配置 -->
     <logger name="org.springframework.data.jpa" level="INFO"/>
-    <logger name="org.hibernate" level="INFO"/>
+    <logger name="org.hibernate.SQL" level="DEBUG" additivity="true">
+        <appender-ref ref="SQL_LOG"/>
+    </logger>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" additivity="true">
+        <appender-ref ref="SQL_LOG"/>
+    </logger>
     
     <!-- Redis日志配置 -->
     <logger name="org.springframework.data.redis" level="INFO"/>

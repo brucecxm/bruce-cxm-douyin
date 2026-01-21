@@ -110,6 +110,8 @@ server:
 logging:
   level:
     com.example.apiserver: debug
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
 jwt:
   secret: your-secret-key-change-in-production
