@@ -4,7 +4,8 @@
     <el-card class="box-card" style="margin-bottom: 20px">
       <div slot="header" class="clearfix">
         <span>角色管理</span>
-        <el-button style="float: right" type="primary" @click="openRoleDialog()"
+        <el-button style="float: right" type="primary"
+@click="openRoleDialog()"
           >新增角色</el-button
         >
       </div>
