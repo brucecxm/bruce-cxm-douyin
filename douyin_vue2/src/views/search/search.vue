@@ -178,7 +178,7 @@ export default {
       // 保存搜索历史
       this.saveSearchHistory(this.searchQuery);
 
-      await this.loadSearchResults();
+      this.loadSearchResults();
     },
 
     // 加载搜索历史
@@ -217,13 +217,28 @@ export default {
       if (this.loading) return;
 
       this.loading = true;
-      try {
-        const res = await searchVideos(
-          this.searchQuery,
-          this.currentPage,
-          this.pageSize
-        );
-        const data = res.data || res;
+      
+      // 使用setTimeout模拟异步请求
+      setTimeout(() => {
+        try {
+          // 生成模拟搜索结果
+          const mockResults = [];
+          const totalResults = 20; // 模拟总共有20个结果
+          
+          for (let i = 0; i < this.pageSize; i++) {
+            const index = (this.currentPage - 1) * this.pageSize + i;
+            if (index >= totalResults) break;
+            
+            mockResults.push({
+              videoId: `video_${index + 1}`,
+              title: `${this.searchQuery} 相关视频 ${index + 1}`,
+              cover: `https://picsum.photos/seed/${this.searchQuery}${index}/200/150`,
+              likeNum: Math.floor(Math.random() * 1000),
+              commentNum: Math.floor(Math.random() * 100),
+              shareNum: Math.floor(Math.random() * 50),
+              username: `用户${Math.floor(Math.random() * 1000)}`
+            });
+          }
 
           if (this.currentPage === 1) {
             this.searchResults = mockResults;
