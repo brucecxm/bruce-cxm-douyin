@@ -354,8 +354,15 @@ const routes = [
     name: 'NewShopWebSocketTest',
     component: () => import('../views/websocket-test/App.vue')
   },
-  {
-    path: '/:pathMatch(.*)*',
+  { path: '/admin/resume-upload',
+    name: 'ResumeUpload',
+    component: () => import('../views/admin/ResumeUpload.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: ['admin']
+    }
+  },
+  { path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('../views/NotFound.vue')
   }
