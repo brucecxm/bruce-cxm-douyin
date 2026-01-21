@@ -60,8 +60,10 @@
     />
 
     <!-- 摄像头预览 & Canvas -->
-    <video ref="video" autoplay playsinline
-muted class="video-preview"></video>
+    <video
+ref="video"
+autoplay playsinline muted
+class="video-preview"></video>
     <canvas ref="canvas" style="display: none"></canvas>
 
     <!-- 拍照结果 -->
