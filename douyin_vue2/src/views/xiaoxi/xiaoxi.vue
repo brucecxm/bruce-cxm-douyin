@@ -447,7 +447,7 @@ export default {
   flex-direction: column;
   gap: 10px;
   width: 100%;
-  height: 100%;
+  height: auto;
   box-sizing: border-box;
   overflow-x: hidden;
 }
