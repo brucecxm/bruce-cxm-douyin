@@ -354,7 +354,8 @@ const routes = [
     name: 'NewShopWebSocketTest',
     component: () => import('../views/websocket-test/App.vue')
   },
-  { path: '/admin/resume-upload',
+  {
+    path: '/admin/resume-upload',
     name: 'ResumeUpload',
     component: () => import('../views/admin/ResumeUpload.vue'),
     meta: {
@@ -362,7 +363,8 @@ const routes = [
       roles: ['admin']
     }
   },
-  { path: '/:pathMatch(.*)*',
+  {
+    path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('../views/NotFound.vue')
   }
