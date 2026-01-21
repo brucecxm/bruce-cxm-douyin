@@ -10,6 +10,9 @@ import io.minio.http.Method;
 import com.bruce.dict.Constant;
 import com.bruce.dto.LikeMessage;
 import com.bruce.entity.*;
+import com.bruce.service.LocationService;
+import com.bruce.service.PrivacyService;
+import com.bruce.service.TopicService;
 import com.bruce.file.service.FileStorageService;
 import com.bruce.pojo.Result;
 import com.bruce.service.*;
@@ -658,6 +661,15 @@ public class VideoController extends ApiController {
     @Autowired
     private MinioClient minioClient;
 
+    @Resource
+    private TopicService topicService;
+
+    @Resource
+    private LocationService locationService;
+
+    @Resource
+    private PrivacyService privacyService;
+
     private final String BUCKET = "douyin";
 
     // 新增：定义签名URL的有效期（单位：秒），这里设置1小时（3600秒）
@@ -764,4 +776,52 @@ public class VideoController extends ApiController {
     // }
     // return success(videosWithAvatar);
     // }
+
+    /**
+     * 获取话题列表
+     * 
+     * @return 话题列表
+     */
+    @GetMapping("/topic/list")
+    public ResponseEntity<?> getTopics() {
+        try {
+            List<Topic> topics = topicService.getAllTopics();
+            return ResponseEntity.ok(topics);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "获取话题列表失败: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * 获取位置列表
+     * 
+     * @return 位置列表
+     */
+    @GetMapping("/location/list")
+    public ResponseEntity<?> getLocations() {
+        try {
+            List<Location> locations = locationService.getAllLocations();
+            return ResponseEntity.ok(locations);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "获取位置列表失败: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * 获取权限设置列表
+     * 
+     * @return 权限设置列表
+     */
+    @GetMapping("/privacy/list")
+    public ResponseEntity<?> getPrivacies() {
+        try {
+            List<Privacy> privacies = privacyService.getAllPrivacies();
+            return ResponseEntity.ok(privacies);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "获取权限设置列表失败: " + e.getMessage()));
+        }
+    }
 }

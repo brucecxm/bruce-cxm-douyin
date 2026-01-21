@@ -8,6 +8,10 @@ target/
 
 **/unpackage/**
 
+**/.github/**
+
+**/.vscode/**
+
 /douyin_vue2/node_modules/
 
 **/node_modules/

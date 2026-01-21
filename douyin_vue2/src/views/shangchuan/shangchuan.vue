@@ -97,14 +97,112 @@
 
     <!-- 弹窗 -->
     <SlidePopup
-      v-if="isAnyPopupVisible"
+      v-if="showSwitchCamera"
       direction="bottom"
       width="100vw"
       height="40vh"
       :isEdge="false"
       @close="closeAllPopups"
     >
-      <!-- 弹窗详情保持不变 -->
+      <div class="popup-header">
+        <h3>切换摄像头</h3>
+      </div>
+      <div class="popup-content">
+        <div class="popup-btn" @click="switchCamera">
+          <span>{{ usingFrontCamera ? '后置摄像头' : '前置摄像头' }}</span>
+        </div>
+      </div>
+    </SlidePopup>
+    <SlidePopup
+      v-if="showFlash"
+      direction="bottom"
+      width="100vw"
+      height="40vh"
+      :isEdge="false"
+      @close="closeAllPopups"
+    >
+      <div class="popup-header">
+        <h3>闪光灯</h3>
+      </div>
+      <div class="popup-content">
+        <div class="popup-btn" @click="toggleFlash">
+          <span>{{ flashOn ? '关闭闪光灯' : '开启闪光灯' }}</span>
+        </div>
+      </div>
+    </SlidePopup>
+    <SlidePopup
+      v-if="showTimer"
+      direction="bottom"
+      width="100vw"
+      height="40vh"
+      :isEdge="false"
+      @close="closeAllPopups"
+    >
+      <div class="popup-header">
+        <h3>倒计时</h3>
+      </div>
+      <div class="popup-content">
+        <div class="timer-options">
+          <div
+            class="popup-btn"
+            @click="
+              timerCount = 3;
+              startTimer();
+            "
+          >
+            3秒
+          </div>
+          <div
+            class="popup-btn"
+            @click="
+              timerCount = 5;
+              startTimer();
+            "
+          >
+            5秒
+          </div>
+          <div
+            class="popup-btn"
+            @click="
+              timerCount = 10;
+              startTimer();
+            "
+          >
+            10秒
+          </div>
+        </div>
+      </div>
+    </SlidePopup>
+    <SlidePopup
+      v-if="
+        showMusic || showSettings || showEffects || showBeauty || showDownload
+      "
+      direction="bottom"
+      width="100vw"
+      height="40vh"
+      :isEdge="false"
+      @close="closeAllPopups"
+    >
+      <div class="popup-header">
+        <h3>
+          {{
+            showMusic
+              ? '选择音乐'
+              : showSettings
+                ? '设置'
+                : showEffects
+                  ? '特效'
+                  : showBeauty
+                    ? '美颜'
+                    : '下载'
+          }}
+        </h3>
+      </div>
+      <div class="popup-content">
+        <div class="popup-btn" @click="closeAllPopups">
+          <span>功能开发中...</span>
+        </div>
+      </div>
     </SlidePopup>
     <!-- 底部导航 -->
     <div class="bottom-bar" v-if="bottomNav">
@@ -409,11 +507,69 @@ export default {
       this.isRecording = false;
       this.bottomNav = false;
     },
-    // 其余弹窗方法等... 保持原有逻辑
-    switchCamera() {},
-    toggleFlash() {},
-    startTimer() {},
-    closeAllPopups() {}
+    // 切换摄像头
+    async switchCamera() {
+      this.usingFrontCamera = !this.usingFrontCamera;
+      try {
+        // 停止当前流
+        if (this.stream) {
+          this.stream.getTracks().forEach((track) => track.stop());
+        }
+        // 获取新流
+        this.stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: this.usingFrontCamera ? 'user' : 'environment' },
+          audio: false
+        });
+        // 更新视频源
+        this.$refs.video.srcObject = this.stream;
+      } catch (err) {
+        console.error('切换摄像头失败', err);
+        // 切换失败时恢复原来的状态
+        this.usingFrontCamera = !this.usingFrontCamera;
+      }
+      this.showSwitchCamera = false;
+    },
+    // 切换闪光灯
+    toggleFlash() {
+      this.flashOn = !this.flashOn;
+      if (this.stream) {
+        const videoTrack = this.stream.getVideoTracks()[0];
+        if (videoTrack && videoTrack.getCapabilities().torch) {
+          videoTrack
+            .applyConstraints({
+              advanced: [{ torch: this.flashOn }]
+            })
+            .catch((err) => {
+              console.error('切换闪光灯失败', err);
+              this.flashOn = !this.flashOn;
+            });
+        }
+      }
+      this.showFlash = false;
+    },
+    // 开始倒计时
+    startTimer() {
+      this.showTimer = false;
+      this.timerCount = 3;
+      this.timerId = setInterval(() => {
+        this.timerCount--;
+        if (this.timerCount <= 0) {
+          clearInterval(this.timerId);
+          this.takePhoto();
+        }
+      }, 1000);
+    },
+    // 关闭所有弹窗
+    closeAllPopups() {
+      this.showMusic = false;
+      this.showSwitchCamera = false;
+      this.showFlash = false;
+      this.showSettings = false;
+      this.showEffects = false;
+      this.showTimer = false;
+      this.showBeauty = false;
+      this.showDownload = false;
+    }
   }
 };
 </script>
@@ -577,5 +733,42 @@ export default {
 .result-media {
   max-width: 100%;
   height: 80vh;
+}
+/* 弹窗样式 */
+.popup-header {
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+.popup-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+.popup-content {
+  padding: 20px;
+}
+.popup-btn {
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  color: #333;
+}
+.popup-btn:hover {
+  background-color: #f5f5f5;
+}
+.timer-options {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 20px 0;
+}
+.timer-options .popup-btn {
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  width: 80px;
+  margin: 0 10px;
+  border-bottom: none;
 }
 </style>
