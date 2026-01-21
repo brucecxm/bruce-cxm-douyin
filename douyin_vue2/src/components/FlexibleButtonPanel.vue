@@ -2,8 +2,8 @@
   <div
     class="btn-panel"
     :style="{
-      display: 'grid',
-      gridTemplateColumns: computedGridColumns,
+      display: 'flex',
+      flexWrap: 'wrap',
       gap: `${gap}px`
     }"
   >
@@ -75,10 +75,6 @@ export default {
       if (this.cols > 0) return this.cols;
       return this.items.filter((item) => item.show !== false && !item.width)
         .length;
-    },
-    computedGridColumns() {
-      const visibleItems = this.items.filter((item) => item.show !== false);
-      return visibleItems.map((item) => item.width || '1fr').join(' ');
     }
   },
   methods: {
@@ -131,7 +127,8 @@ export default {
         position: 'relative',
         overflow: 'hidden',
         transition: 'background-color 0.2s',
-        padding: `${item.padding || '6px 10px'}`
+        padding: `${item.padding || '6px 10px'}`,
+        flexShrink: 0
       };
     },
     darkenColor(hex, f = 0.1) {

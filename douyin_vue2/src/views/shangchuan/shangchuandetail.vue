@@ -288,7 +288,7 @@ export default {
         // 处理音乐数据
         if (musicRes.data && Array.isArray(musicRes.data)) {
           this.musicItems = musicRes.data.map((music) => ({
-            text: music.name,
+            text: music.music_name,
             bgColor: '#f5f5f5',
             textColor: '#333',
             borderRadius: 16,
