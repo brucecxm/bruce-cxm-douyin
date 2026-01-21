@@ -616,13 +616,13 @@
 
     // 下载简历功能
     document.getElementById('download-resume-btn').addEventListener('click', function () {
-      // 这里替换为你的服务器上简历文件的实际URL
-      const resumeUrl = 'https://example.com/your-resume.pdf';
+      // 后端下载接口URL
+      const resumeUrl = '/down/files/陈雪明的简历.docx';
 
       // 创建一个临时的a标签用于下载
       const link = document.createElement('a');
       link.href = resumeUrl;
-      link.download = '陈雪明_简历.pdf'; // 下载时的文件名
+      link.download = '陈雪明_简历.docx'; // 下载时的文件名
       link.target = '_blank';
 
       // 触发点击事件开始下载

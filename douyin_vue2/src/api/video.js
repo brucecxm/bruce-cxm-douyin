@@ -88,3 +88,18 @@ export const addcomment = (params) => {
     }
   });
 };
+
+// 获取话题列表
+export const getTopics = () => {
+  return request.get('/video/topic/list');
+};
+
+// 获取位置列表
+export const getLocations = () => {
+  return request.get('/video/location/list');
+};
+
+// 获取权限设置列表
+export const getPrivacies = () => {
+  return request.get('/video/privacy/list');
+};
