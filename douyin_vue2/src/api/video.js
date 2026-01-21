@@ -127,3 +127,8 @@ export const searchVideos = (keyword, page = 1, size = 10) => {
     }
   });
 };
+
+// 获取音乐列表
+export const getMusicList = () => {
+  return request.get('/video/music/list');
+};
