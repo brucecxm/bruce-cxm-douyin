@@ -2,126 +2,242 @@
   <div class="search-page">
     <header class="header">
       <i class="fas fa-chevron-left" @click="gohome"></i>
-      <input type="text" placeholder="人体捐献要求给钱" v-model="searchQuery" />
-      <i class="fas fa-search" @click="gosearchdetail"></i>
+      <input
+        type="text"
+        placeholder="搜索"
+        v-model="searchQuery"
+        @input="handleInput"
+        @keyup.enter="executeSearch"
+        ref="searchInput"
+      />
+      <i class="fas fa-search" @click="executeSearch"></i>
     </header>
     <main>
-      <div class="suggestions">
+      <!-- 搜索建议 -->
+      <div v-if="showSuggestions && suggestions.length > 0" class="suggestions">
         <p>你是不是想搜:</p>
         <ul class="suggestion-list">
-          <li v-for="(suggestion, index) in suggestions" :key="index">
+          <li
+            v-for="(suggestion, index) in suggestions"
+            :key="index"
+            @click="selectSuggestion(suggestion)"
+          >
+            <i class="fas fa-search"></i>
             {{ suggestion }}
           </li>
         </ul>
       </div>
 
-      <nav class="tabs">
-        <span class="active" @click="setTab(0)">抖音热榜</span>
-        <span @click="setTab(1)">音视频榜</span>
-        <span @click="setTab(2)">百科榜</span>
-        <span @click="setTab(3)">问答榜</span>
-        <span @click="setTab(4)">博物馆榜</span>
-        <span @click="setTab(5)">影视榜</span>
-      </nav>
-
-      <transition name="fade" mode="out-in">
-        <ul class="hot-list" :key="currentTab">
-          <li v-for="(item, index) in currentHotList" :key="index">
-            <span>{{ index + 1 }}</span>
-            <p>{{ item.title }}</p>
-            <i v-if="item.new" class="fas fa-bolt"></i>
-            <span class="views">{{ item.views }}万</span>
+      <!-- 热门搜索 -->
+      <div v-else-if="!searchQuery" class="hot-searches">
+        <div class="hot-header">
+          <h3>热门搜索</h3>
+          <span @click="refreshHotSearches">换一换</span>
+        </div>
+        <ul class="hot-list">
+          <li
+            v-for="(item, index) in hotSearches"
+            :key="index"
+            @click="selectSuggestion(item.keyword)"
+          >
+            <span class="rank">{{ index + 1 }}</span>
+            <span class="keyword">{{ item.keyword }}</span>
+            <span v-if="item.trending" class="trending">{{
+              item.trending
+            }}</span>
           </li>
         </ul>
-      </transition>
+      </div>
+
+      <!-- 搜索结果 -->
+      <div
+        v-else-if="searchQuery && searchResults.length > 0"
+        class="search-results"
+      >
+        <h3>搜索结果</h3>
+        <ul class="result-list">
+          <li
+            v-for="(result, index) in searchResults"
+            :key="result.videoId || index"
+            @click="goToVideoDetail(result)"
+          >
+            <div class="result-item">
+              <div class="result-cover" v-if="result.cover">
+                <img :src="result.cover" :alt="result.title" />
+              </div>
+              <div class="result-info">
+                <p class="result-title">{{ result.title || result.content }}</p>
+                <div class="result-stats">
+                  <span>{{ result.likeNum || 0 }}赞</span>
+                  <span>{{ result.commentNum || 0 }}评论</span>
+                  <span>{{ result.shareNum || 0 }}分享</span>
+                </div>
+                <div class="result-user">
+                  <span class="username">{{
+                    result.username || '未知用户'
+                  }}</span>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <!-- 加载更多 -->
+        <div v-if="hasMore" class="load-more" @click="loadMore">
+          <span>加载更多</span>
+        </div>
+      </div>
+
+      <!-- 无结果提示 -->
+      <div
+        v-else-if="searchQuery && searchResults.length === 0"
+        class="no-results"
+      >
+        <p>暂无搜索结果</p>
+      </div>
     </main>
   </div>
 </template>
 
 <script>
+import {
+  getSearchSuggestions,
+  getHotSearches,
+  searchVideos
+} from '@/api/video.js';
+
 export default {
   data() {
     return {
       searchQuery: '',
-      suggestions: [
-        '安慰捐一次精补偿多少钱',
-        '黑料不打烊黑',
-        '磁吸共振滑率高吗',
-        '底色梦纹',
-        '单曲猫咪',
-        '植物大战僵尸教学'
-      ],
-      hotLists: [
-        [
-          // 抖音热榜
-          { title: '中共中央政治局第十五次集体学习', views: 1130.5, new: true },
-          { title: '武汉暴雨江水上涨', views: 1109.6, new: true },
-          { title: '美国罕见批评“茶党”伙伴印度', views: 1110.7, new: true }
-          // More items...
-        ],
-        [
-          // 音视频榜
-          { title: '音视频内容一', views: 1050, new: false },
-          { title: '音视频内容二', views: 1250, new: false }
-          // More items...
-        ],
-        [
-          // 百科榜
-          { title: '百科内容一', views: 900, new: true },
-          { title: '百科内容二', views: 1000, new: false }
-          // More items...
-        ]
-        // More categories...
-      ],
-      currentTab: 0
+      suggestions: [],
+      showSuggestions: false,
+      hotSearches: [],
+      searchResults: [],
+      currentPage: 1,
+      pageSize: 10,
+      hasMore: true,
+      loading: false
     };
   },
-  computed: {
-    currentHotList() {
-      return this.hotLists[this.currentTab];
-    }
+  mounted() {
+    this.getHotSearchesData();
   },
   methods: {
     gohome() {
       this.$router.push('/');
     },
-    gosearchdetail() {
-      this.$router.push('/searchdetail');
+
+    // 处理输入事件，获取搜索建议
+    async handleInput() {
+      if (this.searchQuery.trim().length > 0) {
+        try {
+          const res = await getSearchSuggestions(this.searchQuery);
+          this.suggestions = res.data || [];
+          this.showSuggestions = true;
+        } catch (error) {
+          console.error('获取搜索建议失败:', error);
+          this.suggestions = [];
+        }
+      } else {
+        this.suggestions = [];
+        this.showSuggestions = false;
+      }
     },
-    setTab(tabIndex) {
-      this.currentTab = tabIndex;
+
+    // 执行搜索
+    async executeSearch() {
+      if (this.searchQuery.trim().length === 0) return;
+
+      this.showSuggestions = false;
+      this.currentPage = 1;
+      this.searchResults = [];
+      this.hasMore = true;
+
+      await this.loadSearchResults();
+    },
+
+    // 加载搜索结果
+    async loadSearchResults() {
+      if (this.loading) return;
+
+      this.loading = true;
+      try {
+        const res = await searchVideos(
+          this.searchQuery,
+          this.currentPage,
+          this.pageSize
+        );
+        const data = res.data || res;
+
+        if (this.currentPage === 1) {
+          this.searchResults = data;
+        } else {
+          this.searchResults = [...this.searchResults, ...data];
+        }
+
+        // 判断是否还有更多数据
+        this.hasMore = data.length >= this.pageSize;
+        this.currentPage++;
+      } catch (error) {
+        console.error('搜索失败:', error);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    // 加载更多
+    loadMore() {
+      if (this.hasMore && !this.loading) {
+        this.loadSearchResults();
+      }
+    },
+
+    // 选择搜索建议
+    selectSuggestion(keyword) {
+      this.searchQuery = keyword;
+      this.showSuggestions = false;
+      this.executeSearch();
+    },
+
+    // 获取热门搜索
+    async getHotSearchesData() {
+      try {
+        const res = await getHotSearches();
+        this.hotSearches = res.data || [];
+      } catch (error) {
+        console.error('获取热门搜索失败:', error);
+        // 失败时使用默认数据
+        this.hotSearches = [
+          { keyword: '热门视频', trending: '↑ 123' },
+          { keyword: '最新音乐', trending: '↑ 45' },
+          { keyword: '搞笑段子', trending: '↓ 67' },
+          { keyword: '美食教程', trending: '↑ 89' },
+          { keyword: '旅游攻略', trending: '↑ 32' }
+        ];
+      }
+    },
+
+    // 刷新热门搜索
+    refreshHotSearches() {
+      this.getHotSearchesData();
+    },
+
+    // 跳转到视频详情
+    goToVideoDetail(result) {
+      if (result.videoId) {
+        this.$router.push(`/video/${result.videoId}`);
+      } else {
+        console.error('缺少视频ID');
+      }
     }
   }
 };
 </script>
 
 <style scoped>
-.suggestions {
-  padding: 10px;
-  background-color: #fff;
-  border-bottom: 1px solid #ddd;
-}
-
-.suggestions p {
-  margin: 0;
-  font-weight: bold;
-}
-
-.suggestion-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  padding: 0;
-  list-style-type: none;
-}
-
-.suggestion-list li {
-  padding: 5px 0;
-}
-
 .search-page {
   width: 414px;
-  height: 896px;
+  min-height: 896px;
   margin: 0 auto;
   background-color: #f8f8f8;
 }
@@ -136,94 +252,239 @@ export default {
 }
 
 .header i {
-  font-size: 0.5rem;
+  font-size: 0.8rem;
+  color: #333;
+  cursor: pointer;
 }
 
 .header input {
   flex-grow: 1;
   margin: 0 10px;
-  padding: 5px;
+  padding: 8px 12px;
   border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 0.5rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  background-color: #f5f5f5;
+  outline: none;
 }
 
+.header input:focus {
+  background-color: #fff;
+  border-color: #007bff;
+}
+
+/* 搜索建议样式 */
 .suggestions {
   padding: 10px;
   background-color: #fff;
   border-bottom: 1px solid #ddd;
-  font-size: 0.5rem;
+  font-size: 0.8rem;
 }
 
 .suggestions p {
+  margin: 0 0 10px 0;
+  font-weight: bold;
+  color: #666;
+}
+
+.suggestion-list {
+  padding: 0;
   margin: 0;
+  list-style-type: none;
+}
+
+.suggestion-list li {
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.suggestion-list li:hover {
+  background-color: #f5f5f5;
+}
+
+.suggestion-list li i {
+  margin-right: 10px;
+  color: #999;
+  font-size: 0.7rem;
+}
+
+/* 热门搜索样式 */
+.hot-searches {
+  background-color: #fff;
+  padding: 10px;
+}
+
+.hot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.hot-header h3 {
+  margin: 0;
+  font-size: 0.9rem;
   font-weight: bold;
 }
 
-.tabs {
-  display: flex;
-  overflow-x: auto;
-  padding: 10px 0;
-  background-color: #fff;
-  border-bottom: 1px solid #ddd;
-}
-
-.tabs span {
-  padding: 10px 20px;
+.hot-header span {
+  font-size: 0.7rem;
+  color: #007bff;
   cursor: pointer;
-  font-size: 0.5rem;
-  white-space: nowrap;
-}
-
-.tabs .active {
-  border-bottom: 2px solid #007bff;
-}
-
-.tabs::-webkit-scrollbar {
-  display: none;
 }
 
 .hot-list {
-  padding: 10px;
+  padding: 0;
+  margin: 0;
   list-style-type: none;
-  background-color: #fff;
-  transition: opacity 0.3s ease;
 }
 
 .hot-list li {
   display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #ddd;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-.hot-list li span {
+.hot-list li:last-child {
+  border-bottom: none;
+}
+
+.hot-list li:hover {
+  background-color: #f5f5f5;
+}
+
+.hot-list .rank {
   font-weight: bold;
-  font-size: 0.5rem;
+  font-size: 1rem;
+  margin-right: 15px;
+  width: 20px;
+  text-align: center;
 }
 
-.hot-list li p {
+.hot-list li:nth-child(1) .rank,
+.hot-list li:nth-child(2) .rank,
+.hot-list li:nth-child(3) .rank {
+  color: #ff4757;
+}
+
+.hot-list .keyword {
   flex-grow: 1;
-  margin: 0 10px;
-  font-size: 0.5rem;
+  font-size: 0.85rem;
 }
 
-.hot-list li .fas {
-  color: #ff0000;
+.hot-list .trending {
+  font-size: 0.7rem;
+  color: #ff4757;
 }
 
-.hot-list li .views {
+/* 搜索结果样式 */
+.search-results {
+  background-color: #fff;
+  padding: 10px;
+}
+
+.search-results h3 {
+  margin: 0 0 15px 0;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.result-list {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+
+.result-item {
+  display: flex;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.result-item:hover {
+  background-color: #f5f5f5;
+}
+
+.result-cover {
+  width: 120px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.result-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.result-info {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.result-title {
+  margin: 0 0 8px 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.result-stats {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 5px;
+  font-size: 0.7rem;
   color: #999;
-  font-size: 0.5rem;
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s;
+.result-user {
+  font-size: 0.7rem;
+  color: #666;
 }
 
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
+.result-user .username {
+  font-weight: bold;
+}
+
+/* 加载更多样式 */
+.load-more {
+  text-align: center;
+  padding: 15px;
+  color: #007bff;
+  font-size: 0.8rem;
+  cursor: pointer;
+  background-color: #f5f5f5;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+
+.load-more:hover {
+  background-color: #e9ecef;
+}
+
+/* 无结果样式 */
+.no-results {
+  text-align: center;
+  padding: 50px 20px;
+  color: #999;
+  font-size: 0.9rem;
+  background-color: #fff;
 }
 </style>
