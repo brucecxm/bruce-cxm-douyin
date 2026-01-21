@@ -106,7 +106,7 @@
             v-for="(item, index) in filteredUsers"
             :key="index"
             :message="item"
-            @click="handleUserClick(item)"
+            @click="handleUserClick"
           />
           <div v-if="filteredUsers.length === 0" class="no-data">暂无数据</div>
 
@@ -292,6 +292,7 @@ export default {
 
     // 处理用户点击事件，跳转到聊天界面
     handleUserClick(user) {
+      console.log('=== handleUserClick called in xiaoxi.vue ===');
       console.log('User clicked in xiaoxi.vue:', user);
       // 检查用户对象是否存在
       if (!user) {
@@ -302,15 +303,21 @@ export default {
       // 检查用户对象中是否包含userId、id、username或name字段作为标识
       const friendId =
         user.userId || user.id || user.username || user.name || '';
+      console.log('Friend ID:', friendId);
       if (friendId) {
         console.log('Navigating to chat with ID:', friendId);
         // 跳转到聊天界面，传递好友id参数
-        this.$router.push({
-          path: '/chatyi',
-          query: {
-            id: friendId
-          }
-        });
+        try {
+          this.$router.push({
+            path: '/chatyi',
+            query: {
+              id: friendId
+            }
+          });
+          console.log('Router push executed successfully');
+        } catch (error) {
+          console.error('Router push failed:', error);
+        }
       } else {
         console.warn('用户数据中缺少必要的标识字段，无法跳转');
       }
@@ -370,12 +377,19 @@ export default {
     // 确保容器存在再添加事件监听
     this.$nextTick(() => {
       const container = this.$refs.scrollContainer;
+      console.log('=== Checking scroll container ===');
+      console.log('Scroll container ref:', container);
       if (container) {
         // 先移除可能存在的监听器，避免重复
         container.removeEventListener('scroll', this.handleScroll);
         // 添加滚动事件监听
         container.addEventListener('scroll', this.handleScroll);
-        console.log('滚动事件监听器已添加');
+        console.log('滚动事件监听器已添加到容器:', container);
+        // 添加调试信息，查看容器的实际样式
+        console.log(
+          'Container computed style:',
+          window.getComputedStyle(container)
+        );
       } else {
         console.error('滚动容器未找到');
       }
@@ -407,7 +421,7 @@ export default {
 .other {
   position: relative;
   width: 100%;
-  overflow-x: hidden;
+  overflow: hidden;
   box-sizing: border-box;
   height: 100vh;
 }
@@ -440,6 +454,8 @@ export default {
   width: 100%;
   box-sizing: border-box;
   position: relative; /* 确保相对定位以便正确计算滚动 */
+  z-index: 1; /* 确保滚动容器在正确的层级 */
+  background-color: #ffffff; /* 添加背景色，确保可见 */
 }
 
 .user-list {
