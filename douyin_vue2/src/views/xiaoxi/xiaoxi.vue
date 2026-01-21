@@ -1,551 +1,486 @@
 <template>
-  <div class="xiaoxi">
+  <div class="message-page">
+    <!-- 侧边菜单 (保留你的逻辑) -->
     <caidan :style="caidancss"></caidan>
-    <div class="other" :style="othercss">
-      <!-- <div class="header">
-        <i class="icon" @click="showcaidanone">☰</i>
-        <i class="icon">🏠</i>
-        <i class="icon">🔍</i>
-      </div> -->
-      <div class="icon-message-container">
-        <!-- 左侧第一个图标 -->
-        <div class="icon left-icon-1" id="icon-left-1"></div>
 
-        <!-- 左侧第二个图标 -->
-        <div class="icon left-icon-2" id="icon-left-2"></div>
-
-        <!-- 中间消息文本 -->
-        <div class="message-content">消息</div>
-        <!-- 右侧第一个图标 -->
-        <div class="icon right-icon-1" id="icon-right-1"></div>
-
-        <!-- 右侧第二个图标 -->
-        <div class="icon right-icon-2" id="icon-right-2"></div>
+    <!-- 主体内容容器 -->
+    <div class="main-content" :style="othercss">
+      <!-- 1. 顶部导航栏 (Fixed Header) -->
+      <div class="nav-header">
+        <div class="nav-left">
+          <!-- 这里的图标可以用你的图片替换 -->
+          <div class="icon-btn" @click="showcaidanone">☰</div>
+        </div>
+        <div class="nav-center">消息</div>
+        <div class="nav-right">
+          <div class="icon-btn">🔍</div>
+          <div class="icon-btn">+</div>
+        </div>
       </div>
-      <div class="commentbody" ref="scrollContainer">
-        <div class="user-list">
+
+      <!-- 2. 可滚动区域 (中间部分) -->
+      <div
+        class="scroll-container"
+        ref="scrollContainer"
+        @scroll="handleScroll"
+      >
+        <!-- A. 搜索栏 (截图风格) -->
+        <div class="search-box-wrapper">
+          <div class="search-box"><i class="search-icon">🔍</i> 搜索</div>
+        </div>
+
+        <!-- B. 横向好友列表 (在线状态) -->
+        <div class="horizontal-section">
           <HorizontalScrollList
-            :nameStyle="{
-              fontSize: '14px',
-              fontWeight: 'bold',
-              color: '#333',
-              marginTop: '8px'
-            }"
             :users="topUsers"
             :avatarStyle="{
-              width: '60px',
-              height: '60px',
-              border: '2px solid #1890ff',
-              borderRadius: '30px' // 改为方形
+              width: '56px',
+              height: '56px',
+              border: '2px solid #2878ff',
+              padding: '1px'
             }"
+            :nameStyle="{ fontSize: '12px', marginTop: '6px', color: '#666' }"
             @user-click="handleUserClick"
           />
-          <!-- <el-input
-            v-model="input"
-            placeholder="请输入用户名"
-            prefix-icon="el-icon-search"
-            clearable
-          ></el-input> -->
-          <!-- <user-info
-            :containerStyle="{
-              backgroundColor: '#f0f0f0',
-              padding: '10px',
-              borderRadius: '8px',
-              margin: '10px 0'
-            }"
-            :avatarInnerStyle="{
-              borderRadius: '0', // 方形头像
-              border: '3px solid #1890ff',
-              boxShadow: '0 0 8px rgba(24, 144, 255, 0.5)'
-            }"
-            :usernameStyle="{
-              fontSize: '18px',
-              fontWeight: 'bold',
-              color: '#1890ff',
-              marginBottom: '5px'
-            }"
-            :statusStyle="{
-              fontSize: '14px',
-              color: '#52c41a',
-              fontStyle: 'italic'
-            }"
-            :onlineDotStyle="{
-              width: '15px',
-              height: '15px',
-              backgroundColor: '#ff4d4f', // 红色
-              borderWidth: '3px',
-              borderColor: '#fff2f0'
-            }"
-            v-for="(item, index) in filteredUsers"
-            :key="index"
-            :message="item"
-          /> -->
-          <user-info
-            :avatarInnerStyle="{
-              border: '3px solid #1890ff',
-              boxShadow: '0 0 8px rgba(24, 144, 255, 0.5)'
-            }"
-            :usernameStyle="{
-              fontSize: '18px',
-              fontWeight: 'bold',
-              color: '#1890ff',
-              marginBottom: '5px'
-            }"
-            :statusStyle="{
-              fontSize: '14px',
-              color: '#52c41a',
-              fontStyle: 'italic'
-            }"
-            :onlineDotStyle="{
-              width: '15px',
-              height: '15px',
-              backgroundColor: '#ff4d4f', // 红色
-              borderWidth: '3px',
-              borderColor: '#fff2f0'
-            }"
-            v-for="(item, index) in filteredUsers"
-            :key="index"
-            :message="item"
-            @click="handleUserClick"
-          />
-          <div v-if="filteredUsers.length === 0" class="no-data">暂无数据</div>
+        </div>
 
-          <div v-if="loading" style="text-align: center; padding: 10px">
-            加载中...
+        <!-- C. 系统消息分类 (仿截图中的 互动消息/粉丝 等) -->
+        <div class="system-messages">
+          <div class="sys-item">
+            <div class="sys-icon icon-pink">💬</div>
+            <div class="sys-text">互动消息</div>
+            <div class="sys-arrow">></div>
           </div>
+          <div class="sys-item">
+            <div class="sys-icon icon-blue">👥</div>
+            <div class="sys-text">粉丝</div>
+            <div class="sys-arrow">></div>
+          </div>
+        </div>
+
+        <!-- D. 消息列表 (Chat List) -->
+        <div class="chat-list">
           <div
-            v-if="!hasMore && userinfos.length > 0"
-            style="text-align: center; padding: 10px; color: #888"
+            v-for="(item, index) in filteredUsers"
+            :key="index"
+            class="chat-item"
+            @click="handleUserClick(item)"
           >
-            没有更多数据了
+            <!-- 头像区 -->
+            <div class="avatar-box">
+              <img :src="item.avatar || defaultAvatar" class="avatar-img" />
+              <div v-if="item.isOnline" class="online-dot"></div>
+            </div>
+
+            <!-- 内容区 -->
+            <div class="content-box">
+              <div class="row-top">
+                <span class="username">{{ item.username }}</span>
+                <span class="time">{{ item.lastTime || '刚刚' }}</span>
+              </div>
+              <div class="row-bottom">
+                <span class="last-msg">{{
+                  item.lastMsg || '点击开始聊天...'
+                }}</span>
+                <div v-if="item.unreadCount" class="badge">
+                  {{ item.unreadCount }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 加载状态 -->
+          <div v-if="loading" class="loading-tips">加载中...</div>
+          <div v-if="!hasMore && userinfos.length > 0" class="no-more-tips">
+            - 没有更多了 -
+          </div>
+          <div v-if="!loading && userinfos.length === 0" class="empty-tips">
+            暂无消息
           </div>
         </div>
       </div>
-    </div>
-    <div class="footerbox">
-      <footer-vue class="footer"></footer-vue>
+
+      <!-- 3. 底部导航 (Footer) -->
+      <div class="footer-wrapper">
+        <footer-vue></footer-vue>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import HorizontalScrollList from '@/components/HorizontalScrollList.vue';
-
-import UserInfo from '../../components/userInfo.vue';
 import caidan from '@/components/caidan.vue';
 import footerVue from '@/components/footer.vue';
-import { getFriendApi, getFriendApiDetail, getUserList } from '@/api/user.js';
+import { getFriendApiDetail, getUserList } from '@/api/user.js';
 
 export default {
+  name: 'MessagePage',
   components: {
     footerVue,
     caidan,
-    UserInfo,
     HorizontalScrollList
   },
   data() {
     return {
-      // 可以在这里定义图标路径，方便后续修改
-      iconPaths: {
-        // 使用本地图片路径
-        left1: '@/assets/xiaoxi/header/xiaoxi_add.png',
-        left2: '@/assets/xiaoxi/header/xiaoxi_hongbao.png',
-        right1: '@/assets/xiaoxi/header/xiaoxi_menu.png',
-        right2: '@/assets/xiaoxi/header/xiaoxi_search.png'
-      },
-      // 清除静态数据，改为从API获取
+      defaultAvatar: 'https://ui-avatars.com/api/?background=random', // 默认头像
       userinfos: [],
       topUsers: [],
-      input: '',
-      page: 1,
-      pageSize: 5,
-      hasMore: true,
       loading: false,
+      hasMore: true,
+      page: 1,
+      pageSize: 10,
+
+      // 样式状态
       caidancss: {
         position: 'absolute',
         right: '100vw',
         bottom: '0px',
-        transition: 'right 0.5s ease',
+        transition: 'right 0.3s ease', // 优化动画时间
         height: '100vh',
         width: '80vw',
         background: 'white',
-        zIndex: 1000
+        zIndex: 1000,
+        boxShadow: '2px 0 8px rgba(0,0,0,0.1)'
       },
       othercss: {
-        position: 'relative',
-        right: '0vw',
-        bottom: '0px',
-        transition: 'right 0.5s ease',
+        transition: 'transform 0.3s ease',
+        transform: 'translateX(0)',
         height: '100vh',
-        width: '100vw'
+        width: '100vw',
+        display: 'flex',
+        flexDirection: 'column'
       }
     };
   },
   computed: {
     filteredUsers() {
-      const keyword = this.input.trim().toLowerCase();
-      if (!keyword) {
-        return this.userinfos;
-      }
-      return this.userinfos.filter((user) =>
-        user.username.toLowerCase().includes(keyword)
-      );
+      // 如果你需要前端搜索过滤，可以在这里处理，
+      // 但通常消息列表是按时间排序的，搜索建议单独做一个页面或弹窗
+      return this.userinfos;
     }
   },
   methods: {
     showcaidanone() {
+      // 使用 transform 性能更好
       if (this.caidancss.right === '100vw') {
         this.caidancss.right = '20vw';
-        this.othercss.right = '-80vw';
+        this.othercss.transform = 'translateX(80vw)';
       } else {
         this.caidancss.right = '100vw';
-        this.othercss.right = '0vw';
+        this.othercss.transform = 'translateX(0)';
       }
     },
 
+    // 1. 获取顶部横向好友列表 (Stories)
     async fetchFriendInfos() {
       try {
         const response = await getFriendApiDetail();
-        // 检查响应数据是否存在且有效
-        if (response && response.data && Array.isArray(response.data)) {
-          // 将朋友数据转换为topUsers所需的格式
+        if (response && response.data) {
           this.topUsers = response.data.map((friend) => ({
-            name: friend.nickname || friend.username || '未知用户',
-            avatar: friend.avatar || '默认头像地址',
-            userId: friend.userId || '未知用户ID',
-            heat: Math.floor(Math.random() * 100) // 可以根据实际需求设置热度值
+            name: friend.nickname || friend.username || '用户',
+            avatar: friend.avatar || this.defaultAvatar,
+            userId: friend.userId || friend.id
           }));
-          console.log('朋友列表加载成功:', this.topUsers);
-        } else {
-          console.error('朋友列表数据格式错误:', response);
-          // 保留默认数据作为备用
         }
       } catch (error) {
-        console.error('加载朋友列表失败:', error);
-        // 保留默认数据作为备用
+        console.error('Fetch friends failed:', error);
       }
     },
 
+    // 2. 获取消息列表 (分页)
     async fetchUserInfos() {
       if (this.loading || !this.hasMore) return;
       this.loading = true;
-      console.log('开始加载第', this.page, '页数据');
 
       try {
-        // 调用后端API获取所有用户数据，传递分页参数
         const response = await getUserList(this.page, this.pageSize);
+        if (response && response.code === 0) {
+          const records = response.data.records || [];
 
-        // 检查响应数据是否存在且有效
-        if (response && response.data && response.code === 0) {
-          // 从响应中获取分页用户列表数据
-          const pageData = response.data.records || [];
-
-          // 转换数据格式以适应前端需求
-          const formattedData = pageData.map((user) => ({
-            username: user.username || user.nickname || '未知用户',
-            status: '在线', // 这里可以根据后端返回的状态字段来设置
-            avatar: user.avatar || '默认头像地址',
-            userId: user.id,
-            height: '60px'
-          }));
-
-          console.log(`加载数据成功，数量: ${formattedData.length}`);
-
-          if (formattedData.length < this.pageSize) {
+          if (records.length < this.pageSize) {
             this.hasMore = false;
-            console.log('已加载全部数据');
           }
 
-          // 将数据添加到列表
-          this.userinfos.push(...formattedData);
-          console.log('当前用户列表长度:', this.userinfos.length);
+          const newItems = records.map((user) => ({
+            userId: user.id,
+            username: user.username || user.nickname || '未知用户',
+            avatar: user.avatar || this.defaultAvatar,
+            lastMsg: user.sign || '分享了视频', // 模拟最后一条消息
+            lastTime: '10:30', // 模拟时间，实际应由后端返回
+            unreadCount: Math.floor(Math.random() * 3), // 模拟未读数
+            isOnline: true
+          }));
 
-          this.page += 1;
+          this.userinfos = [...this.userinfos, ...newItems];
+          this.page++;
         } else {
-          console.error('获取用户数据失败:', response);
           this.hasMore = false;
         }
-      } catch (error) {
-        console.error('加载用户列表失败:', error);
+      } catch (e) {
+        console.error(e);
       } finally {
         this.loading = false;
       }
     },
 
+    // 3. 滚动监听
     handleScroll(e) {
-      const container = e.target;
-      // 调试信息，帮助确认滚动事件触发和计算值
-      console.log('滚动事件触发');
-      console.log(
-        `scrollTop: ${container.scrollTop}, clientHeight: ${container.clientHeight}, scrollHeight: ${container.scrollHeight}`
-      );
-
-      // 优化滚动加载条件，增加容错范围
-      if (
-        container.scrollTop + container.clientHeight >=
-        container.scrollHeight - 50 // 增加触发距离，更容易触发加载
-      ) {
-        console.log('触发加载更多');
+      const { scrollTop, clientHeight, scrollHeight } = e.target;
+      // 距离底部 50px 时触发加载
+      if (scrollTop + clientHeight >= scrollHeight - 50) {
         this.fetchUserInfos();
       }
     },
 
-    // 处理用户点击事件，跳转到聊天界面
+    // 4. 点击跳转聊天
     handleUserClick(user) {
-      console.log('=== handleUserClick called in xiaoxi.vue ===');
-      console.log('User clicked in xiaoxi.vue:', user);
-      // 检查用户对象是否存在
-      if (!user) {
-        console.error('User object is undefined or null');
-        return;
-      }
-
-      // 检查用户对象中是否包含userId、id、username或name字段作为标识
-      const friendId =
-        user.userId || user.id || user.username || user.name || '';
-      console.log('Friend ID:', friendId);
-      if (friendId) {
-        console.log('Navigating to chat with ID:', friendId);
-        // 跳转到聊天界面，传递好友id参数
-        try {
-          this.$router.push({
-            path: '/chatyi',
-            query: {
-              id: friendId
-            }
-          });
-          console.log('Router push executed successfully');
-        } catch (error) {
-          console.error('Router push failed:', error);
-        }
-      } else {
-        console.warn('用户数据中缺少必要的标识字段，无法跳转');
+      const id = user.userId || user.id;
+      if (id) {
+        this.$router.push({ path: '/chatyi', query: { id } });
       }
     }
   },
-
   mounted() {
-    // 直接使用ref来定位具体的图标元素，避免样式冲突问题
-    this.$nextTick(() => {
-      try {
-        // 为每个图标添加ID以便更精确地选择
-        const iconElements = [
-          {
-            selector: '.left-icon-1',
-            path: '/src/assets/xiaoxi/header/xiaoxi_add.png'
-          },
-          {
-            selector: '.left-icon-2',
-            path: '/src/assets/xiaoxi/header/xiaoxi_hongbao.png'
-          },
-          {
-            selector: '.right-icon-1',
-            path: '/src/assets/xiaoxi/header/xiaoxi_menu.png'
-          },
-          {
-            selector: '.right-icon-2',
-            path: '/src/assets/xiaoxi/header/xiaoxi_search.png'
-          }
-        ];
-
-        iconElements.forEach((icon) => {
-          const element = document.querySelector(icon.selector);
-          if (element) {
-            // 在Vite中，使用相对路径来加载本地图片
-            // 由于在开发环境中，Vite会正确处理这些路径
-            element.style.backgroundImage = `url(${icon.path})`;
-            // 确保背景图片正确显示
-            element.style.backgroundSize = 'contain';
-            element.style.backgroundRepeat = 'no-repeat';
-            element.style.backgroundPosition = 'center';
-          }
-        });
-
-        // 额外添加全局样式来防止页面横向滚动
-        document.body.style.overflowX = 'hidden';
-        document.documentElement.style.overflowX = 'hidden';
-      } catch (error) {
-        console.error('设置图标时出错:', error);
-      }
-    });
-
-    // 获取朋友列表数据
     this.fetchFriendInfos();
-    // 获取用户信息数据
     this.fetchUserInfos();
 
-    // 确保容器存在再添加事件监听
-    this.$nextTick(() => {
-      const container = this.$refs.scrollContainer;
-      console.log('=== Checking scroll container ===');
-      console.log('Scroll container ref:', container);
-      if (container) {
-        // 先移除可能存在的监听器，避免重复
-        container.removeEventListener('scroll', this.handleScroll);
-        // 添加滚动事件监听
-        container.addEventListener('scroll', this.handleScroll);
-        console.log('滚动事件监听器已添加到容器:', container);
-        // 添加调试信息，查看容器的实际样式
-        console.log(
-          'Container computed style:',
-          window.getComputedStyle(container)
-        );
-      } else {
-        console.error('滚动容器未找到');
-      }
-    });
-  },
-  beforeDestroy() {
-    const container = this.$refs.scrollContainer;
-    container.removeEventListener('scroll', this.handleScroll);
-
-    // 清理添加的全局样式
-    document.body.style.overflowX = '';
-    document.documentElement.style.overflowX = '';
+    // 隐藏全局滚动条
+    document.body.style.overflow = 'hidden';
   }
 };
 </script>
 
-<style scoped>
-.xiaoxi {
-  overflow: hidden;
-  overflow-x: hidden; /* 明确禁止横向滚动 */
-  font-family: 'Arial', sans-serif;
-  background-color: #ffffff; /* 修改为白色背景 */
-  color: #333;
-  min-height: 100vh;
-  width: 100%;
-  box-sizing: border-box;
-  position: relative;
-}
-.other {
+<style lang="scss" scoped>
+/* 基础容器设置 */
+.message-page {
   position: relative;
   width: 100%;
-  overflow: hidden;
-  box-sizing: border-box;
   height: 100vh;
+  background-color: #fff;
+  overflow: hidden; /* 防止页面整体滚动 */
 }
 
-.header {
-  background-color: #fff;
-  width: 100%;
+/* 顶部导航 */
+.nav-header {
   height: 50px;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
-  top: 0;
-  left: 0;
+  padding: 0 16px;
+  background: #fff;
+  border-bottom: 1px solid #f5f5f5;
+  flex-shrink: 0; /* 防止被挤压 */
   z-index: 10;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* 注释掉这个可能导致冲突的.icon样式定义 */
-/* .icon {
-  font-size: 24px;
+.nav-center {
+  font-size: 17px;
+  font-weight: 600;
+  color: #161823;
+}
+
+.icon-btn {
+  font-size: 20px;
+  padding: 4px;
   color: #333;
-  cursor: pointer;
-} */
-
-.commentbody {
-  overflow-y: auto;
-  overflow-x: hidden; /* 禁止横向滚动 */
-  height: calc(100vh - 120px); /* 调整高度计算，确保占满剩余空间 */
-  padding: 10px;
-  width: 100%;
-  box-sizing: border-box;
-  position: relative; /* 确保相对定位以便正确计算滚动 */
-  z-index: 1; /* 确保滚动容器在正确的层级 */
-  background-color: #ffffff; /* 添加背景色，确保可见 */
 }
 
-.user-list {
+.nav-right {
+  display: flex;
+  gap: 15px;
+}
+
+/* 滚动区域核心布局 */
+.scroll-container {
+  flex: 1; /* 占据除了 Header 和 Footer 外的所有空间 */
+  overflow-y: auto; /* 允许垂直滚动 */
+  overflow-x: hidden;
+  background-color: #fff;
+  padding-bottom: 20px;
+
+  /* 隐藏滚动条但保留功能 */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* 搜索框 */
+.search-box-wrapper {
+  padding: 10px 16px 0;
+}
+.search-box {
+  background: #f1f1f1;
+  border-radius: 4px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 14px;
+}
+.search-icon {
+  margin-right: 6px;
+  font-style: normal;
+}
+
+/* 横向好友列表 */
+.horizontal-section {
+  padding: 10px 0;
+  border-bottom: 1px solid #f8f8f8;
+}
+
+/* 系统消息区 (仿截图) */
+.system-messages {
+  padding: 0 16px;
+  margin-top: 10px;
+}
+
+.sys-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+}
+
+.sys-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  margin-right: 12px;
+}
+
+.icon-pink {
+  background: linear-gradient(135deg, #ff7eb3, #ff758c);
+}
+.icon-blue {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+
+.sys-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #161823;
+  flex: 1;
+}
+
+.sys-arrow {
+  color: #ccc;
+  font-size: 14px;
+}
+
+/* 聊天列表样式 */
+.chat-list {
+  padding: 0 16px;
+}
+
+.chat-item {
+  display: flex;
+  padding: 12px 0;
+  cursor: pointer;
+
+  &:active {
+    background-color: #f9f9f9;
+  }
+}
+
+.avatar-box {
+  position: relative;
+  margin-right: 12px;
+}
+
+.avatar-img {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #eee;
+}
+
+.online-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  background: #3ac674;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+.content-box {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  width: 100%;
-  height: auto;
-  box-sizing: border-box;
-  overflow-x: hidden;
+  justify-content: center;
+  border-bottom: 1px solid #f8f8f8; /* 细分割线 */
+  padding-right: 4px;
 }
 
-/* 确保子组件不会导致横向滚动 */
-:deep(.HorizontalScrollList) {
-  width: 100%;
-  overflow-x: hidden;
-  box-sizing: border-box;
+.row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
 }
 
-/* 确保el-input不会超出容器 */
-:deep(.el-input) {
-  width: 100%;
-  box-sizing: border-box;
+.username {
+  font-size: 16px;
+  font-weight: 500;
+  color: #161823;
 }
 
-.no-data {
+.time {
+  font-size: 12px;
+  color: #999;
+}
+
+.row-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.last-msg {
+  font-size: 13px;
+  color: #999;
+  max-width: 200px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.badge {
+  background: #fe2c55;
+  color: white;
+  font-size: 10px;
+  padding: 0 5px;
+  height: 16px;
+  line-height: 16px;
+  border-radius: 8px;
+  min-width: 16px;
+  text-align: center;
+}
+
+/* 底部状态文字 */
+.loading-tips,
+.no-more-tips,
+.empty-tips {
   text-align: center;
   color: #999;
-  margin-top: 20px;
+  padding: 20px 0;
+  font-size: 13px;
 }
 
-/* Hide scrollbar */
-.commentbody::-webkit-scrollbar {
-  display: none;
-}
-
-.icon-message-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  max-width: 100%; /* 修改为100%以适应屏幕宽度 */
-  padding: 10px 20px;
-  background-color: #ffffff; /* 修改为白色背景 */
-  min-height: 60px;
-  box-sizing: border-box;
-  overflow-x: hidden;
-  border: none;
-  outline: none;
-}
-
-.icon {
-  width: 30px;
-  height: 30px;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  display: inline-block;
-  box-sizing: border-box;
-  border: none;
-  outline: none;
-}
-
-.icon:hover {
-  transform: scale(1.05);
-}
-
-.message-content {
-  font-size: 18px;
-  font-weight: 500;
-  color: #333;
-  padding: 0 20px;
-  flex: 1;
-  text-align: center;
-}
-
-/* 可以根据需要调整左右图标的间距 */
-.left-icon-1 {
-  margin-right: 15px;
-}
-
-.right-icon-1 {
-  margin-right: 15px;
-}
-
-.footerbox {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
+/* Footer 固定容器 */
+.footer-wrapper {
+  height: 50px; /* footer组件的高度 */
+  flex-shrink: 0;
+  border-top: 1px solid #eee;
+  z-index: 10;
 }
 </style>
