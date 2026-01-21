@@ -470,13 +470,15 @@ export default {
 .profile-header {
   background-size: cover;
   background-position: center;
-  height: 20vh;
+  height: 22vh;
+  min-height: 160px;
   display: flex;
   flex-direction: row;
   align-items: flex-end;
   position: relative;
-  padding-bottom: 20px;
-  padding-left: 15px;
+  padding-bottom: 24px;
+  padding-left: 18px;
+  transition: background-image 0.5s ease;
 }
 
 .profile-header::after {
@@ -485,34 +487,52 @@ export default {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 50%;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.3));
+  height: 60%;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
+  transition: opacity 0.3s ease;
+}
+
+.profile-header:hover::after {
+  opacity: 0.6;
 }
 
 .douyinnum {
-  margin-bottom: 8vw;
-  margin-left: 3vw;
+  margin-bottom: 6vw;
+  margin-left: 2vw;
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .avatar-container {
   position: relative;
-  margin-bottom: 5vw;
+  margin-bottom: 3vw;
+  z-index: 1;
 }
 
 .avatar {
   display: block;
-  width: 25vw;
-  height: 25vw;
-  max-width: 100px;
-  max-height: 100px;
+  width: 24vw;
+  height: 24vw;
+  max-width: 110px;
+  max-height: 110px;
   border-radius: 50%;
   border: 3px solid #fff;
   object-fit: cover;
   position: relative;
   z-index: 1;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
 }
 
 .avatar-badge {
@@ -520,16 +540,24 @@ export default {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #fe2c55;
+  background-color: rgba(254, 44, 85, 0.9);
   color: white;
-  padding: 2px 12px;
-  border-radius: 12px;
+  padding: 3px 14px;
+  border-radius: 14px;
   font-size: 12px;
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
   z-index: 2;
   cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.avatar-badge:hover {
+  background-color: #fe2c55;
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 2px 6px rgba(254, 44, 85, 0.4);
 }
 
 .icon-plus::before {
@@ -541,12 +569,17 @@ export default {
 .user-name-row {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .private-account {
   color: white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 12px;
 }
 
 .icon-lock::before {
@@ -555,29 +588,33 @@ export default {
 }
 
 .user-name {
-  margin-top: 1vh;
+  margin-top: 0;
   font-size: 4vw;
   font-weight: bold;
   color: white;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  font-family: Arial, sans-serif;
+  letter-spacing: 0.5px;
 }
 
 .user-id {
-  margin-top: 0.5vh;
+  margin-top: 0;
   font-size: 3vw;
-  opacity: 0.9;
+  opacity: 0.95;
   color: white;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  font-family: Arial, sans-serif;
 }
 
 /* 用户统计信息 */
 .user-stats {
   display: flex;
-  margin-top: 2vh;
+  margin-top: 0;
   background: white;
-  padding: 15px 0;
-  border-bottom: 1px solid #eee;
+  padding: 18px 0;
+  border-bottom: 1px solid #f0f0f0;
   position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .stat-item {
@@ -585,63 +622,140 @@ export default {
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  padding: 5px 0;
+  padding: 8px 0;
+  position: relative;
+}
+
+.stat-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: #fe2c55;
+  transition: width 0.3s ease;
+}
+
+.stat-item:hover::after {
+  width: 30px;
+}
+
+.stat-item:hover {
+  background-color: rgba(254, 44, 85, 0.05);
 }
 
 .stat-item:active {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(254, 44, 85, 0.1);
 }
 
 .num {
-  font-size: 18px;
+  font-size: 19px;
   font-weight: bold;
-  color: #333;
+  color: #222;
+  font-family: Arial, sans-serif;
+  transition: color 0.3s ease;
+}
+
+.stat-item:hover .num {
+  color: #fe2c55;
 }
 
 .label {
   font-size: 12px;
   color: #666;
-  margin-top: 2px;
+  margin-top: 4px;
+  font-family: Arial, sans-serif;
+  transition: color 0.3s ease;
+}
+
+.stat-item:hover .label {
+  color: #fe2c55;
 }
 
 .user-actions {
   position: absolute;
   top: 50%;
-  right: 15px;
+  right: 18px;
   transform: translateY(-50%);
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 
 .btn-edit-profile {
-  padding: 6px 16px;
-  background-color: #f0f0f0;
-  border: none;
-  border-radius: 16px;
+  padding: 7px 18px;
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
   font-size: 14px;
   font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: Arial, sans-serif;
+}
+
+.btn-edit-profile:hover {
+  background-color: #e8e8e8;
+  border-color: #d0d0d0;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.btn-edit-profile:active {
+  transform: translateY(0);
 }
 
 .btn-wallet {
-  padding: 6px 16px;
-  background-color: #f0f0f0;
-  border: none;
-  border-radius: 16px;
+  padding: 7px 18px;
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
   font-size: 14px;
   font-weight: 500;
-  margin-left: 8px;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: Arial, sans-serif;
+  margin-left: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-wallet:hover {
+  background-color: #e8e8e8;
+  border-color: #d0d0d0;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.btn-wallet:active {
+  transform: translateY(0);
 }
 
 .btn-settings {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  border: none;
-  background-color: #f0f0f0;
+  border: 1px solid #e0e0e0;
+  background-color: #f5f5f5;
   font-size: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #666;
+}
+
+.btn-settings:hover {
+  background-color: #e8e8e8;
+  border-color: #d0d0d0;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #333;
 }
 
 .icon-settings::before {
@@ -653,30 +767,49 @@ export default {
 /* 用户信息 */
 .userinfo {
   background: white;
-  padding: 15px;
-  margin-bottom: 10px;
+  padding: 18px;
+  margin-bottom: 12px;
+  border-radius: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.userinfo:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .intro {
   font-size: 14px;
   color: #333;
-  line-height: 1.5;
-  margin-bottom: 10px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  font-family: Arial, sans-serif;
+  word-break: break-word;
 }
 
 .bio {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .bio > div {
-  padding: 4px 8px;
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
+  padding: 5px 10px;
+  background-color: rgba(254, 44, 85, 0.08);
+  border-radius: 16px;
   font-size: 12px;
-  color: #666;
+  color: #555;
+  border: 1px solid rgba(254, 44, 85, 0.15);
+  transition: all 0.3s ease;
+  font-family: Arial, sans-serif;
+}
+
+.bio > div:hover {
+  background-color: rgba(254, 44, 85, 0.12);
+  border-color: rgba(254, 44, 85, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(254, 44, 85, 0.1);
 }
 
 /* 内容项样式 - 抖音风格 */

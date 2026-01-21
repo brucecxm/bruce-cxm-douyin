@@ -3,7 +3,7 @@
     <!-- 顶部导航栏 -->
     <div class="top-nav">
       <div class="nav-left" @click="goBack">
-        <img src="@/assets/IconFont/返回.png" alt="返回" class="nav-icon" />
+        <span class="nav-back-text">返回</span>
       </div>
       <div class="nav-title">发布作品</div>
       <div class="nav-right"></div>
@@ -11,126 +11,115 @@
 
     <!-- 视频预览 -->
     <div class="video-preview">
-      <img
-        :src="videoThumbnail"
-        alt="video"
-        v-if="videoThumbnail"
-        class="preview-img"
-      />
-      <video
-        :src="videoURL"
-        class="preview-video"
-        controls
-        v-if="videoURL"
-      ></video>
-      <div v-if="!videoThumbnail && !videoURL" class="preview-placeholder">
+      <div class="preview-container">
         <img
-          src="@/assets/home/加号黑.png"
-          alt="加号"
-          class="placeholder-icon"
+          :src="videoThumbnail"
+          alt="video"
+          v-if="videoThumbnail"
+          class="preview-img"
         />
-        <span class="placeholder-text">添加视频或图片</span>
+        <video
+          :src="videoURL"
+          class="preview-video"
+          controls
+          v-if="videoURL"
+        ></video>
+        <div class="edit-cover-btn" v-if="videoThumbnail || videoURL">
+          编辑封面
+        </div>
+        <div v-if="!videoThumbnail && !videoURL" class="preview-placeholder">
+          <div class="add-icon">+</div>
+          <span class="placeholder-text">添加视频或图片</span>
+        </div>
       </div>
     </div>
 
-    <!-- 标题输入框 -->
-    <div class="input-area">
-      <textarea
-        v-model="title"
-        placeholder="这一刻的想法..."
-        maxlength="100"
-        class="title-textarea"
-        rows="3"
-      ></textarea>
-      <div class="char-count">{{ title.length }}/100</div>
+    <!-- 标题和描述输入 -->
+    <div class="content-section">
+      <div class="input-item">
+        <input
+          v-model="title"
+          placeholder="添加标题"
+          maxlength="50"
+          class="title-input"
+        />
+        <div class="char-count title-count">{{ title.length }}/50</div>
+      </div>
+      <div class="input-item">
+        <textarea
+          v-model="description"
+          placeholder="添加作品描述..."
+          maxlength="100"
+          class="description-textarea"
+          rows="3"
+        ></textarea>
+        <div class="char-count desc-count">{{ description.length }}/100</div>
+      </div>
+
+      <!-- 快捷功能按钮 -->
+      <div class="quick-actions">
+        <div class="quick-btn"># 话题</div>
+        <div class="quick-btn">@ 朋友</div>
+        <div class="quick-btn">
+          <span class="more-text">更多</span>
+        </div>
+      </div>
     </div>
 
     <!-- 话题选择 -->
-    <div class="setting-section">
-      <div class="section-title">添加话题</div>
-      <div class="topic-container">
+    <div class="setting-section topics-section">
+      <div class="section-label">热门话题</div>
+      <div class="topics-list">
         <FlexibleButtonPanel
           :items="topicItems"
           :cols="3"
-          :gap="10"
+          :gap="8"
           @btnClick="onTopicClick"
         />
       </div>
     </div>
 
     <!-- 添加位置 -->
-    <div class="setting-section">
-      <div class="section-title">添加位置</div>
-      <div class="location-container">
+    <div class="setting-section location-section">
+      <div class="location-header">
+        <span class="location-label">位置</span>
+        <span class="location-text">你在哪里</span>
+      </div>
+      <div class="locations-list">
         <FlexibleButtonPanel
           :items="locationItems"
           :cols="2"
-          :gap="10"
+          :gap="8"
           @btnClick="onLocationClick"
         />
       </div>
     </div>
 
-    <!-- 权限设置 -->
-    <div class="setting-section">
-      <div class="section-title">谁可以看</div>
-      <div class="privacy-container">
-        <FlexibleButtonPanel
-          :items="privacyItems"
-          :cols="2"
-          :gap="15"
-          @btnClick="onPrivacyClick"
-        />
-      </div>
+    <!-- 添加标签 -->
+    <div class="setting-section tags-section">
+      <div class="section-label">添加标签</div>
+      <div class="tags-tip">发布成功后将保存内容至本地</div>
     </div>
 
-    <!-- 高级设置 -->
-    <div class="setting-section">
-      <div class="advance-settings" @click="openSettings">
-        <span class="settings-text">高级设置</span>
-        <img
-          src="@/assets/IconFont/进入.png"
-          alt="进入"
-          class="settings-icon"
-        />
-      </div>
-    </div>
-
-    <!-- 底部发布栏 -->
+    <!-- 底部操作栏 -->
     <div class="bottom-bar">
-      <div class="publish-btn-container">
-        <button
-          class="publish-btn"
-          @click="publishPost"
-          :disabled="loading || !title"
+      <div class="bottom-content">
+        <div class="share-btn" @click="onShare">
+          <span class="share-text">分享</span>
+        </div>
+
+        <div
+          class="daily-option"
+          :class="{ active: isDaily }"
+          @click="toggleDaily"
         >
+          <span class="daily-text">限时日常</span>
+        </div>
+
+        <button class="publish-btn" @click="publishPost" :disabled="loading">
           <span v-if="loading">发布中...</span>
-          <span v-else>发布</span>
+          <span v-else>发作品</span>
         </button>
-      </div>
-      <div class="bottom-actions">
-        <FlexibleButtonPanel
-          :items="buttonItems"
-          :cols="3"
-          :gap="15"
-          :fontSize="14"
-          :iconSize="22"
-          @btnClick="onBtnClick"
-          @btnLongPress="onBtnLongPress"
-        >
-          <template #btn-0="{ item }">
-            <div class="action-item">
-              <img :src="item.icon" alt="" class="action-icon" />
-              <span class="action-text">{{ item.text }}</span>
-            </div>
-          </template>
-          <template #btn-1="{ item }">
-            <div class="action-item">
-              <img :src="item.icon" alt="" class="action-icon" />
-              <span class="action-text">{{ item.text }}</span>
-            </div>
-          </template>
-        </FlexibleButtonPanel>
       </div>
     </div>
   </div>
@@ -149,9 +138,11 @@ export default {
       userId: '123456', // 模拟用户 ID，真实情况从登录态获取
       videoThumbnail: '',
       title: '',
+      description: '',
       selectedTopic: null,
       selectedLocation: null,
       selectedPrivacy: '公开',
+      isDaily: false,
       videoData: '',
       loading: false,
       dataLoading: false,
@@ -160,34 +151,7 @@ export default {
       topicItems: [],
       locationItems: [],
       privacyItems: [],
-      buttonItems: [
-        {
-          height: '40px',
-          width: '80px',
-          text: '存草稿',
-          icon: 'http://gips2.baidu.com/it/u=195724436,3554684702&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
-          bgColor: '#f5f5f5',
-          textColor: '#333',
-          borderRadius: 20
-        },
-        {
-          height: '40px',
-          width: '100px',
-          text: '朋友日常',
-          bgColor: '#464646',
-          textColor: '#fff',
-          icon: 'http://gips2.baidu.com/it/u=195724436,3554684702&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
-          borderRadius: 20
-        },
-        {
-          height: '40px',
-          width: '80px',
-          text: '发作品',
-          bgColor: '#ff2c55',
-          textColor: '#fff',
-          borderRadius: 20
-        }
-      ]
+      buttonItems: []
     };
   },
   mounted() {
@@ -420,18 +384,13 @@ export default {
         selected: i === index
       }));
     },
-    onPrivacyClick({ item, index }) {
-      this.selectedPrivacy = item.text;
-      console.log('选择权限：', item.text);
-
-      // 更新选中状态
-      this.privacyItems = this.privacyItems.map((privacy, i) => ({
-        ...privacy,
-        bgColor: i === index ? '#ff2c55' : '#f5f5f5',
-        textColor: i === index ? '#fff' : '#333',
-        bold: i === index,
-        selected: i === index
-      }));
+    onShare() {
+      console.log('分享作品');
+      // 分享功能逻辑
+    },
+    toggleDaily() {
+      this.isDaily = !this.isDaily;
+      console.log('切换限时日常:', this.isDaily);
     },
     openSettings() {
       console.log('进入高级设置');
@@ -574,11 +533,11 @@ export default {
 <style scoped>
 .publish-page {
   padding: 0;
-  padding-bottom: 100px;
+  padding-bottom: 80px;
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
     Arial, sans-serif;
-  background-color: #fafafa;
+  background-color: #fff;
   min-height: 100vh;
 }
 
@@ -589,7 +548,7 @@ export default {
   justify-content: space-between;
   padding: 12px 16px;
   background-color: #fff;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid #f0f0f0;
   position: sticky;
   top: 0;
   z-index: 101;
@@ -604,9 +563,10 @@ export default {
   justify-content: center;
 }
 
-.nav-icon {
-  width: 24px;
-  height: 24px;
+.nav-back-text {
+  font-size: 16px;
+  color: #000;
+  font-weight: 500;
   cursor: pointer;
 }
 
@@ -619,13 +579,19 @@ export default {
 /* 视频预览 */
 .video-preview {
   width: 100%;
-  height: 300px;
-  background-color: #000;
-  position: relative;
-  overflow: hidden;
+  background-color: #fff;
+  padding: 20px 0;
   display: flex;
-  align-items: center;
   justify-content: center;
+}
+
+.preview-container {
+  width: 220px;
+  height: 390px;
+  background-color: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
 }
 
 .preview-img,
@@ -635,19 +601,40 @@ export default {
   object-fit: cover;
 }
 
+.edit-cover-btn {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
 .preview-placeholder {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   color: #999;
+  height: 100%;
 }
 
-.placeholder-icon {
+.add-icon {
   width: 48px;
   height: 48px;
   margin-bottom: 8px;
   opacity: 0.6;
+  font-size: 40px;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
 }
 
 .placeholder-text {
@@ -655,38 +642,91 @@ export default {
 }
 
 /* 内容区域 */
-.input-area {
+.content-section {
   padding: 16px;
   background-color: #fff;
   margin-bottom: 10px;
+}
+
+.input-item {
+  margin-bottom: 16px;
   position: relative;
 }
 
-.title-textarea {
+.title-input {
   width: 100%;
   border: none;
-  resize: none;
-  padding: 12px;
-  font-size: 16px;
-  background: #fafafa;
-  border-radius: 12px;
+  padding: 12px 0;
+  font-size: 18px;
+  font-weight: 600;
   outline: none;
-  font-family: inherit;
-  box-shadow: inset 0 0 0 1px #e5e5e5;
+  background-color: transparent;
+  border-bottom: 1px solid transparent;
   transition: all 0.2s ease;
 }
 
-.title-textarea:focus {
-  box-shadow: inset 0 0 0 2px #ff2c55;
-  background-color: #fff;
+.title-input:focus {
+  border-bottom-color: #ff2c55;
+}
+
+.description-textarea {
+  width: 100%;
+  border: none;
+  resize: none;
+  padding: 12px 0;
+  font-size: 16px;
+  outline: none;
+  background-color: transparent;
+  line-height: 1.5;
+  font-family: inherit;
 }
 
 .char-count {
   position: absolute;
-  right: 28px;
-  bottom: 28px;
+  right: 0;
+  bottom: 4px;
   font-size: 12px;
   color: #999;
+}
+
+.title-count {
+  bottom: 8px;
+}
+
+.desc-count {
+  bottom: 4px;
+}
+
+/* 快捷功能按钮 */
+.quick-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.quick-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background-color: #f5f5f5;
+  border-radius: 16px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quick-btn:hover {
+  background-color: #e5e5e5;
+}
+
+.more-text {
+  font-size: 14px;
+  color: #333;
 }
 
 /* 设置区域 */
@@ -696,70 +736,132 @@ export default {
   padding: 16px;
 }
 
-.section-title {
+.section-label {
   font-weight: 600;
   font-size: 16px;
   margin-bottom: 12px;
   color: #111;
 }
 
-/* 话题和位置容器 */
-.topic-container,
-.location-container,
-.privacy-container {
+/* 话题区域 */
+.topics-section {
+  padding-bottom: 12px;
+}
+
+.topics-list {
   margin-top: 8px;
 }
 
-/* 高级设置 */
-.advance-settings {
+/* 位置区域 */
+.location-section {
+  padding-bottom: 12px;
+}
+
+.location-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  color: #111;
+  font-weight: 600;
 }
 
-.advance-settings:hover {
-  background-color: #e5e5e5;
-}
-
-.settings-text {
+.location-label {
   font-size: 14px;
-  color: #333;
+  color: #666;
+  margin-right: 8px;
+  background-color: #f5f5f5;
+  padding: 4px 8px;
+  border-radius: 12px;
 }
 
-.settings-icon {
-  width: 20px;
-  height: 20px;
-  opacity: 0.6;
+.location-text {
+  font-weight: 600;
 }
 
-/* 底部发布栏 */
+.locations-list {
+  margin-top: 8px;
+}
+
+/* 标签区域 */
+.tags-section {
+  padding-bottom: 12px;
+}
+
+.tags-tip {
+  font-size: 12px;
+  color: #999;
+  margin-top: 8px;
+}
+
+/* 底部操作栏 */
 .bottom-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 16px;
+  padding: 12px 16px;
   background-color: #fff;
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+  border-top: 1px solid #f0f0f0;
   z-index: 100;
 }
 
-.publish-btn-container {
-  margin-bottom: 12px;
+.bottom-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  background-color: #f5f5f5;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.share-btn:hover {
+  background-color: #e5e5e5;
+}
+
+.share-text {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.daily-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background-color: #f5f5f5;
+  border-radius: 22px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.daily-option.active {
+  background-color: #fff;
+  border-color: #ff2c55;
+}
+
+.daily-text {
+  font-size: 14px;
+  color: #333;
 }
 
 .publish-btn {
-  width: 100%;
-  padding: 14px;
+  padding: 12px 24px;
   background-color: #ff2c55;
   color: #fff;
   border: none;
-  border-radius: 28px;
+  border-radius: 22px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -779,37 +881,24 @@ export default {
   box-shadow: 0 4px 12px rgba(255, 44, 85, 0.3);
 }
 
-.bottom-actions {
-  display: flex;
-  justify-content: center;
-}
-
-.action-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  color: #666;
-}
-
-.action-icon {
-  width: 20px;
-  height: 20px;
-  margin-right: 4px;
-}
-
-.action-text {
-  font-size: 12px;
-}
-
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .video-preview {
-    height: 250px;
+  .preview-container {
+    width: 200px;
+    height: 350px;
+  }
+
+  .daily-text {
+    font-size: 13px;
+  }
+
+  .publish-btn {
+    padding: 10px 20px;
+    font-size: 15px;
   }
 
   .publish-page {
-    padding-bottom: 90px;
+    padding-bottom: 80px;
   }
 }
 </style>
