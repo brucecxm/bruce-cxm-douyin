@@ -99,19 +99,19 @@
 </template>
 
 <script>
-import {
-  getSearchSuggestions,
-  getHotSearches,
-  searchVideos
-} from '@/api/video.js';
-
 export default {
   data() {
     return {
       searchQuery: '',
       suggestions: [],
       showSuggestions: false,
-      hotSearches: [],
+      hotSearches: [
+        { keyword: '热门视频', trending: '↑ 123' },
+        { keyword: '最新音乐', trending: '↑ 45' },
+        { keyword: '搞笑段子', trending: '↓ 67' },
+        { keyword: '美食教程', trending: '↑ 89' },
+        { keyword: '旅游攻略', trending: '↑ 32' }
+      ],
       searchResults: [],
       currentPage: 1,
       pageSize: 10,
@@ -119,25 +119,22 @@ export default {
       loading: false
     };
   },
-  mounted() {
-    this.getHotSearchesData();
-  },
   methods: {
     gohome() {
       this.$router.push('/');
     },
 
     // 处理输入事件，获取搜索建议
-    async handleInput() {
+    handleInput() {
       if (this.searchQuery.trim().length > 0) {
-        try {
-          const res = await getSearchSuggestions(this.searchQuery);
-          this.suggestions = res.data || [];
-          this.showSuggestions = true;
-        } catch (error) {
-          console.error('获取搜索建议失败:', error);
-          this.suggestions = [];
-        }
+        // 使用模拟数据生成搜索建议
+        this.suggestions = [
+          `${this.searchQuery} 热门`,
+          `${this.searchQuery} 最新`,
+          `${this.searchQuery} 教程`,
+          `${this.searchQuery} 合集`
+        ];
+        this.showSuggestions = true;
       } else {
         this.suggestions = [];
         this.showSuggestions = false;
@@ -145,7 +142,7 @@ export default {
     },
 
     // 执行搜索
-    async executeSearch() {
+    executeSearch() {
       if (this.searchQuery.trim().length === 0) return;
 
       this.showSuggestions = false;
@@ -153,36 +150,52 @@ export default {
       this.searchResults = [];
       this.hasMore = true;
 
-      await this.loadSearchResults();
+      this.loadSearchResults();
     },
 
     // 加载搜索结果
-    async loadSearchResults() {
+    loadSearchResults() {
       if (this.loading) return;
 
       this.loading = true;
-      try {
-        const res = await searchVideos(
-          this.searchQuery,
-          this.currentPage,
-          this.pageSize
-        );
-        const data = res.data || res;
+      
+      // 使用setTimeout模拟异步请求
+      setTimeout(() => {
+        try {
+          // 生成模拟搜索结果
+          const mockResults = [];
+          const totalResults = 20; // 模拟总共有20个结果
+          
+          for (let i = 0; i < this.pageSize; i++) {
+            const index = (this.currentPage - 1) * this.pageSize + i;
+            if (index >= totalResults) break;
+            
+            mockResults.push({
+              videoId: `video_${index + 1}`,
+              title: `${this.searchQuery} 相关视频 ${index + 1}`,
+              cover: `https://picsum.photos/seed/${this.searchQuery}${index}/200/150`,
+              likeNum: Math.floor(Math.random() * 1000),
+              commentNum: Math.floor(Math.random() * 100),
+              shareNum: Math.floor(Math.random() * 50),
+              username: `用户${Math.floor(Math.random() * 1000)}`
+            });
+          }
 
-        if (this.currentPage === 1) {
-          this.searchResults = data;
-        } else {
-          this.searchResults = [...this.searchResults, ...data];
+          if (this.currentPage === 1) {
+            this.searchResults = mockResults;
+          } else {
+            this.searchResults = [...this.searchResults, ...mockResults];
+          }
+
+          // 判断是否还有更多数据
+          this.hasMore = this.searchResults.length < totalResults;
+          this.currentPage++;
+        } catch (error) {
+          console.error('搜索失败:', error);
+        } finally {
+          this.loading = false;
         }
-
-        // 判断是否还有更多数据
-        this.hasMore = data.length >= this.pageSize;
-        this.currentPage++;
-      } catch (error) {
-        console.error('搜索失败:', error);
-      } finally {
-        this.loading = false;
-      }
+      }, 500);
     },
 
     // 加载更多
@@ -200,21 +213,15 @@ export default {
     },
 
     // 获取热门搜索
-    async getHotSearchesData() {
-      try {
-        const res = await getHotSearches();
-        this.hotSearches = res.data || [];
-      } catch (error) {
-        console.error('获取热门搜索失败:', error);
-        // 失败时使用默认数据
-        this.hotSearches = [
-          { keyword: '热门视频', trending: '↑ 123' },
-          { keyword: '最新音乐', trending: '↑ 45' },
-          { keyword: '搞笑段子', trending: '↓ 67' },
-          { keyword: '美食教程', trending: '↑ 89' },
-          { keyword: '旅游攻略', trending: '↑ 32' }
-        ];
-      }
+    getHotSearchesData() {
+      // 直接使用默认数据
+      this.hotSearches = [
+        { keyword: '热门视频', trending: '↑ 123' },
+        { keyword: '最新音乐', trending: '↑ 45' },
+        { keyword: '搞笑段子', trending: '↓ 67' },
+        { keyword: '美食教程', trending: '↑ 89' },
+        { keyword: '旅游攻略', trending: '↑ 32' }
+      ];
     },
 
     // 刷新热门搜索

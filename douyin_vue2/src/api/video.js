@@ -103,3 +103,8 @@ export const getLocations = () => {
 export const getPrivacies = () => {
   return request.get('/video/privacy/list');
 };
+
+// 获取音乐列表
+export const getMusicList = () => {
+  return request.get('/video/music/list');
+};

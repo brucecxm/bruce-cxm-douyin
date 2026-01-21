@@ -126,5 +126,15 @@ public class MusicController extends ApiController {
     public R delete(@RequestParam("idList") List<Long> idList) {
         return success(this.musicService.removeByIds(idList));
     }
+    
+    /**
+     * 获取音乐列表
+     *
+     * @return 音乐列表
+     */
+    @GetMapping("/list")
+    public R<List<Music>> getMusicList() {
+        return success(this.musicService.list());
+    }
 }
 
