@@ -104,7 +104,26 @@ export const getPrivacies = () => {
   return request.get('/video/privacy/list');
 };
 
-// 获取音乐列表
-export const getMusicList = () => {
-  return request.get('/video/music/list');
+// 搜索相关接口
+// 获取搜索建议
+export const getSearchSuggestions = (keyword) => {
+  return request.get('/video/search/suggestions', {
+    params: { keyword }
+  });
+};
+
+// 获取热门搜索
+export const getHotSearches = () => {
+  return request.get('/video/search/hot');
+};
+
+// 搜索视频
+export const searchVideos = (keyword, page = 1, size = 10) => {
+  return request.get('/video/search', {
+    params: {
+      keyword,
+      page,
+      size
+    }
+  });
 };

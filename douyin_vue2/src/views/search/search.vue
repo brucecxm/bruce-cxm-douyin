@@ -28,25 +28,45 @@
         </ul>
       </div>
 
-      <!-- 热门搜索 -->
+      <!-- 热门搜索和搜索历史 -->
       <div v-else-if="!searchQuery" class="hot-searches">
-        <div class="hot-header">
-          <h3>热门搜索</h3>
-          <span @click="refreshHotSearches">换一换</span>
+        <!-- 搜索历史 -->
+        <div class="history-section" v-if="searchHistory.length">
+          <div class="section-header">
+            <h3>搜索历史</h3>
+            <span @click="clearSearchHistory">清除</span>
+          </div>
+          <ul class="history-list">
+            <li
+              v-for="(item, index) in searchHistory"
+              :key="index"
+              @click="selectSuggestion(item)"
+            >
+              <i class="fas fa-history"></i>
+              {{ item }}
+            </li>
+          </ul>
         </div>
-        <ul class="hot-list">
-          <li
-            v-for="(item, index) in hotSearches"
-            :key="index"
-            @click="selectSuggestion(item.keyword)"
-          >
-            <span class="rank">{{ index + 1 }}</span>
-            <span class="keyword">{{ item.keyword }}</span>
-            <span v-if="item.trending" class="trending">{{
-              item.trending
-            }}</span>
-          </li>
-        </ul>
+        <!-- 热门搜索 -->
+        <div class="hot-section">
+          <div class="hot-header">
+            <h3>热门搜索</h3>
+            <span @click="refreshHotSearches">换一换</span>
+          </div>
+          <ul class="hot-list">
+            <li
+              v-for="(item, index) in hotSearches"
+              :key="index"
+              @click="selectSuggestion(item.keyword)"
+            >
+              <span class="rank">{{ index + 1 }}</span>
+              <span class="keyword">{{ item.keyword }}</span>
+              <span v-if="item.trending" class="trending">{{
+                item.trending
+              }}</span>
+            </li>
+          </ul>
+        </div>
       </div>
 
       <!-- 搜索结果 -->
@@ -116,8 +136,13 @@ export default {
       currentPage: 1,
       pageSize: 10,
       hasMore: true,
-      loading: false
+      loading: false,
+      searchHistory: []
     };
+  },
+  mounted() {
+    this.getHotSearchesData();
+    this.loadSearchHistory();
   },
   methods: {
     gohome() {
@@ -150,7 +175,41 @@ export default {
       this.searchResults = [];
       this.hasMore = true;
 
-      this.loadSearchResults();
+      // 保存搜索历史
+      this.saveSearchHistory(this.searchQuery);
+
+      await this.loadSearchResults();
+    },
+
+    // 加载搜索历史
+    loadSearchHistory() {
+      const history = localStorage.getItem('searchHistory');
+      if (history) {
+        this.searchHistory = JSON.parse(history);
+      }
+    },
+
+    // 保存搜索历史
+    saveSearchHistory(keyword) {
+      // 去重
+      const index = this.searchHistory.indexOf(keyword);
+      if (index > -1) {
+        this.searchHistory.splice(index, 1);
+      }
+      // 限制最多保存10条
+      if (this.searchHistory.length >= 10) {
+        this.searchHistory.pop();
+      }
+      // 添加到最前面
+      this.searchHistory.unshift(keyword);
+      // 保存到localStorage
+      localStorage.setItem('searchHistory', JSON.stringify(this.searchHistory));
+    },
+
+    // 清除搜索历史
+    clearSearchHistory() {
+      this.searchHistory = [];
+      localStorage.removeItem('searchHistory');
     },
 
     // 加载搜索结果
@@ -158,28 +217,13 @@ export default {
       if (this.loading) return;
 
       this.loading = true;
-      
-      // 使用setTimeout模拟异步请求
-      setTimeout(() => {
-        try {
-          // 生成模拟搜索结果
-          const mockResults = [];
-          const totalResults = 20; // 模拟总共有20个结果
-          
-          for (let i = 0; i < this.pageSize; i++) {
-            const index = (this.currentPage - 1) * this.pageSize + i;
-            if (index >= totalResults) break;
-            
-            mockResults.push({
-              videoId: `video_${index + 1}`,
-              title: `${this.searchQuery} 相关视频 ${index + 1}`,
-              cover: `https://picsum.photos/seed/${this.searchQuery}${index}/200/150`,
-              likeNum: Math.floor(Math.random() * 1000),
-              commentNum: Math.floor(Math.random() * 100),
-              shareNum: Math.floor(Math.random() * 50),
-              username: `用户${Math.floor(Math.random() * 1000)}`
-            });
-          }
+      try {
+        const res = await searchVideos(
+          this.searchQuery,
+          this.currentPage,
+          this.pageSize
+        );
+        const data = res.data || res;
 
           if (this.currentPage === 1) {
             this.searchResults = mockResults;
@@ -323,6 +367,66 @@ export default {
 .hot-searches {
   background-color: #fff;
   padding: 10px;
+}
+
+/* 搜索历史样式 */
+.history-section {
+  margin-bottom: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.section-header span {
+  font-size: 0.7rem;
+  color: #007bff;
+  cursor: pointer;
+}
+
+.history-list {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+
+.history-list li {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.history-list li:last-child {
+  border-bottom: none;
+}
+
+.history-list li:hover {
+  background-color: #f5f5f5;
+}
+
+.history-list li i {
+  margin-right: 15px;
+  color: #999;
+  font-size: 0.7rem;
+  width: 20px;
+  text-align: center;
+}
+
+/* 热门搜索样式 */
+.hot-section {
+  margin-bottom: 20px;
 }
 
 .hot-header {
