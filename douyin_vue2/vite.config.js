@@ -27,6 +27,16 @@ function viteLoggerPlugin() {
 }
 
 export default defineConfig(({ mode }) => {
+  // 定义httpsOptions，根据模式动态设置
+  const httpsOptions = {
+    key: fs.readFileSync(
+      'C:/Users/Administrator/Desktop/tools/127.0.0.1+4-key.pem'
+    ),
+    cert: fs.readFileSync(
+      'C:/Users/Administrator/Desktop/tools/127.0.0.1+4.pem'
+    )
+  };
+
   const commonConfig = {
     plugins: [
       vue2(),
@@ -46,7 +56,7 @@ export default defineConfig(({ mode }) => {
     server: {
       host: true,
       logLevel: 'info', // 服务器日志级别
-      // https: httpsOptions, // 开启 https，使用证书
+      https: httpsOptions, // 开启 https，使用证书
       proxy: {},
       watch: {
         // 监听时忽略 node_modules 和 dist（避免无意义的文件监控消耗内存）
@@ -56,14 +66,6 @@ export default defineConfig(({ mode }) => {
   };
 
   if (mode === 'development') {
-    // const httpsOptions = {
-    //   key: fs.readFileSync(
-    //     'C:/Users/Administrator/Desktop/tools/127.0.0.1+4-key.pem'
-    //   ),
-    //   cert: fs.readFileSync(
-    //     'C:/Users/Administrator/Desktop/tools/127.0.0.1+4.pem'
-    //   )
-    // };
     return {
       ...commonConfig,
       build: {
@@ -118,14 +120,6 @@ export default defineConfig(({ mode }) => {
       }
     };
   } else if (mode === 'production') {
-    // const httpsOptions = {
-    //   key: fs.readFileSync(
-    //     'C:/Users/Administrator/Desktop/tools/127.0.0.1+4-key.pem'
-    //   ),
-    //   cert: fs.readFileSync(
-    //     'C:/Users/Administrator/Desktop/tools/127.0.0.1+4.pem'
-    //   )
-    // };
     return {
       ...commonConfig,
       build: {
@@ -173,6 +167,5 @@ export default defineConfig(({ mode }) => {
         ]
       }
     };
-    // 生产环境一般由nginx等代理做HTTPS，不用在Vite里开https
   }
 });
