@@ -3,9 +3,61 @@
     <!-- 顶部搜索栏 -->
     <header class="header">
       <div class="search-bar" @click="goToSearch">
-        <i class="search-icon">🔍</i>
+        <i class="search-icon-left">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+            <path d="M21 21l-6 -6" />
+          </svg>
+        </i>
         <span class="search-placeholder">搜索你想要的商品</span>
+        <i class="search-icon-right">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+            <path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+            <path d="M17 17h-11v-14h-2" />
+            <path d="M6 5l14 1l-1 7h-13" />
+          </svg>
+        </i>
+        <span class="search-button">搜索</span>
       </div>
+      <i class="search-icon-father">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"
+          />
+          <path d="M9 13a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+        </svg>
+      </i>
     </header>
 
     <!-- 顶部菜单栏 -->
@@ -320,183 +372,217 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+// 变量定义
+$primary-color: #42b983;
+$text-primary: #333;
+$text-secondary: #666;
+$text-light: #999;
+$text-lighter: #ccc;
+$border-color: #eee;
+$danger-color: #ff4444;
+$background-color: #f5f5f5;
+$white: #fff;
+
 .second-hand-app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f5f5f5;
-}
+  background-color: $background-color;
 
-/* 顶部搜索栏 */
-.header {
-  background-color: #42b983;
-  padding: 10px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
+  // 顶部搜索栏
+  .header {
+    background-color: $primary-color;
+    padding: 10px;
+    position: sticky;
+    display: flex;
+    justify-content: space-between;
+    top: 0;
+    z-index: 100;
 
-.search-bar {
-  display: flex;
-  align-items: center;
-  background-color: white;
-  border-radius: 20px;
-  padding: 8px 15px;
-  cursor: pointer;
-}
+    .search-icon-father {
+      margin-left: 0px;
+    }
+    .search-bar {
+      display: flex;
+      align-items: center;
+      background-color: $white;
+      flex: 1;
+      border-radius: 20px;
+      padding: 8px 15px;
+      cursor: pointer;
+      justify-content: space-between;
 
-.search-icon {
-  font-size: 16px;
-  margin-right: 8px;
-  color: #999;
-}
+      .search-icon-left {
+        font-size: 16px;
+        margin-right: 8px;
+        color: $text-light;
+      }
 
-.search-placeholder {
-  font-size: 14px;
-  color: #999;
-}
+      .search-icon-right {
+        font-size: 16px;
+        margin-right: 8px;
+        color: $text-light;
+      }
 
-/* 分类导航 */
-.category-nav {
-  display: flex;
-  overflow-x: auto;
-  background-color: white;
-  padding: 15px 0;
-  border-bottom: 1px solid #eee;
-}
+      .search-placeholder {
+        font-size: 14px;
+        color: $text-light;
+        flex: 1;
+      }
+      .search-button {
+        height: 100%;
+        width: 50px;
+        background-color: red;
+        text-align: center;
+        border-radius: 20px;
+        font-size: 15px;
+        color: $white;
+      }
+    }
+  }
 
-.category-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0 15px;
-  min-width: 60px;
-}
+  // 顶部菜单栏
+  .top-menu {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: $white;
+    border-bottom: 1px solid $border-color;
+    padding: 10px 0;
+    position: sticky;
+    top: 54px;
+    z-index: 90;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
-.category-icon {
-  font-size: 28px;
-  margin-bottom: 5px;
-}
+    .menu-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      padding: 8px 15px;
+      color: $text-secondary;
+      transition: all 0.2s ease;
+      flex: 1;
+      max-width: 80px;
 
-.category-name {
-  font-size: 12px;
-  color: #333;
-}
+      &:hover {
+        color: $primary-color;
+        background-color: rgba($primary-color, 0.05);
+        border-radius: 8px;
+      }
 
-/* 商品列表 */
-.product-list {
-  flex: 1;
-  padding: 10px;
-  padding-bottom: 70px; /* 增加底部间距，避免被固定的footer遮挡 */
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
+      &.active {
+        color: $primary-color;
+        font-weight: bold;
+      }
 
-.product-item {
-  background-color: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: transform 0.2s;
-}
+      .menu-icon {
+        font-size: 20px;
+        margin-bottom: 4px;
+      }
 
-.product-item:hover {
-  transform: translateY(-2px);
-}
+      .menu-text {
+        font-size: 12px;
+        line-height: 1.2;
+      }
+    }
+  }
 
-.product-image {
-  width: 100%;
-  height: 150px;
-  overflow: hidden;
-}
+  // 分类导航
+  .category-nav {
+    display: flex;
+    overflow-x: auto;
+    background-color: $white;
+    padding: 15px 0;
+    border-bottom: 1px solid $border-color;
 
-.product-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+    .category-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 15px;
+      min-width: 60px;
 
-.product-info {
-  padding: 10px;
-}
+      .category-icon {
+        font-size: 28px;
+        margin-bottom: 5px;
+      }
 
-.product-title {
-  font-size: 14px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 5px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+      .category-name {
+        font-size: 12px;
+        color: $text-primary;
+      }
+    }
+  }
 
-.product-price {
-  font-size: 16px;
-  color: #ff4444;
-  font-weight: bold;
-  margin-bottom: 3px;
-}
+  // 商品列表
+  .product-list {
+    flex: 1;
+    padding: 10px;
+    padding-bottom: 70px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
 
-.product-location {
-  font-size: 12px;
-  color: #999;
-  margin-bottom: 2px;
-}
+    .product-item {
+      background-color: $white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: transform 0.2s;
 
-.product-time {
-  font-size: 11px;
-  color: #ccc;
-}
+      &:hover {
+        transform: translateY(-2px);
+      }
 
-/* 顶部菜单栏 */
-.top-menu {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  background-color: white;
-  border-bottom: 1px solid #eee;
-  padding: 10px 0;
-  position: sticky;
-  top: 54px; /* 与顶部搜索栏高度匹配 */
-  z-index: 90;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
+      .product-image {
+        width: 100%;
+        height: 150px;
+        overflow: hidden;
 
-.menu-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  padding: 8px 15px;
-  color: #666;
-  transition: all 0.2s ease;
-  flex: 1;
-  max-width: 80px;
-}
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
 
-.menu-item:hover {
-  color: #42b983;
-  background-color: rgba(66, 185, 131, 0.05);
-  border-radius: 8px;
-}
+      .product-info {
+        padding: 10px;
 
-.menu-item.active {
-  color: #42b983;
-  font-weight: bold;
-}
+        .product-title {
+          font-size: 14px;
+          font-weight: bold;
+          color: $text-primary;
+          margin-bottom: 5px;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
 
-.menu-icon {
-  font-size: 20px;
-  margin-bottom: 4px;
-}
+        .product-price {
+          font-size: 16px;
+          color: $danger-color;
+          font-weight: bold;
+          margin-bottom: 3px;
+        }
 
-.menu-text {
-  font-size: 12px;
-  line-height: 1.2;
+        .product-location {
+          font-size: 12px;
+          color: $text-light;
+          margin-bottom: 2px;
+        }
+
+        .product-time {
+          font-size: 11px;
+          color: $text-lighter;
+        }
+      }
+    }
+  }
 }
 </style>
