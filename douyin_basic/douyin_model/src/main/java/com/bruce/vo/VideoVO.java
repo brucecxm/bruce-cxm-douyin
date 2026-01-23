@@ -7,6 +7,7 @@ public class VideoVO {
     private Long videoId;
     private String url;
     private String content;
+    private String cover;
     private Long userId;
 
     private String username;

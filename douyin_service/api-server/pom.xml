@@ -104,6 +104,11 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
+        <!-- Feign 依赖 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
         <!-- Jackson Hibernate5Module，用于处理Hibernate代理对象的序列化 -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>

@@ -9,9 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 import java.io.Serializable;
 
 /**
@@ -50,6 +48,28 @@ public class User  {
     private LocalDateTime lastLoginTime;
     // 钱包余额
     private BigDecimal balance;
+
+//*****下面是新家的  适配商城用的
+//*****下面是新家的  适配商城用的
+//*****下面是新家的  适配商城用的
+//*****下面是新家的  适配商城用的
+
+    private Date birthday;
+    private String bio;
+
+    private Date createdAt;
+
+    private Date updatedAt;
+
+    protected void onCreate() {
+        createdAt = new Date();
+        updatedAt = new Date();
+    }
+
+    protected void onUpdate() {
+        updatedAt = new Date();
+    }
+
 
     }
 
