@@ -2,6 +2,7 @@ package com.example.apiserver.controller;
 
 import com.example.apiserver.common.Response;
 import com.example.apiserver.entity.User;
+import com.example.apiserver.feign.UserFeignClient;
 import com.example.apiserver.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,14 +21,23 @@ public class UserController {
     
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private UserFeignClient userFeignClient;
 
     @PostMapping("/register")
-    public Response<User> register(@RequestBody User user) {
+    public Response<?> register(@RequestBody User user) {
         logger.info("开始用户注册，请求数据: {}", user);
         try {
-            User registeredUser = userService.register(user);
-            logger.info("用户注册成功，用户ID: {}", registeredUser.getId());
-            return Response.success(registeredUser);
+            // 构建参数
+            Map<String, Object> params = new HashMap<>();
+            params.put("userName", user.getUsername());
+            params.put("password", user.getPassword());
+            
+            // 调用douyin_user服务的注册接口
+            Response<?> response = userFeignClient.register(params);
+            logger.info("用户注册成功");
+            return response;
         } catch (Exception e) {
             logger.error("用户注册失败: {}", e.getMessage(), e);
             return Response.error(e.getMessage());
@@ -35,21 +45,19 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public Response<Map<String, Object>> login(@RequestBody LoginRequest loginRequest) {
+    public Response<?> login(@RequestBody LoginRequest loginRequest) {
         logger.info("开始用户登录，用户名: {}", loginRequest.getUsername());
         try {
-            User user = userService.login(loginRequest.getUsername(), loginRequest.getPassword());
+            // 构建参数
+            Map<String, String> params = new HashMap<>();
+            params.put("userName", loginRequest.getUsername());
+            params.put("password", loginRequest.getPassword());
+            params.put("loginType", "password");
             
-            // 生成token（实际项目中应该使用JWT等安全机制）
-            String token = UUID.randomUUID().toString().replace("-", "");
-            
-            // 构建返回数据
-            Map<String, Object> responseData = new HashMap<>();
-            responseData.put("user", user);
-            responseData.put("token", token);
-            
-            logger.info("用户登录成功，用户ID: {}, Token已生成", user.getId());
-            return Response.success(responseData);
+            // 调用douyin_user服务的登录接口
+            Response<?> response = userFeignClient.doLogin(params);
+            logger.info("用户登录成功");
+            return response;
         } catch (Exception e) {
             logger.error("用户登录失败，用户名: {}, 错误: {}", loginRequest.getUsername(), e.getMessage(), e);
             return Response.error(e.getMessage());

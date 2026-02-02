@@ -17,7 +17,7 @@ import java.util.Optional;
  * 直接调用服务时，使用服务内部的路径，不需要网关路由前缀
  */
 @Repository
-@FeignClient(name = "DouyinUserService", path = "/api/repository/user")
+@FeignClient(name = "DouyinUserService", contextId = "userRepository", path = "/api/repository/user")
 public interface UserRepository {
 
     /**
