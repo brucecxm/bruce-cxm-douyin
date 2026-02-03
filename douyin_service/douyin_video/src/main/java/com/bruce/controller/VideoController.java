@@ -228,19 +228,16 @@ public class VideoController extends ApiController {
 
     @GetMapping("/getVideoPage")
     public List<Map<String, Object>> getVideoInfo(
-            @RequestParam(defaultValue = "1")
-            @Min(value = 1, message = "页码page不能小于1") // 校验页码：最小值1
+            @RequestParam(defaultValue = "1") @Min(value = 1, message = "页码page不能小于1") // 校验页码：最小值1
             int page,
 
-            @RequestParam(defaultValue = "4")
-            @Min(value = 1, message = "每页条数size不能小于1") // 校验条数：最小值1
+            @RequestParam(defaultValue = "4") @Min(value = 1, message = "每页条数size不能小于1") // 校验条数：最小值1
             int size,
 
-            @RequestParam
-            @NotBlank(message = "视频类型videoType不能为空且不能为空白字符") // 校验非空+非空白
+            @RequestParam @NotBlank(message = "视频类型videoType不能为空且不能为空白字符") // 校验非空+非空白
             String videoType) {
 
-        return videoService.getVideoPage(page,size,videoType);
+        return videoService.getVideoPage(page, size, videoType);
     }
 
     @GetMapping("/auth")
@@ -557,6 +554,9 @@ public class VideoController extends ApiController {
     @Resource
     private PrivacyService privacyService;
 
+    @Autowired
+    private UserFeignService userFeignService;
+
     private final String BUCKET = "douyin";
 
     // 新增：定义签名URL的有效期（单位：秒），这里设置1小时（3600秒）
@@ -785,8 +785,8 @@ public class VideoController extends ApiController {
      * 搜索视频
      *
      * @param keyword 搜索关键词
-     * @param page 页码
-     * @param size 每页数量
+     * @param page    页码
+     * @param size    每页数量
      * @return 搜索结果列表
      */
     @GetMapping("/search")
@@ -863,6 +863,94 @@ public class VideoController extends ApiController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("message", "搜索视频失败: " + e.getMessage()));
+        }
+    }
+
+    // 根据ID查询视频
+    @GetMapping("/getById")
+    public Result<Video> getVideoById(@RequestParam("id") Long id) {
+        try {
+            Video video = videoService.getById(id);
+            if (video == null) {
+                return Result.error("视频不存在");
+            }
+            return Result.success(video);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("查询视频失败，请稍后重试");
+        }
+    }
+
+    // 获取视频列表
+    @GetMapping("/list")
+    public Result<Map<String, Object>> getVideoList(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        try {
+            // 使用MyBatis Plus的分页功能查询所有视频
+            Page<Video> pageQuery = new Page<>(page, pageSize);
+            IPage<Video> videoPage = videoService.page(pageQuery);
+
+            // 构建响应数据
+            Map<String, Object> data = new HashMap<>();
+            data.put("records", videoPage.getRecords());
+            data.put("total", videoPage.getTotal());
+            data.put("size", videoPage.getSize());
+            data.put("current", videoPage.getCurrent());
+
+            return Result.success(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("查询视频列表失败，请稍后重试");
+        }
+    }
+
+    // 测试调用douyin_user微服务
+    @GetMapping("/testUserFeign")
+    public Result<Object> testUserFeign(@RequestParam("id") Long id) {
+        try {
+            Object user = userFeignService.getUserById(id);
+            return Result.success(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("调用用户服务失败，请稍后重试");
+        }
+    }
+
+    // 测试获取用户列表
+    @GetMapping("/testUserList")
+    public Result<Object> testUserList() {
+        try {
+            Object userList = userFeignService.getUserList();
+            return Result.success(userList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("调用用户服务失败，请稍后重试");
+        }
+    }
+
+    // 根据用户ID获取视频列表
+    @GetMapping("/listByUserId")
+    public Result<List<Video>> listByUserId(@RequestParam("userId") Long userId) {
+        try {
+            List<Video> videos = videoService.list(new LambdaQueryWrapper<Video>().eq(Video::getUserId, userId));
+            return Result.success(videos);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("查询视频列表失败，请稍后重试");
+        }
+    }
+
+    // 根据用户ID分页获取视频列表
+    @GetMapping("/pageByUserId")
+    public Result<IPage<Video>> pageByUserId(@RequestParam("userId") Long userId, @RequestParam("page") Long page, @RequestParam("pageSize") Long pageSize) {
+        try {
+            Page<Video> pageQuery = new Page<>(page, pageSize);
+            IPage<Video> videoPage = videoService.page(pageQuery, new LambdaQueryWrapper<Video>().eq(Video::getUserId, userId));
+            return Result.success(videoPage);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("分页查询视频列表失败，请稍后重试");
         }
     }
 }

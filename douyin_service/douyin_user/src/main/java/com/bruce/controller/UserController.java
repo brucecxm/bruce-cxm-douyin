@@ -142,11 +142,51 @@ public class UserController extends ApiController {
         }
     }
 
+    // 根据ID查询用户
+    @GetMapping("/getById")
+    public Result<User> getUserById(@RequestParam("id") Long id) {
+        try {
+            User user = userService.getById(id);
+            if (user == null) {
+                return Result.error("用户不存在");
+            }
+            return Result.success(user);
+        } catch (Exception e) {
+            log.error("查询用户失败", e);
+            return Result.error("查询失败，请稍后重试");
+        }
+    }
+
+    // 测试调用douyin_video微服务
+    @GetMapping("/testVideoFeign")
+    public Result<Object> testVideoFeign(@RequestParam("id") Long id) {
+        try {
+            Object video = videoFeignService.getVideoById(id);
+            return Result.success(video);
+        } catch (Exception e) {
+            log.error("调用视频服务失败", e);
+            return Result.error("调用视频服务失败，请稍后重试");
+        }
+    }
+
+    // 测试获取视频列表
+    @GetMapping("/testVideoList")
+    public Result<Object> testVideoList() {
+        try {
+            Object videoList = videoFeignService.getVideoList();
+            return Result.success(videoList);
+        } catch (Exception e) {
+            log.error("调用视频服务失败", e);
+            return Result.error("调用视频服务失败，请稍后重试");
+        }
+    }
+
     @Autowired
     private FriendService friendService;
 
-    @Resource
-    private VideoService videoService; // 用于将对象转换为JSON字符串
+
+    @Autowired
+    private VideoFeignService videoFeignService;
 
     @Autowired
     private UserRelationService userRelationService;
@@ -452,7 +492,7 @@ public class UserController extends ApiController {
     // 生成布隆过滤器并序列化存储到 Redis），服务启动时直接加载 Redis 中的快照数据，无需实时预热；
     // 同时在业务侧通过binlog 增量同步（如 Canal 监听用户表变更），将新增/删除的用户ID实时同步到布隆过滤器。
     @GetMapping("/userInfo")
-        public Result<UserInfo> userInfo(@RequestParam Map<String, Object> params) {
+    public Result<UserInfo> userInfo(@RequestParam Map<String, Object> params) {
         String pageStr = String.valueOf(params.getOrDefault("page", ""));
         String pageSizeStr = String.valueOf(params.getOrDefault("pageSize", ""));
         // String userId = String.valueOf(params.getOrDefault("userId", ""));
@@ -676,7 +716,7 @@ public class UserController extends ApiController {
 
         try {
             if (pageStr.isEmpty() || pageSizeStr.isEmpty()) {
-                List<Video> videoList = videoService.list(
+                List<Video> videoList = videoFeignService.list(
                         new LambdaQueryWrapper<Video>().eq(Video::getUserId, userId));
                 userInfo.setVideoList(videoList);
             } else {
@@ -688,7 +728,7 @@ public class UserController extends ApiController {
                     return Result.error("分页参数格式错误");
                 }
                 Page<Video> pageQry = new Page<>(page, pageSize);
-                IPage<Video> videoPage = videoService.page(
+                IPage<Video> videoPage = videoFeignService.page(
                         pageQry,
                         new LambdaQueryWrapper<Video>().eq(Video::getUserId, userId));
                 userInfo.setVideoPage(videoPage);

@@ -11,10 +11,10 @@ import com.bruce.entity.Favor;
 import com.bruce.entity.Music;
 import com.bruce.entity.User;
 import com.bruce.entity.Video;
+import com.bruce.feign.UserFeignClient;
 import com.bruce.service.CommentService;
 import com.bruce.service.FavorService;
 import com.bruce.service.MusicService;
-import com.bruce.service.UserService;
 import com.bruce.service.strategy.VideoStrategy;
 import com.bruce.vo.VideoVO;
 import org.springframework.beans.BeanUtils;
@@ -40,7 +40,7 @@ public class DefaultVideoStrategy implements VideoStrategy {
     private RedisTemplate redisTemplate;
 
     @Autowired
-    private UserService userService;
+    private UserFeignClient userFeignClient;
 
     @Autowired
     private MusicService musicService;
@@ -81,7 +81,8 @@ public class DefaultVideoStrategy implements VideoStrategy {
             VideoVO vo = new VideoVO();
             BeanUtils.copyProperties(video, vo);
             // 用户信息
-            User user = userService.getById(video.getUserId());
+//            User user = userFeignClient.getById(video.getUserId());
+            User user = (User) userFeignClient.getUserById(video.getUserId());
             if (user != null) {
                 vo.setUsername(user.getNickname());
                 vo.setUserAvatar(user.getAvatar());
