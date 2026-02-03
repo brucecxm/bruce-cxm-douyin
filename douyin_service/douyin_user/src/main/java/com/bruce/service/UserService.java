@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.bruce.entity.User;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * (User)表服务接口
@@ -61,6 +62,13 @@ public interface UserService extends IService<User> {
      * @return 热门用户ID列表
      */
     List<Long> getHotUserIds(int limit);
+
+    /**
+     * 用户登录
+     * @param loginRequestDTO 登录请求DTO
+     * @return 登录用户信息
+     */
+    Map<String, Object> login(com.bruce.dto.LoginRequestDTO loginRequestDTO);
 
     /**
      * 根据用户ID获取用户信息
