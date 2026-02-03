@@ -42,11 +42,26 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 .eq(User::getId, keyword);
         return userDao.selectList(wrapper);
     }
-    
+
     @Override
     public List<Long> listAllUserId() {
         // 使用MyBatis-Plus的lambda查询，只查询ID字段
         return this.listObjs(new LambdaQueryWrapper<User>(), o -> Long.valueOf(o.toString()));
+    }
+
+    @Override
+    public List<Long> getHotUserIds(int limit) {
+        return null;
+    }
+
+    @Override
+    public User getById(Long userId) {
+        return null;
+    }
+
+    @Override
+    public boolean updateById(User user) {
+        return false;
     }
 
     @Override

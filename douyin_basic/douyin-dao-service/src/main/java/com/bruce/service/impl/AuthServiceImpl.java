@@ -4,7 +4,6 @@ import com.bruce.entity.User;
 import com.bruce.service.AuthService;
 import com.bruce.service.PermissionService;
 import com.bruce.service.RoleService;
-import com.bruce.service.UserService;
 import com.bruce.utils.JwtUtil;
 import com.bruce.utils.RedisUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,8 +22,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class AuthServiceImpl extends AuthService {
 
-    @Autowired
-    private UserService userService;
+
 
     @Autowired
     private PermissionService permissionService;

@@ -252,10 +252,8 @@ public class VideoController extends ApiController {
             userid = loginUserId.intValue(); // 使用当前登录用户ID
         }
         Map<String, Object> result = new HashMap<>();
-        // 查询用户信息
-        LambdaQueryWrapper<User> userQuery = new LambdaQueryWrapper<>();
-        userQuery.eq(User::getId, userid);
-        User userInfo = userFeignService.getOne(userQuery);
+
+        User userInfo = (User) userFeignService.getUserById(loginUserId);
         result.put(Constant.User.USER_INFO, userInfo);
         // 查询视频分页数据
         Page<Video> pageInfo = new Page<>(page, size);

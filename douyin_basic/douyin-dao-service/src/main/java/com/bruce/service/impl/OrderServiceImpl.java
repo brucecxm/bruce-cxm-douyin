@@ -29,8 +29,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
     @Autowired
     private ShoppingCartService shoppingCartService;
 
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private AddressBookService addressBookService;
