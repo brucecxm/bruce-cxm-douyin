@@ -723,16 +723,21 @@ public class UserController extends ApiController {
 
     // 邮箱验证码接口
     @PostMapping("/getEmailVerificationCode")
-    public void getEmailVerificationCodeService(@RequestParam String email) throws IOException {
-        // 1. 生成验证码
+    public void getEmailVerificationCodeService(@RequestBody Map<String, Object> params) throws IOException {
+        // 1. 提取参数
+        String email = String.valueOf(params.getOrDefault("email", ""));
+        if (email.isEmpty()) {
+            throw new RuntimeException("邮箱不能为空");
+        }
+        // 2. 生成验证码
         String code = String.valueOf(new Random().nextInt(899999) + 100000);
-        // 2. 存入 Redis，有效期 5 分钟
+        // 3. 存入 Redis，有效期 5 分钟
         stringRedisTemplate.opsForValue().set("email:code:" + email, code, 5, TimeUnit.MINUTES);
-        // 3. 构造消息
+        // 4. 构造消息
         Map<String, String> message = new HashMap<>();
         message.put("email", email);
         message.put("code", code);
-        // 4. 发送到队列（work 模型只需一个队列）
+        // 5. 发送到队列（work 模型只需一个队列）
         rabbitTemplate.convertAndSend("email.queue", message);
     }
 
@@ -741,7 +746,7 @@ public class UserController extends ApiController {
     // 简单的参数类型 如果没有用参数注解 spring会默认把参数前面加上@RequestParam
     @PostMapping("/register")
     @Transactional
-    public Result register(@RequestParam Map<String, Object> params) {
+    public Result register(@RequestBody Map<String, Object> params) {
         // 1. 参数提取与校验
         String userName = String.valueOf(params.getOrDefault("userName", ""));
         String password = String.valueOf(params.getOrDefault("password", ""));
