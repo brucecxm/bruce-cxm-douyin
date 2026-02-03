@@ -15,8 +15,7 @@ import java.util.List;
 @Service
 public class AuthService {
 
-    @Autowired
-    private UserService userService;
+
 
     @Autowired
     private PermissionService permissionService;

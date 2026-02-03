@@ -55,9 +55,6 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
     private FileStorageService fileStorageService;
 
     @Resource
-    private UserService userService;
-
-    @Resource
     private MusicService musicService;
 
     @Resource

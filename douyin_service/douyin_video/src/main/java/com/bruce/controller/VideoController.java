@@ -27,8 +27,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -71,8 +70,7 @@ public class VideoController extends ApiController {
     @Autowired
     private FileStorageService fileStorageService;
 
-    @Resource
-    private UserService userService;
+
 
     @Resource
     private MusicService musicService;
@@ -86,7 +84,7 @@ public class VideoController extends ApiController {
     private CommentService commentService;
 
     @PostMapping("/upvideo")
-    public ResponseEntity<?> upvideo(
+    public Result<?> upvideo(
             @RequestParam("file") MultipartFile file,
             @RequestParam Map<String, String> params) {
         StpUtil.checkLogin(); // 检查是否登录（自动从请求头拿 token，去 Redis 查）
@@ -96,7 +94,7 @@ public class VideoController extends ApiController {
             String videoTitle = params.get("videoTitle");
             String videoContext = params.get("videoContext");
             if (file == null || file.isEmpty()) {
-                return ResponseEntity.badRequest().body("上传失败：文件不能为空");
+                return Result.error("上传失败：文件不能为空");
             }
             // 2. 模拟写死的数据
             String authId = "100112";
@@ -117,11 +115,10 @@ public class VideoController extends ApiController {
             fileStorageService.uploadImgFile(videoId, videoId, in);
             // 5. 保存到数据库
             videoService.save(video);
-            return ResponseEntity.ok("上传成功");
+            return Result.success("上传成功");
         } catch (Exception e) {
             e.printStackTrace(); // 控制台输出异常
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("服务器错误：" + e.getMessage());
+            return Result.error("服务器错误：" + e.getMessage());
         }
     }
 
@@ -129,7 +126,7 @@ public class VideoController extends ApiController {
     private DcSystemService dcSystemService;
 
     @PostMapping("/publish")
-    public ResponseEntity<?> publishVideo(
+    public Result<?> publishVideo(
             @RequestParam("videoFile") MultipartFile videoFile,
             @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,
             @RequestParam("title") String title,
@@ -171,8 +168,7 @@ public class VideoController extends ApiController {
             userId = Long.parseLong((String) userIdObj);
         } else {
             // 处理其他类型或null的情况
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Collections.singletonMap("code", 401));
+            return Result.error("未授权");
         }
 
         Video video = new Video();
@@ -200,11 +196,13 @@ public class VideoController extends ApiController {
         }
 
         videoService.save(video);
-        return ResponseEntity.ok(Collections.singletonMap("code", 200));
+        Map<String, Object> data = new HashMap<>();
+        data.put("code", 200);
+        return Result.success(data);
     }
 
     @PostMapping("/publishss")
-    public ResponseEntity<?> publish(@RequestBody Map<String, Object> req) {
+    public Result<?> publish(@RequestBody Map<String, Object> req) {
         Object userId = StpUtil.getLoginId();
         Object title = req.get("title");
         Object musicId = req.get("musicId");
@@ -213,7 +211,7 @@ public class VideoController extends ApiController {
         Object status = req.get("status");
         if (userId == null || StringUtils.isEmpty(userId.toString())
                 || title == null || StringUtils.isEmpty(title.toString())) {
-            return ResponseEntity.badRequest().body("缺少必要字段");
+            return Result.error("缺少必要字段");
         }
         Video video = new Video();
         video.setCover("1");
@@ -224,11 +222,13 @@ public class VideoController extends ApiController {
         video.setType((Integer) type);
         video.setStatus((Integer) status);
         videoService.save(video);
-        return ResponseEntity.ok(Collections.singletonMap("code", 200));
+        Map<String, Object> data = new HashMap<>();
+        data.put("code", 200);
+        return Result.success(data);
     }
 
     @GetMapping("/getVideoPage")
-    public List<VideoVO> getVideoInfo(
+    public Result<List<VideoVO>> getVideoInfo(
             @RequestParam(defaultValue = "1") @Min(value = 1, message = "页码page不能小于1") // 校验页码：最小值1
             int page,
 
@@ -238,11 +238,11 @@ public class VideoController extends ApiController {
             @RequestParam @NotBlank(message = "视频类型videoType不能为空且不能为空白字符") // 校验非空+非空白
             String videoType) {
 
-        return videoService.getVideoPage(page, size, videoType);
+        return Result.success(videoService.getVideoPage(page, size, videoType));
     }
 
     @GetMapping("/auth")
-    public Map<String, Object> getAuth(
+    public Result<Map<String, Object>> getAuth(
             @RequestParam(required = false) Integer userid,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -255,7 +255,7 @@ public class VideoController extends ApiController {
         // 查询用户信息
         LambdaQueryWrapper<User> userQuery = new LambdaQueryWrapper<>();
         userQuery.eq(User::getId, userid);
-        User userInfo = userService.getOne(userQuery);
+        User userInfo = userFeignService.getOne(userQuery);
         result.put(Constant.User.USER_INFO, userInfo);
         // 查询视频分页数据
         Page<Video> pageInfo = new Page<>(page, size);
@@ -264,18 +264,15 @@ public class VideoController extends ApiController {
         IPage<Video> videoPage = videoService.page(pageInfo, videoQuery);
         result.put(Constant.Video.VIDEO_PAGE_LIST, videoPage.getRecords());
         result.put(Constant.Video.TOTAL, videoPage.getTotal());
-        return result;
+        return Result.success(result);
     }
 
     @PostMapping("/like")
-    public ResponseEntity<Map<String, Object>> like(@RequestBody LikeRequestDTo likeRequest) {
+    public Result<Map<String, Object>> like(@RequestBody LikeRequestDTo likeRequest) {
         try {
             StpUtil.checkLogin();
         } catch (NotLoginException e) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("code", 401);
-            response.put("message", "用户未登录");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            return Result.error("用户未登录");
         }
 
         // 获取当前登录用户ID
@@ -288,10 +285,7 @@ public class VideoController extends ApiController {
         redisTemplate.expire(rateLimitKey, 1, java.util.concurrent.TimeUnit.SECONDS);
         Long count = redisTemplate.opsForHash().increment(rateLimitKey, "count", 1);
         if (count > 10) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("code", 429);
-            response.put("message", "点赞操作过于频繁，请稍后再试");
-            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(response);
+            return Result.error("点赞操作过于频繁，请稍后再试");
         }
 
         // 从请求对象中获取参数
@@ -320,10 +314,7 @@ public class VideoController extends ApiController {
                 resultMessage = contentType + "点赞成功";
                 success = true;
             } else {
-                Map<String, Object> response = new HashMap<>();
-                response.put("code", 400);
-                response.put("message", "您已点赞");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                return Result.error("您已点赞");
             }
         } else {
             // 取消点赞操作
@@ -336,10 +327,7 @@ public class VideoController extends ApiController {
                 resultMessage = contentType + "取消点赞成功";
                 success = true;
             } else {
-                Map<String, Object> response = new HashMap<>();
-                response.put("code", 400);
-                response.put("message", "您尚未点赞");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                return Result.error("您尚未点赞");
             }
         }
 
@@ -381,23 +369,15 @@ public class VideoController extends ApiController {
         data.put("likeCount", likeCount);
         data.put("isLiked", "red".equals(type) ? true : false);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("code", 200);
-        response.put("message", resultMessage);
-        response.put("data", data);
-
-        return ResponseEntity.ok(response);
+        return Result.success(data);
     }
 
     @PostMapping("/collect")
-    public ResponseEntity<Map<String, Object>> collect(@RequestBody LikeRequestDTo likeRequest) {
+    public Result<Map<String, Object>> collect(@RequestBody LikeRequestDTo likeRequest) {
         try {
             StpUtil.checkLogin();
         } catch (NotLoginException e) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("code", 401);
-            response.put("message", "用户未登录");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            return Result.error("用户未登录");
         }
 
         // 获取当前登录用户ID
@@ -410,10 +390,7 @@ public class VideoController extends ApiController {
         redisTemplate.expire(rateLimitKey, 1, java.util.concurrent.TimeUnit.SECONDS);
         Long count = redisTemplate.opsForHash().increment(rateLimitKey, "count", 1);
         if (count > 10) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("code", 429);
-            response.put("message", "收藏操作过于频繁，请稍后再试");
-            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(response);
+            return Result.error("收藏操作过于频繁，请稍后再试");
         }
 
         // 从请求对象中获取参数
@@ -442,10 +419,7 @@ public class VideoController extends ApiController {
                 resultMessage = contentType + "取消收藏成功";
                 success = true;
             } else {
-                Map<String, Object> response = new HashMap<>();
-                response.put("code", 400);
-                response.put("message", "您尚未收藏");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                return Result.error("您尚未收藏");
             }
         } else {
             // 收藏操作
@@ -458,10 +432,7 @@ public class VideoController extends ApiController {
                 resultMessage = contentType + "收藏成功";
                 success = true;
             } else {
-                Map<String, Object> response = new HashMap<>();
-                response.put("code", 400);
-                response.put("message", "您已收藏");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                return Result.error("您已收藏");
             }
         }
 
@@ -503,12 +474,7 @@ public class VideoController extends ApiController {
         data.put("collectCount", collectCount);
         data.put("isCollected", "uncollect".equals(type) ? false : true);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("code", 200);
-        response.put("message", resultMessage);
-        response.put("data", data);
-
-        return ResponseEntity.ok(response);
+        return Result.success(data);
     }
 
     @Autowired
@@ -639,13 +605,12 @@ public class VideoController extends ApiController {
      * @return 话题列表
      */
     @GetMapping("/topic/list")
-    public ResponseEntity<?> getTopics() {
+    public Result<List<Topic>> getTopics() {
         try {
             List<Topic> topics = topicService.getAllTopics();
-            return ResponseEntity.ok(topics);
+            return Result.success(topics);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("message", "获取话题列表失败: " + e.getMessage()));
+            return Result.error("获取话题列表失败: " + e.getMessage());
         }
     }
 
@@ -655,13 +620,12 @@ public class VideoController extends ApiController {
      * @return 位置列表
      */
     @GetMapping("/location/list")
-    public ResponseEntity<?> getLocations() {
+    public Result<List<Location>> getLocations() {
         try {
             List<Location> locations = locationService.getAllLocations();
-            return ResponseEntity.ok(locations);
+            return Result.success(locations);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("message", "获取位置列表失败: " + e.getMessage()));
+            return Result.error("获取位置列表失败: " + e.getMessage());
         }
     }
 
@@ -671,13 +635,12 @@ public class VideoController extends ApiController {
      * @return 权限设置列表
      */
     @GetMapping("/privacy/list")
-    public ResponseEntity<?> getPrivacies() {
+    public Result<List<Privacy>> getPrivacies() {
         try {
             List<Privacy> privacies = privacyService.getAllPrivacies();
-            return ResponseEntity.ok(privacies);
+            return Result.success(privacies);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("message", "获取权限设置列表失败: " + e.getMessage()));
+            return Result.error("获取权限设置列表失败: " + e.getMessage());
         }
     }
 
@@ -688,7 +651,7 @@ public class VideoController extends ApiController {
      * @return 搜索建议列表
      */
     @GetMapping("/search/suggestions")
-    public ResponseEntity<?> getSearchSuggestions(@RequestParam String keyword) {
+    public Result<List<String>> getSearchSuggestions(@RequestParam String keyword) {
         try {
             // 这里可以根据实际需求从数据库或缓存中获取搜索建议
             // 暂时返回模拟数据
@@ -699,10 +662,9 @@ public class VideoController extends ApiController {
             suggestions.add(keyword + " 教程");
             suggestions.add(keyword + " 美食");
 
-            return ResponseEntity.ok(suggestions);
+            return Result.success(suggestions);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("message", "获取搜索建议失败: " + e.getMessage()));
+            return Result.error("获取搜索建议失败: " + e.getMessage());
         }
     }
 
@@ -712,7 +674,7 @@ public class VideoController extends ApiController {
      * @return 热门搜索列表
      */
     @GetMapping("/search/hot")
-    public ResponseEntity<?> getHotSearches() {
+    public Result<List<Map<String, Object>>> getHotSearches() {
         try {
             // 这里可以根据实际需求从数据库或缓存中获取热门搜索
             // 暂时返回模拟数据
@@ -743,10 +705,9 @@ public class VideoController extends ApiController {
             search5.put("trending", "↑ 32");
             hotSearches.add(search5);
 
-            return ResponseEntity.ok(hotSearches);
+            return Result.success(hotSearches);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("message", "获取热门搜索失败: " + e.getMessage()));
+            return Result.error("获取热门搜索失败: " + e.getMessage());
         }
     }
 
@@ -759,7 +720,7 @@ public class VideoController extends ApiController {
      * @return 搜索结果列表
      */
     @GetMapping("/search")
-    public ResponseEntity<?> searchVideos(
+    public Result<List<Map<String, Object>>> searchVideos(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -784,7 +745,7 @@ public class VideoController extends ApiController {
                 BeanUtils.copyProperties(video, vo);
 
                 // 用户信息
-                User user = userService.getById(video.getUserId());
+                User user = (User)userFeignService.getUserById(video.getUserId());
                 if (user != null) {
                     vo.setUsername(user.getNickname());
                     vo.setUserAvatar(user.getAvatar());
@@ -828,10 +789,9 @@ public class VideoController extends ApiController {
                 result.add(map);
             }
 
-            return ResponseEntity.ok(result);
+            return Result.success(result);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("message", "搜索视频失败: " + e.getMessage()));
+            return Result.error("搜索视频失败: " + e.getMessage());
         }
     }
 
@@ -885,6 +845,7 @@ public class VideoController extends ApiController {
             return Result.error("调用用户服务失败，请稍后重试");
         }
     }
+
     // 测试获取用户列表
     @GetMapping("/testUserList")
     public Result<Object> testUserList() {
@@ -911,10 +872,12 @@ public class VideoController extends ApiController {
 
     // 根据用户ID分页获取视频列表
     @GetMapping("/pageByUserId")
-    public Result<IPage<Video>> pageByUserId(@RequestParam("userId") Long userId, @RequestParam("page") Long page, @RequestParam("pageSize") Long pageSize) {
+    public Result<IPage<Video>> pageByUserId(@RequestParam("userId") Long userId, @RequestParam("page") Long page,
+            @RequestParam("pageSize") Long pageSize) {
         try {
             Page<Video> pageQuery = new Page<>(page, pageSize);
-            IPage<Video> videoPage = videoService.page(pageQuery, new LambdaQueryWrapper<Video>().eq(Video::getUserId, userId));
+            IPage<Video> videoPage = videoService.page(pageQuery,
+                    new LambdaQueryWrapper<Video>().eq(Video::getUserId, userId));
             return Result.success(videoPage);
         } catch (Exception e) {
             e.printStackTrace();
