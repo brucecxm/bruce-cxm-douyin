@@ -1,7 +1,9 @@
 package com.bruce.config;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.bruce.dao.UserDao;
+import com.bruce.entity.User;
 import com.bruce.monitor.BloomFilterMonitor;
-import com.bruce.service.UserService;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +31,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 /**
  * Redis 配置类
@@ -53,11 +56,10 @@ public class RedisConfig extends CachingConfigurerSupport implements Application
     private String password;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private BloomFilterMonitor bloomFilterMonitor;
 
+    @Autowired
+    private UserDao userDao;
     // 布隆过滤器预热开关配置
     @Value("${bloom-filter.warmup-enabled:true}")
     private boolean bloomFilterWarmupEnabled;
@@ -178,9 +180,15 @@ public class RedisConfig extends CachingConfigurerSupport implements Application
             // 设置批次大小
             int batchSize = 1000;
             bloomFilterMonitor.setBatchSize(batchSize);
-
+            // 1. 构造空查询条件（查询所有）
+            LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+            // 2. 只查询id字段（按需查询，避免全表字段查询，提升性能）
+            queryWrapper.select(User::getId);
             // 获取所有用户ID
-            List<Long> userIds = userService.listAllUserId();
+            List<User> users = userDao.selectList(queryWrapper);
+            List<Long> userIds = users.stream()
+                    .map(User::getId) // 提取User对象的id属性
+                    .collect(Collectors.toList()); // 收集为Long类型集合
             int totalCount = userIds.size();
 
             // 设置总用户数
