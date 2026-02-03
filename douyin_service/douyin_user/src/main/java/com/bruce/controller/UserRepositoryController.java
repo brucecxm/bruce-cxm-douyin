@@ -2,6 +2,7 @@ package com.bruce.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.bruce.entity.User;
+import com.bruce.pojo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.bruce.mapper.UserMapper;
@@ -27,7 +28,7 @@ public class UserRepositoryController {
      * @return User 保存后的用户信息
      */
     @PostMapping("/save")
-    public User save(@RequestBody User user) {
+    public Result<User> save(@RequestBody User user) {
         if (user.getId() == null || user.getId() == 0) {
             // 新增用户
             userMapper.insert(user);
@@ -35,7 +36,7 @@ public class UserRepositoryController {
             // 更新用户
             userMapper.updateById(user);
         }
-        return user;
+        return Result.success(user);
     }
 
     /**
@@ -45,9 +46,9 @@ public class UserRepositoryController {
      * @return Optional<User> 用户信息
      */
     @GetMapping("/findById/{id}")
-    public Optional<User> findById(@PathVariable Long id) {
+    public Result<Optional<User>> findById(@PathVariable Long id) {
         User user = userMapper.selectById(id);
-        return Optional.ofNullable(user);
+        return Result.success(Optional.ofNullable(user));
     }
 
     /**
@@ -57,10 +58,10 @@ public class UserRepositoryController {
      * @return Optional<User> 用户信息
      */
     @GetMapping("/findByUsername")
-    public Optional<User> findByUsername(@RequestParam String username) {
+    public Result<Optional<User>> findByUsername(@RequestParam String username) {
         User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
                 .eq(User::getUsername, username));
-        return Optional.ofNullable(user);
+        return Result.success(Optional.ofNullable(user));
     }
 
     /**
@@ -70,10 +71,10 @@ public class UserRepositoryController {
      * @return Optional<User> 用户信息
      */
     @GetMapping("/findByEmail")
-    public Optional<User> findByEmail(@RequestParam String email) {
+    public Result<Optional<User>> findByEmail(@RequestParam String email) {
         User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
                 .eq(User::getEmail, email));
-        return Optional.ofNullable(user);
+        return Result.success(Optional.ofNullable(user));
     }
 
     /**
@@ -83,10 +84,10 @@ public class UserRepositoryController {
      * @return Boolean 是否存在
      */
     @GetMapping("/existsByUsername")
-    public Boolean existsByUsername(@RequestParam String username) {
+    public Result<Boolean> existsByUsername(@RequestParam String username) {
         long count = userMapper.selectCount(new LambdaQueryWrapper<User>()
                 .eq(User::getUsername, username));
-        return count > 0;
+        return Result.success(count > 0);
     }
 
     /**
@@ -96,9 +97,9 @@ public class UserRepositoryController {
      * @return Boolean 是否存在
      */
     @GetMapping("/existsByEmail")
-    public Boolean existsByEmail(@RequestParam String email) {
+    public Result<Boolean> existsByEmail(@RequestParam String email) {
         long count = userMapper.selectCount(new LambdaQueryWrapper<User>()
                 .eq(User::getEmail, email));
-        return count > 0;
+        return Result.success(count > 0);
     }
 }

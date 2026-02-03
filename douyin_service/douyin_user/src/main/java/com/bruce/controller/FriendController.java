@@ -5,18 +5,17 @@ package com.bruce.controller;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.ApiController;
-import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.entity.User;
 import com.bruce.pojo.FriendRequestDTO;
 import com.bruce.pojo.FriendRequestVO;
 import com.bruce.pojo.FriendVO;
 import com.bruce.pojo.HandleRequestDTO;
+import com.bruce.pojo.Result;
 import com.bruce.entity.Friend;
 import com.bruce.service.FriendService;
 import com.bruce.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -62,7 +61,7 @@ public class FriendController extends ApiController {
      * @return 所有数据
      */
     @GetMapping
-    public R selectAll(
+    public Result selectAll(
             @RequestParam(defaultValue = "1") int current,  // 当前页，默认为1
             @RequestParam(defaultValue = "10") int size,    // 每页大小，默认为10
             Friend friend) {
@@ -70,7 +69,7 @@ public class FriendController extends ApiController {
         // 创建一个分页对象
         Page<Friend> page = new Page<>(current, size);
 
-        return success(this.friendService.page(page, new QueryWrapper<>(friend)));
+        return Result.success(this.friendService.page(page, new QueryWrapper<>(friend)));
     }
 
 
@@ -80,9 +79,9 @@ public class FriendController extends ApiController {
      * @return 所有数据
      */
     @GetMapping("/all")
-    public R selectAllFriends() {
+    public Result selectAllFriends() {
         List<Friend> friends = this.friendService.list();
-        return success(friends);
+        return Result.success(friends);
     }
     /**
      * 通过主键查询单条数据
@@ -91,28 +90,28 @@ public class FriendController extends ApiController {
      * @return 单条数据
      */
     @GetMapping("{id}")
-    public R selectOne(@PathVariable Serializable id) {
-        return success(this.friendService.getById(id));
+    public Result selectOne(@PathVariable Serializable id) {
+        return Result.success(this.friendService.getById(id));
     }
 
     /**
      * 搜索我的好友列表中的用户（用于我的好友列表搜索）
      */
     @GetMapping("/list/search/zan")
-    public ResponseEntity<?> searchMyFriends(@RequestParam String keyword) {
+    public Result<?> searchMyFriends(@RequestParam String keyword) {
         Long userId = Long.valueOf(StpUtil.getLoginIdAsString());
         List<User> users = friendService.searchMyFriends(userId, keyword);
-        return ResponseEntity.ok(users);
+        return Result.success(users);
     }
 
     /**
      * 搜索我的好友列表中的用户（用于我的好友列表搜索）
      */
     @GetMapping("/list/search")
-    public ResponseEntity<?> searchUser(@RequestParam String keyword) {
+    public Result<?> searchUser(@RequestParam String keyword) {
         Long userId = Long.valueOf(StpUtil.getLoginIdAsString());
         List<User> users = friendService.searchMyFriends(userId, keyword);
-        return ResponseEntity.ok(users);
+        return Result.success(users);
     }
 
     /**
@@ -122,10 +121,10 @@ public class FriendController extends ApiController {
      * @return 匹配的记录数量
      */
     @GetMapping("/count")
-    public R countByAttributes(Friend friend) {
+    public Result countByAttributes(Friend friend) {
         QueryWrapper<Friend> queryWrapper = new QueryWrapper<>(friend);
         int count = friendService.count(queryWrapper);
-        return success(count);
+        return Result.success(count);
     }
 
     /**
@@ -135,8 +134,8 @@ public class FriendController extends ApiController {
      * @return 新增结果
      */
     @PostMapping
-    public R insert(@RequestBody Friend friend) {
-        return success(this.friendService.save(friend));
+    public Result insert(@RequestBody Friend friend) {
+        return Result.success(this.friendService.save(friend));
     }
 
     /**
@@ -146,8 +145,8 @@ public class FriendController extends ApiController {
      * @return 修改结果
      */
     @PutMapping
-    public R update(@RequestBody Friend friend) {
-        return success(this.friendService.updateById(friend));
+    public Result update(@RequestBody Friend friend) {
+        return Result.success(this.friendService.updateById(friend));
     }
 
     /**
@@ -157,9 +156,14 @@ public class FriendController extends ApiController {
      * @return 删除结果
      */
     @DeleteMapping
-    public R delete(@RequestParam("idList") List<Long> idList) {
-        return success(this.friendService.removeByIds(idList));
+    public Result delete(@RequestParam("idList") List<Long> idList) {
+        return Result.success(this.friendService.removeByIds(idList));
     }
+
+
+
+
+
 
 
 
@@ -174,53 +178,75 @@ public class FriendController extends ApiController {
      * 1. 发送好友请求
      */
     @PostMapping("/request")
-    public ResponseEntity<?> sendFriendRequest(@RequestBody FriendRequestDTO dto) {
+    public Result<?> sendFriendRequest(@RequestBody FriendRequestDTO dto) {
         friendService.sendFriendRequest(dto.getToUserId(), dto.getVerifyMsg());
-        return ResponseEntity.ok("好友请求已发送");
+        return Result.success("好友请求已发送");
     }
 
     /**
      * 2. 获取收到的好友请求列表
      */
     @GetMapping("/requests")
-    public ResponseEntity<?> getFriendRequests() {
+    public Result<?> getFriendRequests() {
         List<FriendRequestVO> list = friendService.getReceivedRequests();
-        return ResponseEntity.ok(list);
+        return Result.success(list);
     }
 
     /**
      * 3. 同意或拒绝好友请求
      */
     @PostMapping("/handle")
-    public ResponseEntity<?> handleFriendRequest(@RequestBody HandleRequestDTO dto) {
+    public Result<?> handleFriendRequest(@RequestBody HandleRequestDTO dto) {
         friendService.handleRequest(dto.getRequestId(), dto.getAction());
-        return ResponseEntity.ok("操作成功");
+        return Result.success("操作成功");
     }
 
     /**
      * 4. 获取当前用户好友列表
      */
     @GetMapping("/list")
-    public ResponseEntity<?> getFriendList() {
+    public Result<?> getFriendList() {
         List<FriendVO> list = friendService.getFriendList();
-        return ResponseEntity.ok(list);
+        return Result.success(list);
     }
 
     /**
      * 5. 删除好友
      */
     @DeleteMapping("/{friendId}")
-    public ResponseEntity<?> deleteFriend(@PathVariable Long friendId) {
+    public Result<?> deleteFriend(@PathVariable Long friendId) {
         friendService.deleteFriend(friendId);
-        return ResponseEntity.ok("好友已删除");
+        return Result.success("好友已删除");
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * 获取当前用户所有好友的详细信息列表
      * 结合Friend和User表的信息，返回更丰富的好友数据
      */
     @GetMapping("/list/detail")
-    public R selectAllFriendsWithDetails() {
+    public Result selectAllFriendsWithDetails() {
         // 获取当前登录用户ID
         Long userId = Long.valueOf(StpUtil.getLoginIdAsString());
         
@@ -229,7 +255,7 @@ public class FriendController extends ApiController {
         
         // 如果没有好友，返回空列表
         if (friends.isEmpty()) {
-            return success(new ArrayList<>());
+            return Result.success(new ArrayList<>());
         }
         
         // 提取所有好友ID
@@ -274,7 +300,7 @@ public class FriendController extends ApiController {
             }
         }
         
-        return success(friendDetailsList);
+        return Result.success(friendDetailsList);
     }
     
     /**
@@ -283,7 +309,7 @@ public class FriendController extends ApiController {
      * @return 好友的详细信息
      */
     @GetMapping("/{friendId}/detail")
-    public R selectFriendDetail(@PathVariable Long friendId) {
+    public Result selectFriendDetail(@PathVariable Long friendId) {
         // 获取当前登录用户ID
         Long userId = Long.valueOf(StpUtil.getLoginIdAsString());
         
@@ -294,14 +320,14 @@ public class FriendController extends ApiController {
                 .eq("status", 1));
         
         if (friend == null) {
-            return failed("未找到该好友信息");
+            return Result.error("未找到该好友信息");
         }
         
         // 使用UserService查询好友的用户信息
         User friendUser = userService.getById(friend.getFriendId());
         
         if (friendUser == null) {
-            return failed("好友用户信息不存在");
+            return Result.error("好友用户信息不存在");
         }
         
         // 创建包含详细信息的结果Map
@@ -328,7 +354,7 @@ public class FriendController extends ApiController {
         friendDetail.put("isAnchor", friendUser.getIsAnchor());
         friendDetail.put("isPrivate", friendUser.getIsPrivate());
         
-        return success(friendDetail);
+        return Result.success(friendDetail);
     }
 
 

@@ -6,10 +6,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.entity.User;
 import com.bruce.entitys.WalletTransaction;
 import com.bruce.mapper.WalletTransactionMapper;
+import com.bruce.pojo.Result;
 import com.bruce.service.TransferService;
 import com.bruce.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -34,7 +34,7 @@ public class WalletController {
      * @return 钱包状态信息
      */
     @GetMapping("/status")
-    public ResponseEntity<?> checkWalletStatus() {
+    public Result<?> checkWalletStatus() {
         try {
             // 在实际项目中，这里应该从session或token中获取用户ID
             // 为了演示，这里假设用户ID为1
@@ -43,7 +43,7 @@ public class WalletController {
 
             User user = userService.getById(userId);
             if (user == null) {
-                return ResponseEntity.badRequest().body("用户不存在");
+                return Result.error("用户不存在");
             }
 
             // 检查用户是否设置了支付密码，如果设置了则表示开通了钱包
@@ -59,9 +59,9 @@ public class WalletController {
                 response.put("balance", user.getBalance() != null ? user.getBalance() : BigDecimal.ZERO);
             }
 
-            return ResponseEntity.ok(response);
+            return Result.success(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return Result.error(e.getMessage());
         }
     }
 
@@ -71,7 +71,7 @@ public class WalletController {
      * @return 开通结果
      */
     @PostMapping("/enable")
-    public ResponseEntity<?> enableWallet(@RequestParam String paymentPassword) {
+    public Result<?> enableWallet(@RequestParam String paymentPassword) {
         try {
             // 在实际项目中，这里应该从session或token中获取用户ID
             // 为了演示，这里假设用户ID为1
@@ -80,12 +80,12 @@ public class WalletController {
 
             User user = userService.getById(userId);
             if (user == null) {
-                return ResponseEntity.badRequest().body("用户不存在");
+                return Result.error("用户不存在");
             }
 
             // 验证支付密码格式（6位数字）
             if (paymentPassword == null || paymentPassword.length() != 6 || !paymentPassword.matches("\\d{6}")) {
-                return ResponseEntity.badRequest().body("请输入6位数字支付密码");
+                return Result.error("请输入6位数字支付密码");
             }
 
             // 设置支付密码并初始化余额
@@ -96,9 +96,9 @@ public class WalletController {
 
             userService.updateById(user);
 
-            return ResponseEntity.ok("钱包开通成功");
+            return Result.success("钱包开通成功");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return Result.error(e.getMessage());
         }
     }
 
@@ -107,7 +107,7 @@ public class WalletController {
      * @return 余额信息
      */
     @GetMapping("/balance")
-    public ResponseEntity<?> getWalletBalance() {
+    public Result<?> getWalletBalance() {
         try {
             // 在实际项目中，这里应该从session或token中获取用户ID
             // 为了演示，这里假设用户ID为1
@@ -116,15 +116,15 @@ public class WalletController {
 
             User user = userService.getById(userId);
             if (user == null) {
-                return ResponseEntity.badRequest().body("用户不存在");
+                return Result.error("用户不存在");
             }
 
             Map<String, Object> response = new HashMap<>();
             response.put("balance", user.getBalance() != null ? user.getBalance() : BigDecimal.ZERO);
 
-            return ResponseEntity.ok(response);
+            return Result.success(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return Result.error(e.getMessage());
         }
     }
 
@@ -135,7 +135,7 @@ public class WalletController {
      * @return 交易记录列表
      */
     @GetMapping("/transactions")
-    public ResponseEntity<?> getWalletTransactions(
+    public Result<?> getWalletTransactions(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "20") Integer pageSize) {
         try {
@@ -161,9 +161,9 @@ public class WalletController {
             response.put("page", result.getCurrent());
             response.put("pageSize", result.getSize());
 
-            return ResponseEntity.ok(response);
+            return Result.success(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return Result.error(e.getMessage());
         }
     }
 }

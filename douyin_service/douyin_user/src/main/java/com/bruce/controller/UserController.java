@@ -184,7 +184,6 @@ public class UserController extends ApiController {
     @Autowired
     private FriendService friendService;
 
-
     @Autowired
     private VideoFeignService videoFeignService;
 
@@ -222,19 +221,19 @@ public class UserController extends ApiController {
     private PermissionService permissionService;
 
     @PostMapping("/assignRoles")
-    public R assignRoles(@RequestBody UserRoleDTO dto) {
+    public Result assignRoles(@RequestBody UserRoleDTO dto) {
         userRoleService.assignRoles(dto.getUserId(), dto.getRoleIds());
-        return R.ok("角色分配成功");
+        return Result.success("角色分配成功");
     }
 
     @GetMapping("/roles/{userId}")
-    public R<List<Role>> getRoles(@PathVariable Long userId) {
-        return R.ok(roleService.getRolesByUserId(userId));
+    public Result<List<Role>> getRoles(@PathVariable Long userId) {
+        return Result.success(roleService.getRolesByUserId(userId));
     }
 
     @GetMapping("/permissions/{userId}")
-    public R<List<Permission>> getPermissions(@PathVariable Long userId) {
-        return R.ok(permissionService.getPermissionsByUserId(userId));
+    public Result<List<Permission>> getPermissions(@PathVariable Long userId) {
+        return Result.success(permissionService.getPermissionsByUserId(userId));
     }
 
     // 定义参数接收实体类
