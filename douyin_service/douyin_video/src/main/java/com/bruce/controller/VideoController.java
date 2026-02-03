@@ -33,6 +33,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -226,134 +228,19 @@ public class VideoController extends ApiController {
 
     @GetMapping("/getVideoPage")
     public List<Map<String, Object>> getVideoInfo(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "4") int size,
-            @RequestParam String videoType) {
-        Page<Video> pageInfo = new Page<>(page, size);
-        // LambdaQueryWrapper 用于 Video 表查询
-        LambdaQueryWrapper<Video> videoQueryWrapper = new LambdaQueryWrapper<Video>()
-                .orderByDesc(Video::getVideoId);
-        IPage<Video> videoPage = videoService.page(pageInfo, videoQueryWrapper);
-        List<Video> videos = videoPage.getRecords();
-        List<Map<String, Object>> result = new ArrayList<>();
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "页码page不能小于1") // 校验页码：最小值1
+            int page,
 
-        // 获取当前登录用户ID
-        Long loginUserId = null;
-        try {
-            StpUtil.checkLogin();
-            Object userIdObj = StpUtil.getLoginId();
-            if (userIdObj instanceof Long) {
-                loginUserId = (Long) userIdObj;
-            } else if (userIdObj instanceof Integer) {
-                loginUserId = ((Integer) userIdObj).longValue();
-            } else if (userIdObj instanceof String) {
-                loginUserId = Long.parseLong((String) userIdObj);
-            }
-        } catch (NotLoginException e) {
-            // 用户未登录，loginUserId保持为null
-        }
+            @RequestParam(defaultValue = "4")
+            @Min(value = 1, message = "每页条数size不能小于1") // 校验条数：最小值1
+            int size,
 
-        for (Video video : videos) {
-            VideoVO vo = new VideoVO();
-            BeanUtils.copyProperties(video, vo);
-            // 用户信息
-            User user = userService.getById(video.getUserId());
-            if (user != null) {
-                vo.setUsername(user.getNickname());
-                vo.setUserAvatar(user.getAvatar());
-            }
-            // 音乐信息
-            Music music = musicService.getById(video.getMusicId());
-            if (music != null) {
-                vo.setMusic(music.getMusicName());
-                vo.setMusicAvatar(music.getMusicAvatar());
-                vo.setMusicId(music.getId());
-            }
-            String redisKey = "like:content:" + "video" + video.getVideoId();
-            Integer likenum = (Integer) redisTemplate.opsForValue().get(redisKey + ":count");
-            int likeCount;
-            if (likenum != null) {
-                likeCount = likenum;
-            } else {
-                // LambdaQueryWrapper 用于 Like 表查询点赞数
-                LambdaQueryWrapper<Favor> likeQueryWrapper = new LambdaQueryWrapper<Favor>()
-                        .eq(Favor::getCommentId, video.getVideoId());
+            @RequestParam
+            @NotBlank(message = "视频类型videoType不能为空且不能为空白字符") // 校验非空+非空白
+            String videoType) {
 
-                likeCount = favorService.count(likeQueryWrapper);
-            }
-            vo.setLikeNum((long) likeCount);
-            vo.setUserId((long) user.getId());
-            // 评论数
-            LambdaQueryWrapper<Comment> commentQueryWrapper = new LambdaQueryWrapper<Comment>()
-                    .eq(Comment::getCommentId, video.getVideoId())
-                    .isNotNull(Comment::getComment);
-            int commentCount = commentService.count(commentQueryWrapper);
-            vo.setCommentNum((long) commentCount);
-            // 收藏数
-            LambdaQueryWrapper<Favor> collectWrapper = new LambdaQueryWrapper<Favor>()
-                    .eq(Favor::getCommentId, video.getVideoId());
-            // .eq(Like::getCollect, 1);
-            int collectCount = favorService.count(collectWrapper);
-            vo.setCollectNum((long) collectCount);
-            // 分享数
-            LambdaQueryWrapper<Favor> shareWrapper = new LambdaQueryWrapper<Favor>()
-                    .eq(Favor::getCommentId, video.getVideoId());
-            int shareCount = favorService.count(shareWrapper);
-            vo.setShareNum((long) shareCount);
-
-            // 判断当前用户是否已点赞
-            boolean isLiked = false;
-            if (loginUserId != null) {
-                // 先从Redis查询点赞状态
-                Boolean redisLiked = redisTemplate.opsForSet().isMember(redisKey, loginUserId);
-                if (redisLiked != null) {
-                    isLiked = redisLiked;
-                } else {
-                    // Redis中没有，从数据库查询
-                    LambdaQueryWrapper<Favor> userLikeQuery = new LambdaQueryWrapper<Favor>()
-                            .eq(Favor::getCommentId, video.getVideoId())
-                            .eq(Favor::getUserId, loginUserId);
-                    isLiked = favorService.count(userLikeQuery) > 0;
-                }
-            }
-
-            // 判断当前用户是否已收藏
-            boolean isCollected = false;
-            if (loginUserId != null) {
-                // 先从Redis查询收藏状态
-                String collectRedisKey = "collect:content:" + "video" + video.getVideoId();
-                Boolean redisCollected = redisTemplate.opsForSet().isMember(collectRedisKey, loginUserId);
-                if (redisCollected != null) {
-                    isCollected = redisCollected;
-                } else {
-                    // Redis中没有，从数据库查询
-                    LambdaQueryWrapper<Favor> userCollectQuery = new LambdaQueryWrapper<Favor>()
-                            .eq(Favor::getCommentId, video.getVideoId())
-                            .eq(Favor::getUserId, loginUserId);
-                    isCollected = favorService.count(userCollectQuery) > 0;
-                }
-            }
-
-            // 组装返回数据
-            Map<String, Object> map = new HashMap<>();
-            map.put(Constant.ApiParam.VIDEO_ID, vo.getVideoId());
-            map.put(Constant.ApiParam.USER_ID, vo.getUserId());
-            map.put(Constant.ApiParam.CONTENT, vo.getContent());
-            map.put(Constant.Video.VIDEO_URL, vo.getUrl());
-            map.put(Constant.User.USER_NAME, vo.getUsername());
-            map.put(Constant.User.USER_AVATAR, vo.getUserAvatar());
-            map.put(Constant.Music.MUSIC, vo.getMusic());
-            map.put(Constant.Music.MUSIC_AVATAR, vo.getMusicAvatar());
-            map.put(Constant.Stat.LIKE_NUM, vo.getLikeNum());
-            map.put(Constant.Stat.COMMENT_NUM, vo.getCommentNum());
-            map.put(Constant.Stat.COLLECT_NUM, vo.getCollectNum());
-            map.put(Constant.Stat.SHARE_NUM, vo.getShareNum());
-            map.put(Constant.ApiParam.MUSIC_ID, vo.getMusicId());
-            map.put("isLiked", isLiked); // 添加是否点赞的标识
-            map.put("isCollected", isCollected); // 添加是否收藏的标识
-            result.add(map);
-        }
-        return result;
+        return videoService.getVideoPage(page,size,videoType);
     }
 
     @GetMapping("/auth")
@@ -779,7 +666,7 @@ public class VideoController extends ApiController {
 
     /**
      * 获取话题列表
-     * 
+     *
      * @return 话题列表
      */
     @GetMapping("/topic/list")
@@ -795,7 +682,7 @@ public class VideoController extends ApiController {
 
     /**
      * 获取位置列表
-     * 
+     *
      * @return 位置列表
      */
     @GetMapping("/location/list")
@@ -811,7 +698,7 @@ public class VideoController extends ApiController {
 
     /**
      * 获取权限设置列表
-     * 
+     *
      * @return 权限设置列表
      */
     @GetMapping("/privacy/list")
@@ -824,10 +711,10 @@ public class VideoController extends ApiController {
                     .body(Collections.singletonMap("message", "获取权限设置列表失败: " + e.getMessage()));
         }
     }
-    
+
     /**
      * 获取搜索建议
-     * 
+     *
      * @param keyword 搜索关键词
      * @return 搜索建议列表
      */
@@ -842,17 +729,17 @@ public class VideoController extends ApiController {
             suggestions.add(keyword + " 搞笑");
             suggestions.add(keyword + " 教程");
             suggestions.add(keyword + " 美食");
-            
+
             return ResponseEntity.ok(suggestions);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("message", "获取搜索建议失败: " + e.getMessage()));
         }
     }
-    
+
     /**
      * 获取热门搜索
-     * 
+     *
      * @return 热门搜索列表
      */
     @GetMapping("/search/hot")
@@ -861,42 +748,42 @@ public class VideoController extends ApiController {
             // 这里可以根据实际需求从数据库或缓存中获取热门搜索
             // 暂时返回模拟数据
             List<Map<String, Object>> hotSearches = new ArrayList<>();
-            
+
             Map<String, Object> search1 = new HashMap<>();
             search1.put("keyword", "热门视频");
             search1.put("trending", "↑ 123");
             hotSearches.add(search1);
-            
+
             Map<String, Object> search2 = new HashMap<>();
             search2.put("keyword", "最新音乐");
             search2.put("trending", "↑ 45");
             hotSearches.add(search2);
-            
+
             Map<String, Object> search3 = new HashMap<>();
             search3.put("keyword", "搞笑段子");
             search3.put("trending", "↓ 67");
             hotSearches.add(search3);
-            
+
             Map<String, Object> search4 = new HashMap<>();
             search4.put("keyword", "美食教程");
             search4.put("trending", "↑ 89");
             hotSearches.add(search4);
-            
+
             Map<String, Object> search5 = new HashMap<>();
             search5.put("keyword", "旅游攻略");
             search5.put("trending", "↑ 32");
             hotSearches.add(search5);
-            
+
             return ResponseEntity.ok(hotSearches);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("message", "获取热门搜索失败: " + e.getMessage()));
         }
     }
-    
+
     /**
      * 搜索视频
-     * 
+     *
      * @param keyword 搜索关键词
      * @param page 页码
      * @param size 每页数量
@@ -909,31 +796,31 @@ public class VideoController extends ApiController {
             @RequestParam(defaultValue = "10") int size) {
         try {
             Page<Video> pageInfo = new Page<>(page, size);
-            
+
             // 根据关键词搜索视频，匹配标题和内容
             LambdaQueryWrapper<Video> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.and(wrapper -> wrapper
                     .like(Video::getTitle, keyword)
                     .or().like(Video::getContent, keyword))
                     .orderByDesc(Video::getVideoId);
-            
+
             IPage<Video> videoPage = videoService.page(pageInfo, queryWrapper);
             List<Video> videos = videoPage.getRecords();
-            
+
             List<Map<String, Object>> result = new ArrayList<>();
-            
+
             // 处理搜索结果，添加用户信息和统计数据
             for (Video video : videos) {
                 VideoVO vo = new VideoVO();
                 BeanUtils.copyProperties(video, vo);
-                
+
                 // 用户信息
                 User user = userService.getById(video.getUserId());
                 if (user != null) {
                     vo.setUsername(user.getNickname());
                     vo.setUserAvatar(user.getAvatar());
                 }
-                
+
                 // 音乐信息
                 Music music = musicService.getById(video.getMusicId());
                 if (music != null) {
@@ -941,23 +828,23 @@ public class VideoController extends ApiController {
                     vo.setMusicAvatar(music.getMusicAvatar());
                     vo.setMusicId(music.getId());
                 }
-                
+
                 // 点赞数
                 String redisKey = "like:content:" + "video" + video.getVideoId();
                 Integer likenum = (Integer) redisTemplate.opsForValue().get(redisKey + ":count");
                 int likeCount = likenum != null ? likenum : 0;
                 vo.setLikeNum((long) likeCount);
-                
+
                 // 评论数
                 LambdaQueryWrapper<Comment> commentQueryWrapper = new LambdaQueryWrapper<Comment>()
                         .eq(Comment::getCommentId, video.getVideoId())
                         .isNotNull(Comment::getComment);
                 int commentCount = commentService.count(commentQueryWrapper);
                 vo.setCommentNum((long) commentCount);
-                
+
                 // 分享数（暂时使用模拟数据）
                 vo.setShareNum(0L);
-                
+
                 // 组装返回数据
                 Map<String, Object> map = new HashMap<>();
                 map.put("videoId", vo.getVideoId());
@@ -971,7 +858,7 @@ public class VideoController extends ApiController {
                 map.put("shareNum", vo.getShareNum());
                 result.add(map);
             }
-            
+
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
