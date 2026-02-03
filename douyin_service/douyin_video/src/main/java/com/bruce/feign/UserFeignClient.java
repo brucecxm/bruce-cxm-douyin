@@ -1,5 +1,7 @@
 package com.bruce.feign;
 
+import com.bruce.entity.User;
+import com.bruce.pojo.Result;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -8,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface UserFeignClient {
 
     @GetMapping("/getById")
-    Object getUserById(@RequestParam("id") Long id);
+    Result<User> getUserById(@RequestParam("id") Long id);
 
     @GetMapping("/list")
     Object getUserList();

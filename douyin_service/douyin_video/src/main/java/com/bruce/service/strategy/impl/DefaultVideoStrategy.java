@@ -1,8 +1,8 @@
 package com.bruce.service.strategy.impl;
 
-import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.dao.VideoDao;
 import com.bruce.dict.Constant;
@@ -12,10 +12,12 @@ import com.bruce.entity.Music;
 import com.bruce.entity.User;
 import com.bruce.entity.Video;
 import com.bruce.feign.UserFeignClient;
+import com.bruce.pojo.Result;
 import com.bruce.service.CommentService;
 import com.bruce.service.FavorService;
 import com.bruce.service.MusicService;
 import com.bruce.service.strategy.VideoStrategy;
+import com.bruce.utils.AuthUtils;
 import com.bruce.vo.VideoVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,32 +59,21 @@ public class DefaultVideoStrategy implements VideoStrategy {
         // LambdaQueryWrapper 用于 Video 表查询
         LambdaQueryWrapper<Video> videoQueryWrapper = new LambdaQueryWrapper<Video>()
                 .orderByDesc(Video::getVideoId);
-        com.baomidou.mybatisplus.core.metadata.IPage<Video> videoPage = videoDao.selectPage(pageInfo, videoQueryWrapper);
+        IPage<Video> videoPage = videoDao.selectPage(pageInfo,
+                videoQueryWrapper);
         List<Video> videos = videoPage.getRecords();
         List<Map<String, Object>> result = new ArrayList<>();
 
         // 获取当前登录用户ID
-        Long loginUserId = null;
-        try {
-            StpUtil.checkLogin();
-            Object userIdObj = StpUtil.getLoginId();
-            if (userIdObj instanceof Long) {
-                loginUserId = (Long) userIdObj;
-            } else if (userIdObj instanceof Integer) {
-                loginUserId = ((Integer) userIdObj).longValue();
-            } else if (userIdObj instanceof String) {
-                loginUserId = Long.parseLong((String) userIdObj);
-            }
-        } catch (NotLoginException e) {
-            // 用户未登录，loginUserId保持为null
-        }
+        Long loginUserId = AuthUtils.getCurrentUserId();
 
         for (Video video : videos) {
             VideoVO vo = new VideoVO();
             BeanUtils.copyProperties(video, vo);
             // 用户信息
-//            User user = userFeignClient.getById(video.getUserId());
-            User user = (User) userFeignClient.getUserById(video.getUserId());
+            // User user = userFeignClient.getById(video.getUserId());
+            Result<User> userR = userFeignClient.getUserById(video.getUserId());
+            User user = userR.getData();
             if (user != null) {
                 vo.setUsername(user.getNickname());
                 vo.setUserAvatar(user.getAvatar());

@@ -30,10 +30,21 @@ public class AuthUtils {
      * @return 用户ID
      */
     public static Long getCurrentUserId() {
-        if (StpUtil.isLogin()) {
-            return Long.parseLong(StpUtil.getLoginId().toString());
+        Long loginUserId = null;
+        try {
+            StpUtil.checkLogin();
+            Object userIdObj = StpUtil.getLoginId();
+            if (userIdObj instanceof Long) {
+                loginUserId = (Long) userIdObj;
+            } else if (userIdObj instanceof Integer) {
+                loginUserId = ((Integer) userIdObj).longValue();
+            } else if (userIdObj instanceof String) {
+                loginUserId = Long.parseLong((String) userIdObj);
+            }
+        } catch (cn.dev33.satoken.exception.NotLoginException e) {
+            // 用户未登录，loginUserId保持为null
         }
-        return null;
+        return loginUserId;
     }
     
     /**

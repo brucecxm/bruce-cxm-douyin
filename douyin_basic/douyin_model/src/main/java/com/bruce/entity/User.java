@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -20,7 +21,7 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 @Data
-public class User  {
+public class User {
     private Long id;
     private String email;
     private String userPic;
@@ -34,10 +35,12 @@ public class User  {
     private String phone;
     private String password;
     private String nickname;
-    private String avatar;       // 发起人头像URL
+    private String avatar; // 发起人头像URL
     @TableField(fill = FieldFill.INSERT)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
     @TableField(fill = FieldFill.INSERT_UPDATE)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
     private String permissionId;
     private String roleId;
@@ -45,14 +48,15 @@ public class User  {
     private Boolean isAnchor;
     private int isPrivate;
     // 最后登录时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastLoginTime;
     // 钱包余额
     private BigDecimal balance;
 
-//*****下面是新家的  适配商城用的
-//*****下面是新家的  适配商城用的
-//*****下面是新家的  适配商城用的
-//*****下面是新家的  适配商城用的
+    // *****下面是新家的 适配商城用的
+    // *****下面是新家的 适配商城用的
+    // *****下面是新家的 适配商城用的
+    // *****下面是新家的 适配商城用的
 
     private Date birthday;
     private String bio;
@@ -70,6 +74,4 @@ public class User  {
         updatedAt = new Date();
     }
 
-
-    }
-
+}
