@@ -13,7 +13,6 @@
         <module>douyin_video</module>
         <module>api-server</module>
         <module>douyin_user</module>
-        <module>douyin_shop</module>
         <module>douyin_common</module>
         <!--        <module>douyin_test</module>-->
 
