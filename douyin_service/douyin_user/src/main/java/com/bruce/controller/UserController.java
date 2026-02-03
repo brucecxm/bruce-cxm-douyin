@@ -9,6 +9,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.dict.Constant;
 import com.bruce.dto.LoginRequestDTO;
 import com.bruce.dto.UserRoleDTO;
+import com.bruce.dto.LogoutRequestDTO;
+import com.bruce.dto.UpdateInfoRequestDTO;
+import com.bruce.dto.ChangePasswordRequestDTO;
+import com.bruce.dto.UserStatusResponseDTO;
+import com.bruce.dto.FreezeRequestDTO;
 import com.bruce.entity.*;
 import com.bruce.handlar.MyCustomException;
 import com.bruce.pojo.Result;
@@ -237,31 +242,8 @@ public class UserController extends ApiController {
         return Result.success(permissionService.getPermissionsByUserId(userId));
     }
 
-    // 定义参数接收实体类
-    static class LogoutRequest {
-        private String action; // 操作类型：logout、logoutByDevice等
-        private Object param; // 操作参数，根据action不同格式不同
-
-        // getter和setter（必须，用于JSON反序列化）
-        public String getAction() {
-            return action;
-        }
-
-        public void setAction(String action) {
-            this.action = action;
-        }
-
-        public Object getParam() {
-            return param;
-        }
-
-        public void setParam(Object param) {
-            this.param = param;
-        }
-    }
-
     @PostMapping("logout")
-    public void handleLogoutAction(@RequestBody LogoutRequest request) {
+    public void handleLogoutAction(@RequestBody LogoutRequestDTO request) {
         String action = request.getAction();
         Object param = request.getParam();
 
@@ -417,7 +399,7 @@ public class UserController extends ApiController {
         // }
 
         // 2. 格式校验（是否为纯数字，避免非数字ID穿透）
-        if (!userId.matches("^\\d+$") || userId.equals("")) {
+        if (!userId.matches("^\\d+$")) {
             return Result.error("用户ID必须为数字格式");
         }
 
@@ -827,69 +809,10 @@ public class UserController extends ApiController {
 
     // ===== 一、用户基础信息扩展接口 =====
 
-    // 更新用户信息请求参数类
-    static class UpdateInfoRequest {
-        private Long userId;
-        private String nickname;
-        private String avatar;
-        private String phone;
-        private String gender; // 修改为String类型以匹配User实体
-        private String birthday;
-
-        // getter和setter
-        public Long getUserId() {
-            return userId;
-        }
-
-        public void setUserId(Long userId) {
-            this.userId = userId;
-        }
-
-        public String getNickname() {
-            return nickname;
-        }
-
-        public void setNickname(String nickname) {
-            this.nickname = nickname;
-        }
-
-        public String getAvatar() {
-            return avatar;
-        }
-
-        public void setAvatar(String avatar) {
-            this.avatar = avatar;
-        }
-
-        public String getPhone() {
-            return phone;
-        }
-
-        public void setPhone(String phone) {
-            this.phone = phone;
-        }
-
-        public String getGender() {
-            return gender;
-        }
-
-        public void setGender(String gender) {
-            this.gender = gender;
-        }
-
-        public String getBirthday() {
-            return birthday;
-        }
-
-        public void setBirthday(String birthday) {
-            this.birthday = birthday;
-        }
-    }
-
     // 更新用户信息
     @PutMapping("/updateInfo")
     @Transactional
-    public Result updateInfo(@RequestBody UpdateInfoRequest request) {
+    public Result updateInfo(@RequestBody UpdateInfoRequestDTO request) {
         try {
             Long userId = request.getUserId();
             // 如果未指定userId，使用当前登录用户
@@ -934,51 +857,10 @@ public class UserController extends ApiController {
         }
     }
 
-    // 修改密码请求参数类
-    static class ChangePasswordRequest {
-        private Long userId;
-        private String oldPassword;
-        private String newPassword;
-        private String verificationCode;
-
-        // getter和setter
-        public Long getUserId() {
-            return userId;
-        }
-
-        public void setUserId(Long userId) {
-            this.userId = userId;
-        }
-
-        public String getOldPassword() {
-            return oldPassword;
-        }
-
-        public void setOldPassword(String oldPassword) {
-            this.oldPassword = oldPassword;
-        }
-
-        public String getNewPassword() {
-            return newPassword;
-        }
-
-        public void setNewPassword(String newPassword) {
-            this.newPassword = newPassword;
-        }
-
-        public String getVerificationCode() {
-            return verificationCode;
-        }
-
-        public void setVerificationCode(String verificationCode) {
-            this.verificationCode = verificationCode;
-        }
-    }
-
     // 修改密码
     @PostMapping("/changePassword")
     @Transactional
-    public Result changePassword(@RequestBody ChangePasswordRequest request) {
+    public Result changePassword(@RequestBody ChangePasswordRequestDTO request) {
         try {
             Long userId = request.getUserId();
             // 如果未指定userId，使用当前登录用户
@@ -1035,29 +917,9 @@ public class UserController extends ApiController {
 
     // ===== 二、用户状态与安全控制接口 =====
 
-    // 用户状态响应类
-    static class UserStatusResponse {
-        private Integer status; // 1-正常，2-冻结，3-禁用
-        private String reason; // 状态原因
-
-        public UserStatusResponse(Integer status, String reason) {
-            this.status = status;
-            this.reason = reason;
-        }
-
-        // getter
-        public Integer getStatus() {
-            return status;
-        }
-
-        public String getReason() {
-            return reason;
-        }
-    }
-
     // 查询用户状态
     @GetMapping("/status/{userId}")
-    public Result<UserStatusResponse> getUserStatus(@PathVariable Long userId) {
+    public Result<UserStatusResponseDTO> getUserStatus(@PathVariable Long userId) {
         try {
             User user = userService.getById(userId);
             if (user == null) {
@@ -1066,43 +928,11 @@ public class UserController extends ApiController {
 
             // 这里简化处理，实际应根据用户状态字段返回
             // 模拟返回正常状态
-            UserStatusResponse response = new UserStatusResponse(1, "");
+            UserStatusResponseDTO response = new UserStatusResponseDTO(1, "");
             return Result.success(response);
         } catch (Exception e) {
             log.error("查询用户状态失败", e);
             return Result.error("查询失败，请稍后重试");
-        }
-    }
-
-    // 冻结/解冻用户请求参数类
-    static class FreezeRequest {
-        private Long userId;
-        private Boolean freeze;
-        private String reason;
-
-        // getter和setter
-        public Long getUserId() {
-            return userId;
-        }
-
-        public void setUserId(Long userId) {
-            this.userId = userId;
-        }
-
-        public Boolean getFreeze() {
-            return freeze;
-        }
-
-        public void setFreeze(Boolean freeze) {
-            this.freeze = freeze;
-        }
-
-        public String getReason() {
-            return reason;
-        }
-
-        public void setReason(String reason) {
-            this.reason = reason;
         }
     }
 }
