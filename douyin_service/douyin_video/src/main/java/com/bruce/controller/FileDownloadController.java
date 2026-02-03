@@ -1,5 +1,6 @@
 package com.bruce.controller;
 
+import com.bruce.pojo.Result;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,14 +27,14 @@ public class FileDownloadController {
      */
     @GetMapping("/files/{fileName}/info")
     // JDK 1.8 兼容版本
-    public Map<String, Object> getFileInfo(@PathVariable String fileName) {
+    public Result<Map<String, Object>> getFileInfo(@PathVariable String fileName) {
         Path filePath = Paths.get(storagePath, fileName);
         if (!Files.exists(filePath)) {
             // 使用 HashMap 替代 Map.of()
             Map<String, Object> result = new HashMap<>();
             result.put("exists", false);
             result.put("message", "文件不存在");
-            return result;
+            return Result.success(result);
         }
 
         try {
@@ -44,13 +45,13 @@ public class FileDownloadController {
             result.put("fileName", fileName);
             result.put("fileSize", fileSize);
             result.put("message", "文件信息获取成功");
-            return result;
+            return Result.success(result);
         } catch (IOException e) {
             // 使用 HashMap 替代 Map.of()
             Map<String, Object> result = new HashMap<>();
             result.put("exists", false);
             result.put("message", "获取文件大小失败");
-            return result;
+            return Result.success(result);
         }
     }
 
@@ -128,7 +129,7 @@ public class FileDownloadController {
      * 简历上传接口
      */
     @PostMapping("/api/resume/upload")
-    public Map<String, Object> uploadResume(
+    public Result<Map<String, Object>> uploadResume(
             @RequestParam("file") MultipartFile file) {
         try {
             // 检查文件是否为空
@@ -136,7 +137,7 @@ public class FileDownloadController {
                 Map<String, Object> result = new HashMap<>();
                 result.put("success", false);
                 result.put("message", "上传文件不能为空");
-                return result;
+                return Result.success(result);
             }
 
             // 检查文件类型
@@ -145,7 +146,7 @@ public class FileDownloadController {
                 Map<String, Object> result = new HashMap<>();
                 result.put("success", false);
                 result.put("message", "只能上传docx或pdf文件");
-                return result;
+                return Result.success(result);
             }
 
             // 保存文件到指定目录，使用固定文件名
@@ -162,13 +163,13 @@ public class FileDownloadController {
             result.put("success", true);
             result.put("message", "简历上传成功");
             result.put("data", getResumeInfo());
-            return result;
+            return Result.success(result);
         } catch (IOException e) {
             e.printStackTrace();
             Map<String, Object> result = new HashMap<>();
             result.put("success", false);
             result.put("message", "简历上传失败：" + e.getMessage());
-            return result;
+            return Result.success(result);
         }
     }
 
@@ -176,7 +177,7 @@ public class FileDownloadController {
      * 获取简历信息
      */
     @GetMapping("/api/resume/info")
-    public Map<String, Object> getResumeInfo() {
+    public Result<Map<String, Object>> getResumeInfo() {
         try {
             String filename = "陈雪明的简历.docx";
             Path filePath = Paths.get(storagePath, filename);
@@ -185,7 +186,7 @@ public class FileDownloadController {
                 Map<String, Object> result = new HashMap<>();
                 result.put("success", false);
                 result.put("message", "简历不存在");
-                return result;
+                return Result.success(result);
             }
 
             long fileSize = Files.size(filePath);
@@ -200,13 +201,13 @@ public class FileDownloadController {
             result.put("success", true);
             result.put("message", "获取简历信息成功");
             result.put("data", resumeInfo);
-            return result;
+            return Result.success(result);
         } catch (IOException e) {
             e.printStackTrace();
             Map<String, Object> result = new HashMap<>();
             result.put("success", false);
             result.put("message", "获取简历信息失败：" + e.getMessage());
-            return result;
+            return Result.success(result);
         }
     }
 
@@ -214,7 +215,7 @@ public class FileDownloadController {
      * 更新简历接口（与上传接口功能相同，用于语义化区分）
      */
     @PostMapping("/api/resume/update")
-    public Map<String, Object> updateResume(
+    public Result<Map<String, Object>> updateResume(
             @RequestParam("file") MultipartFile file) {
         // 复用上传接口的逻辑
         return uploadResume(file);

@@ -1,12 +1,12 @@
 package com.bruce.controller;
 
 import com.bruce.dto.LikeMessage;
+import com.bruce.pojo.Result;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -29,7 +29,7 @@ public class RabbitMQController {
      * @return 响应结果
      */
     @PostMapping("/send/simple")
-    public ResponseEntity<Map<String, Object>> sendSimpleMessage(
+    public Result<Map<String, Object>> sendSimpleMessage(
             @RequestParam String exchange,
             @RequestParam String routingKey,
             @RequestParam String message) {
@@ -39,11 +39,11 @@ public class RabbitMQController {
             rabbitTemplate.convertAndSend(exchange, routingKey, message);
             response.put("code", 200);
             response.put("message", "消息发送成功");
-            return ResponseEntity.ok(response);
+            return Result.success(response);
         } catch (Exception e) {
             response.put("code", 500);
             response.put("message", "消息发送失败: " + e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            return Result.success(response);
         }
     }
 
@@ -56,7 +56,7 @@ public class RabbitMQController {
      * @return 响应结果
      */
     @PostMapping("/send/persistent")
-    public ResponseEntity<Map<String, Object>> sendPersistentMessage(
+    public Result<Map<String, Object>> sendPersistentMessage(
             @RequestParam String exchange,
             @RequestParam String routingKey,
             @RequestParam String message) {
@@ -69,11 +69,11 @@ public class RabbitMQController {
             });
             response.put("code", 200);
             response.put("message", "持久化消息发送成功");
-            return ResponseEntity.ok(response);
+            return Result.success(response);
         } catch (Exception e) {
             response.put("code", 500);
             response.put("message", "持久化消息发送失败: " + e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            return Result.success(response);
         }
     }
 
@@ -86,7 +86,7 @@ public class RabbitMQController {
      * @return 响应结果
      */
     @PostMapping("/send/object")
-    public ResponseEntity<Map<String, Object>> sendObjectMessage(
+    public Result<Map<String, Object>> sendObjectMessage(
             @RequestParam String exchange,
             @RequestParam String routingKey,
             @RequestBody LikeMessage likeMessage) {
@@ -96,11 +96,11 @@ public class RabbitMQController {
             rabbitTemplate.convertAndSend(exchange, routingKey, likeMessage);
             response.put("code", 200);
             response.put("message", "对象消息发送成功");
-            return ResponseEntity.ok(response);
+            return Result.success(response);
         } catch (Exception e) {
             response.put("code", 500);
             response.put("message", "对象消息发送失败: " + e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            return Result.success(response);
         }
     }
 
@@ -113,7 +113,7 @@ public class RabbitMQController {
      * @return 响应结果
      */
     @PostMapping("/send/with-callback")
-    public ResponseEntity<Map<String, Object>> sendMessageWithCallback(
+    public Result<Map<String, Object>> sendMessageWithCallback(
             @RequestParam String exchange,
             @RequestParam String routingKey,
             @RequestParam String message) {
@@ -125,11 +125,11 @@ public class RabbitMQController {
             response.put("code", 200);
             response.put("message", "带回调消息发送成功");
             response.put("correlationId", correlationData.getId());
-            return ResponseEntity.ok(response);
+            return Result.success(response);
         } catch (Exception e) {
             response.put("code", 500);
             response.put("message", "带回调消息发送失败: " + e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            return Result.success(response);
         }
     }
 
@@ -142,7 +142,7 @@ public class RabbitMQController {
      * @return 响应结果
      */
     @PostMapping("/send/batch")
-    public ResponseEntity<Map<String, Object>> sendBatchMessages(
+    public Result<Map<String, Object>> sendBatchMessages(
             @RequestParam String exchange,
             @RequestParam String routingKey,
             @RequestBody String[] messages) {
@@ -155,11 +155,11 @@ public class RabbitMQController {
             response.put("code", 200);
             response.put("message", "批量消息发送成功");
             response.put("count", messages.length);
-            return ResponseEntity.ok(response);
+            return Result.success(response);
         } catch (Exception e) {
             response.put("code", 500);
             response.put("message", "批量消息发送失败: " + e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            return Result.success(response);
         }
     }
 
@@ -169,18 +169,18 @@ public class RabbitMQController {
      * @return 响应结果
      */
     @GetMapping("/status")
-    public ResponseEntity<Map<String, Object>> getRabbitMQStatus() {
+    public Result<Map<String, Object>> getRabbitMQStatus() {
         Map<String, Object> response = new HashMap<>();
         try {
             // 检查连接是否正常
             rabbitTemplate.getConnectionFactory().createConnection().close();
             response.put("code", 200);
             response.put("message", "RabbitMQ连接正常");
-            return ResponseEntity.ok(response);
+            return Result.success(response);
         } catch (Exception e) {
             response.put("code", 500);
             response.put("message", "RabbitMQ连接异常: " + e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            return Result.success(response);
         }
     }
 }

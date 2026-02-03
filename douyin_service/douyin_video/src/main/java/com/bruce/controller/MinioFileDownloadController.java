@@ -1,5 +1,6 @@
 package com.bruce.controller;
 
+import com.bruce.pojo.Result;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.ObjectStat;
@@ -46,13 +47,12 @@ public class MinioFileDownloadController {
      * 获取文件信息（用于前端初始化下载）
      */
     @GetMapping("/files/{fileName}/info")
-    public Map<String, Object> getFileInfo(@PathVariable String fileName) {
+    public Result<Map<String, Object>> getFileInfo(@PathVariable String fileName) {
         Map<String, Object> result = new HashMap<>();
         try {
             // 查询文件元信息
             ObjectStat stat = minioClient.statObject(bucketName, fileName);
             long fileSize = stat.length();
-
 
             result.put("exists", true);
             result.put("fileName", fileName);
@@ -65,7 +65,7 @@ public class MinioFileDownloadController {
             result.put("exists", false);
             result.put("message", "未知错误：" + e.getMessage());
         }
-        return result;
+        return Result.success(result);
     }
 
     /**
@@ -80,7 +80,6 @@ public class MinioFileDownloadController {
             // 获取文件大小
             ObjectStat stat = minioClient.statObject(bucketName, fileName);
             long fileSize = stat.length();
-
 
             // 解析Range请求头
             String rangeHeader = request.getHeader("Range");
@@ -106,7 +105,8 @@ public class MinioFileDownloadController {
             // 设置响应头
             response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
             response.setContentType("application/octet-stream");
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + URLEncoder.encode(fileName, "UTF-8") + "\"");
+            response.setHeader("Content-Disposition",
+                    "attachment; filename=\"" + URLEncoder.encode(fileName, "UTF-8") + "\"");
             response.setHeader("Accept-Ranges", "bytes");
             response.setHeader("Content-Range", "bytes " + start + "-" + end + "/" + fileSize);
             response.setContentLengthLong(contentLength);
@@ -119,8 +119,8 @@ public class MinioFileDownloadController {
                             .offset(start)
                             .length(contentLength)
                             .build());
-                 // 输出到响应流
-                 java.io.OutputStream out = response.getOutputStream()) {
+                    // 输出到响应流
+                    java.io.OutputStream out = response.getOutputStream()) {
 
                 byte[] buffer = new byte[8192];
                 int bytesRead;

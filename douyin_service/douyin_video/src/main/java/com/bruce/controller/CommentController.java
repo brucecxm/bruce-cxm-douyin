@@ -2,10 +2,10 @@ package com.bruce.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.api.ApiController;
-import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.dict.Constant;
 import com.bruce.entity.Comment;
+import com.bruce.pojo.Result;
 import com.bruce.service.CommentService;
 import com.bruce.service.IdService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class CommentController extends ApiController {
 
     // Controller 层
     @GetMapping("/getFatherComment")
-    public R getFatherComment(@RequestParam Map<String, Object> params) {
+    public Result<Page<Comment>> getFatherComment(@RequestParam Map<String, Object> params) {
         String videoId = String.valueOf(params.get("videoId"));
         int pageNum = Integer.parseInt(String.valueOf(params.getOrDefault(Constant.ApiParam.PAGE, 1)));
         int pageSize = Integer.parseInt(String.valueOf(params.getOrDefault(Constant.ApiParam.LIMIT, 10)));
@@ -44,12 +44,11 @@ public class CommentController extends ApiController {
         queryWrapper.eq(Comment::getCommentId, videoId)
                 .isNull(Comment::getFatherId);
         Page<Comment> result = commentService.page(page, queryWrapper);
-        return R.ok(result);
+        return Result.success(result);
     }
 
-
     @PostMapping("/addVideoComment")
-    public R addVideoComment(@RequestBody Map<String, Object> params) {
+    public Result<String> addVideoComment(@RequestBody Map<String, Object> params) {
         // 输出接收到的参数
         Comment comment = new Comment();
         comment.setComment((String) params.get(Constant.ApiParam.COMMENT));
@@ -60,35 +59,37 @@ public class CommentController extends ApiController {
         comment.setUserId((Long) params.get("userId"));
         commentService.save(comment);
         // 这里可以处理评论逻辑
-        return R.ok("评论成功");  // 返回成功响应
+        return Result.success("评论成功"); // 返回成功响应
     }
 
-//    @GetMapping("/getzi")
-//    //获得对应父评论的子评论
-//    public R getzi(@RequestParam("fu_id") int fu_id) {
-//        List<CommentDto> m = commentservice.getcommenti(fu_id);
-//        return R.ok(m);
-//    }
-//
+    // @GetMapping("/getzi")
+    // //获得对应父评论的子评论
+    // public R getzi(@RequestParam("fu_id") int fu_id) {
+    // List<CommentDto> m = commentservice.getcommenti(fu_id);
+    // return R.ok(m);
+    // }
+    //
 
     @GetMapping("/likeping")
-    public R likeping(@RequestParam boolean like, int comment_id, int user_id) {
+    public Result<Object> likeping(@RequestParam boolean like, int comment_id, int user_id) {
         if (like == true) {
-//            insert comment_user into (comment_id,user_id,like_or_dislike) (&{comment_id},&{user_id},&{like})
+            // insert comment_user into (comment_id,user_id,like_or_dislike)
+            // (&{comment_id},&{user_id},&{like})
         } else {
-//            insert comment_user into (comment_id,user_id,like_or_dislike) (&{comment_id},&{user_id},&{dislike})
+            // insert comment_user into (comment_id,user_id,like_or_dislike)
+            // (&{comment_id},&{user_id},&{dislike})
         }
-        return R.ok(null);
+        return Result.success(null);
     }
 
     @GetMapping("/insertpinglun")
-    public R insertpinglun(@RequestParam int lastId) {
+    public Result<Object> insertpinglun(@RequestParam int lastId) {
         if (lastId == -1) {
-//            分配id  并且将其父字段设置为-1
-            return R.ok(null);
+            // 分配id 并且将其父字段设置为-1
+            return Result.success(null);
         } else {
-//            分配id  父id设置为lastid
-            return R.ok(null);
+            // 分配id 父id设置为lastid
+            return Result.success(null);
         }
     }
 }

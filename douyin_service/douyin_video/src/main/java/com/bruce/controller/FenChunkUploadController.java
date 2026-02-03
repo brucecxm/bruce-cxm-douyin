@@ -1,6 +1,8 @@
 package com.bruce.controller;
+
 import com.bruce.entity.VideoInfo;
 import com.bruce.file.service.FileStorageService;
+import com.bruce.pojo.Result;
 import com.bruce.service.VideoInfoService;
 import com.bruce.utils.FfmpegUtils;
 import io.minio.*;
@@ -29,17 +31,15 @@ public class FenChunkUploadController {
     @Autowired
     private VideoInfoService videoInfoService;
 
-
-
     @Autowired
-    private FfmpegUtils ffmpegUtils;  // 注入FFmpeg工具类
+    private FfmpegUtils ffmpegUtils; // 注入FFmpeg工具类
 
     @Value("${video.temp.dir}")
-    private String videoTempDir;  // 本地临时目录
+    private String videoTempDir; // 本地临时目录
 
     private final String BUCKET = "douyin";
     // HLS文件存储路径（MinIO中）
-    private final String HLS_PREFIX = "testfile/hls/";  // .m3u8和.ts存放的根路径
+    private final String HLS_PREFIX = "testfile/hls/"; // .m3u8和.ts存放的根路径
 
     @Autowired
     private FileStorageService fileStorageService; // 注入 MinIOFileStorageService
@@ -48,18 +48,17 @@ public class FenChunkUploadController {
      * 查询已上传分片（在 MinIO 中查询已存在的 .part 文件）
      */
     @GetMapping("/check")
-    public Map<String, Object> checkUploadedChunks(@RequestParam String fileHash) throws Exception {
+    public Result<Map<String, Object>> checkUploadedChunks(@RequestParam String fileHash) throws Exception {
         List<Integer> uploaded = new ArrayList<>();
 
-        Iterable<Result<Item>> results = minioClient.listObjects(
+        Iterable<io.minio.Result<Item>> results = minioClient.listObjects(
                 ListObjectsArgs.builder()
                         .bucket(BUCKET)
                         .prefix("testfile/temp/" + fileHash + "/")
                         .recursive(true)
-                        .build()
-        );
+                        .build());
 
-        for (Result<Item> result : results) {
+        for (io.minio.Result<Item> result : results) {
             Item item = result.get();
             String objectName = item.objectName();
             if (objectName.endsWith(".part")) {
@@ -70,17 +69,16 @@ public class FenChunkUploadController {
 
         Map<String, Object> map = new HashMap<>();
         map.put("uploaded", uploaded);
-        return map;
+        return Result.success(map);
     }
-
 
     /**
      * 上传分片（直接上传到 MinIO）
      */
     @PostMapping("/chunk")
-    public String uploadChunk(@RequestParam("file") MultipartFile file,
-                              @RequestParam("index") Integer index,
-                              @RequestParam("fileHash") String fileHash) throws Exception {
+    public Result<String> uploadChunk(@RequestParam("file") MultipartFile file,
+            @RequestParam("index") Integer index,
+            @RequestParam("fileHash") String fileHash) throws Exception {
 
         String objectName = "testfile/temp/" + fileHash + "/" + index + ".part";
 
@@ -90,25 +88,22 @@ public class FenChunkUploadController {
                         .object(objectName)
                         .stream(file.getInputStream(), file.getSize(), -1)
                         .contentType("application/octet-stream")
-                        .build()
-        );
+                        .build());
 
-        return "分片 " + index + " 上传成功";
+        return Result.success("分片 " + index + " 上传成功");
     }
-
 
     /**
      * 改造核心：合并分片 + 转换为HLS + 上传.m3u8和.ts
      */
     @PostMapping("/merge")
-    public Map<String, Object> mergeChunks(@RequestBody Map<String, Object> param) throws Exception {
+    public Result<Map<String, Object>> mergeChunks(@RequestBody Map<String, Object> param) throws Exception {
         String fileName = (String) param.get("fileName");
         String fileHash = (String) param.get("fileHash");
         Integer total = (Integer) param.get("total");
         String datePath = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
         // 合并后的完整视频在MinIO中的路径（原始视频，转换后可删除）
         String originalObjectName = "testfile/" + datePath + "/" + fileName;
-
 
         // -------------------------- 步骤1：合并分片为完整视频（原有逻辑） --------------------------
         List<ComposeSource> sources = new ArrayList<>();
@@ -125,19 +120,16 @@ public class FenChunkUploadController {
                         .bucket(BUCKET)
                         .object(originalObjectName)
                         .sources(sources)
-                        .build()
-        );
-
+                        .build());
 
         // -------------------------- 新增步骤：将完整视频转换为HLS格式 --------------------------
         // 1. 创建本地临时目录（存放转换过程文件）
-//        String localTempDir = videoTempDir + fileHash + "/";
+        // String localTempDir = videoTempDir + fileHash + "/";
         Path localTempPath = Paths.get(videoTempDir, fileHash);
         String localTempDir = localTempPath.toString();
         Files.createDirectories(Paths.get(localTempDir));
         // 本地临时保存的完整视频路径
         String localOriginalPath = localTempDir + "original." + getFileExtension(fileName);
-
 
         // 2. 将MinIO中的完整视频下载到本地临时目录
         try (InputStream in = minioClient.getObject(
@@ -145,8 +137,7 @@ public class FenChunkUploadController {
                         .bucket(BUCKET)
                         .object(originalObjectName)
                         .build());
-             OutputStream out = Files.newOutputStream(Paths.get(localOriginalPath))
-        ) {
+                OutputStream out = Files.newOutputStream(Paths.get(localOriginalPath))) {
             byte[] buffer = new byte[8192];
             int bytesRead;
             while ((bytesRead = in.read(buffer)) != -1) {
@@ -154,16 +145,13 @@ public class FenChunkUploadController {
             }
         }
 
-
         // 3. 调用FFmpeg转换为HLS（生成.m3u8和.ts）
-        String hlsLocalDir = localTempDir + "hls/";  // 本地存放HLS文件的目录
+        String hlsLocalDir = localTempDir + "hls/"; // 本地存放HLS文件的目录
         ffmpegUtils.convertToHls(localOriginalPath, hlsLocalDir);
 
-
         // 4. 将HLS文件（.m3u8和.ts）上传到MinIO
-        String hlsMinioDir = HLS_PREFIX + fileHash + "/";  // MinIO中HLS文件的路径
+        String hlsMinioDir = HLS_PREFIX + fileHash + "/"; // MinIO中HLS文件的路径
         uploadLocalDirToMinIO(hlsLocalDir, hlsMinioDir);
-
 
         // -------------------------- 清理资源 --------------------------
         // 删除本地临时文件（避免占用磁盘）
@@ -173,14 +161,9 @@ public class FenChunkUploadController {
                 RemoveObjectArgs.builder()
                         .bucket(BUCKET)
                         .object(originalObjectName)
-                        .build()
-        );
+                        .build());
         // 删除临时分片（原有逻辑）
         deleteTempParts(fileHash);
-
-
-
-
 
         // -------------------------- 新增：将视频信息存入数据库 --------------------------
         // 1. 获取视频元信息（时长、大小等）
@@ -202,19 +185,17 @@ public class FenChunkUploadController {
         // -------------------------- 构建返回结果 --------------------------
         Map<String, Object> result = new HashMap<>();
         result.put("message", "合并并转换HLS完成");
-        result.put("originalUrl", originalObjectName);  // 原始视频路径（可选，已删除则返回null）
-        result.put("m3u8Url", hlsMinioDir + "index.m3u8");  // .m3u8索引文件路径（前端播放用）
-        result.put("m3u8AccessUrl", generatePresignedUrl(hlsMinioDir + "index.m3u8"));  // 带签名的临时访问URL
-        return result;
+        result.put("originalUrl", originalObjectName); // 原始视频路径（可选，已删除则返回null）
+        result.put("m3u8Url", hlsMinioDir + "index.m3u8"); // .m3u8索引文件路径（前端播放用）
+        result.put("m3u8AccessUrl", generatePresignedUrl(hlsMinioDir + "index.m3u8")); // 带签名的临时访问URL
+        return Result.success(result);
     }
-
-
 
     /**
      * 合并分片（从 MinIO 拉取分片拼接后直接上传回 MinIO）
      */
     @PostMapping("/mergebefore")
-    public Map<String, Object> mergeChunksbefore(@RequestBody Map<String, Object> param) throws Exception {
+    public Result<Map<String, Object>> mergeChunksbefore(@RequestBody Map<String, Object> param) throws Exception {
         String fileName = (String) param.get("fileName");
         String fileHash = (String) param.get("fileHash");
         Integer total = (Integer) param.get("total");
@@ -251,15 +232,14 @@ public class FenChunkUploadController {
         mergeThread.join();
 
         // 删除临时分片
-        Iterable<Result<Item>> results = minioClient.listObjects(
+        Iterable<io.minio.Result<Item>> results = minioClient.listObjects(
                 ListObjectsArgs.builder()
                         .bucket(BUCKET)
                         .prefix("testfile/temp/" + fileHash + "/")
                         .recursive(true)
-                        .build()
-        );
+                        .build());
 
-        for (Result<Item> result : results) {
+        for (io.minio.Result<Item> result : results) {
             Item item = result.get();
             String objectName = item.objectName();
             minioClient.removeObject(RemoveObjectArgs.builder()
@@ -271,19 +251,8 @@ public class FenChunkUploadController {
         Map<String, Object> result = new HashMap<>();
         result.put("message", "上传并合并完成，已上传至 MinIO");
         result.put("minioUrl", minioUrl);
-        return result;
+        return Result.success(result);
     }
-
-
-
-
-
-
-
-
-
-
-
 
     // -------------------------- 工具方法 --------------------------
 
@@ -293,7 +262,8 @@ public class FenChunkUploadController {
     private void uploadLocalDirToMinIO(String localDir, String minioDir) throws Exception {
         File dir = new File(localDir);
         File[] files = dir.listFiles();
-        if (files == null) return;
+        if (files == null)
+            return;
 
         for (File file : files) {
             if (file.isFile()) {
@@ -304,8 +274,7 @@ public class FenChunkUploadController {
                                 .object(minioObjectName)
                                 .filename(file.getAbsolutePath())
                                 .contentType(getContentType(file.getName()))
-                                .build()
-                );
+                                .build());
             }
         }
     }
@@ -319,30 +288,27 @@ public class FenChunkUploadController {
                         .method(Method.GET)
                         .bucket(BUCKET)
                         .object(objectName)
-                        .expiry(3600)  // 1小时有效期
-                        .build()
-        );
+                        .expiry(3600) // 1小时有效期
+                        .build());
     }
 
     /**
      * 删除MinIO中的临时分片
      */
     private void deleteTempParts(String fileHash) throws Exception {
-        Iterable<Result<Item>> results = minioClient.listObjects(
+        Iterable<io.minio.Result<Item>> results = minioClient.listObjects(
                 ListObjectsArgs.builder()
                         .bucket(BUCKET)
                         .prefix("testfile/temp/" + fileHash + "/")
                         .recursive(true)
-                        .build()
-        );
-        for (Result<Item> result : results) {
+                        .build());
+        for (io.minio.Result<Item> result : results) {
             Item item = result.get();
             minioClient.removeObject(
                     RemoveObjectArgs.builder()
                             .bucket(BUCKET)
                             .object(item.objectName())
-                            .build()
-            );
+                            .build());
         }
     }
 

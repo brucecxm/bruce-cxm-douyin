@@ -1,13 +1,12 @@
 package com.bruce.controller;
 
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.ApiController;
-import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.dao.musiconeDao;
 import com.bruce.entity.Music;
 import com.bruce.entity.Video;
+import com.bruce.pojo.Result;
 import com.bruce.service.MusicService;
 import com.bruce.service.VideoService;
 import org.slf4j.Logger;
@@ -32,9 +31,7 @@ import java.util.Map;
 @RequestMapping("/video/music")
 public class MusicController extends ApiController {
 
-
     private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
-
 
     @Autowired
     private musiconeDao musiconedao;
@@ -45,10 +42,8 @@ public class MusicController extends ApiController {
     @Resource
     private MusicService musicService;
 
-
     @Resource
     private VideoService videoService;
-
 
     /**
      * 通过主键查询单条数据
@@ -57,12 +52,12 @@ public class MusicController extends ApiController {
      * @return 单条数据
      */
     @GetMapping("{id}")
-    public R selectOne(@PathVariable Serializable id) {
-        return success(this.musicService.getById(id));
+    public Result<Music> selectOne(@PathVariable Serializable id) {
+        return Result.success(this.musicService.getById(id));
     }
 
     @GetMapping("/getmusicbefore")
-    public Map selectOnebefore(String musicId) {
+    public Result<Map> selectOnebefore(String musicId) {
         List<Map> one = musiconedao.one(musicId);
         List<Map> videoArr = new ArrayList<Map>();
         for (Map a : one) {
@@ -74,12 +69,12 @@ public class MusicController extends ApiController {
         Map oneww = new HashMap();
         oneww.put("videoimg", videoArr);
         oneww.put("music_info", one.get(0));
-        return oneww;
+        return Result.success(oneww);
 
     }
 
     @GetMapping("/getmusic")
-    public Map<String, Object> selectOne(
+    public Result<Map<String, Object>> selectOne(
             @RequestParam(value = "musicId", required = true) String musicId,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
@@ -110,11 +105,8 @@ public class MusicController extends ApiController {
         result.put("page", page);
         result.put("size", size);
 
-        return result;
+        return Result.success(result);
     }
-
-
-
 
     /**
      * 删除数据
@@ -123,18 +115,17 @@ public class MusicController extends ApiController {
      * @return 删除结果
      */
     @DeleteMapping
-    public R delete(@RequestParam("idList") List<Long> idList) {
-        return success(this.musicService.removeByIds(idList));
+    public Result<Boolean> delete(@RequestParam("idList") List<Long> idList) {
+        return Result.success(this.musicService.removeByIds(idList));
     }
-    
+
     /**
      * 获取音乐列表
      *
      * @return 音乐列表
      */
     @GetMapping("/list")
-    public R<List<Music>> getMusicList() {
-        return success(this.musicService.list());
+    public Result<List<Music>> getMusicList() {
+        return Result.success(this.musicService.list());
     }
 }
-
