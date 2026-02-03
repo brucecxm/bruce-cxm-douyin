@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.minio.http.Method;
 import com.bruce.dict.Constant;
 import com.bruce.dto.LikeMessage;
+import com.bruce.dto.LikeRequestDTo;
 import com.bruce.entity.*;
 import com.bruce.service.LocationService;
 import com.bruce.service.PrivacyService;
@@ -267,7 +268,7 @@ public class VideoController extends ApiController {
     }
 
     @PostMapping("/like")
-    public ResponseEntity<Map<String, Object>> like(@RequestBody LikeRequest likeRequest) {
+    public ResponseEntity<Map<String, Object>> like(@RequestBody LikeRequestDTo likeRequest) {
         try {
             StpUtil.checkLogin();
         } catch (NotLoginException e) {
@@ -389,7 +390,7 @@ public class VideoController extends ApiController {
     }
 
     @PostMapping("/collect")
-    public ResponseEntity<Map<String, Object>> collect(@RequestBody LikeRequest likeRequest) {
+    public ResponseEntity<Map<String, Object>> collect(@RequestBody LikeRequestDTo likeRequest) {
         try {
             StpUtil.checkLogin();
         } catch (NotLoginException e) {
@@ -508,38 +509,6 @@ public class VideoController extends ApiController {
         response.put("data", data);
 
         return ResponseEntity.ok(response);
-    }
-
-    // 点赞请求对象
-    static class LikeRequest {
-        private Long contentId;
-        private String type;
-        private String contentType;
-
-        // getter and setter methods
-        public Long getContentId() {
-            return contentId;
-        }
-
-        public void setContentId(Long contentId) {
-            this.contentId = contentId;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public String getContentType() {
-            return contentType;
-        }
-
-        public void setContentType(String contentType) {
-            this.contentType = contentType;
-        }
     }
 
     @Autowired
@@ -916,7 +885,6 @@ public class VideoController extends ApiController {
             return Result.error("调用用户服务失败，请稍后重试");
         }
     }
-
     // 测试获取用户列表
     @GetMapping("/testUserList")
     public Result<Object> testUserList() {
