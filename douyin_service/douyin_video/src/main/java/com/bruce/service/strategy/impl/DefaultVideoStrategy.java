@@ -54,7 +54,7 @@ public class DefaultVideoStrategy implements VideoStrategy {
     private CommentService commentService;
 
     @Override
-    public List<Map<String, Object>> getVideos(int page, int size) {
+    public List<VideoVO> getVideos(int page, int size) {
         Page<Video> pageInfo = new Page<>(page, size);
         // LambdaQueryWrapper 用于 Video 表查询
         LambdaQueryWrapper<Video> videoQueryWrapper = new LambdaQueryWrapper<Video>()
@@ -62,7 +62,7 @@ public class DefaultVideoStrategy implements VideoStrategy {
         IPage<Video> videoPage = videoDao.selectPage(pageInfo,
                 videoQueryWrapper);
         List<Video> videos = videoPage.getRecords();
-        List<Map<String, Object>> result = new ArrayList<>();
+        List<VideoVO> result = new ArrayList<>();
 
         // 获取当前登录用户ID
         Long loginUserId = AuthUtils.getCurrentUserId();
@@ -132,6 +132,7 @@ public class DefaultVideoStrategy implements VideoStrategy {
                     isLiked = favorService.count(userLikeQuery) > 0;
                 }
             }
+            vo.setLiked(isLiked);
 
             // 判断当前用户是否已收藏
             boolean isCollected = false;
@@ -149,25 +150,9 @@ public class DefaultVideoStrategy implements VideoStrategy {
                     isCollected = favorService.count(userCollectQuery) > 0;
                 }
             }
+            vo.setCollected(isCollected);
 
-            // 组装返回数据
-            Map<String, Object> map = new HashMap<>();
-            map.put(Constant.ApiParam.VIDEO_ID, vo.getVideoId());
-            map.put(Constant.ApiParam.USER_ID, vo.getUserId());
-            map.put(Constant.ApiParam.CONTENT, vo.getContent());
-            map.put(Constant.Video.VIDEO_URL, vo.getUrl());
-            map.put(Constant.User.USER_NAME, vo.getUsername());
-            map.put(Constant.User.USER_AVATAR, vo.getUserAvatar());
-            map.put(Constant.Music.MUSIC, vo.getMusic());
-            map.put(Constant.Music.MUSIC_AVATAR, vo.getMusicAvatar());
-            map.put(Constant.Stat.LIKE_NUM, vo.getLikeNum());
-            map.put(Constant.Stat.COMMENT_NUM, vo.getCommentNum());
-            map.put(Constant.Stat.COLLECT_NUM, vo.getCollectNum());
-            map.put(Constant.Stat.SHARE_NUM, vo.getShareNum());
-            map.put(Constant.ApiParam.MUSIC_ID, vo.getMusicId());
-            map.put("isLiked", isLiked); // 添加是否点赞的标识
-            map.put("isCollected", isCollected); // 添加是否收藏的标识
-            result.add(map);
+            result.add(vo);
         }
         return result;
     }

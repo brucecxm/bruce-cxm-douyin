@@ -227,7 +227,7 @@ public class VideoController extends ApiController {
     }
 
     @GetMapping("/getVideoPage")
-    public List<Map<String, Object>> getVideoInfo(
+    public List<VideoVO> getVideoInfo(
             @RequestParam(defaultValue = "1") @Min(value = 1, message = "页码page不能小于1") // 校验页码：最小值1
             int page,
 

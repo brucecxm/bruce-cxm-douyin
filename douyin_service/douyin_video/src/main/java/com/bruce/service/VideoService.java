@@ -3,6 +3,7 @@ package com.bruce.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.bruce.entity.Video;
+import com.bruce.vo.VideoVO;
 
 import java.util.List;
 import java.util.Map;
@@ -15,9 +16,9 @@ import java.util.Map;
  */
 public interface VideoService extends IService<Video> {
 
-     List<Map<String, Object>> getVideoPage(int page,
-                                                   int size,
-                                                   String videoType);
+     List<VideoVO> getVideoPage(int page,
+                                int size,
+                                String videoType);
 
 
 }

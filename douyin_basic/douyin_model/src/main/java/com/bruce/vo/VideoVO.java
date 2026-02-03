@@ -24,4 +24,7 @@ public class VideoVO {
     private Long type;
     private Long status;
     private Long title;
+    
+    private boolean isLiked;
+    private boolean isCollected;
 }

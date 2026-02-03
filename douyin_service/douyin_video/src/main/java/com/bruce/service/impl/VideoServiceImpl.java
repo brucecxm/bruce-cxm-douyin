@@ -72,7 +72,7 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
     private VideoStrategyFactory videoStrategyFactory;
 
     @Override
-    public List<Map<String, Object>> getVideoPage(int page,
+    public List<VideoVO> getVideoPage(int page,
             int size,
             String videoType) {
         // 根据videoType获取对应的策略
