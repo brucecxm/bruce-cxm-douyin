@@ -72,13 +72,7 @@
             <version>1.5</version>
         </dependency>
         <!-- Spring Boot DevTools，实现热加载 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
-            <optional>true</optional>
-        </dependency>
-        
+
         <!-- Exclude SpringFox from dependencies since this module doesn't use Swagger -->
         <dependency>
             <groupId>org.example</groupId>

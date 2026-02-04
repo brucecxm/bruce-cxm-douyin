@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bruce.dao.UserDao;
+import com.bruce.dto.UserInfoRequestDTO;
+import com.bruce.dto.UserInfoResponseDTO;
 import com.bruce.entity.User;
 import com.bruce.entity.Salt;
 import com.bruce.service.UserService;
@@ -153,10 +155,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     @Autowired
     private org.springframework.data.redis.core.StringRedisTemplate stringRedisTemplate;
-    
+
     @Autowired
     private com.bruce.service.strategy.CachingStrategyFactory cachingStrategyFactory;
-    
+
     @Autowired
     private com.bruce.service.VideoFeignService videoFeignService;
 
@@ -222,18 +224,18 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         try {
             // 获取缓存策略
             com.bruce.service.strategy.CachingStrategy strategy = cachingStrategyFactory.getStrategy(requestDTO.getType());
-            
+
             // 使用策略获取用户信息
             com.bruce.entity.UserInfo userInfo = strategy.getUserInfo(
                 requestDTO.getUserId(),
                 requestDTO.getPage(),
                 requestDTO.getPageSize()
             );
-            
+
             if (userInfo == null) {
                 return null;
             }
-            
+
             // 转换为响应DTO
             com.bruce.dto.UserInfoResponseDTO responseDTO = new com.bruce.dto.UserInfoResponseDTO();
             // 复制基本信息
@@ -249,7 +251,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             responseDTO.setAge(userInfo.getAge());
             responseDTO.setSchool(userInfo.getSchool());
             responseDTO.setGender(userInfo.getGender());
-            
+
             // 复制统计信息
             responseDTO.setFansCount(userInfo.getFansCount());
             responseDTO.setFollowCount(userInfo.getFollowCount());
@@ -257,7 +259,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             responseDTO.setFollowers(userInfo.getFollowers());
             responseDTO.setFollowing(userInfo.getFollowing());
             responseDTO.setMutualFollow(userInfo.getMutualFollow());
-            
+
             // 处理视频信息
             if (userInfo.getVideoPage() != null) {
                 // 转换视频列表为DTO
@@ -276,18 +278,18 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                     videoDTO.setStatus(video.getStatus());
                     videoDTOs.add(videoDTO);
                 }
-                
+
                 // 创建分页对象
                 com.baomidou.mybatisplus.core.metadata.IPage<com.bruce.dto.VideoDTO> videoPageDTO = new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>();
                 videoPageDTO.setRecords(videoDTOs);
                 videoPageDTO.setTotal(userInfo.getVideoPage().getTotal());
                 videoPageDTO.setSize(userInfo.getVideoPage().getSize());
                 videoPageDTO.setCurrent(userInfo.getVideoPage().getCurrent());
-                
+
                 responseDTO.setVideoPage(videoPageDTO);
                 responseDTO.setTotal((int) userInfo.getVideoPage().getTotal());
             }
-            
+
             return responseDTO;
         } catch (Exception e) {
             throw new RuntimeException("获取用户信息失败", e);
@@ -457,6 +459,94 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         }
 
         return success;
+    }
+
+    @Autowired
+    private org.springframework.amqp.rabbit.core.RabbitTemplate rabbitTemplate;
+
+    @Override
+    public java.util.Map<String, Object> getVerificationCode(String uuid, String userName) {
+        if (uuid == null || uuid.isEmpty()) {
+            uuid = String.valueOf(System.currentTimeMillis());
+        }
+        // 创建验证码对象（设置图片宽高和验证码字符数）
+        com.wf.captcha.SpecCaptcha captcha = new com.wf.captcha.SpecCaptcha(120, 40, 5);
+        captcha.setCharType(com.wf.captcha.base.Captcha.TYPE_DEFAULT);
+        String intervalKey = "code:interval:" + userName;
+        if (Boolean.TRUE.equals(stringRedisTemplate.hasKey(intervalKey))) {
+            throw new RuntimeException("验证码发送过于频繁，请稍后再试");
+        }
+        stringRedisTemplate.opsForValue().set(intervalKey, "1", 60, java.util.concurrent.TimeUnit.SECONDS);
+
+        // 存入 Redis，过期时间 3 分钟
+        stringRedisTemplate.opsForValue().set("CAPTCHA_" + uuid + userName, captcha.text(), 3, java.util.concurrent.TimeUnit.MINUTES);
+
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        result.put("uuid", uuid);
+        result.put("captcha", captcha);
+        return result;
+    }
+
+    @Override
+    public void getEmailVerificationCode(String email) {
+        // 生成验证码
+        String code = String.valueOf(new java.util.Random().nextInt(899999) + 100000);
+        // 存入 Redis，有效期 5 分钟
+        stringRedisTemplate.opsForValue().set("email:code:" + email, code, 5, java.util.concurrent.TimeUnit.MINUTES);
+        // 构造消息
+        java.util.Map<String, String> message = new java.util.HashMap<>();
+        message.put("email", email);
+        message.put("code", code);
+        // 发送到队列
+        rabbitTemplate.convertAndSend("email.queue", message);
+    }
+
+    @Override
+    public com.bruce.dto.UserStatusResponseDTO getUserStatus(Long userId) {
+        User user = this.getById(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("用户不存在");
+        }
+
+        // 模拟返回正常状态
+        return new com.bruce.dto.UserStatusResponseDTO(1, "");
+    }
+
+    @Override
+    public UserInfoResponseDTO getUserInfoWithLoginCheck(UserInfoRequestDTO requestDTO, Long currentUserId) {
+        // 如果未提供userId，使用当前登录用户ID
+        if (requestDTO.getUserId() == null) {
+            requestDTO.setUserId(currentUserId);
+        }
+
+        // 验证userId格式
+        if (requestDTO.getUserId() <= 0) {
+            throw new IllegalArgumentException("用户ID格式错误，请输入有效的数字ID");
+        }
+
+        return getUserInfo(requestDTO);
+    }
+
+    @Override
+    public boolean updateInfoWithLoginCheck(com.bruce.dto.UpdateInfoRequestDTO request, Long currentUserId) {
+        Long userId = request.getUserId();
+        // 如果未指定userId，使用当前登录用户
+        if (userId == null) {
+            userId = currentUserId;
+        }
+
+        return updateInfo(userId, request.getNickname(), request.getAvatar(), request.getPhone(), request.getGender());
+    }
+
+    @Override
+    public boolean changePasswordWithLoginCheck(com.bruce.dto.ChangePasswordRequestDTO request, Long currentUserId) {
+        Long userId = request.getUserId();
+        // 如果未指定userId，使用当前登录用户
+        if (userId == null) {
+            userId = currentUserId;
+        }
+
+        return changePassword(userId, request.getOldPassword(), request.getNewPassword(), request.getVerificationCode());
     }
 
     // 生成一个随机盐值

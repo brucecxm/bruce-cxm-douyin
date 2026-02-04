@@ -141,5 +141,51 @@ public interface UserService extends IService<User> {
      * @return 修改结果
      */
     boolean changePassword(Long userId, String oldPassword, String newPassword, String verificationCode);
+
+    /**
+     * 获取图片验证码
+     * @param uuid 唯一标识符
+     * @param userName 用户名
+     * @return 验证码信息
+     */
+    java.util.Map<String, Object> getVerificationCode(String uuid, String userName);
+
+    /**
+     * 获取邮箱验证码
+     * @param email 邮箱地址
+     * @return 验证码信息
+     */
+    void getEmailVerificationCode(String email);
+
+    /**
+     * 获取用户状态
+     * @param userId 用户ID
+     * @return 用户状态响应DTO
+     */
+    com.bruce.dto.UserStatusResponseDTO getUserStatus(Long userId);
+
+    /**
+     * 根据用户ID获取用户信息（带登录状态处理）
+     * @param requestDTO 用户信息请求DTO
+     * @param currentUserId 当前登录用户ID
+     * @return 用户信息响应DTO
+     */
+    UserInfoResponseDTO getUserInfoWithLoginCheck(UserInfoRequestDTO requestDTO, Long currentUserId);
+
+    /**
+     * 更新用户信息（带登录状态处理）
+     * @param request 更新信息请求DTO
+     * @param currentUserId 当前登录用户ID
+     * @return 更新结果
+     */
+    boolean updateInfoWithLoginCheck(com.bruce.dto.UpdateInfoRequestDTO request, Long currentUserId);
+
+    /**
+     * 修改密码（带登录状态处理）
+     * @param request 修改密码请求DTO
+     * @param currentUserId 当前登录用户ID
+     * @return 修改结果
+     */
+    boolean changePasswordWithLoginCheck(com.bruce.dto.ChangePasswordRequestDTO request, Long currentUserId);
 }
 

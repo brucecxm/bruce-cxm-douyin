@@ -74,6 +74,11 @@ public class UserController extends ApiController {
     @PostMapping("/update")
     public Result updateUserInfo(@RequestBody User user) {
         try {
+            // 参数校验
+            if (user == null) {
+                return Result.error("用户信息不能为空");
+            }
+
             // 获取当前登录用户ID
             Long userId = StpUtil.getLoginIdAsLong();
 
@@ -98,6 +103,11 @@ public class UserController extends ApiController {
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer pageSize) {
         try {
+            // 参数校验
+            if (page <= 0 || pageSize <= 0) {
+                return Result.error("页码和每页大小必须大于0");
+            }
+
             // 调用服务获取用户列表
             IPage<User> userPage = userService.getUserList(page, pageSize);
 
@@ -119,6 +129,11 @@ public class UserController extends ApiController {
     @GetMapping("/getById")
     public Result<User> getUserById(@RequestParam("id") Long id) {
         try {
+            // 参数校验
+            if (id <= 0) {
+                return Result.error("用户ID必须大于0");
+            }
+
             User user = userService.getById(id);
             if (user == null) {
                 return Result.error("用户不存在");
@@ -287,31 +302,8 @@ public class UserController extends ApiController {
         }
     }
 
-    // todo 缓存穿透实例接口
-    // todo 缓存穿透实例接口
-    // todo 缓存穿透实例接口
-    // todo 缓存穿透实例接口
-    // todo 缓存穿透实例接口
-    // todo 缓存穿透实例接口
-    // todo 缓存穿透实例接口
-    // todo 缓存穿透实例接口
-    // todo 缓存穿透实例接口
-    // todo 缓存穿透实例接口
-    // todo 缓存穿透实例接口
-    // todo 缓存穿透实例接口
-    // todo 缓存穿透实例接口
-    // todo 缓存穿透实例接口
-    // todo 缓存穿透实例接口
-    // todo 下面的就是 启动时通过多线程异步预热数据 预热完成前用把缓存设置为空的办法 预热完毕后在用布隆过滤器
-    // todo 下面的就是 启动时通过多线程异步预热数据 预热完成前用把缓存设置为空的办法 预热完毕后在用布隆过滤器
-    // todo 下面的就是 启动时通过多线程异步预热数据 预热完成前用把缓存设置为空的办法 预热完毕后在用布隆过滤器
-
     // ****************************************************************
 
-    // todo 下面是通过脚本 比如python 或者别的 每天凌晨相当于手动把需要预热的数据写入redis
-    // 性能优化方案：可通过离线任务预先生成布隆过滤器快照（如每日凌晨用 Spark/Flink 读取用户全量表，
-    // 生成布隆过滤器并序列化存储到 Redis），服务启动时直接加载 Redis 中的快照数据，无需实时预热；
-    // 同时在业务侧通过binlog 增量同步（如 Canal 监听用户表变更），将新增/删除的用户ID实时同步到布隆过滤器。
     @GetMapping("/userInfo")
     public Result<UserInfoResponseDTO> userInfo(
             @RequestParam(value = "userId", required = false) Long userId,
@@ -320,16 +312,6 @@ public class UserController extends ApiController {
             @RequestParam(value = "type", required = false) String type,
             @RequestParam(value = "isRedis", required = false) Boolean isRedis) {
         try {
-            // 如果未提供userId，使用当前登录用户ID
-            if (userId == null) {
-                userId = Long.parseLong(StpUtil.getLoginId().toString());
-            }
-
-            // 验证userId格式
-            if (userId <= 0) {
-                return Result.error("用户ID格式错误，请输入有效的数字ID");
-            }
-
             // 构建请求DTO
             UserInfoRequestDTO requestDTO = new UserInfoRequestDTO();
             requestDTO.setUserId(userId);
@@ -338,8 +320,11 @@ public class UserController extends ApiController {
             requestDTO.setType(type);
             requestDTO.setRedis(isRedis != null && isRedis);
 
-            // 调用服务获取用户信息
-            UserInfoResponseDTO userInfo = userService.getUserInfo(requestDTO);
+            // 获取当前登录用户ID
+            Long currentUserId = Long.parseLong(StpUtil.getLoginId().toString());
+
+            // 调用服务获取用户信息（带登录状态处理）
+            UserInfoResponseDTO userInfo = userService.getUserInfoWithLoginCheck(requestDTO, currentUserId);
 
             if (userInfo == null) {
                 return Result.error("用户不存在");
@@ -348,6 +333,8 @@ public class UserController extends ApiController {
             return Result.success(userInfo);
         } catch (NumberFormatException e) {
             return Result.error("用户ID格式错误");
+        } catch (IllegalArgumentException e) {
+            return Result.error(e.getMessage());
         } catch (Exception e) {
             log.error("获取用户信息失败", e);
             return Result.error("获取用户信息失败，请稍后重试");
@@ -358,26 +345,21 @@ public class UserController extends ApiController {
     @GetMapping("/getVerificationCode")
     public void getVerificationCode(HttpServletResponse response, @RequestParam Map<String, Object> params)
             throws IOException {
+        // 参数校验
         String uuid = params.containsKey("uuid") ? String.valueOf(params.get("uuid")) : "";
         String userName = params.containsKey("userName") ? String.valueOf(params.get("userName")) : "";
-        if (uuid == null || uuid.isEmpty()) {
-            uuid = String.valueOf(System.currentTimeMillis()); // 生成唯一标识符
-        }
-        // 创建验证码对象（设置图片宽高和验证码字符数）
-        SpecCaptcha captcha = new SpecCaptcha(120, 40, 5); // 验证码宽度 120px, 高度 40px，5个字符
-        captcha.setCharType(Captcha.TYPE_DEFAULT); // 设置验证码类型为数字字母组合
-        String intervalKey = "code:interval:" + userName;
-        if (Boolean.TRUE.equals(stringRedisTemplate.hasKey(intervalKey))) {
-            throw new RuntimeException("验证码发送过于频繁，请稍后再试");
-        }
-        stringRedisTemplate.opsForValue().set(intervalKey, "1", 60, TimeUnit.SECONDS);
 
-        // 存入 Redis，过期时间 3 分钟`
-        stringRedisTemplate.opsForValue().set("CAPTCHA_" + uuid + userName, captcha.text(), 3, TimeUnit.MINUTES);
+        // 调用服务获取验证码
+        java.util.Map<String, Object> result = userService.getVerificationCode(uuid, userName);
+
+        // 获取验证码信息
+        String newUuid = (String) result.get("uuid");
+        com.wf.captcha.SpecCaptcha captcha = (com.wf.captcha.SpecCaptcha) result.get("captcha");
+
         // 设置响应头
         response.setContentType("image/png"); // 设置返回类型为 PNG 格式的图片
         response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate"); // 防止缓存
-        response.setHeader("uuid", uuid); // 返回 uuid，供前端请求时使用
+        response.setHeader("uuid", newUuid); // 返回 uuid，供前端请求时使用
         // 使用 out() 方法生成并输出验证码图片
         try (ServletOutputStream out = response.getOutputStream()) {
             captcha.out(out); // 直接输出验证码到响应流
@@ -393,23 +375,14 @@ public class UserController extends ApiController {
         if (email.isEmpty()) {
             throw new RuntimeException("邮箱不能为空");
         }
-        // 2. 生成验证码
-        String code = String.valueOf(new Random().nextInt(899999) + 100000);
-        // 3. 存入 Redis，有效期 5 分钟
-        stringRedisTemplate.opsForValue().set("email:code:" + email, code, 5, TimeUnit.MINUTES);
-        // 4. 构造消息
-        Map<String, String> message = new HashMap<>();
-        message.put("email", email);
-        message.put("code", code);
-        // 5. 发送到队列（work 模型只需一个队列）
-        rabbitTemplate.convertAndSend("email.queue", message);
+        // 2. 调用服务获取邮箱验证码
+        userService.getEmailVerificationCode(email);
     }
 
     // 简单的参数类型 如果没有用参数注解 spring会默认把参数前面加上@RequestParam
     // 简单的参数类型 如果没有用参数注解 spring会默认把参数前面加上@RequestParam
     // 简单的参数类型 如果没有用参数注解 spring会默认把参数前面加上@RequestParam
     @PostMapping("/register")
-    @Transactional
     public Result register(@RequestBody Map<String, Object> params) {
         // 1. 参数提取
         String userName = String.valueOf(params.getOrDefault("userName", ""));
@@ -417,7 +390,15 @@ public class UserController extends ApiController {
         boolean isCheck = Boolean.parseBoolean(String.valueOf(params.getOrDefault("isCheck", "false")));
         String verificationCode = String.valueOf(params.getOrDefault("verificationCode", ""));
 
-        // 2. 调用服务进行注册
+        // 2. 参数校验
+        if (userName == null || userName.isEmpty()) {
+            return Result.error("用户名不能为空");
+        }
+        if (password == null || password.isEmpty()) {
+            return Result.error("密码不能为空");
+        }
+
+        // 3. 调用服务进行注册
         try {
             User user = userService.register(userName, password, isCheck, verificationCode);
             return Result.success(user);
@@ -436,22 +417,18 @@ public class UserController extends ApiController {
 
     // 更新用户信息
     @PutMapping("/updateInfo")
-    @Transactional
     public Result updateInfo(@RequestBody UpdateInfoRequestDTO request) {
         try {
-            Long userId = request.getUserId();
-            // 如果未指定userId，使用当前登录用户
-            if (userId == null) {
-                userId = Long.parseLong(StpUtil.getLoginId().toString());
+            // 参数校验
+            if (request == null) {
+                return Result.error("请求信息不能为空");
             }
 
+            // 获取当前登录用户ID
+            Long currentUserId = Long.parseLong(StpUtil.getLoginId().toString());
+
             // 调用服务更新用户信息
-            boolean success = userService.updateInfo(
-                    userId,
-                    request.getNickname(),
-                    request.getAvatar(),
-                    request.getPhone(),
-                    request.getGender());
+            boolean success = userService.updateInfoWithLoginCheck(request, currentUserId);
 
             if (success) {
                 return Result.success(null);
@@ -466,21 +443,21 @@ public class UserController extends ApiController {
 
     // 修改密码
     @PostMapping("/changePassword")
-    @Transactional
     public Result changePassword(@RequestBody ChangePasswordRequestDTO request) {
         try {
-            Long userId = request.getUserId();
-            // 如果未指定userId，使用当前登录用户
-            if (userId == null) {
-                userId = Long.parseLong(StpUtil.getLoginId().toString());
+            // 参数校验
+            if (request == null) {
+                return Result.error("请求信息不能为空");
+            }
+            if (request.getNewPassword() == null || request.getNewPassword().isEmpty()) {
+                return Result.error("新密码不能为空");
             }
 
+            // 获取当前登录用户ID
+            Long currentUserId = Long.parseLong(StpUtil.getLoginId().toString());
+
             // 调用服务修改密码
-            boolean success = userService.changePassword(
-                    userId,
-                    request.getOldPassword(),
-                    request.getNewPassword(),
-                    request.getVerificationCode());
+            boolean success = userService.changePasswordWithLoginCheck(request, currentUserId);
 
             if (success) {
                 return Result.success(null);
@@ -501,15 +478,16 @@ public class UserController extends ApiController {
     @GetMapping("/status/{userId}")
     public Result<UserStatusResponseDTO> getUserStatus(@PathVariable Long userId) {
         try {
-            User user = userService.getById(userId);
-            if (user == null) {
-                return Result.error("用户不存在");
+            // 参数校验
+            if (userId <= 0) {
+                return Result.error("用户ID必须大于0");
             }
 
-            // 这里简化处理，实际应根据用户状态字段返回
-            // 模拟返回正常状态
-            UserStatusResponseDTO response = new UserStatusResponseDTO(1, "");
+            // 调用服务获取用户状态
+            UserStatusResponseDTO response = userService.getUserStatus(userId);
             return Result.success(response);
+        } catch (IllegalArgumentException e) {
+            return Result.error(e.getMessage());
         } catch (Exception e) {
             log.error("查询用户状态失败", e);
             return Result.error("查询失败，请稍后重试");
