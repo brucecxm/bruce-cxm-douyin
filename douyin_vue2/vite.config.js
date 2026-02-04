@@ -56,7 +56,7 @@ export default defineConfig(({ mode }) => {
     server: {
       host: true,
       logLevel: 'info', // 服务器日志级别
-      https: httpsOptions, // 开启 https，使用证书
+      // https: httpsOptions, // 开启 https，使用证书
       proxy: {},
       watch: {
         // 监听时忽略 node_modules 和 dist（避免无意义的文件监控消耗内存）

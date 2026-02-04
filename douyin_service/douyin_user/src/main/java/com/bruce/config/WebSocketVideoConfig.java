@@ -15,7 +15,7 @@ public class WebSocketVideoConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(myHandler(), WsConstant.user+WsConstant.videoChat).setAllowedOrigins("*");
+        registry.addHandler(myHandler(), WsConstant.user+WsConstant.videoChat).setAllowedOriginPatterns("*");
     }
 
     @Bean

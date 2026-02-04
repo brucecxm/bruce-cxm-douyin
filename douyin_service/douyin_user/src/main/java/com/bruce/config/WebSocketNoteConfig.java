@@ -13,7 +13,7 @@ public class WebSocketNoteConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(new WebSocketNoteHandler(), WsConstant.user+WsConstant.wsnote)
-                .setAllowedOrigins("*");
+                .setAllowedOriginPatterns("*");
     }
 }
 
