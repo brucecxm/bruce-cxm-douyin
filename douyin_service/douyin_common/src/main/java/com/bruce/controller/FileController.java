@@ -4,8 +4,6 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.bruce.entity.FileOperationLog;
 import com.bruce.file.service.FileStorageService;
 import com.bruce.service.FileOperationLogService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -29,8 +27,7 @@ import java.util.UUID;
  */
 @Slf4j
 @RestController
-@RequestMapping("/file")
-@Api(tags = "文件管理接口")
+@RequestMapping("/common/file")
 public class FileController {
 
     @Autowired
@@ -44,64 +41,64 @@ public class FileController {
 
     /**
      * 上传图片文件
-     * @param file 图片文件
+     * 
+     * @param file   图片文件
      * @param prefix 文件前缀，用于分类存储
      * @return 上传结果，包含文件URL
      */
-    @ApiOperation("上传图片文件")
     @PostMapping("/upload/image")
     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file,
-                                         @RequestParam(value = "prefix", required = false, defaultValue = "images") String prefix) {
+            @RequestParam(value = "prefix", required = false, defaultValue = "images") String prefix) {
         return uploadFile(file, prefix, "image");
     }
 
     /**
      * 上传视频文件
-     * @param file 视频文件
+     * 
+     * @param file   视频文件
      * @param prefix 文件前缀，用于分类存储
      * @return 上传结果，包含文件URL
      */
-    @ApiOperation("上传视频文件")
     @PostMapping("/upload/video")
     public ResponseEntity<?> uploadVideo(@RequestParam("file") MultipartFile file,
-                                        @RequestParam(value = "prefix", required = false, defaultValue = "videos") String prefix) {
+            @RequestParam(value = "prefix", required = false, defaultValue = "videos") String prefix) {
         return uploadFile(file, prefix, "video");
     }
 
     /**
      * 上传HTML文件
-     * @param file HTML文件
+     * 
+     * @param file   HTML文件
      * @param prefix 文件前缀，用于分类存储
      * @return 上传结果，包含文件URL
      */
-    @ApiOperation("上传HTML文件")
     @PostMapping("/upload/html")
     public ResponseEntity<?> uploadHtml(@RequestParam("file") MultipartFile file,
-                                       @RequestParam(value = "prefix", required = false, defaultValue = "htmls") String prefix) {
+            @RequestParam(value = "prefix", required = false, defaultValue = "htmls") String prefix) {
         return uploadFile(file, prefix, "html");
     }
 
     /**
      * 通用文件上传
-     * @param file 文件
-     * @param prefix 文件前缀，用于分类存储
+     * 
+     * @param file     文件
+     * @param prefix   文件前缀，用于分类存储
      * @param fileType 文件类型(image/video/html/other)
      * @return 上传结果，包含文件URL
      */
-    @ApiOperation("通用文件上传")
     @PostMapping("/upload")
     public ResponseEntity<?> uploadAnyFile(@RequestParam("file") MultipartFile file,
-                                         @RequestParam(value = "prefix", required = false, defaultValue = "files") String prefix,
-                                         @RequestParam(value = "fileType", required = false, defaultValue = "other") String fileType) {
+            @RequestParam(value = "prefix", required = false, defaultValue = "files") String prefix,
+            @RequestParam(value = "fileType", required = false, defaultValue = "other") String fileType) {
         return uploadFile(file, prefix, fileType);
     }
 
     /**
      * 删除文件
+     * 
      * @param fileUrl 文件URL
      * @return 删除结果
      */
-    @ApiOperation("删除文件")
     @DeleteMapping("/delete")
     public ResponseEntity<?> deleteFile(@RequestParam("fileUrl") String fileUrl) {
         FileOperationLog logfile = createLog("delete", fileUrl, extractFileName(fileUrl), null, null);
@@ -136,10 +133,10 @@ public class FileController {
 
     /**
      * 下载文件
+     * 
      * @param fileUrl 文件URL
      * @return 文件流
      */
-    @ApiOperation("下载文件")
     @GetMapping("/download")
     public ResponseEntity<?> downloadFile(@RequestParam("fileUrl") String fileUrl) {
         FileOperationLog logfile = createLog("download", fileUrl, extractFileName(fileUrl), null, null);
@@ -183,42 +180,42 @@ public class FileController {
 
     /**
      * 批量上传图片文件
-     * @param files 图片文件数组
+     * 
+     * @param files  图片文件数组
      * @param prefix 文件前缀，用于分类存储
      * @return 上传结果，包含多个文件URL
      */
-    @ApiOperation("批量上传图片文件")
     @PostMapping("/upload/images/batch")
     public ResponseEntity<?> batchUploadImages(@RequestParam("files") MultipartFile[] files,
-                                              @RequestParam(value = "prefix", required = false, defaultValue = "images") String prefix) {
+            @RequestParam(value = "prefix", required = false, defaultValue = "images") String prefix) {
         return batchUploadFiles(files, prefix, "image");
     }
 
     /**
      * 批量上传视频文件
-     * @param files 视频文件数组
+     * 
+     * @param files  视频文件数组
      * @param prefix 文件前缀，用于分类存储
      * @return 上传结果，包含多个文件URL
      */
-    @ApiOperation("批量上传视频文件")
     @PostMapping("/upload/videos/batch")
     public ResponseEntity<?> batchUploadVideos(@RequestParam("files") MultipartFile[] files,
-                                             @RequestParam(value = "prefix", required = false, defaultValue = "videos") String prefix) {
+            @RequestParam(value = "prefix", required = false, defaultValue = "videos") String prefix) {
         return batchUploadFiles(files, prefix, "video");
     }
 
     /**
      * 批量上传文件
-     * @param files 文件数组
-     * @param prefix 文件前缀，用于分类存储
+     * 
+     * @param files    文件数组
+     * @param prefix   文件前缀，用于分类存储
      * @param fileType 文件类型
      * @return 上传结果，包含多个文件URL
      */
-    @ApiOperation("批量上传通用文件")
     @PostMapping("/upload/batch")
     public ResponseEntity<?> batchUploadAnyFiles(@RequestParam("files") MultipartFile[] files,
-                                               @RequestParam(value = "prefix", required = false, defaultValue = "files") String prefix,
-                                               @RequestParam(value = "fileType", required = false, defaultValue = "other") String fileType) {
+            @RequestParam(value = "prefix", required = false, defaultValue = "files") String prefix,
+            @RequestParam(value = "fileType", required = false, defaultValue = "other") String fileType) {
         return batchUploadFiles(files, prefix, fileType);
     }
 
@@ -226,7 +223,8 @@ public class FileController {
      * 内部方法：单个文件上传处理
      */
     private ResponseEntity<?> uploadFile(MultipartFile file, String prefix, String fileType) {
-        FileOperationLog logfile = createLog("upload", null, file.getOriginalFilename(), file.getSize(), file.getContentType());
+        FileOperationLog logfile = createLog("upload", null, file.getOriginalFilename(), file.getSize(),
+                file.getContentType());
         try {
             validateFile(file);
 
@@ -247,7 +245,8 @@ public class FileController {
                         fileUrl = fileStorageService.uploadHtmlFile(prefix, newFilename, inputStream);
                         break;
                     default:
-                        fileUrl = fileStorageService.uploadFile(prefix, newFilename, inputStream, file.getContentType());
+                        fileUrl = fileStorageService.uploadFile(prefix, newFilename, inputStream,
+                                file.getContentType());
                         break;
                 }
             }
@@ -302,7 +301,8 @@ public class FileController {
             int failCount = 0;
 
             for (MultipartFile file : files) {
-                FileOperationLog logfile = createLog("upload", null, file.getOriginalFilename(), file.getSize(), file.getContentType());
+                FileOperationLog logfile = createLog("upload", null, file.getOriginalFilename(), file.getSize(),
+                        file.getContentType());
                 try {
                     validateFile(file);
 
@@ -319,7 +319,8 @@ public class FileController {
                                 fileUrl = fileStorageService.uploadVideoFile(prefix, newFilename, inputStream);
                                 break;
                             default:
-                                fileUrl = fileStorageService.uploadFile(prefix, newFilename, inputStream, file.getContentType());
+                                fileUrl = fileStorageService.uploadFile(prefix, newFilename, inputStream,
+                                        file.getContentType());
                                 break;
                         }
                     }
@@ -409,7 +410,8 @@ public class FileController {
     /**
      * 创建文件操作日志对象
      */
-    private FileOperationLog createLog(String operationType, String fileUrl, String fileName, Long fileSize, String fileType) {
+    private FileOperationLog createLog(String operationType, String fileUrl, String fileName, Long fileSize,
+            String fileType) {
         FileOperationLog log = new FileOperationLog();
         log.setUserId(getCurrentUserId());
         log.setOperationType(operationType);

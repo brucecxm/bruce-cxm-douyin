@@ -1,4 +1,9 @@
 spring:
+  # 文件上传配置
+  servlet:
+    multipart:
+      max-file-size: 100MB # 单个文件最大大小
+      max-request-size: 100MB # 整个请求最大大小
   # redis配置
   redis:
     # Redis数据库索引（默认为0）

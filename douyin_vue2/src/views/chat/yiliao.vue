@@ -63,6 +63,7 @@
 import SockJS from 'sockjs-client';
 import { mapState } from 'vuex';
 import Stomp from 'stompjs';
+import axios from 'axios';
 
 export default {
   data() {
@@ -157,124 +158,75 @@ export default {
       const file = e.target.files[0];
       if (!file) return;
 
-      // 根据文件类型选择不同的上传方法
-      if (file.type.startsWith('image/')) {
-        this.uploadFile(file, 'image');
-      } else if (file.type.startsWith('video/')) {
-        this.uploadFile(file, 'video');
-      } else {
-        this.$message.warning('暂不支持上传此类文件');
-      }
+      // 显示上传中状态
+      const uploadMessage = {
+        sender: this.myId,
+        receiver: this.receiver,
+        content: `正在上传${file.type.startsWith('image/') ? '图片' : '视频'}...`,
+        type: 'uploading',
+        tempId: Date.now(),
+        timestamp: Date.now()
+      };
+      this.messages.push(uploadMessage);
+      this.scrollToBottom();
 
-      // 清空input，以便可以重复选择同一文件
-      this.$refs.fileInput.value = '';
-    },
-    async uploadFile(file, fileType) {
-      try {
-        console.log(
-          `开始上传${fileType === 'image' ? '图片' : '视频'}到文件服务器:`,
-          file.name
-        );
+      // 创建FormData对象上传文件
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append(
+        'prefix',
+        file.type.startsWith('image/') ? 'chat_images' : 'chat_videos'
+      );
 
-        // 显示上传中状态
-        const uploadMessage = {
-          sender: this.myId,
-          receiver: this.receiver,
-          content: `正在上传${fileType === 'image' ? '图片' : '视频'}...`,
-          type: 'uploading',
-          tempId: Date.now(),
-          timestamp: Date.now()
-        };
-        this.messages.push(uploadMessage);
-        this.scrollToBottom();
-
-        // 创建FormData对象
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append(
-          'prefix',
-          fileType === 'image' ? 'chat_images' : 'chat_videos'
-        );
-
-        // 根据文件类型选择不同的上传接口，使用完整URL
-        const baseUrl = 'http://172.20.10.1:9522';
-        const url =
-          fileType === 'image'
-            ? `${baseUrl}/file/upload/image`
-            : `${baseUrl}/file/upload/video`;
-
-        // 调用后端接口上传文件
-        const response = await fetch(url, {
-          method: 'POST',
+      // 通过HTTP POST上传文件
+      const uploadUrl = file.type.startsWith('image/')
+        ? '/api/common/file/upload/image'
+        : '/api/common/file/upload/video';
+      axios
+        .post(uploadUrl, formData, {
           headers: {
-            // 注意：Content-Type由浏览器自动设置为multipart/form-data
-            Authorization: localStorage.getItem('token') || '' // 如果需要认证
-          },
-          body: formData
-        });
-
-        if (!response.ok) {
-          throw new Error(`上传失败: ${response.status}`);
-        }
-
-        const result = await response.json();
-
-        // 移除上传中消息
-        const index = this.messages.findIndex(
-          (msg) => msg.tempId === uploadMessage.tempId
-        );
-        if (index > -1) {
-          this.messages.splice(index, 1);
-        }
-
-        if (result.success && result.fileUrl) {
-          if (fileType === 'image') {
-            this.sendImageMessage(result.fileUrl);
-          } else {
-            this.sendVideoMessage(result.fileUrl);
+            'Content-Type': 'multipart/form-data'
           }
-        } else {
-          throw new Error(result.message || '上传失败');
-        }
-      } catch (error) {
-        console.error('文件上传失败:', error);
-        this.$message.error(`文件上传失败: ${error.message}`);
-
-        // 移除上传中消息
-        const index = this.messages.findIndex(
-          (msg) => msg.type === 'uploading' && msg.sender === this.myId
-        );
-        if (index > -1) {
-          this.messages.splice(index, 1);
-        }
-      }
-    },
-    sendImageMessage(imageUrl) {
-      const msg = {
-        sender: this.myId,
-        receiver: this.receiver,
-        content: imageUrl, // 原图链接
-        thumbnailUrl: imageUrl, // 暂时使用原图作为缩略图
-        type: 'image',
-        timestamp: Date.now()
-      };
-
-      this.stompClient.send('/app/private-chat', {}, JSON.stringify(msg));
-      this.messages.push(msg); // 立即显示发送的图片消息
-      this.scrollToBottom();
-    },
-    sendVideoMessage(videoUrl) {
-      const msg = {
-        sender: this.myId,
-        receiver: this.receiver,
-        content: videoUrl,
-        type: 'video',
-        timestamp: Date.now()
-      };
-
-      this.stompClient.send('/app/private-chat', {}, JSON.stringify(msg));
-      this.messages.push(msg); // 立即显示发送的视频消息
-      this.scrollToBottom();
+        })
+        .then((response) => {
+          if (response.data && response.data.success) {
+            const fileUrl = response.data.fileUrl;
+            // 通过WebSocket发送文件URL
+            const msg = {
+              sender: this.myId,
+              receiver: this.receiver,
+              content: fileUrl,
+              type: file.type.startsWith('image/') ? 'image' : 'video',
+              fileName: file.name,
+              fileSize: file.size,
+              fileType: file.type,
+              timestamp: Date.now()
+            };
+            this.stompClient.send('/app/private-chat', {}, JSON.stringify(msg));
+            // 立即显示发送的文件消息
+            this.messages.push(msg);
+            this.scrollToBottom();
+          } else {
+            this.$message.error(
+              '文件上传失败: ' + (response.data.message || '未知错误')
+            );
+          }
+        })
+        .catch((error) => {
+          console.error('文件上传失败:', error);
+          this.$message.error('文件上传失败，请重试');
+        })
+        .finally(() => {
+          // 移除上传中消息
+          const index = this.messages.findIndex(
+            (m) => m.tempId === uploadMessage.tempId
+          );
+          if (index > -1) {
+            this.messages.splice(index, 1);
+          }
+          // 清空input，以便可以重复选择同一文件
+          this.$refs.fileInput.value = '';
+        });
     },
     viewOriginalImage(msg) {
       console.log('查看原图:', msg.content);

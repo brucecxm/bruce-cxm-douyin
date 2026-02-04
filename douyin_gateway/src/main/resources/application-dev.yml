@@ -1,6 +1,11 @@
 spring:
   application:
     name: api-gateway
+  # 文件上传配置
+  servlet:
+    multipart:
+      max-file-size: 100MB # 单个文件最大大小
+      max-request-size: 100MB # 整个请求最大大小
   # redis配置
 
   cloud:
@@ -36,6 +41,10 @@ spring:
             - Path=/newshop/**
           filters:
             - RewritePath=/newshop/(?<segment>.*), /${segment}
+        - id: DouyinCommonService
+          uri: lb://DouyinCommonService
+          predicates:
+            - Path=/common/**
 
       discovery:
         locator:
