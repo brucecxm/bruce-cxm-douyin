@@ -11,7 +11,7 @@ public class FriendDetailVO {
     private String remark;
     private LocalDateTime addedTime;
     private Integer status;
-    
+
     // 用户详细信息
     private Long userId;
     private String nickname;
@@ -21,10 +21,10 @@ public class FriendDetailVO {
     private String email;
     private String city;
     private String myIntro;
-    private Integer age;
+    private String age;
     private String school;
     private String userPic;
     private String backImg;
-    private Integer isAnchor;
-    private Integer isPrivate;
+    private Boolean isAnchor;
+    private int isPrivate;
 }
