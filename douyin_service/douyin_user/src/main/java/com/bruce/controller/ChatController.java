@@ -12,11 +12,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.security.Principal;
-import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 
 import static com.bruce.config.RabbitConfig.NOTIFY_DELAY_EXCHANGE;
@@ -37,30 +33,11 @@ public class ChatController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    // 文件存储路径
-    private static final String STORAGE_PATH = "D:\\chat_files";
-
     // 一对一私聊消息处理
     @MessageMapping("/private-chat")
     public void privateChat(ChatMessageYi message, Principal principal) {
         System.out.println("当前发消息的是：" + principal.getName());
         System.out.println("准备发送给：" + message.getReceiver());
-
-        // 处理文件上传
-        if (message.getType() != null && ("image".equals(message.getType()) || "video".equals(message.getType()))) {
-            try {
-                // 解码Base64内容并保存文件
-                String fileUrl = saveFile(message);
-                message.setFileUrl(fileUrl);
-                // 清空Base64内容，只保留文件URL
-                message.setContent(fileUrl);
-            } catch (Exception e) {
-                System.error("文件处理失败: " + e.getMessage());
-                // 处理失败，发送错误消息
-                message.setType("text");
-                message.setContent("文件上传失败，请重试");
-            }
-        }
 
         // 使用Sa-Token判断接收者是否在线（已登录）
         boolean receiverOnline = StpUtil.isLogin(message.getReceiver());
@@ -93,40 +70,6 @@ public class ChatController {
 
             System.out.println("接收者离线，消息已暂存Redis并等待补发：" + message.getReceiver());
         }
-    }
-
-    // 保存文件
-    private String saveFile(ChatMessageYi message) throws IOException {
-        // 创建存储目录
-        File storageDir = new File(STORAGE_PATH);
-        if (!storageDir.exists()) {
-            storageDir.mkdirs();
-        }
-
-        // 创建子目录（按类型）
-        String typeDir = message.getType().equals("image") ? "images" : "videos";
-        File typeStorageDir = new File(storageDir, typeDir);
-        if (!typeStorageDir.exists()) {
-            typeStorageDir.mkdirs();
-        }
-
-        // 生成文件名
-        String fileName = System.currentTimeMillis() + "_" + message.getFileName();
-        File file = new File(typeStorageDir, fileName);
-
-        // 解码Base64内容
-        if (message.getContent() != null && message.getContent().contains(",")) {
-            String base64Content = message.getContent().split(",")[1];
-            byte[] bytes = Base64.getDecoder().decode(base64Content);
-
-            // 写入文件
-            try (FileOutputStream fos = new FileOutputStream(file)) {
-                fos.write(bytes);
-            }
-        }
-
-        // 返回文件URL（这里使用本地文件路径，实际项目中应使用HTTP URL）
-        return "file://" + file.getAbsolutePath();
     }
 
     // 简化的发送消息接口，不依赖ChatService
