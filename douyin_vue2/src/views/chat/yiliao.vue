@@ -169,56 +169,25 @@ export default {
       // 清空input，以便可以重复选择同一文件
       this.$refs.fileInput.value = '';
     },
-    async uploadFile(file, fileType) {
-      try {
-        console.log(
-          `开始上传${fileType === 'image' ? '图片' : '视频'}到文件服务器:`,
-          file.name
-        );
+    handleFileChange(e) {
+      const file = e.target.files[0];
+      if (!file) return;
 
-        // 显示上传中状态
-        const uploadMessage = {
-          sender: this.myId,
-          receiver: this.receiver,
-          content: `正在上传${fileType === 'image' ? '图片' : '视频'}...`,
-          type: 'uploading',
-          tempId: Date.now(),
-          timestamp: Date.now()
-        };
-        this.messages.push(uploadMessage);
-        this.scrollToBottom();
+      // 显示上传中状态
+      const uploadMessage = {
+        sender: this.myId,
+        receiver: this.receiver,
+        content: `正在上传${file.type.startsWith('image/') ? '图片' : '视频'}...`,
+        type: 'uploading',
+        tempId: Date.now(),
+        timestamp: Date.now()
+      };
+      this.messages.push(uploadMessage);
+      this.scrollToBottom();
 
-        // 创建FormData对象
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append(
-          'prefix',
-          fileType === 'image' ? 'chat_images' : 'chat_videos'
-        );
-
-        // 根据文件类型选择不同的上传接口，使用完整URL
-        const baseUrl = 'http://172.20.10.1:9522';
-        const url =
-          fileType === 'image'
-            ? `${baseUrl}/file/upload/image`
-            : `${baseUrl}/file/upload/video`;
-
-        // 调用后端接口上传文件
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: {
-            // 注意：Content-Type由浏览器自动设置为multipart/form-data
-            Authorization: localStorage.getItem('token') || '' // 如果需要认证
-          },
-          body: formData
-        });
-
-        if (!response.ok) {
-          throw new Error(`上传失败: ${response.status}`);
-        }
-
-        const result = await response.json();
-
+      // 创建FileReader来读取文件内容
+      const reader = new FileReader();
+      reader.onload = (event) => {
         // 移除上传中消息
         const index = this.messages.findIndex(
           (msg) => msg.tempId === uploadMessage.tempId
@@ -227,54 +196,45 @@ export default {
           this.messages.splice(index, 1);
         }
 
-        if (result.success && result.fileUrl) {
-          if (fileType === 'image') {
-            this.sendImageMessage(result.fileUrl);
-          } else {
-            this.sendVideoMessage(result.fileUrl);
-          }
-        } else {
-          throw new Error(result.message || '上传失败');
-        }
-      } catch (error) {
-        console.error('文件上传失败:', error);
-        this.$message.error(`文件上传失败: ${error.message}`);
+        // 发送文件消息
+        const fileType = file.type.startsWith('image/') ? 'image' : 'video';
+        const msg = {
+          sender: this.myId,
+          receiver: this.receiver,
+          content: event.target.result, // Base64编码的文件内容
+          fileName: file.name,
+          fileSize: file.size,
+          mimeType: file.type,
+          type: fileType,
+          timestamp: Date.now()
+        };
+
+        this.stompClient.send('/app/private-chat', {}, JSON.stringify(msg));
+        // 暂时显示发送消息，实际显示会等待后端处理完成后返回
+        const tempMsg = {
+          ...msg,
+          content: `发送${fileType === 'image' ? '图片' : '视频'}: ${file.name}`,
+          type: 'text'
+        };
+        this.messages.push(tempMsg);
+        this.scrollToBottom();
+      };
+      reader.onerror = (error) => {
+        console.error('文件读取失败:', error);
+        this.$message.error('文件读取失败');
 
         // 移除上传中消息
         const index = this.messages.findIndex(
-          (msg) => msg.type === 'uploading' && msg.sender === this.myId
+          (msg) => msg.tempId === uploadMessage.tempId
         );
         if (index > -1) {
           this.messages.splice(index, 1);
         }
-      }
-    },
-    sendImageMessage(imageUrl) {
-      const msg = {
-        sender: this.myId,
-        receiver: this.receiver,
-        content: imageUrl, // 原图链接
-        thumbnailUrl: imageUrl, // 暂时使用原图作为缩略图
-        type: 'image',
-        timestamp: Date.now()
       };
+      reader.readAsDataURL(file);
 
-      this.stompClient.send('/app/private-chat', {}, JSON.stringify(msg));
-      this.messages.push(msg); // 立即显示发送的图片消息
-      this.scrollToBottom();
-    },
-    sendVideoMessage(videoUrl) {
-      const msg = {
-        sender: this.myId,
-        receiver: this.receiver,
-        content: videoUrl,
-        type: 'video',
-        timestamp: Date.now()
-      };
-
-      this.stompClient.send('/app/private-chat', {}, JSON.stringify(msg));
-      this.messages.push(msg); // 立即显示发送的视频消息
-      this.scrollToBottom();
+      // 清空input，以便可以重复选择同一文件
+      this.$refs.fileInput.value = '';
     },
     viewOriginalImage(msg) {
       console.log('查看原图:', msg.content);
