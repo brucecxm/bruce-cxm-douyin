@@ -40,12 +40,14 @@ export const userRegisterService = (registerData) => {
   });
 };
 
-export const getUserInfo = (userId, page, pageSize) => {
+export const getUserInfo = (userId, page, pageSize, type = 'empty', isRedis = false) => {
   //构建参数对象
   const params = {
     userId: userId,
     page: page,
-    pageSize: pageSize
+    pageSize: pageSize,
+    type: type,
+    isRedis: isRedis
   };
   return request.get('/user/userInfo', { params });
 };

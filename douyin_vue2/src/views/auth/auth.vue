@@ -136,13 +136,13 @@ export default {
       if (this.loading || this.noMoreData) return;
       this.loading = true;
 
-      getUserInfo(this.queryData)
+      getUserInfo(this.queryData.userId, this.queryData.page, this.queryData.pageSize, 'empty', false)
         .then((res) => {
-          const videos = res.data.videobox || [];
+          const videos = res.data.videoPage?.records || [];
           const total = res.data.total || 0;
 
           if (this.queryData.page === 1) {
-            this.userInfo = res.data.userInfo || {};
+            this.userInfo = res.data || {};
           }
 
           this.videobox.push(...videos);

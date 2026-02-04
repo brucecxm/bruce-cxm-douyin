@@ -136,7 +136,7 @@ export default {
   methods: {
     // 获取用户信息
     getUserInfoInit() {
-      getUserInfo()
+      getUserInfo(null, null, null, 'empty', false)
         .then((res) => {
           this.userInfo = res.data; // 更新用户信息
         })

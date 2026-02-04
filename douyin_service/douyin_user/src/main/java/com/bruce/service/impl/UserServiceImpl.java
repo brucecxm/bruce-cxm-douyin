@@ -153,6 +153,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     @Autowired
     private org.springframework.data.redis.core.StringRedisTemplate stringRedisTemplate;
+    
+    @Autowired
+    private com.bruce.service.strategy.CachingStrategyFactory cachingStrategyFactory;
+    
+    @Autowired
+    private com.bruce.service.VideoFeignService videoFeignService;
 
     @Override
     public java.util.Map<String, Object> login(com.bruce.dto.LoginRequestDTO loginRequestDTO) {
@@ -208,6 +214,275 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             throw e;
         } catch (Exception e) {
             throw new RuntimeException("登录失败，请稍后重试", e);
+        }
+    }
+
+    @Override
+    public com.bruce.dto.UserInfoResponseDTO getUserInfo(com.bruce.dto.UserInfoRequestDTO requestDTO) {
+        try {
+            // 获取缓存策略
+            com.bruce.service.strategy.CachingStrategy strategy = cachingStrategyFactory.getStrategy(requestDTO.getType());
+            
+            // 使用策略获取用户信息
+            com.bruce.entity.UserInfo userInfo = strategy.getUserInfo(
+                requestDTO.getUserId(),
+                requestDTO.getPage(),
+                requestDTO.getPageSize()
+            );
+            
+            if (userInfo == null) {
+                return null;
+            }
+            
+            // 转换为响应DTO
+            com.bruce.dto.UserInfoResponseDTO responseDTO = new com.bruce.dto.UserInfoResponseDTO();
+            // 复制基本信息
+            responseDTO.setId(userInfo.getId());
+            responseDTO.setNickname(userInfo.getNickname());
+            responseDTO.setUsername(userInfo.getUsername());
+            responseDTO.setAvatar(userInfo.getAvatar());
+            responseDTO.setUserPic(userInfo.getUserPic());
+            responseDTO.setBackImg(userInfo.getBackImg());
+            responseDTO.setCity(userInfo.getCity());
+            responseDTO.setMyIntro(userInfo.getMyIntro());
+            responseDTO.setJieshao(userInfo.getMyIntro()); // 兼容前端字段
+            responseDTO.setAge(userInfo.getAge());
+            responseDTO.setSchool(userInfo.getSchool());
+            responseDTO.setGender(userInfo.getGender());
+            
+            // 复制统计信息
+            responseDTO.setFansCount(userInfo.getFansCount());
+            responseDTO.setFollowCount(userInfo.getFollowCount());
+            responseDTO.setMutualFollowCount(userInfo.getMutualFollowCount());
+            responseDTO.setFollowers(userInfo.getFollowers());
+            responseDTO.setFollowing(userInfo.getFollowing());
+            responseDTO.setMutualFollow(userInfo.getMutualFollow());
+            
+            // 处理视频信息
+            if (userInfo.getVideoPage() != null) {
+                // 转换视频列表为DTO
+                java.util.List<com.bruce.dto.VideoDTO> videoDTOs = new java.util.ArrayList<>();
+                for (com.bruce.entity.Video video : userInfo.getVideoPage().getRecords()) {
+                    com.bruce.dto.VideoDTO videoDTO = new com.bruce.dto.VideoDTO();
+                    videoDTO.setId(video.getVideoId());
+                    videoDTO.setVideoId(video.getVideoId());
+                    videoDTO.setUserId(video.getUserId());
+                    videoDTO.setMusicId(video.getMusicId());
+                    videoDTO.setUrl(video.getUrl());
+                    videoDTO.setContent(video.getContent());
+                    videoDTO.setTitle(video.getTitle());
+                    videoDTO.setCover(video.getCover());
+                    videoDTO.setType(video.getType());
+                    videoDTO.setStatus(video.getStatus());
+                    videoDTOs.add(videoDTO);
+                }
+                
+                // 创建分页对象
+                com.baomidou.mybatisplus.core.metadata.IPage<com.bruce.dto.VideoDTO> videoPageDTO = new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>();
+                videoPageDTO.setRecords(videoDTOs);
+                videoPageDTO.setTotal(userInfo.getVideoPage().getTotal());
+                videoPageDTO.setSize(userInfo.getVideoPage().getSize());
+                videoPageDTO.setCurrent(userInfo.getVideoPage().getCurrent());
+                
+                responseDTO.setVideoPage(videoPageDTO);
+                responseDTO.setTotal((int) userInfo.getVideoPage().getTotal());
+            }
+            
+            return responseDTO;
+        } catch (Exception e) {
+            throw new RuntimeException("获取用户信息失败", e);
+        }
+    }
+
+    @Override
+    public boolean updateUserInfo(User user, Long userId) {
+        // 确保只能更新自己的信息
+        if (user.getId() == null || !user.getId().equals(userId)) {
+            throw new IllegalArgumentException("无权修改其他用户信息");
+        }
+
+        // 更新用户信息
+        boolean success = this.updateById(user);
+        if (success) {
+            // 清除 Redis 缓存
+            String cacheKey = "user_info:" + userId;
+            try {
+                stringRedisTemplate.delete(cacheKey);
+            } catch (Exception e) {
+                // Redis 操作失败不应影响主流程
+            }
+        }
+        return success;
+    }
+
+    @Override
+    public com.baomidou.mybatisplus.core.metadata.IPage<User> getUserList(Integer page, Integer pageSize) {
+        // 使用MyBatis Plus的分页功能查询所有用户
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<User> pageQuery = new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(page, pageSize);
+        return this.page(pageQuery);
+    }
+
+    @Override
+    public User register(String username, String password, boolean isCheck, String verificationCode) {
+        // 参数校验
+        if (username == null || username.isEmpty()) {
+            throw new IllegalArgumentException("用户名不能为空");
+        }
+        if (password == null || password.isEmpty()) {
+            throw new IllegalArgumentException("密码不能为空");
+        }
+
+        // 验证码校验
+        if (isCheck) {
+            if (verificationCode == null || verificationCode.isEmpty()) {
+                throw new IllegalArgumentException("验证码不能为空");
+            }
+            String storedCode = stringRedisTemplate.opsForValue()
+                    .get(com.bruce.dict.Constant.User.EMAIL_CODE_PREFIX + username);
+            if (storedCode == null || !verificationCode.equalsIgnoreCase(storedCode)) {
+                throw new IllegalArgumentException("验证码错误");
+            }
+        }
+
+        // 查询是否已存在
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getUsername, username);
+        User existingUser = this.getOne(queryWrapper);
+
+        if (existingUser != null) {
+            throw new com.bruce.handlar.MyCustomException(400, com.bruce.dict.Constant.Error.USER_REPEAT);
+        }
+
+        // 生成盐值并保存
+        String saltStr = generateSalt(16);
+        com.bruce.entity.Salt salt = new com.bruce.entity.Salt();
+        salt.setUserId(0L); // 临时ID，后续会更新
+        salt.setSalt(saltStr);
+        saltService.save(salt);
+
+        // 加密密码
+        String encryptedPassword = saltedDoubleHashPassword(password, saltStr);
+
+        // 设置用户基本信息
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(encryptedPassword);
+        user.setNickname(com.bruce.dict.Constant.Chinese.NEW_USER + System.currentTimeMillis());
+        user.setRoleId(com.bruce.dict.Constant.Role.USER);
+
+        // 保存用户
+        this.save(user);
+
+        // 更新盐值的用户ID
+        salt.setUserId(user.getId());
+        saltService.updateById(salt);
+
+        return user;
+    }
+
+    @Override
+    public boolean updateInfo(Long userId, String nickname, String avatar, String phone, String gender) {
+        // 验证用户是否存在
+        User user = this.getById(userId);
+        if (user == null) {
+            return false;
+        }
+
+        // 更新用户信息
+        if (nickname != null) {
+            user.setNickname(nickname);
+        }
+        if (avatar != null) {
+            user.setAvatar(avatar);
+        }
+        if (phone != null) {
+            user.setPhone(phone);
+        }
+        if (gender != null) {
+            user.setGender(gender);
+        }
+
+        boolean success = this.updateById(user);
+        if (success) {
+            // 清除Redis缓存
+            String userInfoKey = userId + com.bruce.dict.Constant.User._USER_INFO;
+            stringRedisTemplate.delete(userInfoKey);
+        }
+        return success;
+    }
+
+    @Override
+    public boolean changePassword(Long userId, String oldPassword, String newPassword, String verificationCode) {
+        User user = this.getById(userId);
+        if (user == null) {
+            return false;
+        }
+
+        // 验证原密码或验证码
+        if (verificationCode != null) {
+            // 验证码方式
+            // 这里简化处理，实际应验证验证码
+        } else {
+            // 原密码方式
+            if (oldPassword == null) {
+                throw new IllegalArgumentException("原密码不能为空");
+            }
+
+            // 获取用户盐值并验证密码
+            com.bruce.entity.Salt salt = saltService.getOne(new LambdaQueryWrapper<com.bruce.entity.Salt>().eq(com.bruce.entity.Salt::getUserId, userId));
+            if (salt == null) {
+                return false;
+            }
+
+            String encryptedOldPassword = saltedDoubleHashPassword(oldPassword, salt.getSalt());
+            if (!encryptedOldPassword.equals(user.getPassword())) {
+                throw new IllegalArgumentException("原密码错误");
+            }
+        }
+
+        // 更新密码
+        String newSalt = generateSalt(16);
+        String encryptedNewPassword = saltedDoubleHashPassword(newPassword, newSalt);
+
+        user.setPassword(encryptedNewPassword);
+        boolean success = this.updateById(user);
+
+        // 更新盐值
+        if (success) {
+            com.bruce.entity.Salt salt = saltService.getOne(new LambdaQueryWrapper<com.bruce.entity.Salt>().eq(com.bruce.entity.Salt::getUserId, userId));
+            if (salt != null) {
+                salt.setSalt(newSalt);
+                saltService.updateById(salt);
+            }
+        }
+
+        return success;
+    }
+
+    // 生成一个随机盐值
+    private String generateSalt(int length) {
+        String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder salt = new StringBuilder(length);
+        java.util.Random rand = new java.util.Random();
+        for (int i = 0; i < length; i++) {
+            salt.append(characters.charAt(rand.nextInt(characters.length())));
+        }
+        return salt.toString();
+    }
+
+    // 双重哈希加盐加密
+    private String saltedDoubleHashPassword(String password, String salt) {
+        try {
+            // 第一次哈希，使用SHA-256
+            MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+            byte[] firstHash = sha256.digest((password + salt).getBytes());
+            // 第二次哈希，使用MD5
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            byte[] secondHash = md5.digest(firstHash);
+            // 返回Base64编码的加密密码
+            return Base64.getEncoder().encodeToString(secondHash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new com.bruce.handlar.MyCustomException(400, com.bruce.dict.Constant.Error.HASH_TRANSFORM_ERROR);
         }
     }
 }

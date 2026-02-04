@@ -1,53 +1,33 @@
 package com.bruce.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.api.ApiController;
-import com.baomidou.mybatisplus.extension.api.R;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.bruce.dict.Constant;
-import com.bruce.dto.LoginRequestDTO;
-import com.bruce.dto.UserRoleDTO;
-import com.bruce.dto.LogoutRequestDTO;
-import com.bruce.dto.UpdateInfoRequestDTO;
-import com.bruce.dto.ChangePasswordRequestDTO;
-import com.bruce.dto.UserStatusResponseDTO;
-import com.bruce.dto.FreezeRequestDTO;
+import com.bruce.dto.*;
 import com.bruce.entity.*;
 import com.bruce.handlar.MyCustomException;
 import com.bruce.pojo.Result;
 import com.bruce.service.*;
-import com.bruce.utils.AuthUtils;
 import com.bruce.utils.JwtUtil;
 import com.bruce.utils.RedisUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
 import org.redisson.api.RedissonClient;
+import org.redisson.api.RBloomFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import com.bruce.monitor.BloomFilterMonitor;
-import org.redisson.api.RBloomFilter;
-import org.redisson.api.RLock;
-import javax.annotation.Resource;
+
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -97,27 +77,15 @@ public class UserController extends ApiController {
             // 获取当前登录用户ID
             Long userId = StpUtil.getLoginIdAsLong();
 
-            // 确保只能更新自己的信息
-            if (user.getId() == null || !user.getId().equals(userId)) {
-                return Result.error("无权修改其他用户信息");
-            }
-
-            // 更新用户信息
-            boolean success = userService.updateById(user);
+            // 调用服务更新用户信息
+            boolean success = userService.updateUserInfo(user, userId);
             if (success) {
-                // 清除 Redis 缓存，确保下次查询时获取最新数据
-                String cacheKey = "user_info:" + userId;
-                try {
-                    stringRedisTemplate.delete(cacheKey);
-                    log.info("用户信息缓存已清除，用户ID: {}", userId);
-                } catch (Exception e) {
-                    log.error("清除用户信息缓存失败，用户ID: {}", userId, e);
-                    // Redis 操作失败不应影响主流程
-                }
                 return Result.success("更新成功");
             } else {
                 return Result.error("更新失败");
             }
+        } catch (IllegalArgumentException e) {
+            return Result.error(e.getMessage());
         } catch (Exception e) {
             log.error("更新用户信息失败", e);
             return Result.error("更新失败，请稍后重试");
@@ -130,9 +98,8 @@ public class UserController extends ApiController {
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer pageSize) {
         try {
-            // 使用MyBatis Plus的分页功能查询所有用户
-            Page<User> pageQuery = new Page<>(page, pageSize);
-            IPage<User> userPage = userService.page(pageQuery);
+            // 调用服务获取用户列表
+            IPage<User> userPage = userService.getUserList(page, pageSize);
 
             // 构建响应数据
             Map<String, Object> data = new HashMap<>();
@@ -208,9 +175,6 @@ public class UserController extends ApiController {
     private ExecutorService executorService;
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-
-    @Autowired
-    private ObjectMapper objectMapper; // 用于将对象转换为JSON字符串
 
     public UserController() {
         // 创建一个固定大小的线程池
@@ -304,33 +268,6 @@ public class UserController extends ApiController {
         }
     }
 
-    // 生成一个随机盐值
-    public static String generateSalt(int length) {
-        String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        StringBuilder salt = new StringBuilder(length);
-        Random rand = new Random();
-        for (int i = 0; i < length; i++) {
-            salt.append(characters.charAt(rand.nextInt(characters.length())));
-        }
-        return salt.toString();
-    }
-
-    // 双重哈希加盐加密
-    public static String saltedDoubleHashPassword(String password, String salt) {
-        try {
-            // 第一次哈希，使用SHA-256
-            MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
-            byte[] firstHash = sha256.digest((password + salt).getBytes());
-            // 第二次哈希，使用MD5
-            MessageDigest md5 = MessageDigest.getInstance("MD5");
-            byte[] secondHash = md5.digest(firstHash);
-            // 返回Base64编码的加密密码
-            return Base64.getEncoder().encodeToString(secondHash);
-        } catch (NoSuchAlgorithmException e) {
-            throw new MyCustomException(400, Constant.Error.HASH_TRANSFORM_ERROR);
-        }
-    }
-
     @PostMapping("/doLogin")
     @Transactional
     public Result doLogin(@RequestBody LoginRequestDTO loginRequestDTO) {
@@ -363,13 +300,11 @@ public class UserController extends ApiController {
     // todo 缓存穿透实例接口
     // todo 缓存穿透实例接口
     // todo 缓存穿透实例接口
+    // todo 缓存穿透实例接口
+    // todo 缓存穿透实例接口
     // todo 下面的就是 启动时通过多线程异步预热数据 预热完成前用把缓存设置为空的办法 预热完毕后在用布隆过滤器
     // todo 下面的就是 启动时通过多线程异步预热数据 预热完成前用把缓存设置为空的办法 预热完毕后在用布隆过滤器
     // todo 下面的就是 启动时通过多线程异步预热数据 预热完成前用把缓存设置为空的办法 预热完毕后在用布隆过滤器
-    // 这个方案通过"线程安全的状态标记+多线程异步预热+降级兜底"实现高效启动：
-    // 服务启动时先将布隆过滤器预热状态设为false，此时请求不使用布隆过滤器，而是通过缓存空数据/直接查库兜底；
-    // 同时后台多线程分片加载全量用户数据到布隆过滤器，完成后将状态标记为true，
-    // 请求自动切换为"布隆过滤器+查库"的高效逻辑——既避免了服务启动阻塞，又保证了预热完成后布隆过滤器的性能优势。
 
     // ****************************************************************
 
@@ -378,298 +313,45 @@ public class UserController extends ApiController {
     // 生成布隆过滤器并序列化存储到 Redis），服务启动时直接加载 Redis 中的快照数据，无需实时预热；
     // 同时在业务侧通过binlog 增量同步（如 Canal 监听用户表变更），将新增/删除的用户ID实时同步到布隆过滤器。
     @GetMapping("/userInfo")
-    public Result<UserInfo> userInfo(@RequestParam Map<String, Object> params) {
-        String pageStr = String.valueOf(params.getOrDefault("page", ""));
-        String pageSizeStr = String.valueOf(params.getOrDefault("pageSize", ""));
-        // String userId = String.valueOf(params.getOrDefault("userId", ""));
-
-        String userId = String.valueOf(params.getOrDefault("userId", ""));
-        if (userId.isEmpty()) {
-            userId = String.valueOf(StpUtil.getLoginId());
-        }
-        // todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
-        // todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
-        // todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
-        // todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
-        // todo 下面是预防缓存穿透的第一步 排除无意义的参数的干扰
-
-        // // 1. 非空校验（空字符串或空白字符）
-        // if (userId.trim().isEmpty()) {
-        // return Result.error("用户ID不能为空");
-        // }
-
-        // 2. 格式校验（是否为纯数字，避免非数字ID穿透）
-        if (!userId.matches("^\\d+$")) {
-            return Result.error("用户ID必须为数字格式");
-        }
-
-        // 3. 数值范围校验（防止过大/过小的非法ID，如-1、999999999999）
-        long userIdLongcan;
+    public Result<UserInfoResponseDTO> userInfo(
+            @RequestParam(value = "userId", required = false) Long userId,
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "pageSize", required = false) Integer pageSize,
+            @RequestParam(value = "type", required = false) String type,
+            @RequestParam(value = "isRedis", required = false) Boolean isRedis) {
         try {
-            userIdLongcan = Long.parseLong(userId);
-        } catch (NumberFormatException e) {
-            return Result.error("用户ID格式错误，请输入有效的数字ID");
-        }
+            // 如果未提供userId，使用当前登录用户ID
+            if (userId == null) {
+                userId = Long.parseLong(StpUtil.getLoginId().toString());
+            }
 
-        // if (userIdLongcan <= 0 || userIdLongcan > 1000000000L) { // 假设业务中用户ID最大为10亿
-        // return Result.error("用户ID超出合法范围（1-1000000000）");
-        // }
+            // 验证userId格式
+            if (userId <= 0) {
+                return Result.error("用户ID格式错误，请输入有效的数字ID");
+            }
 
-        // 4. 业务规则校验（拦截已知的非法ID，如恶意构造的特殊值）
-        if (userIdLongcan == 999999999L || userIdLongcan == 123456789L) { // 示例：拦截特定非法ID
-            return Result.error("用户ID非法，禁止访问");
-        }
+            // 构建请求DTO
+            UserInfoRequestDTO requestDTO = new UserInfoRequestDTO();
+            requestDTO.setUserId(userId);
+            requestDTO.setPage(page);
+            requestDTO.setPageSize(pageSize);
+            requestDTO.setType(type);
+            requestDTO.setRedis(isRedis != null && isRedis);
 
-        String type = String.valueOf(params.getOrDefault("type", ""));
-        // 新增isredis参数处理，检查是否传了isredis参数
-        boolean isRedis = params.containsKey("isredis");
+            // 调用服务获取用户信息
+            UserInfoResponseDTO userInfo = userService.getUserInfo(requestDTO);
 
-        if (userId.isEmpty()) {
-            userId = String.valueOf(StpUtil.getLoginId());
-        }
+            if (userInfo == null) {
+                return Result.error("用户不存在");
+            }
 
-        Long userIdLong;
-        try {
-            userIdLong = Long.parseLong(userId);
+            return Result.success(userInfo);
         } catch (NumberFormatException e) {
             return Result.error("用户ID格式错误");
-        }
-
-        // 根据type选择缓存穿透解决方案
-        User user = null;
-        String key = "user_info:" + userId;
-        String emptyKey = "empty_user:" + userId;
-
-        // 如果传了isredis参数，直接从数据库查询，不使用redis
-        if (isRedis) {
-            user = queryUserFromDbDirect(userIdLong);
-        } else {
-            // 方案1: 布隆过滤器 (type=bloom)
-            if ("bloom".equals(type)) {
-                // 检查是否需要布隆过滤器预热完成才能使用
-                if (bloomFilterRequireWarmup) {
-                    boolean isWarmupCompleted = bloomFilterMonitor.isWarmupCompleted();
-
-                    // 如果需要预热且未完成，则返回错误或降级处理
-                    if (!isWarmupCompleted) {
-                        log.warn("布隆过滤器预热未完成，当前配置要求预热完成后才能使用，请求将被拒绝");
-                        return Result.error("布隆过滤器服务暂不可用，请稍后再试");
-                    }
-                }
-                // 检查布隆过滤器预热是否完成
-                boolean isWarmupCompleted = bloomFilterMonitor.isWarmupCompleted();
-
-                // 预热完成前：布隆过滤器返回不存在也需要查库验证，避免误判
-                // 预热完成后：布隆过滤器返回不存在则可以直接返回（假阴性概率极低）
-                if (!isWarmupCompleted) {
-                    log.debug("布隆过滤器预热未完成，即使布隆过滤器返回不存在，也继续查询数据库");
-
-                    // 在预热未完成时，同时应用空值缓存策略
-                    try {
-                        String emptyValue = stringRedisTemplate.opsForValue().get(emptyKey);
-                        if ("null".equals(emptyValue)) {
-                            log.debug("空值缓存命中，用户ID {} 不存在", userIdLong);
-                            return Result.error("用户不存在");
-                        }
-                    } catch (Exception e) {
-                        log.error("读取空值缓存失败，降级查询数据库", e);
-                    }
-                } else if (!userBloomFilter.contains(userIdLong)) {
-                    // 预热完成后，布隆过滤器返回不存在，则用户几乎肯定不存在
-                    log.debug("布隆过滤器预热已完成，用户ID {} 不在布隆过滤器中，直接返回不存在", userIdLong);
-                    return Result.error("用户不存在");
-                }
-            }
-
-            try {
-                String userJson = stringRedisTemplate.opsForValue().get(key);
-                if (userJson != null) {
-                    user = objectMapper.readValue(userJson, User.class);
-                }
-
-                // 方案1: 空值缓存 (type=empty)
-                if ("empty".equals(type) && user == null) {
-                    String emptyValue = stringRedisTemplate.opsForValue().get(emptyKey);
-                    if ("null".equals(emptyValue)) {
-                        return Result.error("用户不存在");
-                    }
-                }
-            } catch (Exception e) {
-                log.error("Redis 用户信息反序列化失败，降级查询数据库", e);
-            }
-
-            // 方案3: 互斥锁 (type=lock)
-            if (user == null) {
-                if ("lock".equals(type)) {
-                    RLock lock = redissonClient.getLock("user_info_lock:" + userId);
-                    boolean lockAcquired = false;
-                    try {
-                        // 尝试获取锁，最多等待5秒，锁自动释放时间30秒
-                        lockAcquired = lock.tryLock(5, 30, TimeUnit.SECONDS);
-                        if (lockAcquired) {
-                            try {
-                                // 双重检查
-                                String userJson = stringRedisTemplate.opsForValue().get(key);
-                                if (userJson != null) {
-                                    user = objectMapper.readValue(userJson, User.class);
-                                } else {
-                                    user = queryUserFromDb(userIdLong, key, emptyKey, type);
-                                }
-                            } catch (JsonProcessingException e) {
-                                log.error("处理用户数据序列化异常", e);
-                                // 序列化异常，尝试直接查询数据库（兜底）
-                                user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getId, userIdLong));
-                            } finally {
-                                lock.unlock();
-                            }
-                        }
-                    } catch (InterruptedException e) {
-                        log.error("获取锁异常", e);
-                        Thread.currentThread().interrupt();
-                    }
-
-                    // 获取锁失败或处理异常后，重试读取缓存（包括空值缓存）
-                    if (!lockAcquired || user == null) {
-                        try {
-                            // 重试读取正常缓存
-                            String userJson = stringRedisTemplate.opsForValue().get(key);
-                            if (userJson != null) {
-                                user = objectMapper.readValue(userJson, User.class);
-                            } else {
-                                // 检查空值缓存
-                                String emptyValue = stringRedisTemplate.opsForValue().get(emptyKey);
-                                if ("null".equals(emptyValue)) {
-                                    log.debug("空值缓存命中，用户ID {} 不存在", userIdLong);
-                                    // 空值缓存存在，说明数据真的不存在
-                                    return Result.error("用户不存在");
-                                } else {
-                                    // 空值缓存不存在，且获取锁失败，说明可能是并发查询，尝试直接查询数据库兜底
-                                    log.debug("获取锁失败，尝试直接查询数据库兜底，用户ID: {}", userIdLong);
-                                    user = userService
-                                            .getOne(new LambdaQueryWrapper<User>().eq(User::getId, userIdLong));
-                                    // 如果兜底查询到数据，更新缓存
-                                    if (user != null) {
-                                        try {
-                                            String userJsonStr = objectMapper.writeValueAsString(user);
-                                            stringRedisTemplate.opsForValue().set(key, userJsonStr, 10,
-                                                    TimeUnit.MINUTES);
-                                            // 将存在的用户ID添加到布隆过滤器
-                                            if (!userBloomFilter.contains(userIdLong)) {
-                                                userBloomFilter.add(userIdLong);
-                                                log.info("用户ID {} 已添加到布隆过滤器", userIdLong);
-                                            }
-                                        } catch (JsonProcessingException e) {
-                                            log.error("兜底查询后更新缓存失败", e);
-                                            // 更新缓存失败不影响返回结果
-                                        }
-                                    } else {
-                                        // 兜底查询也没有数据，设置空值缓存
-                                        stringRedisTemplate.opsForValue().set(emptyKey, "null", 5, TimeUnit.MINUTES);
-                                        log.debug("兜底查询无数据，为用户ID {} 设置空值缓存，过期时间5分钟", userIdLong);
-                                    }
-                                }
-                            }
-                        } catch (Exception e) {
-                            log.error("获取锁失败后重试缓存或兜底查询异常", e);
-                            // 异常兜底：如果所有尝试都失败，返回友好错误，而不是直接返回用户不存在
-                            return Result.error("请求繁忙，请稍后重试");
-                        }
-                    }
-                } else {
-                    user = queryUserFromDb(userIdLong, key, emptyKey, type);
-                }
-            }
-        }
-
-        if (user == null) {
-            return Result.error("用户不存在");
-        }
-
-        UserInfo userInfo = new UserInfo();
-        BeanUtils.copyProperties(user, userInfo);
-
-        // 设置粉丝、关注和互关数量
-        Integer fansCount = userRelationService.getFansCount(userIdLong);
-        Integer followCount = userRelationService.getFollowCount(userIdLong);
-        Integer mutualFollowCount = userRelationService.getMutualFollowCount(userIdLong);
-
-        userInfo.setFansCount(fansCount);
-        userInfo.setFollowCount(followCount);
-        userInfo.setMutualFollowCount(mutualFollowCount);
-        userInfo.setFollowers(fansCount);
-        userInfo.setFollowing(followCount);
-        userInfo.setMutualFollow(mutualFollowCount);
-
-        try {
-            if (pageStr.isEmpty() || pageSizeStr.isEmpty()) {
-                List<Video> videoList = videoFeignService.list(
-                        new LambdaQueryWrapper<Video>().eq(Video::getUserId, userId));
-                userInfo.setVideoList(videoList);
-            } else {
-                long page, pageSize;
-                try {
-                    page = Long.parseLong(pageStr);
-                    pageSize = Long.parseLong(pageSizeStr);
-                } catch (NumberFormatException e) {
-                    return Result.error("分页参数格式错误");
-                }
-                Page<Video> pageQry = new Page<>(page, pageSize);
-                IPage<Video> videoPage = videoFeignService.page(
-                        pageQry,
-                        new LambdaQueryWrapper<Video>().eq(Video::getUserId, userId));
-                userInfo.setVideoPage(videoPage);
-            }
         } catch (Exception e) {
-            log.error("查询视频信息失败", e);
-            return Result.error("查询视频信息失败");
+            log.error("获取用户信息失败", e);
+            return Result.error("获取用户信息失败，请稍后重试");
         }
-
-        return Result.success(userInfo);
-    }
-
-    /**
-     * 从数据库查询用户信息并处理缓存
-     */
-    private User queryUserFromDb(Long userId, String key, String emptyKey, String type) {
-        User user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getId, userId));
-
-        try {
-            if (user != null) {
-                // 将存在的用户ID添加到布隆过滤器
-                if (!userBloomFilter.contains(userId)) {
-                    userBloomFilter.add(userId);
-                    log.info("用户ID {} 已添加到布隆过滤器", userId);
-                }
-
-                String userJson = objectMapper.writeValueAsString(user);
-                stringRedisTemplate.opsForValue().set(key, userJson, 10, TimeUnit.MINUTES);
-                // 如果是空值缓存策略或布隆过滤器策略，删除空值标记
-                if ("empty".equals(type) || "bloom".equals(type) || "布隆".equals(type)) {
-                    stringRedisTemplate.delete(emptyKey);
-                }
-            } else {
-                // 方案1: 缓存空值 - 对空值缓存策略和布隆过滤器策略都应用空值缓存
-                if ("empty".equals(type) || "bloom".equals(type) || "布隆".equals(type)) {
-                    stringRedisTemplate.opsForValue().set(emptyKey, "null", 5, TimeUnit.MINUTES);
-                    log.debug("为用户ID {} 设置空值缓存，过期时间5分钟", userId);
-                }
-            }
-        } catch (JsonProcessingException e) {
-            log.error("用户信息序列化失败", e);
-        } catch (Exception e) {
-            log.error("处理用户数据时发生异常", e);
-        }
-
-        return user;
-    }
-
-    /**
-     * 直接从数据库查询用户信息，不处理缓存
-     */
-    private User queryUserFromDbDirect(Long userId) {
-        User user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getId, userId));
-        log.debug("直接从数据库查询用户信息，用户ID: {}", userId);
-        return user;
     }
 
     // 图片验证码接口
@@ -729,82 +411,25 @@ public class UserController extends ApiController {
     @PostMapping("/register")
     @Transactional
     public Result register(@RequestBody Map<String, Object> params) {
-        // 1. 参数提取与校验
+        // 1. 参数提取
         String userName = String.valueOf(params.getOrDefault("userName", ""));
         String password = String.valueOf(params.getOrDefault("password", ""));
         boolean isCheck = Boolean.parseBoolean(String.valueOf(params.getOrDefault("isCheck", "false")));
         String verificationCode = String.valueOf(params.getOrDefault("verificationCode", ""));
-        // 基础参数校验
-        if (userName.isEmpty() || password.isEmpty()) {
-            return Result.error("用户名和密码不能为空");
-        }
-        // 2. 验证码校验（如果需要）
-        if (isCheck) {
-            if (verificationCode.isEmpty()) {
-                return Result.error("验证码不能为空");
-            }
-            String storedCode = stringRedisTemplate.opsForValue()
-                    .get(Constant.User.EMAIL_CODE_PREFIX + userName);
-            if (storedCode == null || !verificationCode.equalsIgnoreCase(storedCode)) {
-                return Result.error("验证码错误");
-            }
-        }
-        // 3. 用户注册处理
+
+        // 2. 调用服务进行注册
         try {
-            User user = registerNewUser(userName, password);
-            return Result.success(user); // 直接返回对象，让Result类处理序列化
+            User user = userService.register(userName, password, isCheck, verificationCode);
+            return Result.success(user);
+        } catch (IllegalArgumentException e) {
+            return Result.error(e.getMessage());
         } catch (MyCustomException e) {
             log.error("业务异常: {}", e.getMessage());
-            return Result.error(e.getMessage()); // 返回具体错误信息
+            return Result.error(e.getMessage());
         } catch (Exception e) {
             log.error("系统异常: {}", e.getMessage(), e);
             return Result.error("注册失败，请稍后重试");
         }
-    }
-
-    @Transactional
-    public User registerNewUser(String username, String password)
-            throws NoSuchAlgorithmException, InvalidKeySpecException {
-        // 查询是否已存在
-        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(User::getUsername, username);
-        User existingUser = userService.getOne(queryWrapper);
-
-        if (existingUser != null) {
-            throw new MyCustomException(400, Constant.Error.USER_REPEAT);
-        }
-
-        long userId = idService.SnowflakeGen();
-
-        // 生成盐值并保存
-        String saltStr = generateSalt(16);
-        Salt salt = new Salt();
-        salt.setUserId(userId);
-        salt.setSalt(saltStr);
-        saltService.save(salt);
-
-        // 加密密码
-        String encryptedPassword = saltedDoubleHashPassword(password, saltStr);
-
-        // 设置用户基本信息
-        User user = new User();
-        user.setId(userId);
-        user.setUsername(username);
-        user.setPassword(encryptedPassword);
-        user.setNickname(Constant.Chinese.NEW_USER + idService.SnowflakeGen());
-        user.setAvatar(
-                dcSystemService.getOne(new LambdaQueryWrapper<DcSystem>()
-                        .eq(DcSystem::getSysName, Constant.User.DEFAULT_USER_AVATAR))
-                        .getSysValue());
-        user.setBackImg(
-                dcSystemService.getOne(new LambdaQueryWrapper<DcSystem>()
-                        .eq(DcSystem::getSysName, Constant.User.DEFAULT_USER_BACK_IMG))
-                        .getSysValue());
-        user.setRoleId(Constant.Role.USER);
-
-        userService.save(user);
-
-        return user;
     }
 
     // ===== 一、用户基础信息扩展接口 =====
@@ -820,37 +445,19 @@ public class UserController extends ApiController {
                 userId = Long.parseLong(StpUtil.getLoginId().toString());
             }
 
-            // 验证用户是否存在
-            User user = userService.getById(userId);
-            if (user == null) {
+            // 调用服务更新用户信息
+            boolean success = userService.updateInfo(
+                    userId,
+                    request.getNickname(),
+                    request.getAvatar(),
+                    request.getPhone(),
+                    request.getGender());
+
+            if (success) {
+                return Result.success(null);
+            } else {
                 return Result.error("用户不存在");
             }
-
-            // 验证手机号是否已被占用
-            if (request.getPhone() != null && !request.getPhone().equals(user.getPhone())) {
-                // 这里简化处理，实际应查询数据库验证
-                System.out.println("验证手机号是否已被占用");
-                // 模拟手机号已被占用的情况
-                // return Result.error("手机号已被占用");
-            }
-
-            // 更新用户信息
-            if (request.getNickname() != null)
-                user.setNickname(request.getNickname());
-            if (request.getAvatar() != null)
-                user.setAvatar(request.getAvatar());
-            if (request.getPhone() != null)
-                user.setPhone(request.getPhone());
-            if (request.getGender() != null)
-                user.setGender(request.getGender());
-
-            userService.updateById(user);
-
-            // 清除Redis缓存
-            String userInfoKey = userId + Constant.User._USER_INFO;
-            stringRedisTemplate.delete(userInfoKey);
-
-            return Result.success(null);
         } catch (Exception e) {
             log.error("更新用户信息失败", e);
             return Result.error("更新失败，请稍后重试");
@@ -868,47 +475,20 @@ public class UserController extends ApiController {
                 userId = Long.parseLong(StpUtil.getLoginId().toString());
             }
 
-            User user = userService.getById(userId);
-            if (user == null) {
+            // 调用服务修改密码
+            boolean success = userService.changePassword(
+                    userId,
+                    request.getOldPassword(),
+                    request.getNewPassword(),
+                    request.getVerificationCode());
+
+            if (success) {
+                return Result.success(null);
+            } else {
                 return Result.error("用户不存在");
             }
-
-            // 验证原密码或验证码
-            if (request.getVerificationCode() != null) {
-                // 验证码方式（未登录状态）
-                // 这里简化处理，实际应验证验证码
-                System.out.println("验证验证码: " + request.getVerificationCode());
-            } else {
-                // 原密码方式（登录状态）
-                if (request.getOldPassword() == null) {
-                    return Result.error("原密码不能为空");
-                }
-
-                // 获取用户盐值并验证密码
-                Salt salt = saltService.getOne(new LambdaQueryWrapper<Salt>().eq(Salt::getUserId, userId));
-                if (salt == null) {
-                    return Result.error("用户信息异常");
-                }
-
-                String encryptedOldPassword = saltedDoubleHashPassword(request.getOldPassword(), salt.getSalt());
-                if (!encryptedOldPassword.equals(user.getPassword())) {
-                    return Result.error("原密码错误");
-                }
-            }
-
-            // 更新密码
-            String newSalt = generateSalt(16);
-            String encryptedNewPassword = saltedDoubleHashPassword(request.getNewPassword(), newSalt);
-
-            user.setPassword(encryptedNewPassword);
-            userService.updateById(user);
-
-            // 更新盐值
-            Salt salt = saltService.getOne(new LambdaQueryWrapper<Salt>().eq(Salt::getUserId, userId));
-            salt.setSalt(newSalt);
-            saltService.updateById(salt);
-
-            return Result.success(null);
+        } catch (IllegalArgumentException e) {
+            return Result.error(e.getMessage());
         } catch (Exception e) {
             log.error("修改密码失败", e);
             return Result.error("修改失败，请稍后重试");

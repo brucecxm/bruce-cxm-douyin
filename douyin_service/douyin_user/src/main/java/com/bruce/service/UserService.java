@@ -1,7 +1,11 @@
 package com.bruce.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.bruce.entity.User;
+import com.bruce.entity.UserInfo;
+import com.bruce.dto.UserInfoRequestDTO;
+import com.bruce.dto.UserInfoResponseDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -83,5 +87,59 @@ public interface UserService extends IService<User> {
      * @return 是否更新成功
      */
     boolean updateById(User user);
+    
+    /**
+     * 根据请求DTO获取用户信息
+     * @param requestDTO 用户信息请求DTO
+     * @return 用户信息响应DTO
+     */
+    UserInfoResponseDTO getUserInfo(UserInfoRequestDTO requestDTO);
+
+    /**
+     * 更新用户信息
+     * @param user 用户信息
+     * @param userId 当前登录用户ID
+     * @return 更新结果
+     */
+    boolean updateUserInfo(User user, Long userId);
+
+    /**
+     * 获取用户列表（分页）
+     * @param page 页码
+     * @param pageSize 每页大小
+     * @return 分页结果
+     */
+    IPage<User> getUserList(Integer page, Integer pageSize);
+
+    /**
+     * 用户注册
+     * @param username 用户名
+     * @param password 密码
+     * @param isCheck 是否需要验证码
+     * @param verificationCode 验证码
+     * @return 注册用户信息
+     */
+    User register(String username, String password, boolean isCheck, String verificationCode);
+
+    /**
+     * 更新用户详细信息
+     * @param userId 用户ID
+     * @param nickname 昵称
+     * @param avatar 头像
+     * @param phone 手机号
+     * @param gender 性别
+     * @return 更新结果
+     */
+    boolean updateInfo(Long userId, String nickname, String avatar, String phone, String gender);
+
+    /**
+     * 修改密码
+     * @param userId 用户ID
+     * @param oldPassword 原密码
+     * @param newPassword 新密码
+     * @param verificationCode 验证码
+     * @return 修改结果
+     */
+    boolean changePassword(Long userId, String oldPassword, String newPassword, String verificationCode);
 }
 

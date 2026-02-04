@@ -242,7 +242,7 @@ export default {
     // 核心数据获取逻辑
     fetchUserAndVideosData(page) {
       // 注意：这里为了防止报错，加了 try-catch 或空判断，实际运行依赖你的 api
-      getUserInfo(null, page, this.pageSize)
+      getUserInfo(null, page, this.pageSize, 'empty', false)
         .then((res) => {
           if (res && res.data) {
             if (page === 1) {
