@@ -1,7 +1,5 @@
 package com.bruce.controller;
 
-
-
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.ApiController;
@@ -10,6 +8,7 @@ import com.bruce.entity.User;
 import com.bruce.pojo.FriendRequestDTO;
 import com.bruce.pojo.FriendRequestVO;
 import com.bruce.pojo.FriendVO;
+import com.bruce.pojo.FriendDetailVO;
 import com.bruce.pojo.HandleRequestDTO;
 import com.bruce.pojo.Result;
 import com.bruce.entity.Friend;
@@ -41,15 +40,8 @@ public class FriendController extends ApiController {
     @Resource
     private FriendService friendService;
 
-
-
-
     @Autowired
     private UserService userService;
-
-
-
-
 
     /**
      *
@@ -62,8 +54,8 @@ public class FriendController extends ApiController {
      */
     @GetMapping
     public Result selectAll(
-            @RequestParam(defaultValue = "1") int current,  // 当前页，默认为1
-            @RequestParam(defaultValue = "10") int size,    // 每页大小，默认为10
+            @RequestParam(defaultValue = "1") int current, // 当前页，默认为1
+            @RequestParam(defaultValue = "10") int size, // 每页大小，默认为10
             Friend friend) {
 
         // 创建一个分页对象
@@ -71,7 +63,6 @@ public class FriendController extends ApiController {
 
         return Result.success(this.friendService.page(page, new QueryWrapper<>(friend)));
     }
-
 
     /**
      * 查询所有数据
@@ -83,6 +74,7 @@ public class FriendController extends ApiController {
         List<Friend> friends = this.friendService.list();
         return Result.success(friends);
     }
+
     /**
      * 通过主键查询单条数据
      *
@@ -160,20 +152,6 @@ public class FriendController extends ApiController {
         return Result.success(this.friendService.removeByIds(idList));
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * 1. 发送好友请求
      */
@@ -219,28 +197,6 @@ public class FriendController extends ApiController {
         return Result.success("好友已删除");
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * 获取当前用户所有好友的详细信息列表
      * 结合Friend和User表的信息，返回更丰富的好友数据
@@ -249,62 +205,64 @@ public class FriendController extends ApiController {
     public Result selectAllFriendsWithDetails() {
         // 获取当前登录用户ID
         Long userId = Long.valueOf(StpUtil.getLoginIdAsString());
-        
+
         // 先获取当前用户的所有好友关系记录
-        List<Friend> friends = this.friendService.list(new QueryWrapper<Friend>().eq("user_id", userId).eq("status", 1));
-        
+        List<Friend> friends = this.friendService
+                .list(new QueryWrapper<Friend>().eq("user_id", userId).eq("status", 1));
+
         // 如果没有好友，返回空列表
         if (friends.isEmpty()) {
             return Result.success(new ArrayList<>());
         }
-        
+
         // 提取所有好友ID
         List<Long> friendIds = friends.stream().map(Friend::getFriendId).collect(Collectors.toList());
-        
+
         // 使用UserService批量查询好友的用户信息
         List<User> friendUsers = userService.listByIds(friendIds);
-        
+
         // 将好友关系和用户信息组合成Map便于关联
         Map<Long, User> userMap = friendUsers.stream().collect(Collectors.toMap(User::getId, user -> user));
-        
+
         // 创建包含详细信息的结果列表
-        List<Map<String, Object>> friendDetailsList = new ArrayList<>();
-        
+        List<FriendDetailVO> friendDetailsList = new ArrayList<>();
+
         for (Friend friend : friends) {
             User friendUser = userMap.get(friend.getFriendId());
             if (friendUser != null) {
-                Map<String, Object> friendDetail = new HashMap<>();
+                FriendDetailVO friendDetail = new FriendDetailVO();
                 // 好友关系信息
-                friendDetail.put("friendId", friend.getId());
-                friendDetail.put("remark", friend.getRemark());
-                friendDetail.put("addedTime", friend.getCreatedTime());
-                friendDetail.put("status", friend.getStatus());
-                
+                friendDetail.setFriendId(friend.getId());
+                friendDetail.setRemark(friend.getRemark());
+                friendDetail.setAddedTime(friend.getCreatedTime());
+                friendDetail.setStatus(friend.getStatus());
+
                 // 用户详细信息
-                friendDetail.put("userId", friendUser.getId());
-                friendDetail.put("nickname", friendUser.getNickname());
-                friendDetail.put("avatar", friendUser.getAvatar());
-                friendDetail.put("gender", friendUser.getGender());
-                friendDetail.put("phone", friendUser.getPhone());
-                friendDetail.put("email", friendUser.getEmail());
-                friendDetail.put("city", friendUser.getCity());
-                friendDetail.put("myIntro", friendUser.getMyIntro());
-                friendDetail.put("age", friendUser.getAge());
-                friendDetail.put("school", friendUser.getSchool());
-                friendDetail.put("userPic", friendUser.getUserPic());
-                friendDetail.put("backImg", friendUser.getBackImg());
-                friendDetail.put("isAnchor", friendUser.getIsAnchor());
-                friendDetail.put("isPrivate", friendUser.getIsPrivate());
-                
+                friendDetail.setUserId(friendUser.getId());
+                friendDetail.setNickname(friendUser.getNickname());
+                friendDetail.setAvatar(friendUser.getAvatar());
+                friendDetail.setGender(friendUser.getGender());
+                friendDetail.setPhone(friendUser.getPhone());
+                friendDetail.setEmail(friendUser.getEmail());
+                friendDetail.setCity(friendUser.getCity());
+                friendDetail.setMyIntro(friendUser.getMyIntro());
+                friendDetail.setAge(friendUser.getAge());
+                friendDetail.setSchool(friendUser.getSchool());
+                friendDetail.setUserPic(friendUser.getUserPic());
+                friendDetail.setBackImg(friendUser.getBackImg());
+                friendDetail.setIsAnchor(friendUser.getIsAnchor());
+                friendDetail.setIsPrivate(friendUser.getIsPrivate());
+
                 friendDetailsList.add(friendDetail);
             }
         }
-        
+
         return Result.success(friendDetailsList);
     }
-    
+
     /**
      * 获取指定好友的详细信息
+     * 
      * @param friendId 好友关系ID
      * @return 好友的详细信息
      */
@@ -312,24 +270,24 @@ public class FriendController extends ApiController {
     public Result selectFriendDetail(@PathVariable Long friendId) {
         // 获取当前登录用户ID
         Long userId = Long.valueOf(StpUtil.getLoginIdAsString());
-        
+
         // 查询好友关系记录，确保是当前用户的好友
         Friend friend = this.friendService.getOne(new QueryWrapper<Friend>()
                 .eq("id", friendId)
                 .eq("user_id", userId)
                 .eq("status", 1));
-        
+
         if (friend == null) {
             return Result.error("未找到该好友信息");
         }
-        
+
         // 使用UserService查询好友的用户信息
         User friendUser = userService.getById(friend.getFriendId());
-        
+
         if (friendUser == null) {
             return Result.error("好友用户信息不存在");
         }
-        
+
         // 创建包含详细信息的结果Map
         Map<String, Object> friendDetail = new HashMap<>();
         // 好友关系信息
@@ -337,7 +295,7 @@ public class FriendController extends ApiController {
         friendDetail.put("remark", friend.getRemark());
         friendDetail.put("addedTime", friend.getCreatedTime());
         friendDetail.put("status", friend.getStatus());
-        
+
         // 用户详细信息
         friendDetail.put("userId", friendUser.getId());
         friendDetail.put("nickname", friendUser.getNickname());
@@ -353,12 +311,8 @@ public class FriendController extends ApiController {
         friendDetail.put("backImg", friendUser.getBackImg());
         friendDetail.put("isAnchor", friendUser.getIsAnchor());
         friendDetail.put("isPrivate", friendUser.getIsPrivate());
-        
+
         return Result.success(friendDetail);
     }
 
-
-
-
 }
-
