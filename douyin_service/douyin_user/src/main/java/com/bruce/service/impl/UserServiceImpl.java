@@ -221,9 +221,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     @Override
     public com.bruce.dto.UserInfoResponseDTO getUserInfo(com.bruce.dto.UserInfoRequestDTO requestDTO) {
-        try {
-            // 获取缓存策略
-            com.bruce.service.strategy.CachingStrategy strategy = cachingStrategyFactory.getStrategy(requestDTO.getType());
+                try {
+                    // 获取缓存策略
+                    com.bruce.service.strategy.CachingStrategy strategy = cachingStrategyFactory.getStrategy(requestDTO.getType());
 
             // 使用策略获取用户信息
             com.bruce.entity.UserInfo userInfo = strategy.getUserInfo(

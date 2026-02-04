@@ -92,6 +92,16 @@ export default {
       return; // 终止后续逻辑
     }
     this.connect();
+    // 进入聊天页面时上报状态
+    this.reportChatStatus('enter');
+  },
+  beforeUnmount() {
+    // 离开聊天页面时上报状态
+    this.reportChatStatus('leave');
+    // 断开 WebSocket 连接
+    if (this.stompClient) {
+      this.stompClient.disconnect();
+    }
   },
   methods: {
     getAvatar(sender) {
@@ -127,8 +137,11 @@ export default {
           this.stompClient.subscribe('/user/queue/messages', (msg) => {
             const message = JSON.parse(msg.body);
             message.timestamp = message.timestamp || Date.now(); // 确保有时间戳
-            this.messages.push(message);
-            this.scrollToBottom();
+            // 过滤掉自己发送的消息，避免重复显示
+            if (message.sender !== this.myId) {
+              this.messages.push(message);
+              this.scrollToBottom();
+            }
           });
         },
         (error) => {
@@ -259,6 +272,22 @@ export default {
         hour: '2-digit',
         minute: '2-digit'
       });
+    },
+    reportChatStatus(status) {
+      if (this.connected && this.stompClient) {
+        const statusMsg = {
+          userId: this.myId,
+          chatUserId: this.receiver,
+          status: status, // 'enter' 或 'leave'
+          timestamp: Date.now()
+        };
+        this.stompClient.send(
+          '/app/chat-status',
+          {},
+          JSON.stringify(statusMsg)
+        );
+        console.log(`上报聊天状态: ${status}，与 ${this.receiver} 聊天`);
+      }
     }
   }
 };
