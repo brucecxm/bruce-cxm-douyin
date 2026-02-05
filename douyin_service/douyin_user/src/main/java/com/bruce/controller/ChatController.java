@@ -92,19 +92,19 @@ public class ChatController {
                 /**
                  * ⭐ Spring 底层流程：
                  * 1. 查表：找到 user=message.getReceiver() 的所有 session
-                 *    Spring 内部维护 userId → sessionId 的映射表
-                 *    例如：
-                 *    userId  → sessionId
-                 *    -------------------------
-                 *    1001    → s1x9a
-                 *    1002    → k22pq
-                 *    1001    → z88bc  // 同一用户多连接
-                 *    
+                 * Spring 内部维护 userId → sessionId 的映射表
+                 * 例如：
+                 * userId → sessionId
+                 * -------------------------
+                 * 1001 → s1x9a
+                 * 1002 → k22pq
+                 * 1001 → z88bc // 同一用户多连接
+                 * 
                  * 2. 转换真实地址：
-                 *    内部会变成：
-                 *    /queue/messages-userS1x9a
-                 *    /queue/messages-userZ88bc
-                 *    
+                 * 内部会变成：
+                 * /queue/messages-userS1x9a
+                 * /queue/messages-userZ88bc
+                 * 
                  * 3. 推送：消息发送到对应 WebSocket 连接
                  */
                 messagingTemplate.convertAndSendToUser(
@@ -199,7 +199,30 @@ public class ChatController {
         System.out.println("触发通知：用户 " + message.getReceiver() + " 收到来自 " + message.getSender() + " 的消息");
     }
 
-    // 简化的发送消息接口，不依赖ChatService
+    /**
+     * ⭐ 简化的发送消息接口，不依赖ChatService
+     * 
+     * STOMP SEND流程：
+     * 客户端：client.publish({destination:"/app/chat", body:"hello"})
+     * 实际Frame：
+     * SEND
+     * destination:/app/chat
+     * 
+     * hello
+     * 
+     * Spring处理：
+     * 1. 识别 /app 前缀
+     * 2. 路由到 @MessageMapping("/chat")
+     * 3. 执行Controller方法
+     * 
+     * 如果添加 @SendTo("/topic/chat")：
+     * Broker会推送MESSAGE到所有订阅者
+     * MESSAGE
+     * subscription:sub-1
+     * destination:/topic/chat
+     * 
+     * hello
+     */
     @MessageMapping("/chat")
     public void handleBasicChat(ChatMessageYi message) {
         System.out.println("收到基础聊天消息: " + message.getContent());
@@ -243,280 +266,279 @@ public class ChatController {
 
 }
 
-
-
-
 //
 //
-//好 👍 我们继续往下 —— 这一步就是 **STOMP 架子里最有价值、最容易面试被问的部分**
+// 好 👍 我们继续往下 —— 这一步就是 **STOMP 架子里最有价值、最容易面试被问的部分**
 //
-//        # ⭐ `/user` 私聊推送完整原理（核心理解）
+// # ⭐ `/user` 私聊推送完整原理（核心理解）
 //
-//        你现在已经知道怎么用：
+// 你现在已经知道怎么用：
 //
-//        ```java
-//        convertAndSendToUser(...)
-//        ```
+// ```java
+// convertAndSendToUser(...)
+// ```
 //
-//        但真正重要的是：
+// 但真正重要的是：
 //
-//        > **Spring 是怎么知道消息该发给哪个 WebSocket 连接的？**
+// > **Spring 是怎么知道消息该发给哪个 WebSocket 连接的？**
 //
-//        这才是核心。
+// 这才是核心。
 //
-//        我们一步一步拆。
+// 我们一步一步拆。
 //
-//        ---
+// ---
 //
-//        # 一、先看使用方式（回顾）
+// # 一、先看使用方式（回顾）
 //
-//        ## 服务端发送
+// ## 服务端发送
 //
-//        ```java
-//@Autowired
-//private SimpMessagingTemplate template;
+// ```java
+// @Autowired
+// private SimpMessagingTemplate template;
 //
-//        template.convertAndSendToUser(
-//        "1001",                 // 用户ID
-//        "/queue/msg",           // 目标地址
-//        "hello"
-//        );
-//        ```
+// template.convertAndSendToUser(
+// "1001", // 用户ID
+// "/queue/msg", // 目标地址
+// "hello"
+// );
+// ```
 //
-//        ---
+// ---
 //
-//        ## 客户端订阅
+// ## 客户端订阅
 //
-//        ```javascript
-//        client.subscribe("/user/queue/msg", cb)
-//        ```
+// ```javascript
+// client.subscribe("/user/queue/msg", cb)
+// ```
 //
-//        注意区别：
+// 注意区别：
 //
-//        | 客户端写              | 服务端写         |
-//        | ----------------- | ------------ |
-//        | `/user/queue/msg` | `/queue/msg` |
+// | 客户端写 | 服务端写 |
+// | ----------------- | ------------ |
+// | `/user/queue/msg` | `/queue/msg` |
 //
-//        Spring 自动拼接映射
+// Spring 自动拼接映射
 //
-//        ---
+// ---
 //
-//        # 二、真正底层流程（非常重要）
+// # 二、真正底层流程（非常重要）
 //
-//        我们按真实执行流程走一遍：
+// 我们按真实执行流程走一遍：
 //
-//        ---
+// ---
 //
-//        ## ⭐ 第一步：WebSocket 建立连接
+// ## ⭐ 第一步：WebSocket 建立连接
 //
-//        浏览器连接：
+// 浏览器连接：
 //
-//        ```
-//        /user/ws
-//        ```
+// ```
+// /user/ws
+// ```
 //
-//        进入你写的：
+// 进入你写的：
 //
-//        ```
-//        HandshakeInterceptor
-//        HandshakeHandler
-//        ```
+// ```
+// HandshakeInterceptor
+// HandshakeHandler
+// ```
 //
-//        这里你通常做：
+// 这里你通常做：
 //
-//        ```java
-//        attributes.put("userId", token解析结果);
-//        ```
+// ```java
+// attributes.put("userId", token解析结果);
+// ```
 //
-//        然后：
+// 然后：
 //
-//        ```java
-//        return new UsernamePasswordAuthenticationToken(userId,null);
-//        ```
+// ```java
+// return new UsernamePasswordAuthenticationToken(userId,null);
+// ```
 //
-//        👉 设置 Principal
+// 👉 设置 Principal
 //
-//        ---
+// ---
 //
-//        # 三、第二步：Spring 建立用户映射表
+// # 三、第二步：Spring 建立用户映射表
 //
-//        连接成功后
-//        Spring 内部维护一张表（逻辑上类似）
+// 连接成功后
+// Spring 内部维护一张表（逻辑上类似）
 //
-//        ```
-//        userId  → sessionId
-//        -------------------------
-//        1001    → s1x9a
-//        1002    → k22pq
-//        1001    → z88bc
-//        ```
+// ```
+// userId → sessionId
+// -------------------------
+// 1001 → s1x9a
+// 1002 → k22pq
+// 1001 → z88bc
+// ```
 //
-//        注意：
+// 注意：
 //
-//        # ⭐ 一个用户可以多个连接
+// # ⭐ 一个用户可以多个连接
 //
-//        * 多浏览器
-//        * 多标签页
-//        * 多设备
+// * 多浏览器
+// * 多标签页
+// * 多设备
 //
-//        这就是为什么 STOMP 比原生好用
+// 这就是为什么 STOMP 比原生好用
 //
-//        ---
+// ---
 //
-//        # 四、第三步：发送私聊消息
+// # 四、第三步：发送私聊消息
 //
-//        当你执行：
+// 当你执行：
 //
-//        ```java
-//        convertAndSendToUser("1001","/queue/msg",data)
-//        ```
+// ```java
+// convertAndSendToUser("1001","/queue/msg",data)
+// ```
 //
-//        Spring 做了这些事：
+// Spring 做了这些事：
 //
-//        ### ① 查表
+// ### ① 查表
 //
-//        找到 user=1001 的所有 session
+// 找到 user=1001 的所有 session
 //
-//        ```
-//        s1x9a
-//        z88bc
-//        ```
+// ```
+// s1x9a
+// z88bc
+// ```
 //
-//        ---
+// ---
 //
-//        ### ② 转换真实地址
+// ### ② 转换真实地址
 //
-//        内部会变成：
+// 内部会变成：
 //
-//        ```
-//        /queue/msg-userS1x9a
-//        /queue/msg-userZ88bc
-//        ```
+// ```
+// /queue/msg-userS1x9a
+// /queue/msg-userZ88bc
+// ```
 //
-//        客户端其实订阅的是这种隐藏地址
+// 客户端其实订阅的是这种隐藏地址
 //
-//        你看不到
+// 你看不到
 //
-//        ---
+// ---
 //
-//        ### ③ 推送
+// ### ③ 推送
 //
-//        消息发送到对应 WebSocket
+// 消息发送到对应 WebSocket
 //
-//        ✔ 精准送达
-//        ✔ 不广播
-//        ✔ 不遍历你写代码
+// ✔ 精准送达
+// ✔ 不广播
+// ✔ 不遍历你写代码
 //
-//        全部框架完成
+// 全部框架完成
 //
-//        ---
+// ---
 //
-//        # 五、这就是 `/user` 的本质
+// # 五、这就是 `/user` 的本质
 //
-//        一句话总结：
+// 一句话总结：
 //
-//        # ⭐ `/user` = 用户ID → Session路由层
+// # ⭐ `/user` = 用户ID → Session路由层
 //
-//        Spring 帮你维护：
+// Spring 帮你维护：
 //
-//        * 用户连接关系
-//        * 路由转换
-//        * 推送执行
+// * 用户连接关系
+// * 路由转换
+// * 推送执行
 //
-//        你只关心 userId
+// 你只关心 userId
 //
-//        ---
+// ---
 //
-//        # 六、为什么必须设置 Principal（超级重点）
+// # 六、为什么必须设置 Principal（超级重点）
 //
-//        如果你不在握手时绑定用户：
+// 如果你不在握手时绑定用户：
 //
-//        ```java
-//        return null;
-//        ```
+// ```java
+// return null;
+// ```
 //
-//        那么：
+// 那么：
 //
-//        ```
-//        convertAndSendToUser()
-//        ```
+// ```
+// convertAndSendToUser()
+// ```
 //
-//        会失败 ❌
+// 会失败 ❌
 //
-//        因为：
+// 因为：
 //
-//        Spring 不知道：
+// Spring 不知道：
 //
-//        > 这个连接属于谁
+// > 这个连接属于谁
 //
-//        ---
+// ---
 //
-//        # 七、面试级总结（你可以直接背）
+// # 七、面试级总结（你可以直接背）
 //
-//        > Spring STOMP 私聊基于 Principal 与 Session 映射实现。连接建立时通过 HandshakeHandler 绑定用户身份，Spring 在内部维护 userId 到 sessionId 的关系表。调用 convertAndSendToUser 时，Broker 根据映射将消息路由到对应 session，实现精准推送。
+// > Spring STOMP 私聊基于 Principal 与 Session 映射实现。连接建立时通过 HandshakeHandler
+// 绑定用户身份，Spring 在内部维护 userId 到 sessionId 的关系表。调用 convertAndSendToUser 时，Broker
+// 根据映射将消息路由到对应 session，实现精准推送。
 //
-//        这回答非常加分。
+// 这回答非常加分。
 //
-//        ---
+// ---
 //
-//        # 八、进阶一点（真正工程问题）
+// # 八、进阶一点（真正工程问题）
 //
-//        这一步你理解后，会马上遇到一个现实问题：
+// 这一步你理解后，会马上遇到一个现实问题：
 //
-//        # ❗ 多服务节点怎么办？
+// # ❗ 多服务节点怎么办？
 //
-//        ```
-//        服务器A 连接
-//        服务器B 发消息
-//        ```
+// ```
+// 服务器A 连接
+// 服务器B 发消息
+// ```
 //
-//        B 根本不知道 session 在 A 上
+// B 根本不知道 session 在 A 上
 //
-//        私聊失效
+// 私聊失效
 //
-//        ---
+// ---
 //
-//        ## 企业解决方案
+// ## 企业解决方案
 //
-//        ```
-//        WebSocket节点
-//        ↓
-//        RabbitMQ / Redis PubSub
-//        ↓
-//        跨节点广播
-//        ```
+// ```
+// WebSocket节点
+// ↓
+// RabbitMQ / Redis PubSub
+// ↓
+// 跨节点广播
+// ```
 //
-//        Spring 支持：
+// Spring 支持：
 //
-//        ```
-//        StompBrokerRelay
-//        ```
+// ```
+// StompBrokerRelay
+// ```
 //
-//        接入外部 MQ
+// 接入外部 MQ
 //
-//        （这就是生产架构）
+// （这就是生产架构）
 //
-//        ---
+// ---
 //
-//        # 👉 下一步我建议继续深入（非常关键）
+// # 👉 下一步我建议继续深入（非常关键）
 //
-//        我们可以继续拆：
+// 我们可以继续拆：
 //
-//        ### ⭐ `HandshakeInterceptor` 真正应该写什么
+// ### ⭐ `HandshakeInterceptor` 真正应该写什么
 //
-//        * token校验
-//        * 登录态绑定
-//        * 安全设计
+// * token校验
+// * 登录态绑定
+// * 安全设计
 //
-//        或者
+// 或者
 //
-//        ### ⭐ STOMP 消息完整生命周期
+// ### ⭐ STOMP 消息完整生命周期
 //
-//        * CONNECT
-//        * SUBSCRIBE
-//        * SEND
-//        * DISCONNECT
+// * CONNECT
+// * SUBSCRIBE
+// * SEND
+// * DISCONNECT
 //
-//        这是抓包级理解
+// 这是抓包级理解
 //
-//        你选一个方向，我带你继续深入 👍
+// 你选一个方向，我带你继续深入 👍

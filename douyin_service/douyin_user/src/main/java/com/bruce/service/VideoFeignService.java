@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class VideoFeignService {
@@ -20,7 +21,7 @@ public class VideoFeignService {
 
     /**
      * 通过Feign调用douyin_video微服务，根据ID获取视频
-     * 
+     *
      * @param id 视频ID
      * @return 视频信息
      */
@@ -30,7 +31,7 @@ public class VideoFeignService {
 
     /**
      * 通过Feign调用douyin_video微服务，获取视频列表
-     * 
+     *
      * @return 视频列表
      */
     public Object getVideoList() {
@@ -39,7 +40,7 @@ public class VideoFeignService {
 
     /**
      * 通过Feign调用douyin_video微服务，根据用户ID获取视频列表
-     * 
+     *
      * @param queryWrapper 查询条件
      * @return 视频列表
      */
@@ -100,7 +101,7 @@ public class VideoFeignService {
 
     /**
      * 从LambdaQueryWrapper中提取查询参数值
-     * 
+     *
      * @param queryWrapper 查询条件
      * @param column       列名
      * @param <T>          实体类型
@@ -159,7 +160,7 @@ public class VideoFeignService {
 
     /**
      * 通过Feign调用douyin_video微服务，根据用户ID分页获取视频列表
-     * 
+     *
      * @param page         分页对象
      * @param queryWrapper 查询条件
      * @return 分页视频列表

@@ -39,6 +39,23 @@ import org.springframework.web.socket.config.annotation.*;
  * 重要说明：
  * 👉 这不是原生 WebSocket 架子
  * 👉 这是 STOMP（消息代理模式）的架子
+ * 
+ * ⭐ STOMP 消息完整生命周期
+ * 
+ * 总览：
+ * 1️⃣ CONNECT —— 建立STOMP会话
+ * 2️⃣ CONNECTED —— 服务端确认
+ * 3️⃣ SUBSCRIBE —— 订阅消息
+ * 4️⃣ SEND —— 发送消息
+ * 5️⃣ MESSAGE —— 接收推送
+ * 6️⃣ DISCONNECT —— 断开连接
+ * 
+ * 完整层级：
+ * TCP
+ * └─ WebSocket
+ * └─ STOMP
+ * 
+ * 面试加分点 ⭐
  */
 
 @Configuration
@@ -60,6 +77,82 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
      * ├──── /app → Controller处理
      * │
      * └──── /topic /queue → 推送客户端
+     */
+
+    /**
+     * ⭐ STOMP 消息完整生命周期详解
+     * 
+     * 一、① CONNECT（客户端发起）
+     * 前端执行：client.activate()
+     * 实际发送Frame：
+     * CONNECT
+     * accept-version:1.2
+     * heart-beat:10000,10000
+     * 
+     * \0
+     * 
+     * 注意：WebSocket连接已建立，这是STOMP层建立会话
+     * 
+     * 二、② CONNECTED（服务端响应）
+     * Spring Broker回复：
+     * CONNECTED
+     * version:1.2
+     * heart-beat:0,0
+     * 
+     * \0
+     * 
+     * 此时：STOMP Session创建完成
+     * 
+     * 三、③ SUBSCRIBE（客户端订阅）
+     * 前端：client.subscribe("/topic/chat")
+     * 实际发送：
+     * SUBSCRIBE
+     * id:sub-1
+     * destination:/topic/chat
+     * 
+     * Broker内部记录：sessionX → /topic/chat
+     * 
+     * 四、④ SEND（客户端发送）
+     * 前端：client.publish({destination:"/app/chat", body:"hello"})
+     * 实际Frame：
+     * SEND
+     * destination:/app/chat
+     * 
+     * hello
+     * 
+     * 进入：@MessageMapping("/chat")
+     * 
+     * 五、⑤ MESSAGE（Broker推送）
+     * Controller：@SendTo("/topic/chat")
+     * Broker推送：
+     * MESSAGE
+     * subscription:sub-1
+     * destination:/topic/chat
+     * 
+     * hello
+     * 
+     * 六、⑥ DISCONNECT（关闭连接）
+     * 前端：client.deactivate() 或浏览器关闭
+     * 发送：DISCONNECT
+     * 
+     * Spring：删除订阅、删除session、清理user映射
+     * 
+     * ⭐ 完整真实流程（工程级理解）
+     * ① TCP连接 → ② WebSocket握手 → ③ STOMP CONNECT → ④ 服务端CONNECTED →
+     * ⑤ 客户端SUBSCRIBE → ⑥ 客户端SEND → ⑦ Broker MESSAGE推送 → ⑧ DISCONNECT
+     * 
+     * ⭐ 面试杀手点
+     * 此生命周期解释：
+     * - 心跳为什么存在
+     * - 重连怎么实现
+     * - 订阅为什么会丢
+     * - 多节点为什么要MQ
+     * - `/user`为什么可路由
+     * 
+     * ⭐ 面试总结
+     * STOMP在WebSocket之上建立会话，其生命周期包括CONNECT建立协议连接、SUBSCRIBE注册订阅、
+     * SEND发送消息、Broker触发MESSAGE推送以及DISCONNECT释放资源。
+     * Spring WebSocket利用该模型实现发布订阅通信。
      */
 
     /**
