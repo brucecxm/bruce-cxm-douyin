@@ -412,7 +412,7 @@ export default {
 
     // 跳转到商品详情
     goToProductDetail() {
-      window.location.href = `/detail.html?id=${this.chatInfo.product.id}`;
+      window.location.href = `/newshop/detail?id=${this.chatInfo.product.id}`;
     },
 
     // 发送消息

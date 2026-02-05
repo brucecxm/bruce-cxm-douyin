@@ -417,7 +417,7 @@ export default {
     },
     // 跳转到商品详情页
     goToDetail(productId) {
-      routerUtils.navigateTo(`/detail.html?id=${productId}`);
+      routerUtils.navigateTo(`/newshop/detail?id=${productId}`);
     },
     // 格式化时间
     formatTime(timeString) {

@@ -330,7 +330,7 @@ export default {
 
     // 跳转到订单详情页
     goToOrderDetail(orderId) {
-      routerUtils.navigateTo(`/newshop/orderDetail.html?id=${orderId}`);
+      routerUtils.navigateTo(`/newshop/newshop/detail?id=${orderId}`);
     },
 
     // 取消订单

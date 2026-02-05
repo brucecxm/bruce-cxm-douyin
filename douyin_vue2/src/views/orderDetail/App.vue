@@ -462,7 +462,7 @@ export default {
 
     // 跳转到商品详情页
     goToProductDetail(productId) {
-      routerUtils.navigateTo(`/detail.html?id=${productId}`);
+      routerUtils.navigateTo(`/newshop/detail?id=${productId}`);
     },
 
     // 立即付款

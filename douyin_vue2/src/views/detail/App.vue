@@ -561,7 +561,7 @@ export default {
     },
     // 跳转到商品详情（卖家其他商品）
     goToDetail(productId) {
-      routerUtils.navigateTo(`/detail.html?id=${productId}`);
+      routerUtils.navigateTo(`/newshop/detail?id=${productId}`);
     },
     // 跳转到卖家主页
     goToSellerProfile() {
@@ -747,7 +747,7 @@ export default {
         if (response.code === 0 && response.data) {
           // 订单创建成功，跳转到订单详情页面
           routerUtils.navigateTo(
-            `/newshop/orderDetail.html?id=${response.data.id}`
+            `/newshop/ordernewshop/detail?id=${response.data.id}`
           );
         } else {
           nativeUtils.showToast(response.message || '创建订单失败', 1500);

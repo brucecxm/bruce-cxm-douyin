@@ -329,7 +329,7 @@ export default {
 
           // 跳转到商品列表或详情页
           if (productId) {
-            routerUtils.navigateTo(`/detail.html?id=${productId}`);
+            routerUtils.navigateTo(`/newshop/detail?id=${productId}`);
           } else {
             routerUtils.navigateTo('/newshop/myProducts.html');
           }
