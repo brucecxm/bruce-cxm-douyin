@@ -7,6 +7,24 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.*;
 
+
+//
+//👉 这不是原生 WebSocket 架子
+//👉 这不是原生 WebSocket 架子
+//👉 这不是原生 WebSocket 架子
+//👉 这不是原生 WebSocket 架子
+//👉 这不是原生 WebSocket 架子
+//👉 这不是原生 WebSocket 架子
+//👉 这不是原生 WebSocket 架子
+//👉 这不是原生 WebSocket 架子
+//        👉 这是 STOMP（消息代理模式）的架子
+//        👉 这是 STOMP（消息代理模式）的架子
+//        👉 这是 STOMP（消息代理模式）的架子
+//        👉 这是 STOMP（消息代理模式）的架子
+//        👉 这是 STOMP（消息代理模式）的架子
+//        👉 这是 STOMP（消息代理模式）的架子
+//        👉 这是 STOMP（消息代理模式）的架子
+
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
