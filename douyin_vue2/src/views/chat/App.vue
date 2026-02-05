@@ -269,7 +269,7 @@ export default {
         if (this.chatInfo.productId) {
           const productId = Number(this.chatInfo.productId);
           try {
-            const response = await get(`/product/${productId}`);
+            const response = await get(`/newshop/product/${productId}`);
             if (response.code === 0 && response.data) {
               this.chatInfo.product = {
                 id: response.data.id,

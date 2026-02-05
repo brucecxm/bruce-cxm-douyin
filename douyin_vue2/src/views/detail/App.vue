@@ -363,8 +363,7 @@ export default {
         nativeUtils.showLoading('加载中...');
 
         // 获取URL中的商品ID
-        const urlParams = new URLSearchParams(window.location.search);
-        const productId = urlParams.get('id');
+        const productId = this.$route.query.id;
 
         if (!productId) {
           nativeUtils.hideLoading();
@@ -373,7 +372,7 @@ export default {
         }
 
         // 调用真实API获取商品详情
-        const response = await get(`/product/${productId}`);
+        const response = await get(`/newshop/product/${productId}`);
 
         // 检查API响应
         if (response.code === 0 && response.data) {
@@ -430,18 +429,8 @@ export default {
     // 添加最近浏览记录
     async addRecentView(productId) {
       try {
-        // 检查用户是否登录
-        const userInfo = localStorage.getItem('user');
-        if (!userInfo) {
-          return; // 未登录用户不记录浏览历史
-        }
-
-        const user = JSON.parse(userInfo);
-        const userId = user.id;
-
         // 调用API添加浏览记录
         await post('/newshop/recent-view', {
-          userId: userId,
           productId: productId
         });
 
@@ -456,9 +445,11 @@ export default {
     async fetchComments(productId) {
       try {
         // 获取评论统计信息
-        const statsResponse = await get(`/comments/stats/${productId}`);
+        const statsResponse = await get(`/newshop/comments/stats/${productId}`);
         // 获取评论列表
-        const listResponse = await get(`/comments/product/${productId}`);
+        const listResponse = await get(
+          `/newshop/comments/product/${productId}`
+        );
 
         if (statsResponse.code === 0 && statsResponse.data) {
           // 更新评论统计信息

@@ -14,12 +14,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/comments")
 public class CommentController {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
-    
+
     @Autowired
     private CommentService commentService;
-    
+
     /**
      * 根据商品ID获取评论列表
      */
@@ -35,7 +35,7 @@ public class CommentController {
             return Response.error(e.getMessage());
         }
     }
-    
+
     /**
      * 获取商品评论统计信息
      */
@@ -51,7 +51,7 @@ public class CommentController {
             return Response.error(e.getMessage());
         }
     }
-    
+
     /**
      * 提交评论
      */
@@ -63,12 +63,12 @@ public class CommentController {
             Long userId = Long.parseLong(requestBody.get("userId").toString());
             Integer rating = Integer.parseInt(requestBody.get("rating").toString());
             String content = requestBody.get("content").toString();
-            
+
             logger.info("开始创建评论，商品ID: {}, 用户ID: {}, 评分: {}, 内容: {}", productId, userId, rating, content);
-            
+
             // 调用服务创建评论
-            Comment comment = commentService.createComment(productId, userId, rating, content);
-            
+            Comment comment = commentService.createComment(productId, rating, content);
+
             logger.info("创建评论成功，评论ID: {}", comment.getId());
             return Response.success(comment);
         } catch (Exception e) {
@@ -76,7 +76,7 @@ public class CommentController {
             return Response.error(e.getMessage());
         }
     }
-    
+
     /**
      * 点赞评论
      */
@@ -92,7 +92,7 @@ public class CommentController {
             return Response.error(e.getMessage());
         }
     }
-    
+
     /**
      * 取消点赞评论
      */
@@ -108,7 +108,7 @@ public class CommentController {
             return Response.error(e.getMessage());
         }
     }
-    
+
     /**
      * 删除评论
      */

@@ -219,7 +219,7 @@ export default {
 
     // 跳转到首页
     goToHome() {
-      routerUtils.navigateTo('/newshop/index.html');
+      routerUtils.navigateTo('/newshop.html');
     },
 
     // 跳转到分类页

@@ -152,7 +152,7 @@ export default {
             localStorage.setItem('token', data.token || '');
 
             // 跳转到主页
-            routerUtils.navigateTo('/newshop/index.html');
+            routerUtils.navigateTo('/newshop.html');
           } else {
             // 请求失败
             nativeUtils.hideLoading();
@@ -194,7 +194,7 @@ export default {
             localStorage.setItem('token', data.token || '');
 
             // 跳转到主页
-            routerUtils.navigateTo('/newshop/index.html');
+            routerUtils.navigateTo('/newshop.html');
           } else {
             // 请求失败
             nativeUtils.hideLoading();

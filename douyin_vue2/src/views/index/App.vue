@@ -315,7 +315,7 @@ export default {
     },
     // 跳转到首页
     goToHome() {
-      routerUtils.navigateTo('/newshop/index.html');
+      routerUtils.navigateTo('/newshop');
     },
     // 跳转到分类页
     goToCategories() {
@@ -337,7 +337,7 @@ export default {
         const categoryName = this.categories.find(
           (cat) => cat.id === categoryId
         ).name;
-        const response = await get(`/product/category/${categoryName}`);
+        const response = await get(`/newshop/product/category/${categoryName}`);
 
         // 检查API响应
         if (response.code === 0 && response.data) {

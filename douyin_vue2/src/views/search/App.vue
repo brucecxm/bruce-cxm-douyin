@@ -260,7 +260,7 @@ export default {
       try {
         // 调用API获取搜索结果
         const response = await get(
-          `/product/search?keyword=${encodeURIComponent(this.searchQuery)}`
+          `/newshop/product/search?keyword=${encodeURIComponent(this.searchQuery)}`
         );
 
         // 隐藏加载提示

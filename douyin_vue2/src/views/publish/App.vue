@@ -314,7 +314,7 @@ export default {
 
         if (productId) {
           // 编辑模式
-          response = await put(`/product/${productId}`, productData);
+          response = await put(`/newshop/product/${productId}`, productData);
         } else {
           // 发布新模式
           response = await post('/newshop/product', productData);

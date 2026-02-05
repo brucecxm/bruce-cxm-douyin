@@ -193,11 +193,8 @@ export default {
           return;
         }
 
-        const user = JSON.parse(userInfo);
-        const userId = user.id;
-
         // 调用API获取最近浏览记录
-        const response = await get(`/recent-view/${userId}`);
+        const response = await get('/newshop/recent-view');
 
         if (response.code === 0) {
           // API请求成功，转换数据格式
