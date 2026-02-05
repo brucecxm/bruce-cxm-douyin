@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.*;
 
-
 /**
  * 六、前端完整最小连接代码
  * 你项目可以直接用
@@ -36,13 +35,11 @@ import org.springframework.web.socket.config.annotation.*;
 // 
 // client.activate();
 
-
 /**
  * 重要说明：
  * 👉 这不是原生 WebSocket 架子
  * 👉 这是 STOMP（消息代理模式）的架子
  */
-
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -50,40 +47,41 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     /**
      * 消息流程图：
-     *              浏览器(stomp.js)
-     *                  │
-     *                  ▼
-     *              WebSocket连接端点
-     *              (registerStompEndpoints)
-     *                  │
-     *                  ▼
-     *              Spring Message Broker
-     *              (SimpleBroker / RabbitMQ)
-     *                  │
-     *                  ├──── /app → Controller处理
-     *                  │
-     *                  └──── /topic /queue → 推送客户端
+     * 浏览器(stomp.js)
+     * │
+     * ▼
+     * WebSocket连接端点
+     * (registerStompEndpoints)
+     * │
+     * ▼
+     * Spring Message Broker
+     * (SimpleBroker / RabbitMQ)
+     * │
+     * ├──── /app → Controller处理
+     * │
+     * └──── /topic /queue → 推送客户端
      */
 
     /**
-     * 连接建立流程：
-     *     浏览器请求连接
-     *         ↓
-     *     HandshakeInterceptor
-     *         ↓
-     *     HandshakeHandler
-     *         ↓
-     *     建立连接成功
+     * ⭐ 连接建立流程（非常重要）
+     * 浏览器请求连接：/user/ws
+     * ↓
+     * HandshakeInterceptor
+     * - 校验token
+     * - 取用户ID
+     * - 存入attributes
+     * ↓
+     * HandshakeHandler
+     * - 设置Principal（关键）
+     * - 绑定用户身份
+     * - return new UsernamePasswordAuthenticationToken(userId, null);
+     * ↓
+     * 建立连接成功
      * 
-     *     ***Interceptor常做***
-     *         - 校验token
-     *         - 取用户ID
-     *         - 存入attributes
-     *     
-     *     ***Handler常做***
-     *         - 设置Principal（关键）
-     *         - 绑定用户身份
-     *         👉 这是后面 /user/xxx 私聊的基础
+     * 👉 为什么必须设置 Principal？
+     * 如果不在握手时绑定用户：return null;
+     * 那么：convertAndSendToUser() 会失败 ❌
+     * 因为：Spring 不知道这个连接属于谁
      */
 
     /**
@@ -92,12 +90,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint(WsConstant.user + WsConstant.ws) // 客户端连接的端点
-                .setHandshakeHandler(new UserHandshakeHandler())   // 使用自定义 HandshakeHandler
+                .setHandshakeHandler(new UserHandshakeHandler()) // 使用自定义 HandshakeHandler
                 .addInterceptors(new UserHandshakeInterceptor()) // 绑定用户身份
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
-
 
     /**
      * 三、第二层 —— Broker（消息代理）
@@ -125,26 +122,26 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         /**
          * 客户端发送消息流程：
          * client.publish({
-         *     destination: "/app/chat"
+         * destination: "/app/chat"
          * });
          * 
          * 消息不会直接广播，而是：
          * 1. 进入 Controller
          * 2. Controller处理：
-         *    @MessageMapping("/chat")
-         *    @SendTo("/topic/msg")
-         *    public String chat(String msg) {
-         *        return msg;
-         *    }
+         * @MessageMapping("/chat")
+         * @SendTo("/topic/msg")
+         * public String chat(String msg) {
+         * return msg;
+         * }
          * 3. 流程：
-         *    客户端 → /app/chat → Controller → 转发 → /topic/msg → 所有订阅者收到
+         * 客户端 → /app/chat → Controller → 转发 → /topic/msg → 所有订阅者收到
          */
 
         // 应用前缀，客户端发送消息的路径要以 /app 开头
         registry.setApplicationDestinationPrefixes(WsConstant.app);
 
         /**
-         * 五、第四层 —— 用户私聊路由（重点）
+         * ⭐ 五、第四层 —— 用户私聊路由（重点）
          * 
          * 配置：
          * registry.setUserDestinationPrefix("/user");
@@ -152,9 +149,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
          * 支持功能：
          * ⭐ 私聊推送（发送给某个用户）
          * simpMessagingTemplate.convertAndSendToUser(
-         *     userId,
-         *     "/queue/msg",
-         *     data
+         * userId,
+         * "/queue/msg",
+         * data
          * );
          * 
          * 客户端订阅：
@@ -164,6 +161,49 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
          * - 客户端写：/user/queue/msg
          * - 服务器写：/queue/msg
          * Spring 自动映射
+         * 
+         * ⭐ Spring 建立用户映射表
+         * 连接成功后，Spring 内部维护一张表（逻辑上类似）：
+         * userId → sessionId
+         * -------------------------
+         * 1001 → s1x9a
+         * 1002 → k22pq
+         * 1001 → z88bc // 同一用户多连接
+         * 
+         * 注意：一个用户可以多个连接
+         * - 多浏览器
+         * - 多标签页
+         * - 多设备
+         * 
+         * ⭐ 发送私聊消息流程
+         * 当你执行：convertAndSendToUser("1001", "/queue/msg", data)
+         * Spring 做了这些事：
+         * 1. 查表：找到 user=1001 的所有 session
+         * s1x9a
+         * z88bc
+         * 
+         * 2. 转换真实地址：
+         * 内部会变成：
+         * /queue/msg-userS1x9a
+         * /queue/msg-userZ88bc
+         * 
+         * 3. 推送：消息发送到对应 WebSocket 连接
+         * ✔ 精准送达
+         * ✔ 不广播
+         * ✔ 不遍历你写代码
+         * 全部框架完成
+         * 
+         * ⭐ 面试级总结
+         * Spring STOMP 私聊基于 Principal 与 Session 映射实现。连接建立时通过 HandshakeHandler 绑定用户身份，
+         * Spring 在内部维护 userId 到 sessionId 的关系表。调用 convertAndSendToUser 时，
+         * Broker 根据映射将消息路由到对应 session，实现精准推送。
+         * 
+         * ⭐ 多服务节点方案
+         * 企业级解决方案：
+         * WebSocket节点 → RabbitMQ / Redis PubSub → 跨节点广播
+         * 
+         * Spring 支持：StompBrokerRelay
+         * 接入外部 MQ（这就是生产架构）
          * 
          * 👉 这是 STOMP 最强功能之一
          */
