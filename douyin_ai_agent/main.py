@@ -61,3 +61,14 @@ if __name__ == "__main__":
         response = agent.run(user)
         # 打印 Agent 响应
         print("Agent:", response)
+
+#
+# User Input
+#     ↓
+# LLM 决策
+#     ↓
+# 是否调用工具
+#     ↓
+#    执行
+#     ↓
+# 返回结果

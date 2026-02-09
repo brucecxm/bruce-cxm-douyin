@@ -90,6 +90,24 @@ def fake_llm_decision(user_text):
             "args": {"city": city}  # 工具参数：城市名称
         }
 
+    # 检查是否需要调用时间工具
+    if "time" in txt:
+        # 返回工具调用决策
+        return {
+            "type": "tool",      # 决策类型：工具调用
+            "tool": "time",       # 工具名称：时间
+            "args": {}            # 工具参数：无
+        }
+
+    # 检查是否需要调用随机数工具
+    if "random" in txt:
+        # 返回工具调用决策
+        return {
+            "type": "tool",          # 决策类型：工具调用
+            "tool": "random",         # 工具名称：随机数
+            "args": {"min_val": 1, "max_val": 100}  # 工具参数：最小值和最大值
+        }
+
     # 默认情况：直接回复
     return {
         "type": "text",                           # 决策类型：直接回复

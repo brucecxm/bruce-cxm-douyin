@@ -35,6 +35,10 @@ AI Agent 工具系统
 4. 执行复杂的任务
 """
 
+# 导入必要的模块
+import random
+from datetime import datetime
+
 
 def calculator(expression: str):
     """
@@ -70,6 +74,25 @@ def weather(city: str):
     return f"Weather in {city}: Sunny 30C (mock data)"
 
 
+# ===== 新工具1：获取当前时间 =====
+def get_time():
+    """
+    返回当前时间
+    这是典型的工具函数
+    Agent可以调用它获取外部信息
+    """
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
+# ===== 新工具2：生成随机数 =====
+def random_number(min_val: int, max_val: int):
+    """
+    生成随机数
+    演示带参数的工具调用
+    """
+    return random.randint(min_val, max_val)
+
+
 # 工具注册表
 # 存储工具名称到工具函数的映射
 # 格式：{工具名称: 工具函数}
@@ -79,7 +102,11 @@ def weather(city: str):
 # 3. 包含工具描述（用于大模型理解）
 TOOL_REGISTRY = {
     "calculator": calculator,    # 计算器工具
-    "weather": weather          # 天气工具
+    "weather": weather,          # 天气工具
+    
+    # 新加 👇
+    "time": get_time,            # 当前时间工具
+    "random": random_number,     # 随机数工具
 }
 
 """
