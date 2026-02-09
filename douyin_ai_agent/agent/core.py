@@ -30,46 +30,50 @@ class SimpleAgent:
 
     def run(self, user_input):
 
-        # ===== 记录用户输入 =====
         self.memory.add("user", user_input)
-
-        # ===== 模拟模型思考 =====
-        decision = fake_llm_decision(user_input)
 
         output_log = []
 
-        # ⭐ Thought（思考）
-        thought = f"I think user wants: {user_input}"
-        output_log.append(f"Thought: {thought}")
+        # ⭐ 简单规划：按 and 拆分任务
+        output_log.append(f"Planning: Splitting task -> {user_input}")
+        tasks = [t.strip() for t in user_input.split("and")]
+        output_log.append(f"Tasks identified: {tasks}")
 
-        # ===== 是否调用工具 =====
-        if decision["type"] == "tool":
+        results = []
 
-            tool_name = decision["tool"]
-            args = decision["args"]
+        for task in tasks:
 
-            output_log.append(f"Action: Call tool [{tool_name}] with {args}")
+            decision = fake_llm_decision(task)
 
-            # 执行工具
-            tool_fn = TOOL_REGISTRY[tool_name]
-            result = tool_fn(**args)
+            output_log.append(f"\n--- New Step ---")
+            output_log.append(f"Thought: Handling task -> {task}")
 
-            # ⭐ Observation（观察）
-            output_log.append(f"Observation: Tool returned -> {result}")
+            # ===== 工具调用 =====
+            if decision["type"] == "tool":
 
-            self.memory.add("observation", str(result))
+                tool_name = decision["tool"]
+                args = decision["args"]
 
-            # ⭐ 最终回答
-            final_answer = f"Here you go 🙂 Result = {result}"
-            output_log.append(f"Answer: {final_answer}")
+                output_log.append(
+                    f"Action: Call [{tool_name}] with {args}"
+                )
 
-            return "\n".join(output_log)
+                tool_fn = TOOL_REGISTRY[tool_name]
+                result = tool_fn(**args)
 
-        # ===== 不调用工具 =====
-        response = decision["response"]
+                output_log.append(
+                    f"Observation: {result}"
+                )
 
-        output_log.append(f"Answer: {response}")
+                results.append(result)
+                self.memory.add("observation", str(result))
 
-        self.memory.add("assistant", response)
+            else:
+                response = decision["response"]
+                results.append(response)
+
+        # ⭐ 汇总最终答案
+        final_answer = " | ".join(str(r) for r in results)
+        output_log.append(f"\nFinal Answer: {final_answer}")
 
         return "\n".join(output_log)
