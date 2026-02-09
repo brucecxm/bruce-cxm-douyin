@@ -1,6 +1,7 @@
 package com.bruce.service;
 
 import com.bruce.feign.UserFeignClient;
+import com.bruce.pojo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,8 @@ public class UserFeignService {
      * @return 用户信息
      */
     public Object getUserById(Long id) {
-        return userFeignClient.getUserById(id);
+        Result<?> result = userFeignClient.getUserById(id);
+        return result.getCode() == 0 ? result.getData() : null;
     }
 
     /**
@@ -24,6 +26,7 @@ public class UserFeignService {
      * @return 用户列表
      */
     public Object getUserList() {
-        return userFeignClient.getUserList();
+        Result<?> result = userFeignClient.getUserList();
+        return result.getCode() == 0 ? result.getData() : null;
     }
 }

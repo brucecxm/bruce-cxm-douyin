@@ -13,5 +13,5 @@ public interface UserFeignClient {
     Result<User> getUserById(@RequestParam("id") Long id);
 
     @GetMapping("/list")
-    Object getUserList();
+    Result<?> getUserList();
 }

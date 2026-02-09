@@ -1,13 +1,12 @@
 package com.bruce.feign;
 
+import com.bruce.pojo.Result;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Map;
 
 /**
  * 文件上传Feign客户端
@@ -23,7 +22,7 @@ public interface FileFeignClient {
      * @return 上传结果，包含文件URL
      */
     @PostMapping(value = "/upload/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    Map<String, Object> uploadImage(
+    Result<?> uploadImage(
             @RequestPart("file") MultipartFile file,
             @RequestParam(value = "prefix", required = false, defaultValue = "images") String prefix
     );
@@ -35,7 +34,7 @@ public interface FileFeignClient {
      * @return 上传结果，包含文件URL
      */
     @PostMapping(value = "/upload/video", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    Map<String, Object> uploadVideo(
+    Result<?> uploadVideo(
             @RequestPart("file") MultipartFile file,
             @RequestParam(value = "prefix", required = false, defaultValue = "videos") String prefix
     );
@@ -48,7 +47,7 @@ public interface FileFeignClient {
      * @return 上传结果，包含文件URL
      */
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    Map<String, Object> uploadAnyFile(
+    Result<?> uploadAnyFile(
             @RequestPart("file") MultipartFile file,
             @RequestParam(value = "prefix", required = false, defaultValue = "files") String prefix,
             @RequestParam(value = "fileType", required = false, defaultValue = "other") String fileType

@@ -26,7 +26,8 @@ public class VideoFeignService {
      * @return 视频信息
      */
     public Object getVideoById(Long id) {
-        return videoFeignClient.getVideoById(id);
+        Result<?> result = videoFeignClient.getVideoById(id);
+        return result.getCode() == 0 ? result.getData() : null;
     }
 
     /**
@@ -35,7 +36,8 @@ public class VideoFeignService {
      * @return 视频列表
      */
     public Object getVideoList() {
-        return videoFeignClient.getVideoList();
+        Result<?> result = videoFeignClient.getVideoList();
+        return result.getCode() == 0 ? result.getData() : null;
     }
 
     /**
@@ -64,11 +66,10 @@ public class VideoFeignService {
 
         if (userId != null) {
             // 调用videoFeignClient.listByUserId(userId)
-            Object result = videoFeignClient.listByUserId(userId);
+            Result<?> result = videoFeignClient.listByUserId(userId);
             // 处理返回结果
-            if (result instanceof Result) {
-                Result<?> resultObj = (Result<?>) result;
-                Object data = resultObj.getData();
+            if (result.getCode() == 0) {
+                Object data = result.getData();
                 if (data instanceof List) {
                     // 尝试将List中的对象转换为Video类型
                     List<?> dataList = (List<?>) data;
@@ -185,11 +186,10 @@ public class VideoFeignService {
 
         if (userId != null) {
             // 调用videoFeignClient.pageByUserId(userId, page.getCurrent(), page.getSize())
-            Object result = videoFeignClient.pageByUserId(userId, page.getCurrent(), page.getSize());
+            Result<?> result = videoFeignClient.pageByUserId(userId, page.getCurrent(), page.getSize());
             // 处理返回结果
-            if (result instanceof Result) {
-                Result<?> resultObj = (Result<?>) result;
-                Object data = resultObj.getData();
+            if (result.getCode() == 0) {
+                Object data = result.getData();
                 if (data instanceof IPage) {
                     return (IPage<Video>) data;
                 } else if (data instanceof Map) {

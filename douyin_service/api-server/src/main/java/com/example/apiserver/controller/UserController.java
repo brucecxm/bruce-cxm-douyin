@@ -1,8 +1,9 @@
 package com.example.apiserver.controller;
 
+import com.bruce.feign.ApiServerUserFeignClient;
+import com.bruce.pojo.Result;
 import com.example.apiserver.common.Response;
 import com.example.apiserver.entity.User;
-import com.example.apiserver.feign.UserFeignClient;
 import com.example.apiserver.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,7 @@ public class UserController {
 
 
     @Autowired
-    private UserFeignClient userFeignClient;
+    private ApiServerUserFeignClient userFeignClient;
 
     @PostMapping("/register")
     public Response<?> register(@RequestBody User user) {
@@ -33,9 +34,9 @@ public class UserController {
             params.put("password", user.getPassword());
 
             // 调用douyin_user服务的注册接口
-            Response<?> response = userFeignClient.register(params);
+            Result<?> result = userFeignClient.register(params);
             logger.info("用户注册成功");
-            return response;
+            return new Response<>(result.getCode(), result.getMessage(), result.getData());
         } catch (Exception e) {
             logger.error("用户注册失败: {}", e.getMessage(), e);
             return Response.error(e.getMessage());
@@ -53,9 +54,9 @@ public class UserController {
             params.put("loginType", "password");
 
             // 调用douyin_user服务的登录接口
-            Response<?> response = userFeignClient.doLogin(params);
+            Result<?> result = userFeignClient.doLogin(params);
             logger.info("用户登录成功");
-            return response;
+            return new Response<>(result.getCode(), result.getMessage(), result.getData());
         } catch (Exception e) {
             logger.error("用户登录失败，用户名: {}, 错误: {}", loginRequest.getUsername(), e.getMessage(), e);
             return Response.error(e.getMessage());

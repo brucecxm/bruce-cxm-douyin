@@ -1,6 +1,7 @@
 package com.bruce.service;
 
 import com.bruce.feign.FileFeignClient;
+import com.bruce.pojo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +25,11 @@ public class FileFeignService {
      * @return 上传结果，包含文件URL
      */
     public Map<String, Object> uploadImage(MultipartFile file, String prefix) {
-        return fileFeignClient.uploadImage(file, prefix);
+        Result<?> result = fileFeignClient.uploadImage(file, prefix);
+        if (result.getCode() == 0 && result.getData() instanceof Map) {
+            return (Map<String, Object>) result.getData();
+        }
+        return null;
     }
 
     /**
@@ -34,7 +39,11 @@ public class FileFeignService {
      * @return 上传结果，包含文件URL
      */
     public Map<String, Object> uploadVideo(MultipartFile file, String prefix) {
-        return fileFeignClient.uploadVideo(file, prefix);
+        Result<?> result = fileFeignClient.uploadVideo(file, prefix);
+        if (result.getCode() == 0 && result.getData() instanceof Map) {
+            return (Map<String, Object>) result.getData();
+        }
+        return null;
     }
 
     /**
@@ -45,6 +54,10 @@ public class FileFeignService {
      * @return 上传结果，包含文件URL
      */
     public Map<String, Object> uploadAnyFile(MultipartFile file, String prefix, String fileType) {
-        return fileFeignClient.uploadAnyFile(file, prefix, fileType);
+        Result<?> result = fileFeignClient.uploadAnyFile(file, prefix, fileType);
+        if (result.getCode() == 0 && result.getData() instanceof Map) {
+            return (Map<String, Object>) result.getData();
+        }
+        return null;
     }
 }
