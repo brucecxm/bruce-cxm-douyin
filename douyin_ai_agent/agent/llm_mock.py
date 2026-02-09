@@ -36,82 +36,71 @@ Function Calling / Tool Calling：
 本文件模拟了大模型的决策过程，用于演示 Agent 的工作原理。
 """
 
+import re
+
 
 def fake_llm_decision(user_text):
     """
-    模拟大模型决策
-    
-    模拟大模型的决策过程，根据用户输入决定：
-    1. 是否调用工具
-    2. 调用哪个工具
-    3. 生成工具参数
-    4. 生成直接回复
-    
-    Args:
-        user_text: 用户输入文本
-        
-    Returns:
-        dict: 决策结果
-        格式1（工具调用）：
-        {
-            "type": "tool",
-            "tool": "工具名称",
-            "args": {"参数名": "参数值"}
-        }
-        
-        格式2（直接回复）：
-        {
-            "type": "text",
-            "response": "回复内容"
-        }
+    模拟 LLM 推理：
+    从自然语言中提取参数
+
+    真实世界：
+    这是 GPT 完成的事情
+    我们这里只做简化规则
     """
-    # 转换为小写，方便匹配
-    txt = user_text.lower()
 
-    # 检查是否需要调用计算器工具
-    if "calculate" in txt:
-        # 提取数学表达式
+    txt = user_text.lower().strip()
+
+    # ========= RANDOM =========
+    # 支持:
+    # random 10 50
+    match = re.match(r"random\s+(\d+)\s+(\d+)", txt)
+    if match:
+        min_v = int(match.group(1))
+        max_v = int(match.group(2))
+
+        return {
+            "type": "tool",
+            "tool": "random",
+            "args": {
+                "min_val": min_v,
+                "max_val": max_v
+            }
+        }
+
+    # ========= CALCULATOR =========
+    if txt.startswith("calculate"):
         expr = txt.replace("calculate", "").strip()
-        # 返回工具调用决策
+
         return {
-            "type": "tool",          # 决策类型：工具调用
-            "tool": "calculator",     # 工具名称：计算器
-            "args": {"expression": expr}  # 工具参数：数学表达式
+            "type": "tool",
+            "tool": "calculator",
+            "args": {"expression": expr}
         }
 
-    # 检查是否需要调用天气工具
-    if "weather" in txt:
-        # 提取城市名称（假设最后一个词是城市）
-        city = txt.split()[-1]
-        # 返回工具调用决策
+    # ========= WEATHER =========
+    match = re.match(r"weather\s+(\w+)", txt)
+    if match:
+        city = match.group(1)
+
         return {
-            "type": "tool",      # 决策类型：工具调用
-            "tool": "weather",     # 工具名称：天气
-            "args": {"city": city}  # 工具参数：城市名称
+            "type": "tool",
+            "tool": "weather",
+            "args": {"city": city}
         }
 
-    # 检查是否需要调用时间工具
-    if "time" in txt:
-        # 返回工具调用决策
+    # ========= TIME =========
+    if txt.startswith("time"):
         return {
-            "type": "tool",      # 决策类型：工具调用
-            "tool": "time",       # 工具名称：时间
-            "args": {}            # 工具参数：无
+            "type": "tool",
+            "tool": "time",
+            "args": {}
         }
 
-    # 检查是否需要调用随机数工具
-    if "random" in txt:
-        # 返回工具调用决策
-        return {
-            "type": "tool",          # 决策类型：工具调用
-            "tool": "random",         # 工具名称：随机数
-            "args": {"min_val": 1, "max_val": 100}  # 工具参数：最小值和最大值
-        }
-
-    # 默认情况：直接回复
+    # ========= 默认 =========
     return {
-        "type": "text",                           # 决策类型：直接回复
-        "response": "Hello! I am a minimal AI agent."  # 回复内容
+        "type": "text",
+        "response": "I didn't understand, try using a tool 🙂"
     }
 
 
