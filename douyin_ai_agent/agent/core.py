@@ -18,6 +18,7 @@ Agent = LLM + 工具 + 记忆 + 循环决策
 """
 
 # 导入记忆系统
+import re
 from .memory import Memory
 from .tools import TOOL_REGISTRY
 from .llm_mock import fake_llm_decision
@@ -36,7 +37,8 @@ class SimpleAgent:
 
         # ⭐ 简单规划：按 and 拆分任务
         output_log.append(f"Planning: Splitting task -> {user_input}")
-        tasks = [t.strip() for t in user_input.split("and")]
+        # 使用正则表达式按单词边界拆分，确保只拆分完整的 "and"
+        tasks = [t.strip() for t in re.split(r'\s+and\s+', user_input)]
         output_log.append(f"Tasks identified: {tasks}")
 
         results = []
