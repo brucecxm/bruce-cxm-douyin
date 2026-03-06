@@ -100,7 +100,7 @@ export default {
         nativeUtils.showLoading('加载中...');
 
         // 获取当前用户信息
-        const userInfo = localStorage.getItem('user');
+        const userInfo = localStorage.getItem('userInfo');
         if (userInfo) {
           const user = JSON.parse(userInfo);
           const userId = user.id;
@@ -148,7 +148,7 @@ export default {
           nativeUtils.hideLoading();
           nativeUtils.showToast('请先登录', 1500);
           setTimeout(() => {
-            routerUtils.navigateTo('/newshop/login.html');
+            routerUtils.navigateTo('/login.html');
           }, 1500);
         }
       } catch (error) {
@@ -259,7 +259,7 @@ export default {
 
     // 跳转到发布页面
     goToPublish() {
-      routerUtils.navigateTo('/newshop/publish.html');
+      routerUtils.navigateTo('/publish.html');
     },
 
     // 切换筛选标签
@@ -270,7 +270,7 @@ export default {
 
     // 跳转到商品详情页
     goToDetail(productId) {
-      routerUtils.navigateTo(`/newshop/detail?id=${productId}`);
+      routerUtils.navigateTo(`/detail?id=${productId}`);
     },
 
     // 编辑商品

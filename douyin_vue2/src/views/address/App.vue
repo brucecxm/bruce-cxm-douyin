@@ -186,13 +186,13 @@ export default {
         nativeUtils.showLoading('加载中...');
 
         // 获取当前用户信息
-        const userInfo = localStorage.getItem('user');
+        const userInfo = localStorage.getItem('userInfo');
         if (userInfo) {
           const user = JSON.parse(userInfo);
           const userId = user.id;
 
           // 调用API获取地址列表
-          get(`/address/user/${userId}`)
+          get(`/newshop/address/user/${userId}`)
             .then((response) => {
               if (response.code === 0) {
                 this.addresses = response.data || [];
@@ -215,7 +215,7 @@ export default {
           nativeUtils.hideLoading();
           nativeUtils.showToast('请先登录', 1500);
           setTimeout(() => {
-            routerUtils.navigateTo('/newshop/login.html');
+            routerUtils.navigateTo('/login.html');
           }, 1500);
         }
       } catch (error) {
@@ -234,7 +234,7 @@ export default {
 
     // 打开添加地址弹窗
     addAddress() {
-      const userInfo = localStorage.getItem('user');
+      const userInfo = localStorage.getItem('userInfo');
       if (userInfo) {
         const user = JSON.parse(userInfo);
         this.editingAddress = null;
@@ -246,7 +246,7 @@ export default {
           district: '',
           detail: '',
           isDefault: this.addresses.length === 0,
-          userId: user.id
+          userId: Number(user.id)
         };
         this.phoneError = '';
         this.showModal = true;
@@ -256,9 +256,11 @@ export default {
     // 打开编辑地址弹窗
     editAddress(address) {
       this.editingAddress = address;
+      const userInfo = localStorage.getItem('userInfo');
+      const user = userInfo ? JSON.parse(userInfo) : null;
       this.formData = {
         ...address,
-        userId: address.userId || JSON.parse(localStorage.getItem('user')).id
+        userId: Number(address.userId || (user ? user.id : null))
       };
       this.phoneError = '';
       this.showModal = true;
@@ -309,8 +311,8 @@ export default {
 
       // 调用API保存地址
       const request = this.editingAddress
-        ? put(`/address/${this.editingAddress.id}`, this.formData)
-        : post('/address', this.formData);
+        ? put(`/newshop/address/${this.editingAddress.id}`, this.formData)
+        : post('/newshop/address', this.formData);
 
       request
         .then((response) => {
@@ -352,7 +354,7 @@ export default {
         nativeUtils.showLoading('删除中...');
 
         // 调用API删除地址
-        del(`/address/${addressId}`)
+        del(`/newshop/address/${addressId}`)
           .then((response) => {
             if (response.code === 0) {
               // 重新加载地址列表
@@ -379,13 +381,14 @@ export default {
         // 更新地址对象，将isDefault设为true
         const updatedAddress = {
           ...address,
-          isDefault: true
+          isDefault: true,
+          userId: Number(address.userId)
         };
 
         nativeUtils.showLoading('设置中...');
 
         // 调用API更新地址
-        put(`/address/${addressId}`, updatedAddress)
+        put(`/newshop/address/${addressId}`, updatedAddress)
           .then((response) => {
             if (response.code === 0) {
               // 重新加载地址列表

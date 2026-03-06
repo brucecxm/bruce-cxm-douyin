@@ -124,7 +124,7 @@ export default {
         nativeUtils.showLoading('加载中...');
 
         // 获取当前用户信息
-        const userInfo = localStorage.getItem('user');
+        const userInfo = localStorage.getItem('userInfo');
         if (userInfo) {
           const user = JSON.parse(userInfo);
           const userId = user.id;
@@ -168,7 +168,7 @@ export default {
           nativeUtils.hideLoading();
           nativeUtils.showToast('请先登录', 1500);
           setTimeout(() => {
-            routerUtils.navigateTo('/newshop/login.html');
+            routerUtils.navigateTo('/login.html');
           }, 1500);
         }
       } catch (error) {
@@ -330,7 +330,7 @@ export default {
 
     // 跳转到订单详情页
     goToOrderDetail(orderId) {
-      routerUtils.navigateTo(`/newshop/newshop/detail?id=${orderId}`);
+      routerUtils.navigateTo(`/detail?id=${orderId}`);
     },
 
     // 取消订单
@@ -375,7 +375,7 @@ export default {
     // 立即付款
     payOrder(orderId) {
       // 跳转到转账页面，传递订单ID
-      routerUtils.navigateTo(`/newshop/transfer.html?orderId=${orderId}`);
+      routerUtils.navigateTo(`/transfer.html?orderId=${orderId}`);
     },
 
     // 确认收货

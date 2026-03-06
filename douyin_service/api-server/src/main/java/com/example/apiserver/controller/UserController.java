@@ -1,7 +1,6 @@
 package com.example.apiserver.controller;
 
-import com.bruce.feign.ApiServerUserFeignClient;
-import com.bruce.pojo.Result;
+import com.example.apiserver.feign.UserFeignClient;
 import com.example.apiserver.common.Response;
 import com.example.apiserver.entity.User;
 import com.example.apiserver.service.UserService;
@@ -20,9 +19,8 @@ import java.util.UUID;
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-
     @Autowired
-    private ApiServerUserFeignClient userFeignClient;
+    private UserFeignClient userFeignClient;
 
     @PostMapping("/register")
     public Response<?> register(@RequestBody User user) {
@@ -34,9 +32,9 @@ public class UserController {
             params.put("password", user.getPassword());
 
             // 调用douyin_user服务的注册接口
-            Result<?> result = userFeignClient.register(params);
+            Response<?> result = userFeignClient.register(params);
             logger.info("用户注册成功");
-            return new Response<>(result.getCode(), result.getMessage(), result.getData());
+            return result;
         } catch (Exception e) {
             logger.error("用户注册失败: {}", e.getMessage(), e);
             return Response.error(e.getMessage());
@@ -54,9 +52,9 @@ public class UserController {
             params.put("loginType", "password");
 
             // 调用douyin_user服务的登录接口
-            Result<?> result = userFeignClient.doLogin(params);
+            Response<?> result = userFeignClient.doLogin(params);
             logger.info("用户登录成功");
-            return new Response<>(result.getCode(), result.getMessage(), result.getData());
+            return result;
         } catch (Exception e) {
             logger.error("用户登录失败，用户名: {}, 错误: {}", loginRequest.getUsername(), e.getMessage(), e);
             return Response.error(e.getMessage());
@@ -84,45 +82,48 @@ public class UserController {
             this.password = password;
         }
     }
-//
-//    @GetMapping("/{id}")
-//    public Response<User> getUserById(@PathVariable Long id) {
-//        logger.info("开始根据ID查询用户，ID: {}", id);
-//        try {
-//            User user = userFeignClient.getUserById(id);
-//            logger.info("根据ID查询用户成功，用户信息: {}", user);
-//            return Response.success(user);
-//        } catch (Exception e) {
-//            logger.error("根据ID查询用户失败，ID: {}, 错误: {}", id, e.getMessage(), e);
-//            return Response.error(e.getMessage());
-//        }
-//    }
-//
-//    @PutMapping("/{id}")
-//    public Response<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-//        logger.info("开始更新用户信息，ID: {}, 更新数据: {}", id, user);
-//        try {
-//            User updatedUser = userFeignClient.updateUser(id, user);
-//            logger.info("用户信息更新成功，ID: {}", updatedUser.getId());
-//            return Response.success(updatedUser);
-//        } catch (Exception e) {
-//            logger.error("用户信息更新失败，ID: {}, 错误: {}", id, e.getMessage(), e);
-//            return Response.error(e.getMessage());
-//        }
-//    }
-//
-//    @PostMapping("/changePassword")
-//    public Response<User> changePassword(@RequestParam Long id, @RequestParam String oldPassword, @RequestParam String newPassword) {
-//        logger.info("开始修改用户密码，用户ID: {}", id);
-//        try {
-//            User updatedUser = userFeignClient.changePassword(id, oldPassword, newPassword);
-//            logger.info("用户密码修改成功，用户ID: {}", id);
-//            return Response.success(updatedUser);
-//        } catch (Exception e) {
-//            logger.error("用户密码修改失败，用户ID: {}, 错误: {}", id, e.getMessage(), e);
-//            return Response.error(e.getMessage());
-//        }
-//    }
+    //
+    // @GetMapping("/{id}")
+    // public Response<User> getUserById(@PathVariable Long id) {
+    // logger.info("开始根据ID查询用户，ID: {}", id);
+    // try {
+    // User user = userFeignClient.getUserById(id);
+    // logger.info("根据ID查询用户成功，用户信息: {}", user);
+    // return Response.success(user);
+    // } catch (Exception e) {
+    // logger.error("根据ID查询用户失败，ID: {}, 错误: {}", id, e.getMessage(), e);
+    // return Response.error(e.getMessage());
+    // }
+    // }
+    //
+    // @PutMapping("/{id}")
+    // public Response<User> updateUser(@PathVariable Long id, @RequestBody User
+    // user) {
+    // logger.info("开始更新用户信息，ID: {}, 更新数据: {}", id, user);
+    // try {
+    // User updatedUser = userFeignClient.updateUser(id, user);
+    // logger.info("用户信息更新成功，ID: {}", updatedUser.getId());
+    // return Response.success(updatedUser);
+    // } catch (Exception e) {
+    // logger.error("用户信息更新失败，ID: {}, 错误: {}", id, e.getMessage(), e);
+    // return Response.error(e.getMessage());
+    // }
+    // }
+    //
+    // @PostMapping("/changePassword")
+    // public Response<User> changePassword(@RequestParam Long id, @RequestParam
+    // String oldPassword, @RequestParam String newPassword) {
+    // logger.info("开始修改用户密码，用户ID: {}", id);
+    // try {
+    // User updatedUser = userFeignClient.changePassword(id, oldPassword,
+    // newPassword);
+    // logger.info("用户密码修改成功，用户ID: {}", id);
+    // return Response.success(updatedUser);
+    // } catch (Exception e) {
+    // logger.error("用户密码修改失败，用户ID: {}, 错误: {}", id, e.getMessage(), e);
+    // return Response.error(e.getMessage());
+    // }
+    // }
 
     // 生成BCrypt密码（仅用于开发测试）
     @GetMapping("/generatePassword")

@@ -146,7 +146,7 @@ export default {
     // 从localStorage获取用户信息
     getUserInfoFromStorage() {
       try {
-        const userStr = localStorage.getItem('user');
+        const userStr = localStorage.getItem('userInfo');
         if (userStr) {
           const user = JSON.parse(userStr);
           this.userInfo = {
@@ -183,7 +183,7 @@ export default {
 
     // 跳转到设置页面
     goToSettings() {
-      routerUtils.navigateTo('/newshop/settings.html');
+      routerUtils.navigateTo('/settings.html');
     },
 
     // 跳转到编辑个人资料页面
@@ -193,32 +193,32 @@ export default {
 
     // 跳转到我的商品页面
     goToMyProducts() {
-      routerUtils.navigateTo('/newshop/myProducts.html');
+      routerUtils.navigateTo('/myProducts.html');
     },
 
     // 跳转到我的订单页面
     goToMyOrders() {
-      routerUtils.navigateTo('/newshop/orders.html');
+      routerUtils.navigateTo('/orders.html');
     },
 
     // 跳转到我的收藏页面
     goToFavorites() {
-      routerUtils.navigateTo('/newshop/favorites.html');
+      routerUtils.navigateTo('/favorites.html');
     },
 
     // 跳转到我的消息页面
     goToMessages() {
-      routerUtils.navigateTo('/newshop/messages.html');
+      routerUtils.navigateTo('/messages.html');
     },
 
     // 跳转到购物车页面
     goToCart() {
-      routerUtils.navigateTo('/newshop/cart.html');
+      routerUtils.navigateTo('/cart.html');
     },
 
     // 跳转到收货地址页面
     goToAddressBook() {
-      routerUtils.navigateTo('/newshop/address.html');
+      routerUtils.navigateTo('/address.html');
     },
 
     // 跳转到客服中心
@@ -244,7 +244,7 @@ export default {
 
         nativeUtils.hideLoading();
         nativeUtils.showToast('已退出登录', 1500);
-        routerUtils.navigateTo('/newshop/login.html');
+        routerUtils.navigateTo('/login.html');
       }, 1500);
     }
   }

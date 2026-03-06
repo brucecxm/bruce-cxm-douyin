@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -22,7 +23,7 @@ public interface UserRepository {
 
     /**
      * 保存用户信息
-     * 
+     *
      * @param user 用户信息
      * @return User 保存后的用户信息
      */
@@ -31,16 +32,16 @@ public interface UserRepository {
 
     /**
      * 根据ID查询用户
-     * 
+     *
      * @param id 用户ID
-     * @return Optional<User> 用户信息
+     * @return Map<String, Object> 用户信息
      */
     @GetMapping("/findById/{id}")
-    Optional<User> findById(@PathVariable("id") Long id);
+    Map<String, Object> findById(@PathVariable("id") Long id);
 
     /**
      * 根据用户名查询用户
-     * 
+     *
      * @param username 用户名
      * @return Optional<User> 用户信息
      */
@@ -49,7 +50,7 @@ public interface UserRepository {
 
     /**
      * 根据邮箱查询用户
-     * 
+     *
      * @param email 邮箱
      * @return Optional<User> 用户信息
      */
@@ -58,7 +59,7 @@ public interface UserRepository {
 
     /**
      * 检查用户名是否存在
-     * 
+     *
      * @param username 用户名
      * @return Boolean 是否存在
      */
@@ -67,7 +68,7 @@ public interface UserRepository {
 
     /**
      * 检查邮箱是否存在
-     * 
+     *
      * @param email 邮箱
      * @return Boolean 是否存在
      */

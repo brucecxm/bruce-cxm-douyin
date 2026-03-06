@@ -128,7 +128,7 @@ export default {
         nativeUtils.showLoading('加载中...');
 
         // 获取当前用户信息
-        const userInfo = localStorage.getItem('user');
+        const userInfo = localStorage.getItem('userInfo');
         if (userInfo) {
           const user = JSON.parse(userInfo);
           const userId = user.id;
@@ -187,7 +187,7 @@ export default {
         this.isLoadingRecent = true;
 
         // 获取当前用户信息
-        const userInfo = localStorage.getItem('user');
+        const userInfo = localStorage.getItem('userInfo');
         if (!userInfo) {
           this.isLoadingRecent = false;
           return;
@@ -291,7 +291,7 @@ export default {
     // 切换收藏状态
     toggleFavorite(productId) {
       // 获取当前用户信息
-      const userInfo = localStorage.getItem('user');
+      const userInfo = localStorage.getItem('userInfo');
       if (userInfo) {
         const user = JSON.parse(userInfo);
         const userId = user.id;
@@ -374,7 +374,7 @@ export default {
       }
 
       // 获取当前用户信息
-      const userInfo = localStorage.getItem('user');
+      const userInfo = localStorage.getItem('userInfo');
       if (userInfo) {
         const user = JSON.parse(userInfo);
         const userId = user.id;

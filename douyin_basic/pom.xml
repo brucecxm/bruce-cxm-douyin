@@ -21,6 +21,11 @@
     <!--    这样做的效果是：虽然插件仍然存在，但它不会在任何生命周期阶段被执行，达到了“排除”的效果。-->
 <dependencies>
     <dependency>
+        <groupId>org.example</groupId>
+        <artifactId>douyin_feign</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-data-redis</artifactId>
     </dependency>

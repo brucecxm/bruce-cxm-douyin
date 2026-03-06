@@ -142,7 +142,7 @@ export default {
     // 从localStorage加载用户信息
     loadUserInfo() {
       try {
-        const userStr = localStorage.getItem('user');
+        const userStr = localStorage.getItem('userInfo');
         if (userStr) {
           const user = JSON.parse(userStr);
           this.userInfo = {
@@ -237,7 +237,7 @@ export default {
 
     // 跳转到WebSocket测试页面
     goToWebSocketTest() {
-      routerUtils.navigateTo('/newshop/websocket-test.html');
+      routerUtils.navigateTo('/websocket-test.html');
     },
 
     // 退出登录
@@ -251,10 +251,10 @@ export default {
           localStorage.removeItem('favorites');
 
           // 跳转到登录页面
-          routerUtils.navigateTo('/newshop/login.html');
+          routerUtils.navigateTo('/login.html');
         } catch (error) {
           console.error('退出登录失败:', error);
-          routerUtils.navigateTo('/newshop/login.html');
+          routerUtils.navigateTo('/login.html');
         }
       }
     }

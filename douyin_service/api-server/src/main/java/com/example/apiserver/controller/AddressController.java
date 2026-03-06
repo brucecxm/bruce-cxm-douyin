@@ -5,9 +5,11 @@ import com.example.apiserver.entity.Address;
 import com.example.apiserver.entity.User;
 import com.example.apiserver.repository.UserRepository;
 import com.example.apiserver.service.AddressService;
+import com.example.apiserver.util.UserConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -31,12 +33,28 @@ public class AddressController {
             address.setDistrict((String) addressData.get("district"));
             address.setDetail((String) addressData.get("detail"));
             address.setIsDefault((Boolean) addressData.getOrDefault("isDefault", false));
-            
+
             // 处理用户关联
-            Long userId = ((Number) addressData.get("userId")).longValue();
-            User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("用户不存在"));
+            Object userIdObj = addressData.get("userId");
+            Long userId;
+            if (userIdObj instanceof Number) {
+                userId = ((Number) userIdObj).longValue();
+            } else if (userIdObj instanceof String) {
+                try {
+                    userId = Long.parseLong((String) userIdObj);
+                } catch (NumberFormatException e) {
+                    throw new RuntimeException("无效的用户ID");
+                }
+            } else {
+                throw new RuntimeException("无效的用户ID");
+            }
+            Map<String, Object> userMap = userRepository.findById(userId);
+            if (userMap == null || userMap.isEmpty()) {
+                throw new RuntimeException("用户不存在");
+            }
+            User user = UserConverter.convertToUser(userMap);
             address.setUser(user);
-            
+
             Address createdAddress = addressService.createAddress(address);
             return Response.success(createdAddress);
         } catch (Exception e) {
@@ -69,7 +87,7 @@ public class AddressController {
         try {
             // 获取现有地址
             Address existingAddress = addressService.getAddressById(id);
-            
+
             // 更新地址信息
             existingAddress.setReceiver((String) addressData.get("receiver"));
             existingAddress.setPhone((String) addressData.get("phone"));
@@ -78,14 +96,30 @@ public class AddressController {
             existingAddress.setDistrict((String) addressData.get("district"));
             existingAddress.setDetail((String) addressData.get("detail"));
             existingAddress.setIsDefault((Boolean) addressData.getOrDefault("isDefault", false));
-            
+
             // 如果提供了userId，更新用户关联
             if (addressData.containsKey("userId")) {
-                Long userId = ((Number) addressData.get("userId")).longValue();
-                User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("用户不存在"));
+                Object userIdObj = addressData.get("userId");
+                Long userId;
+                if (userIdObj instanceof Number) {
+                    userId = ((Number) userIdObj).longValue();
+                } else if (userIdObj instanceof String) {
+                    try {
+                        userId = Long.parseLong((String) userIdObj);
+                    } catch (NumberFormatException e) {
+                        throw new RuntimeException("无效的用户ID");
+                    }
+                } else {
+                    throw new RuntimeException("无效的用户ID");
+                }
+                Map<String, Object> userMap = userRepository.findById(userId);
+                if (userMap == null || userMap.isEmpty()) {
+                    throw new RuntimeException("用户不存在");
+                }
+                User user = UserConverter.convertToUser(userMap);
                 existingAddress.setUser(user);
             }
-            
+
             Address updatedAddress = addressService.updateAddress(id, existingAddress);
             return Response.success(updatedAddress);
         } catch (Exception e) {

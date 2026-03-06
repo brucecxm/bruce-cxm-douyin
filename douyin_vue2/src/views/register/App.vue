@@ -106,7 +106,7 @@ export default {
       try {
         // 调用注册API
         nativeUtils.showLoading('注册中...');
-        const response = await post('/newshop/user/register', {
+        const response = await post('/user/register', {
           username: this.username,
           password: this.password,
           email: this.email,
@@ -118,7 +118,7 @@ export default {
           nativeUtils.showToast('注册成功', 1500);
 
           // 跳转到登录页面
-          routerUtils.navigateTo('/newshop/login.html');
+          routerUtils.navigateTo('/login.html');
         } else {
           nativeUtils.hideLoading();
           nativeUtils.showToast(response.message || '注册失败', 1500);
@@ -138,7 +138,7 @@ export default {
     },
 
     handleLogin() {
-      routerUtils.navigateTo('/newshop/login.html');
+      routerUtils.navigateTo('/login.html');
     }
   }
 };

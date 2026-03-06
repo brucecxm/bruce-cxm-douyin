@@ -256,7 +256,7 @@ export default {
         nativeUtils.showLoading('加载中...');
 
         // 尝试从API获取数据
-        get(`/order/${this.orderId}`)
+        get(`/newshop/order/${this.orderId}`)
           .then((response) => {
             if (response.code === 0) {
               // API请求成功

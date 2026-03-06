@@ -4,10 +4,12 @@ import com.example.apiserver.entity.Address;
 import com.example.apiserver.entity.User;
 import com.example.apiserver.repository.AddressRepository;
 import com.example.apiserver.repository.UserRepository;
+import com.example.apiserver.util.UserConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AddressService {
@@ -19,7 +21,11 @@ public class AddressService {
     public Address createAddress(Address address) {
         // 从前端接收的address中获取userId，然后查询完整的User对象
         Long userId = address.getUser().getId();
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("用户不存在"));
+        Map<String, Object> userMap = userRepository.findById(userId);
+        if (userMap == null || userMap.isEmpty()) {
+            throw new RuntimeException("用户不存在");
+        }
+        User user = UserConverter.convertToUser(userMap);
         address.setUser(user);
         
         // 如果设置为默认地址，先将其他地址设为非默认

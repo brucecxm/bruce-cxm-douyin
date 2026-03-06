@@ -2,10 +2,12 @@ package com.example.apiserver.service;
 
 import com.example.apiserver.entity.User;
 import com.example.apiserver.repository.UserRepository;
+import com.example.apiserver.util.UserConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -50,7 +52,11 @@ public class UserService {
     }
 
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("用户不存在"));
+        Map<String, Object> userMap = userRepository.findById(id);
+        if (userMap == null || userMap.isEmpty()) {
+            throw new RuntimeException("用户不存在");
+        }
+        return UserConverter.convertToUser(userMap);
     }
 
     public User updateUser(Long id, User user) {

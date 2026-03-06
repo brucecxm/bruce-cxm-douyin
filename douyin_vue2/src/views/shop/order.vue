@@ -212,7 +212,7 @@ export default {
     // 加载用户地址
     async loadUserAddress() {
       try {
-        const res = await request.get('/shop/address/list');
+        const res = await request.get('/newshop/address/list');
         if (res.code === 200 && res.data && res.data.length > 0) {
           // 默认选择第一个地址
           this.address = res.data[0];

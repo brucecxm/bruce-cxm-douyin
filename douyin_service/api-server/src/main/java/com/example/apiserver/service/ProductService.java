@@ -4,6 +4,7 @@ import com.example.apiserver.entity.Product;
 import com.example.apiserver.entity.User;
 import com.example.apiserver.repository.ProductRepository;
 import com.example.apiserver.repository.UserRepository;
+import com.example.apiserver.util.UserConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ProductService {
@@ -44,8 +46,11 @@ public class ProductService {
         
         try {
             // 只查找用户，不创建新用户
-            User user = userRepository.findById(finalUserId)
-                .orElseThrow(() -> new RuntimeException("用户不存在，userId: " + finalUserId));
+            Map<String, Object> userMap = userRepository.findById(finalUserId);
+            if (userMap == null || userMap.isEmpty()) {
+                throw new RuntimeException("用户不存在，userId: " + finalUserId);
+            }
+            User user = UserConverter.convertToUser(userMap);
             product.setUser(user);
         } catch (Exception e) {
             logger.error("处理用户信息失败，userId: {}, 错误: {}", finalUserId, e.getMessage());

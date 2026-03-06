@@ -239,7 +239,7 @@ export default {
     nativeUtils.setTitleBar('发布商品');
 
     // 从localStorage获取用户信息
-    const userInfo = localStorage.getItem('user');
+    const userInfo = localStorage.getItem('userInfo');
     if (userInfo) {
       try {
         const user = JSON.parse(userInfo);

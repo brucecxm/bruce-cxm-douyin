@@ -8,11 +8,13 @@ import com.example.apiserver.repository.AddressRepository;
 import com.example.apiserver.repository.OrderRepository;
 import com.example.apiserver.repository.ProductRepository;
 import com.example.apiserver.repository.UserRepository;
+import com.example.apiserver.util.UserConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -31,8 +33,11 @@ public class OrderService {
 
     public Order createOrder(OrderRequest orderRequest) {
         // 检查用户是否存在
-        User user = userRepository.findById(orderRequest.getUserId())
-                .orElseThrow(() -> new RuntimeException("用户不存在"));
+        Map<String, Object> userMap = userRepository.findById(orderRequest.getUserId());
+        if (userMap == null || userMap.isEmpty()) {
+            throw new RuntimeException("用户不存在");
+        }
+        User user = UserConverter.convertToUser(userMap);
 
         // 检查商品是否存在
         Product product = productRepository.findById(orderRequest.getProductId())

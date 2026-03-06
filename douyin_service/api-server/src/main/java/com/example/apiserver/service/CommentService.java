@@ -7,6 +7,7 @@ import com.example.apiserver.entity.User;
 import com.example.apiserver.repository.CommentRepository;
 import com.example.apiserver.repository.ProductRepository;
 import com.example.apiserver.repository.UserRepository;
+import com.example.apiserver.util.UserConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,8 +84,11 @@ public class CommentService {
         // 获取当前登录用户ID
         Long loginUserId = AuthUtils.getCurrentUserId();
         // 验证用户是否存在
-        User user = userRepository.findById(loginUserId)
-                .orElseThrow(() -> new IllegalArgumentException("用户不存在"));
+        Map<String, Object> userMap = userRepository.findById(loginUserId);
+        if (userMap == null || userMap.isEmpty()) {
+            throw new IllegalArgumentException("用户不存在");
+        }
+        User user = UserConverter.convertToUser(userMap);
 
         // 创建评论
         Comment comment = new Comment();

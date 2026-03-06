@@ -230,7 +230,7 @@ export default {
     async initChatData() {
       try {
         // 获取当前用户信息（实际项目中从localStorage或API获取）
-        const userStr = localStorage.getItem('user');
+        const userStr = localStorage.getItem('userInfo');
         if (userStr) {
           const user = JSON.parse(userStr);
           this.myInfo.id = user.id;

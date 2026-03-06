@@ -552,7 +552,7 @@ export default {
     },
     // 跳转到商品详情（卖家其他商品）
     goToDetail(productId) {
-      routerUtils.navigateTo(`/newshop/detail?id=${productId}`);
+      routerUtils.navigateTo(`/detail?id=${productId}`);
     },
     // 跳转到卖家主页
     goToSellerProfile() {
@@ -562,11 +562,11 @@ export default {
     async addToFavorite() {
       try {
         // 检查用户是否登录
-        const userInfo = localStorage.getItem('user');
+        const userInfo = localStorage.getItem('userInfo');
         if (!userInfo) {
           nativeUtils.showToast('请先登录', 1500);
           setTimeout(() => {
-            routerUtils.navigateTo('/newshop/login.html');
+            routerUtils.navigateTo('/login.html');
           }, 1500);
           return;
         }
@@ -575,7 +575,7 @@ export default {
         const userId = user.id;
 
         // 调用API收藏商品
-        const response = await post('/newshop/favorite', {
+        const response = await post('/favorite', {
           userId: userId,
           productId: this.product.id
         });
@@ -594,11 +594,11 @@ export default {
     async addToCart() {
       try {
         // 检查用户是否登录
-        const userInfo = localStorage.getItem('user');
+        const userInfo = localStorage.getItem('userInfo');
         if (!userInfo) {
           nativeUtils.showToast('请先登录', 1500);
           setTimeout(() => {
-            routerUtils.navigateTo('/newshop/login.html');
+            routerUtils.navigateTo('/login.html');
           }, 1500);
           return;
         }
@@ -607,7 +607,7 @@ export default {
         const userId = user.id;
 
         // 调用API加入购物车
-        const response = await post('/newshop/cart', {
+        const response = await post('/cart', {
           userId: userId,
           productId: this.product.id,
           quantity: 1
@@ -631,13 +631,13 @@ export default {
         this.saveChatRecord();
         // 跳转到聊天页面，传递卖家ID和商品ID
         routerUtils.navigateTo(
-          `/newshop/chat.html?userId=${this.seller.id}&productId=${this.product.id}`
+          `/chat.html?userId=${this.seller.id}&productId=${this.product.id}`
         );
       } catch (error) {
         console.error('保存聊天记录失败:', error);
         // 即使保存失败，也跳转到聊天页面
         routerUtils.navigateTo(
-          `/newshop/chat.html?userId=${this.seller.id}&productId=${this.product.id}`
+          `/chat.html?userId=${this.seller.id}&productId=${this.product.id}`
         );
       }
     },
@@ -709,11 +709,11 @@ export default {
     // 立即购买
     async buyNow() {
       // 检查用户是否登录
-      const userInfo = localStorage.getItem('user');
+      const userInfo = localStorage.getItem('userInfo');
       if (!userInfo) {
         nativeUtils.showToast('请先登录', 1500);
         setTimeout(() => {
-          routerUtils.navigateTo('/newshop/login.html');
+          routerUtils.navigateTo('/login.html');
         }, 1500);
         return;
       }
@@ -738,7 +738,7 @@ export default {
         if (response.code === 0 && response.data) {
           // 订单创建成功，跳转到订单详情页面
           routerUtils.navigateTo(
-            `/newshop/ordernewshop/detail?id=${response.data.id}`
+            `/newshop/order/detail?id=${response.data.id}`
           );
         } else {
           nativeUtils.showToast(response.message || '创建订单失败', 1500);
@@ -766,7 +766,7 @@ export default {
         // 获取当前用户ID（从localStorage的user对象中获取）
         let userId = 1;
         try {
-          const userStr = localStorage.getItem('user');
+          const userStr = localStorage.getItem('userInfo');
           if (userStr) {
             const user = JSON.parse(userStr);
             userId = user.id || 1;
@@ -776,7 +776,7 @@ export default {
         }
 
         // 调用真实API提交评论
-        const response = await post('/newshop/comments', {
+        const response = await post('/comments', {
           productId: this.product.id,
           userId: userId,
           rating: this.commentForm.rating,

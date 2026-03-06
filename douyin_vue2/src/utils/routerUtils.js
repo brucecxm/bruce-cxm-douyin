@@ -39,7 +39,10 @@ export function navigateTo(url, params = {}, options = {}) {
   // 检查是否需要添加/newshop前缀
   let finalUrl = routerUrl;
   const pathWithoutParams = routerUrl.split('?')[0];
-  if (newShopPages.includes(pathWithoutParams)) {
+  if (
+    newShopPages.includes(pathWithoutParams) &&
+    !routerUrl.includes('login')
+  ) {
     // 添加/newshop前缀
     finalUrl = `/newshop${routerUrl}`;
   }
