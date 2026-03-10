@@ -16,7 +16,6 @@ public class VideoStrategy2 implements VideoStrategy {
 
     @Override
     public List<VideoVO> getVideos(int page, int size) {
-        // TODO: 实现videoType=2的视频获取逻辑
         // 示例：返回空列表，后续根据具体需求实现
         return new ArrayList<>();
     }
