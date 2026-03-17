@@ -5,15 +5,20 @@ import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.dict.Constant;
 import com.bruce.entity.Comment;
+import com.bruce.entity.User;
+import com.bruce.entitys.CommentVO;
 import com.bruce.pojo.Result;
 import com.bruce.service.CommentService;
 import com.bruce.service.IdService;
+import com.bruce.service.UserFeignService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * (Comment)表控制层
@@ -30,38 +35,118 @@ public class CommentController extends ApiController {
     private RedisTemplate redisTemplate;
     @Autowired
     private IdService idService;
+    @Autowired
+    private UserFeignService userFeignService;
     // 使用线程池来异步上传图片
     private static final ExecutorService executorService = Executors.newCachedThreadPool();
 
     // Controller 层
     @GetMapping("/getFatherComment")
-    public Result<Page<Comment>> getFatherComment(@RequestParam Map<String, Object> params) {
+    public Result<Page<CommentVO>> getFatherComment(@RequestParam Map<String, Object> params) {
         String videoId = String.valueOf(params.get("videoId"));
         int pageNum = Integer.parseInt(String.valueOf(params.getOrDefault(Constant.ApiParam.PAGE, 1)));
         int pageSize = Integer.parseInt(String.valueOf(params.getOrDefault(Constant.ApiParam.LIMIT, 10)));
+
         Page<Comment> page = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Comment::getCommentId, videoId)
+        queryWrapper.eq(Comment::getContentId, videoId)
                 .isNull(Comment::getFatherId);
-        Page<Comment> result = commentService.page(page, queryWrapper);
-        return Result.success(result);
-    }
 
+        // 1. 查询分页评论
+        Page<Comment> commentPage = commentService.page(page, queryWrapper);
+
+        // 2. 封装成VO，补充用户信息
+        Page<CommentVO> voPage = new Page<>();
+        // 复制分页基础信息
+        voPage.setCurrent(commentPage.getCurrent());
+        voPage.setSize(commentPage.getSize());
+        voPage.setTotal(commentPage.getTotal());
+        voPage.setPages(commentPage.getPages());
+
+        // 3. 遍历评论，查询用户信息并赋值
+        List<CommentVO> voList = commentPage.getRecords().stream().map(comment -> {
+            CommentVO vo = new CommentVO();
+            // 复制评论所有属性
+            BeanUtils.copyProperties(comment, vo);
+
+            // 4. 根据userId查询用户信息（你自己的userService）
+            User user = (User) userFeignService.getUserById((comment.getUserId()));
+
+            if (user != null) {
+                vo.setUsername(user.getUsername());
+                vo.setAvatar(user.getAvatar());
+            }
+            return vo;
+        }).collect(Collectors.toList());
+
+        voPage.setRecords(voList);
+        return Result.success(voPage);
+    }
     @PostMapping("/addVideoComment")
     public Result<String> addVideoComment(@RequestBody Map<String, Object> params) {
-        // 输出接收到的参数
         Comment comment = new Comment();
+
+        // 1. 评论内容
         comment.setComment((String) params.get(Constant.ApiParam.COMMENT));
-        comment.setFatherId((Integer) params.get(Constant.ApiParam.FATHER_ID));
+
+        // 2. 父评论ID
+        Object fatherIdObj = params.get(Constant.ApiParam.FATHER_ID);
+        Integer fatherId = null;
+        if (fatherIdObj != null) {
+            String strVal = fatherIdObj.toString().trim();
+            if (!strVal.isEmpty()) {
+                try {
+                    fatherId = Integer.valueOf(strVal);
+                } catch (NumberFormatException e) {
+                    fatherId = null;
+                }
+            }
+        }
+        comment.setFatherId(fatherId);
+
+        // 3. 评论ID
         long commentId = idService.SnowflakeGen();
         comment.setCommentId(commentId);
-        comment.setContentId((Integer) params.get(Constant.ApiParam.VIDEO_ID));
-        comment.setUserId((Long) params.get("userId"));
-        commentService.save(comment);
-        // 这里可以处理评论逻辑
-        return Result.success("评论成功"); // 返回成功响应
-    }
 
+        // 4. 视频ID
+        Object videoIdObj = params.get(Constant.ApiParam.VIDEO_ID);
+        Long videoId = null;
+        if (videoIdObj != null) {
+            String str = videoIdObj.toString().trim();
+            if (!str.isEmpty()) {
+                try {
+                    videoId = Long.valueOf(str);
+                } catch (NumberFormatException e) {
+                    videoId = null;
+                }
+            }
+        }
+        comment.setContentId(videoId);
+
+        // 5. 用户ID
+        Object userIdObj = params.get("userId");
+        Long userId = null;
+        if (userIdObj != null) {
+            String str = userIdObj.toString().trim();
+            if (!str.isEmpty()) {
+                try {
+                    userId = Long.valueOf(str);
+                } catch (NumberFormatException e) {
+                    userId = null;
+                }
+            }
+        }
+        comment.setUserId(userId);
+
+        // ==============================================
+        // 🔴 修复点 2：设置评论类型默认值
+        // ==============================================
+        comment.setCommentType(1L);
+
+        // 保存
+        commentService.save(comment);
+        return Result.success("评论成功");
+    }
     // @GetMapping("/getzi")
     // //获得对应父评论的子评论
     // public R getzi(@RequestParam("fu_id") int fu_id) {

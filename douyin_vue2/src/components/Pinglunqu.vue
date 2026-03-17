@@ -98,7 +98,7 @@ export default {
 
       getComment(params)
         .then((res) => {
-          const list = res.data.data || [];
+          const list = res.data.records || [];
           if (list.length < this.pageSize) {
             this.finished = true;
           }
@@ -113,8 +113,9 @@ export default {
         });
     },
     submitComment() {
-      const userInfoMap = this.$store.state.userInfo.userInfo; // 从 Vuex 获取用户信息
+      const userInfoMap = this.$store.state.userInfo.userInfo;
 
+      // 空内容直接返回
       if (this.newComment.trim() === '') return;
 
       const newCommentObj = {
@@ -126,33 +127,36 @@ export default {
         likes: 0
       };
 
-      if (!Array.isArray(this.commentsData)) {
-        this.commentsData = [];
-      }
-
+      // 本地渲染
       this.commentsData.unshift(newCommentObj);
-      this.newComment = '';
 
-      // 构造评论参数（你也可以不使用 this.Constant，直接写 key）
+      // ==============================================
+      // 🔴 修复点 1：把评论内容传给后端！！！
+      // ==============================================
       const params = {
         videoId: parseInt(this.videoData.videoId, 10),
         userId: newCommentObj.userId,
-        fatherId: this.fatherId
+        fatherId: this.fatherId,
+        comment: this.newComment.trim() // ✅ 必须加这一行
       };
 
+      // 发送请求
       addcomment(params)
         .then((res) => {
           console.log('评论发布成功:', res);
+          this.newComment = ''; // ✅ 成功后再清空
         })
         .catch((err) => {
           console.error('评论发布失败:', err);
+          // 失败了把本地评论删掉
+          this.commentsData.shift();
         });
     }
   },
   mounted() {
     this.videoData = this.$store.getters['videoInfo/getVideoInfo'];
     this.getCommentInit();
-    const container = this.$el.querySelector('.pinglunqu');
+    const container = this.$el;
     container.addEventListener('scroll', this.onScroll);
   }
 };
@@ -160,9 +164,6 @@ export default {
 
 <style scoped>
 .pinglunqu {
-  position: fixed;
-  bottom: 0;
-  left: 0;
   width: 100vw;
   height: 60vh;
   background: #fff;
@@ -275,7 +276,7 @@ export default {
 
 /* 底部固定评论输入框 */
 .comment-input-container {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   width: 100vw;

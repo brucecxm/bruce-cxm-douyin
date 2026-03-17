@@ -24,7 +24,7 @@
     >
       <!-- 视频侧边栏组件 -->
       <div class="videoasideone">
-        <videoaside-vue :video-data="videoboxdata[index]"></videoaside-vue>
+        <videoaside-vue :video-data="videoboxdata[index]" @show-comment="handleShowComment"></videoaside-vue>
       </div>
 
       <!-- 视频文章组件 -->
@@ -385,6 +385,9 @@ export default {
       this.currentY = newY;
       this.updateBoxesPosition();
       this.updateVideoPlayback();
+    },
+    handleShowComment(val) {
+      this.$emit('show-comment', val); // 将事件传递给父组件
     }
   }
 };

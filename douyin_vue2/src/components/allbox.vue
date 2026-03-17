@@ -1,15 +1,21 @@
 <template>
   <div class="allbox">
-    <videobox-vue v-if="boxtype === '推荐'"></videobox-vue>
-    <videobox-vue v-if="boxtype === '视频详情'"></videobox-vue>
-    <shopbox-vue v-if="boxtype === '商城'"></shopbox-vue>
+    <videobox-vue
+      v-if="boxtype === '推荐'"
+      @show-comment="handleShowComment"
+    ></videobox-vue>
+    <!-- <videobox-vue
+      v-if="boxtype === '视频详情'"
+      @show-comment="handleShowComment"
+    ></videobox-vue> -->
+    <!-- <shopbox-vue v-if="boxtype === '商城'"></shopbox-vue>
     <samecity-vue v-if="boxtype === '同城'"></samecity-vue>
     <followbox-vue v-if="boxtype === '关注'"></followbox-vue>
     <livebox-vue v-if="boxtype === '直播'"></livebox-vue>
     <experiencebox v-if="boxtype === '经验'"></experiencebox>
     <experiencebox v-if="boxtype === '团购'"></experiencebox>
     <experiencebox v-if="boxtype === '精选'"></experiencebox>
-    <experiencebox v-if="boxtype === '热点'"></experiencebox>
+    <experiencebox v-if="boxtype === '热点'"></experiencebox> -->
     <!-- 其实可以通过传入一个type  yongv-if等控制组件的显示和消失  避免创建这么多组件 -->
   </div>
 </template>
@@ -43,6 +49,9 @@ export default {
   methods: {
     allboxtest() {
       console.log('sssssssss');
+    },
+    handleShowComment(val) {
+      this.$emit('show-comment', val); // 将事件传递给父组件
     }
   }
 };

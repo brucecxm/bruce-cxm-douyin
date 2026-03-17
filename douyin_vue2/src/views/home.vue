@@ -39,15 +39,17 @@
             <all-box-vue
               v-if="visibleIndexes.includes(index)"
               :boxtype="boxes[index].boxtest"
+              @show-comment="handleChildMessage"
             ></all-box-vue>
           </div>
         </div>
       </div>
-      <pinglunqu
-        class="lpinglunqu"
-        v-if="message"
-        @send-message="handleChildMessage"
-      ></pinglunqu>
+      <div class="lpinglunqu">
+        <pinglunqu
+          v-if="message"
+          @send-message="handleChildMessage"
+        ></pinglunqu>
+      </div>
       <div class="danmubox" v-if="showdanmu">
         <danmu
           :width="'100%'"
@@ -67,7 +69,7 @@
 
       <!-- 统一弹窗 -->
       <SlidePopup
-        v-if="sharedState.commentVisible"
+        v-if="sharePopupVisible"
         :direction="'bottom'"
         width="100vw"
         height="30vh"
@@ -112,67 +114,8 @@ export default {
           name: '阿泽',
           avatar:
             'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '小发发',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '小发发',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '小发发',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '小发发',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '小发发',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '小发发',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '小发发',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '小发发',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '小发发',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '小发发',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '小发发',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '小发发',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
         }
+
         // ...
       ],
       bottomUsers: [
@@ -190,51 +133,8 @@ export default {
           name: '分享到日常',
           avatar:
             'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '分享到日常',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '分享到日常',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '分享到日常',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '分享到日常',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '分享到日常',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '分享到日常',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '分享到日常',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '分享到日常',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
         }
       ],
-      sharedState: Vue.observable({
-        commentVisible: false
-      }),
       isAnyPopupVisible: false, // 是否有弹窗显示的标志
       message: false,
       isDragging: false, // 是否正在拖动的标志
@@ -297,9 +197,9 @@ export default {
     // 初始化 boxes 的数据，包括颜色和左边距
     this.boxes = [
       { color: 'black', left: 0, boxtest: '推荐' },
-      { color: 'black', left: this.boxWidth, boxtest: '同城' },
-      { color: 'black', left: 2 * this.boxWidth, boxtest: '关注' },
-      { color: 'black', left: 3 * this.boxWidth, boxtest: '直播' }
+      { color: 'black', left: this.boxWidth, boxtest: '同城' }
+      // { color: 'black', left: 2 * this.boxWidth, boxtest: '关注' },
+      // { color: 'black', left: 3 * this.boxWidth, boxtest: '直播' }
       // { color: "pink", left: 4 * this.boxWidth, boxtest: "经验" },
       // { color: "white", left: 5 * this.boxWidth, boxtest: "商城" },
       // { color: "pink", left: 6 * this.boxWidth, boxtest: "团购" },
@@ -307,11 +207,29 @@ export default {
       // { color: "pink", left: 8 * this.boxWidth, boxtest: "热点" },
     ];
   },
+  computed: {
+    // 监听 Vuex 中的 videoInfo 变化
+    videoInfo() {
+      return this.$store.getters['videoInfo/getVideoInfo'];
+    },
+    // 从 Vuex 获取分享弹窗状态
+    sharePopupVisible() {
+      return this.$store.getters['videoInfo/sharePopupVisible'];
+    }
+  },
+  watch: {
+    // 当 videoInfo 被设置时自动显示评论区
+    videoInfo(newInfo) {
+      if (newInfo && Object.keys(newInfo).length > 0) {
+        this.message = true;
+      }
+    }
+  },
   beforeDestroy() {},
   methods: {
     closeAllPopups() {
       // 关闭所有弹窗
-      this.sharedState.commentVisible = false;
+      this.$store.commit('videoInfo/CLOSE_SHARE_POPUP');
     },
     sendDanmu() {
       if (this.danmuText.trim()) {
@@ -472,7 +390,7 @@ export default {
 .lpinglunqu {
   position: absolute;
   left: 0px;
-  bottom: 0px;
+  bottom: 5vh;
   z-index: 10;
 }
 

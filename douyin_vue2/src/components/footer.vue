@@ -148,7 +148,6 @@ export default {
   left: 0;
   width: 100%;
   height: 5vh;
-  min-height: 50px;
   background-color: black;
   display: flex;
   flex-direction: row;

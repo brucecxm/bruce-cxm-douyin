@@ -11,18 +11,18 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 public class Comment extends Model<Comment> {
-    
+
     private Long commentId;
-    
+
     private String comment;
-    
+
     private Long commentType;
-    
+
     private Long userId;
-    
+
     private Integer fatherId;
-    
-    private Integer contentId;
+
+    private Long contentId;
 
 
     public Long getCommentId() {
@@ -65,11 +65,11 @@ public class Comment extends Model<Comment> {
         this.fatherId = fatherId;
     }
 
-    public Integer getContentId() {
+    public Long getContentId() {
         return contentId;
     }
 
-    public void setContentId(Integer contentId) {
+    public void setContentId(Long contentId) {
         this.contentId = contentId;
     }
 

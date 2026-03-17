@@ -90,6 +90,7 @@ export default {
         this.isCommentClicked = false; // 0.5秒后恢复状态
       }, 500);
       this.showcomment(); // 调用评论方法
+      this.$emit('show-comment', true); // 触发事件通知父组件显示评论区
     },
     test() {
       console.log('test');
@@ -178,12 +179,11 @@ export default {
         });
     },
     toggleShare() {
-      // this.sharedState.commentVisible = true; 把这换成vuex
-      // this.sharedState.commentVisible = true; 把这换成vuex
       this.isShareClicked = true; // 设置分享图标点击状态
       setTimeout(() => {
         this.isShareClicked = false; // 0.5秒后恢复状态
       }, 500);
+      this.$store.commit('videoInfo/OPEN_SHARE_POPUP'); // 调用 Vuex 打开分享弹窗
       this.behaviour('share'); // 调用分享方法
     },
     behaviour(name) {
