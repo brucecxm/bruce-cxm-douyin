@@ -2,7 +2,9 @@ package com.bruce.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.bruce.dto.LikeRequestDTo;
 import com.bruce.entity.Video;
+import com.bruce.pojo.Result;
 import com.bruce.vo.VideoVO;
 
 import java.util.List;
@@ -19,6 +21,16 @@ public interface VideoService extends IService<Video> {
      List<VideoVO> getVideoPage(int page,
                                 int size,
                                 String videoType);
+
+
+
+
+     Result<Map<String, Object>>  handleLike(LikeRequestDTo likeRequest);
+
+
+
+
+
 
 
 }

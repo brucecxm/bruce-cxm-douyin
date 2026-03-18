@@ -38,23 +38,25 @@ public class EmptyCacheStrategy implements CachingStrategy {
         String key = "user_info:" + userId;
         String emptyKey = "empty_user:" + userId;
 
-        // 尝试从缓存获取
-        try {
-            String userJson = stringRedisTemplate.opsForValue().get(key);
-            if (userJson != null) {
-                // 反序列化用户信息
-                UserInfo userInfo = objectMapper.readValue(userJson, UserInfo.class);
-                return userInfo;
-            }
-
-            // 检查空值缓存
-            String emptyValue = stringRedisTemplate.opsForValue().get(emptyKey);
-            if ("null".equals(emptyValue)) {
-                return null;
-            }
-        } catch (Exception e) {
-            // Redis操作失败，继续查询数据库
-        }
+//
+//
+//        // 尝试从缓存获取
+//        try {
+//            String userJson = stringRedisTemplate.opsForValue().get(key);
+//            if (userJson != null) {
+//                // 反序列化用户信息
+//                UserInfo userInfo = objectMapper.readValue(userJson, UserInfo.class);
+//                return userInfo;
+//            }
+//
+//            // 检查空值缓存
+//            String emptyValue = stringRedisTemplate.opsForValue().get(emptyKey);
+//            if ("null".equals(emptyValue)) {
+//                return null;
+//            }
+//        } catch (Exception e) {
+//            // Redis操作失败，继续查询数据库
+//        }
 
         // 从数据库查询用户信息
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();

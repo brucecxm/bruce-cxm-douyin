@@ -1,5 +1,6 @@
 package com.bruce.service;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -167,22 +168,11 @@ public class VideoFeignService {
      * @return 分页视频列表
      */
     public IPage<Video> page(Page<Video> page, LambdaQueryWrapper<Video> queryWrapper) {
-        // 注意：由于Feign无法直接传递LambdaQueryWrapper，这里我们需要从查询条件中提取参数
-        // 实际实现中，应该根据查询条件构建正确的请求
-        // 这里简化处理，假设查询条件中包含userId
-        // 从查询条件中提取userId
-        Long userId = null;
-        try {
-            // 解析LambdaQueryWrapper获取userId参数
-            // 这里简化处理，实际项目中可能需要更复杂的解析逻辑
-            // 假设查询条件中只包含userId的等值查询
-            Object paramValue = getQueryParamValue(queryWrapper, Video::getUserId);
-            if (paramValue != null) {
-                userId = (Long) paramValue;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+
+        // 获取当前登录用户ID
+        Long userId = StpUtil.getLoginIdAsLong();
+
 
         if (userId != null) {
             // 调用videoFeignClient.pageByUserId(userId, page.getCurrent(), page.getSize())
@@ -209,19 +199,20 @@ public class VideoFeignService {
                             if (item instanceof Video) {
                                 videoList.add((Video) item);
                             } else if (item instanceof Map) {
-                                // 如果是Map类型，尝试转换为Video对象
                                 Map<?, ?> itemMap = (Map<?, ?>) item;
                                 Video video = new Video();
-                                video.setVideoId(itemMap.containsKey("videoId") ? (Long) itemMap.get("videoId") : null);
-                                video.setUserId(itemMap.containsKey("userId") ? (Long) itemMap.get("userId") : null);
-                                video.setMusicId(itemMap.containsKey("musicId") ? (Long) itemMap.get("musicId") : null);
-                                video.setUrl(itemMap.containsKey("url") ? (String) itemMap.get("url") : null);
-                                video.setContent(
-                                        itemMap.containsKey("content") ? (String) itemMap.get("content") : null);
-                                video.setTitle(itemMap.containsKey("title") ? (String) itemMap.get("title") : null);
-                                video.setCover(itemMap.containsKey("cover") ? (String) itemMap.get("cover") : null);
-                                video.setType(itemMap.containsKey("type") ? (Integer) itemMap.get("type") : null);
-                                video.setStatus(itemMap.containsKey("status") ? (Integer) itemMap.get("status") : null);
+
+                                // 修复：String 转 Long，不能直接强转
+                                video.setVideoId(itemMap.get("videoId") == null ? null : Long.valueOf(itemMap.get("videoId").toString()));
+                                video.setUserId(itemMap.get("userId") == null ? null : Long.valueOf(itemMap.get("userId").toString()));
+                                video.setMusicId(itemMap.get("musicId") == null ? null : Long.valueOf(itemMap.get("musicId").toString()));
+
+                                video.setUrl((String) itemMap.get("url"));
+                                video.setContent((String) itemMap.get("content"));
+                                video.setTitle((String) itemMap.get("title"));
+                                video.setCover((String) itemMap.get("cover"));
+                                video.setType((Integer) itemMap.get("type"));
+                                video.setStatus((Integer) itemMap.get("status"));
                                 videoList.add(video);
                             }
                         }
