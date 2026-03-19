@@ -78,7 +78,7 @@ const routes = [
     }
   },
   {
-    path: '/videodetail',
+    path: '/videodetail/:id',
     name: 'Videodetail',
     component: () => import('@/views/video/videodetail.vue')
   },

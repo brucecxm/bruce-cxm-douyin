@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ public class MessageService {
 
     /**
      * 发送消息
-     * 
+     *
      * @param senderId   发送者ID
      * @param receiverId 接收者ID
      * @param content    消息内容
@@ -56,7 +57,7 @@ public class MessageService {
 
     /**
      * 获取两个用户之间的聊天记录
-     * 
+     *
      * @param userId1 用户1的ID
      * @param userId2 用户2的ID
      * @return 聊天记录列表
@@ -82,7 +83,7 @@ public class MessageService {
 
     /**
      * 获取用户的未读消息数量
-     * 
+     *
      * @param userId 用户ID
      * @return 未读消息数量
      */
@@ -98,7 +99,7 @@ public class MessageService {
 
     /**
      * 获取用户与特定用户之间的未读消息数量
-     * 
+     *
      * @param senderId   发送者ID
      * @param receiverId 接收者ID
      * @return 未读消息数量
@@ -121,7 +122,7 @@ public class MessageService {
 
     /**
      * 标记消息为已读
-     * 
+     *
      * @param senderId   发送者ID
      * @param receiverId 接收者ID
      */
@@ -145,7 +146,7 @@ public class MessageService {
 
     /**
      * 获取与用户有过聊天记录的所有用户
-     * 
+     *
      * @param userId 用户ID
      * @return 用户列表
      */
@@ -161,7 +162,7 @@ public class MessageService {
 
     /**
      * 获取用户的聊天列表（包含最新消息和未读数量）
-     * 
+     *
      * @param userId 用户ID
      * @return 聊天列表
      */
@@ -215,27 +216,27 @@ public class MessageService {
             throw new RuntimeException("用户不存在");
         }
         User user = UserConverter.convertToUser(userMap);
-        
+
         // 注意：这里需要在MessageRepository中添加相应的方法
         // 为了简化，我们暂时返回空列表
-        return List.of();
+        return new ArrayList<>();
     }
 
     /**
      * 获取用户的未读消息
-     * 
+     *
      * @param userId 用户ID
      * @return 未读消息列表
      */
     public List<Message> getUnreadMessages(Long userId) {
         // 这里可以根据需求实现
         // 为了简化，我们暂时返回空列表
-        return List.of();
+        return new ArrayList<>();
     }
 
     /**
      * 标记单条消息为已读
-     * 
+     *
      * @param messageId 消息ID
      */
     @Transactional
@@ -248,7 +249,7 @@ public class MessageService {
 
     /**
      * 删除消息
-     * 
+     *
      * @param messageId 消息ID
      */
     public void deleteMessage(Long messageId) {
