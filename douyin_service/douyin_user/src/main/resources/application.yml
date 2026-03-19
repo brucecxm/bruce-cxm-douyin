@@ -1,5 +1,28 @@
 server:
   port: 7456  # 设置应用的端口号为7456
+  tomcat:
+    # 最大连接数：服务器在任何给定时间可以处理的最大连接数
+    max-connections: 10000
+    # 最大线程数：Tomcat可以同时处理的请求数
+    max-threads: 200
+    # 最小备用线程数：Tomcat启动时创建的线程数
+    min-spare-threads: 25
+    # 连接超时时间（毫秒）：连接在被关闭之前可以保持空闲的时间
+    connection-timeout: 20000
+    # 接受队列大小：当所有线程都在使用时，等待处理的请求队列大小
+    accept-count: 100
+    # 最大HTTP头大小（字节）：限制HTTP请求头的大小，防止头部攻击
+    max-http-header-size: 8192
+    # 最大HTTP表单POST大小（字节）：限制表单提交的大小
+    max-http-post-size: 2097152
+    # 启用连接超时：是否启用连接超时
+    connection-timeout-enabled: true
+    # 启用重试：是否在连接失败时重试
+    connection-reuse-enabled: true
+    # 保持连接的超时时间（毫秒）：在关闭连接之前，连接可以保持空闲的时间
+    keep-alive-timeout: 60000
+    # 最大保持连接请求数：在关闭连接之前，连接可以处理的最大请求数
+    max-keep-alive-requests: 100
 
 
 spring:
