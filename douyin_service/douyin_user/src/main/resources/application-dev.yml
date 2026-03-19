@@ -111,6 +111,12 @@ eureka:
       #      defaultZone: http://127.0.0.1:10086/eureka  # Eureka 服务注册中心的地址
       defaultZone: http://1.94.131.16:8080/eureka # Eureka 服务注册中心的地址
 
+# OpenFeign配置
+feign:
+  circuitbreaker:
+    enabled: true # 启用Circuit Breaker，支持服务降级
+
+
 # 布隆过滤器配置
 bloom-filter:
   # 是否开启布隆过滤器预热

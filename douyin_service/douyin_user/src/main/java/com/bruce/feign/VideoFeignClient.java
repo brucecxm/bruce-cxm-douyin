@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "DouyinVideoService", path = "/video")
+@FeignClient(name = "DouyinVideoService", path = "/video", fallback = VideoFeignClientFallback.class)
 public interface VideoFeignClient {
 
     @GetMapping("/getById")
