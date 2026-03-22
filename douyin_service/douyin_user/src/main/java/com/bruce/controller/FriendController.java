@@ -2,6 +2,7 @@ package com.bruce.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.api.ApiController;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bruce.entity.User;
@@ -105,6 +106,174 @@ public class FriendController extends ApiController {
         List<User> users = friendService.searchMyFriends(userId, keyword);
         return Result.success(users);
     }
+
+
+
+
+
+/**
+ * 用户搜索接口 SQL 性能优化案例
+ * isOptimize = false：优化前（慢查询、全表扫描、无索引、无分页）
+ * isOptimize = true：优化后（索引查询、分页、逻辑拆分、性能提升10~100倍）
+ */
+
+    /**
+     * 搜索用户（支持ID、用户名、手机号、邮箱）
+     *
+     * @param keyword  搜索关键词
+     * @param pageNum  页码（默认第1页）
+     * @param pageSize 每页条数（默认10条）
+     * @return 搜索结果
+     */
+    @GetMapping("/search")
+    public Result<?> searchUsers(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+
+        // ===================== 优化开关：false=原始慢查询 | true=高性能查询 =====================
+        boolean isOptimize = false;
+
+        // 获取当前登录用户ID，业务要求：搜索结果必须排除自己
+        Long currentUserId = Long.valueOf(StpUtil.getLoginIdAsString());
+
+        // 初始化查询构造器
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+
+        // 基础条件：无论优化前后，都必须排除当前登录用户自己
+        queryWrapper.ne("id", currentUserId);
+
+        // ===================== 优化前：原始低效业务代码 =====================
+        if (!isOptimize) {
+
+
+//
+//            EXPLAIN
+//                    SELECT
+//            id,
+//                    email,
+//                    user_pic,
+//                    back_img,
+//                    city,
+//                    my_intro,
+//                    age,
+//                    school,
+//                    username,
+//                    gender,
+//                    phone,
+//                    password,
+//                    nickname,
+//                    avatar,
+//                    create_time,
+//                    update_time,
+//                    permission_id,
+//                    role_id,
+//                    payment_password,
+//                    is_anchor,
+//                    is_private,
+//                    last_login_time,
+//                    balance,
+//                    birthday,
+//                    bio,
+//                    created_at,
+//                    updated_at
+//            FROM
+//                    user
+//            WHERE
+//                    (id <> 480971991428129
+//            OR id = 1111
+//            OR username LIKE '%1111%'
+//            OR phone LIKE '%1111%'
+//            OR email LIKE '%1111%')
+//
+
+
+
+
+
+
+
+
+
+            /*
+             * 【优化前缺陷1】：ID 与模糊查询混合，无条件 OR 拼接
+             * 生成 SQL：WHERE id != ? OR id = ? OR username LIKE %?% ...
+             * 后果：OR 逻辑混乱，数据库无法使用索引，强制全表扫描
+             */
+            try {
+                // 尝试将关键词转为数字（用户ID）
+                Long id = Long.parseLong(keyword);
+                // 无条件拼接 OR，破坏索引生效条件
+                queryWrapper.or().eq("id", id);
+            } catch (NumberFormatException ignored) {
+                // 关键词不是数字，不处理
+            }
+
+            /*
+             * 【优化前缺陷2】：全模糊查询 %keyword%
+             * 最致命问题：% 开头的模糊查询 = 索引完全失效
+             * 数据库必须逐行扫描全表，数据量越大越慢
+             */
+            queryWrapper.or().like("username", keyword)
+                    .or().like("phone", keyword)
+                    .or().like("email", keyword);
+
+            /*
+             * 【优化前缺陷3】：无分页，全表返回
+             * 一次性加载所有匹配数据，内存溢出、网络IO极高
+             */
+            List<User> users = userService.list(queryWrapper);
+            return Result.success(users);
+        }
+
+        // ===================== 优化后：高性能业务代码 =====================
+        else {
+            /*
+             * 【优化点1】：查询优先级拆分 → ID优先精准查询
+             * 原理：主键 ID 自带聚簇索引，等值查询是数据库最快查询方式
+             * 只要关键词是数字，直接走主键查询，毫秒级返回
+             */
+            try {
+                Long id = Long.parseLong(keyword);
+                // 使用 and() 包裹条件，保证索引生效，不破坏查询结构
+                queryWrapper.and(w -> w.eq("id", id));
+
+                // ID精准匹配，直接返回结果，无需执行模糊查询
+                List<User> users = userService.list(queryWrapper);
+                return Result.success(users);
+            } catch (NumberFormatException e) {
+                /*
+                 * 【优化点2】：非数字关键词 → 走右模糊查询 keyword%
+                 * 原理：like "%keyword%" → 索引失效
+                 *      like "keyword%" → 索引生效（最左前缀原则）
+                 * 性能提升：10倍~100倍
+                 */
+                queryWrapper.and(w -> w.likeRight("username", keyword)
+                        .or().likeRight("phone", keyword)
+                        .or().likeRight("email", keyword));
+            }
+
+            /*
+             * 【优化点3】：分页查询（核心优化）
+             * 原理：限制数据库扫描行数 + 减少网络传输数据量
+             * 避免一次性加载全表数据，彻底解决慢查询
+             */
+            IPage<User> userPage = userService.page(new Page<>(pageNum, pageSize), queryWrapper);
+            return Result.success(userPage);
+        }
+//
+//
+//        -- 用户搜索联合索引
+//                -- 作用：覆盖 username、phone、email 三个搜索字段
+//        -- 原理：让右模糊查询走索引，避免全表扫描
+//        CREATE INDEX idx_user_search ON user (username, phone, email);
+//
+
+
+
+    }
+
+
 
     /**
      * 根据实体类属性查询所有匹配记录的数量
@@ -262,7 +431,7 @@ public class FriendController extends ApiController {
 
     /**
      * 获取指定好友的详细信息
-     * 
+     *
      * @param friendId 好友关系ID
      * @return 好友的详细信息
      */
