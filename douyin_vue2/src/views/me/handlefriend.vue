@@ -51,7 +51,7 @@ export default {
   methods: {
     searchFriend() {
       axios
-        .get('/user/friend/list/search', {
+        .get('/user/friend/search', {
           params: { keyword: this.searchKeyword }
         })
         .then((res) => {

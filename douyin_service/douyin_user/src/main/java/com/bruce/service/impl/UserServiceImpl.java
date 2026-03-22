@@ -64,11 +64,21 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return userDao.selectOne(queryWrapper);
     }
 
+
+    /**
+     * 重写 根据ID更新用户
+     */
     @Override
     public boolean updateById(User user) {
-        return false;
-    }
+        // 你可以在这里写自定义逻辑
+        // 示例：自动更新更新时间
+//        if (user != null) {
+//            user.onUpdate(); // 调用实体类里的更新时间方法
+//        }
 
+        // 调用 MyBatis-Plus 原生的更新方法
+        return super.updateById(user);
+    }
     @Override
     public User getUserByUsername(String username) {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
@@ -298,7 +308,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     @Override
     public boolean updateUserInfo(User user, Long userId) {
-        // 确保只能更新自己的信息
+            // 确保只能更新自己的信息
         if (user.getId() == null || !user.getId().equals(userId)) {
             throw new IllegalArgumentException("无权修改其他用户信息");
         }

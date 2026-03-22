@@ -38,25 +38,25 @@ public class EmptyCacheStrategy implements CachingStrategy {
         String key = "user_info:" + userId;
         String emptyKey = "empty_user:" + userId;
 
-//
-//
-//        // 尝试从缓存获取
-//        try {
-//            String userJson = stringRedisTemplate.opsForValue().get(key);
-//            if (userJson != null) {
-//                // 反序列化用户信息
-//                UserInfo userInfo = objectMapper.readValue(userJson, UserInfo.class);
-//                return userInfo;
-//            }
-//
-//            // 检查空值缓存
-//            String emptyValue = stringRedisTemplate.opsForValue().get(emptyKey);
-//            if ("null".equals(emptyValue)) {
-//                return null;
-//            }
-//        } catch (Exception e) {
-//            // Redis操作失败，继续查询数据库
-//        }
+        //
+        //
+        // // 尝试从缓存获取
+        // try {
+        // String userJson = stringRedisTemplate.opsForValue().get(key);
+        // if (userJson != null) {
+        // // 反序列化用户信息
+        // UserInfo userInfo = objectMapper.readValue(userJson, UserInfo.class);
+        // return userInfo;
+        // }
+        //
+        // // 检查空值缓存
+        // String emptyValue = stringRedisTemplate.opsForValue().get(emptyKey);
+        // if ("null".equals(emptyValue)) {
+        // return null;
+        // }
+        // } catch (Exception e) {
+        // // Redis操作失败，继续查询数据库
+        // }
 
         // 从数据库查询用户信息
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
@@ -78,17 +78,8 @@ public class EmptyCacheStrategy implements CachingStrategy {
         BeanUtils.copyProperties(user, userInfo);
 
         // 查询视频信息
-        try {
-            if (page != null && pageSize != null) {
-                Page<Video> pageQuery = new Page<>(page, pageSize);
-                LambdaQueryWrapper<Video> videoQueryWrapper = new LambdaQueryWrapper<>();
-                videoQueryWrapper.eq(Video::getUserId, userId);
-                IPage<Video> videoPage = videoFeignService.page(pageQuery, videoQueryWrapper);
-                userInfo.setVideoPage(videoPage);
-            }
-        } catch (Exception e) {
-            // 视频查询失败，不影响用户信息返回
-        }
+        queryAndSetVideoInfo(userInfo, userId, page, pageSize);
+
 
         // 更新缓存
         try {
@@ -103,4 +94,22 @@ public class EmptyCacheStrategy implements CachingStrategy {
 
         return userInfo;
     }
+
+    /**
+     * 查询并设置用户视频信息
+     */
+    private void queryAndSetVideoInfo(UserInfo userInfo, Long userId, Integer page, Integer pageSize) {
+        try {
+            if (page != null && pageSize != null) {
+                Page<Video> pageQuery = new Page<>(page, pageSize);
+                LambdaQueryWrapper<Video> videoQueryWrapper = new LambdaQueryWrapper<>();
+                videoQueryWrapper.eq(Video::getUserId, userId);
+                IPage<Video> videoPage = videoFeignService.page(pageQuery, videoQueryWrapper);
+                userInfo.setVideoPage(videoPage);
+            }
+        } catch (Exception e) {
+            // 视频查询失败，不影响用户信息返回
+        }
+    }
+
 }

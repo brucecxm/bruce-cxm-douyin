@@ -132,7 +132,7 @@ public class FriendController extends ApiController {
             @RequestParam(defaultValue = "10") Integer pageSize) {
 
         // ===================== 优化开关：false=原始慢查询 | true=高性能查询 =====================
-        boolean isOptimize = false;
+        boolean isOptimize = true;
 
         // 获取当前登录用户ID，业务要求：搜索结果必须排除自己
         Long currentUserId = Long.valueOf(StpUtil.getLoginIdAsString());
@@ -240,6 +240,10 @@ public class FriendController extends ApiController {
 
                 // ID精准匹配，直接返回结果，无需执行模糊查询
                 List<User> users = userService.list(queryWrapper);
+                if(users.size()==0)
+                {
+                    throw new NumberFormatException();
+                }
                 return Result.success(users);
             } catch (NumberFormatException e) {
                 /*
