@@ -101,8 +101,7 @@ export default defineConfig(({ mode }) => {
           '@fortawesome/fontawesome-svg-core',
           '@fortawesome/free-solid-svg-icons',
           'hls.js',
-          '@videojs/http-streaming',
-          'leaflet'
+          '@videojs/http-streaming'
         ],
         // 强制预构建某些依赖（避免重复处理）
         include: [
