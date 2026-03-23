@@ -33,13 +33,13 @@ case "$env_choice" in
     1)
         PROFILE="dev"
         BRANCH="dev"
-        JVM_OPTS="-Xms128m -Xmx256m"
+        JVM_OPTS="-Xms128m -Xmx256m -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=128m -XX:MaxDirectMemorySize=64m"
         AUTO_RESTART="no"  # 开发环境默认不自动重启
         ;;
     2)
         PROFILE="prod"
         BRANCH="prod"
-        JVM_OPTS="-Xms128m -Xmx256m -XX:+UseG1GC"
+        JVM_OPTS="-Xms128m -Xmx256m -XX:+UseG1GC -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=128m -XX:MaxDirectMemorySize=64m"
 
         # 新增：生产环境是否启用自动拉取
         echo "请选择生产环境自动拉取策略："
