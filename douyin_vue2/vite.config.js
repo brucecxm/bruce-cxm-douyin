@@ -97,12 +97,7 @@ export default defineConfig(({ mode }) => {
       },
       optimizeDeps: {
         // 排除不需要预构建的依赖（已是 ESM 格式或体积较大的库）
-        exclude: [
-          '@fortawesome/fontawesome-svg-core',
-          '@fortawesome/free-solid-svg-icons',
-          'hls.js',
-          '@videojs/http-streaming'
-        ],
+        exclude: ['hls.js', '@videojs/http-streaming'],
         // 强制预构建某些依赖（避免重复处理）
         include: [
           'axios/dist/axios.min.js',

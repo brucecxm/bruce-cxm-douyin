@@ -8,13 +8,8 @@ import '@/assets/base.css';
 import './assets/css/theme.css';
 import { Constant } from './constants/dict';
 // 导入 Font Awesome
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { fas } from '@fortawesome/free-solid-svg-icons';
 // 注册所有图标
-library.add(fas);
 // 注册为全局组件
-Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.config.productionTip = false;
 Vue.use(InfiniteScroll);
 Vue.use(ElementUI);
@@ -82,7 +77,7 @@ function initWebSocket() {
 initWebSocket();
 
 // 全局方法，用于关闭WebSocket连接
-Vue.prototype.closeWebSocket = function() {
+Vue.prototype.closeWebSocket = function () {
   if (socket) {
     socket.close();
     socket = null;
