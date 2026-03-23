@@ -69,7 +69,7 @@ export default defineConfig(({ mode }) => {
     return {
       ...commonConfig,
       build: {
-        outDir: 'dist',
+        outDir: '/usr/share/nginx/html/dist',
         minify: false, // 开发环境不压缩
         sourcemap: true, // 生成源码映射
         emptyOutDir: true, // 清空输出目录
