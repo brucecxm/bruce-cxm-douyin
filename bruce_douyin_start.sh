@@ -85,15 +85,17 @@ MAVEN_OPTS="-Xms128m -Xmx256m" mvn install -DskipTests || { echo "❌ mvn instal
 echo "✅ mvn install 成功"
 
 # 5. 启动 Redis
+
+REDIS_PASSWORD="Aa.147258"
 echo "➡️ 检查 Redis 是否运行中..."
 if command -v redis-cli &> /dev/null; then
-    if redis-cli ping | grep -q "PONG"; then
+    if redis-cli -a "$REDIS_PASSWORD" ping | grep -q "PONG"; then
         echo "✅ Redis 已运行"
     else
         echo "🔄 Redis 未运行，尝试启动..."
         if systemctl list-units --type=service | grep -q "redis"; then
             sudo systemctl start redis
-            redis-cli ping | grep -q "PONG" && echo "✅ Redis 启动成功" || { echo "❌ Redis 启动失败"; exit 1; }
+            redis-cli -a "$REDIS_PASSWORD" ping | grep -q "PONG" && echo "✅ Redis 启动成功" || { echo "❌ Redis 启动失败"; exit 1; }
         else
             echo "❌ 系统中未安装 Redis"
             exit 1
