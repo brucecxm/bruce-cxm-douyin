@@ -46,9 +46,12 @@
 
         <!-- C. 系统消息分类 (仿截图中的 互动消息/粉丝 等) -->
         <div class="system-messages">
-          <div class="sys-item">
+          <div class="sys-item" @click="handleFriendRequests">
             <div class="sys-icon icon-pink">💬</div>
             <div class="sys-text">互动消息</div>
+            <div v-if="hasFriendRequests" class="sys-badge">
+              {{ friendRequests.length }}
+            </div>
             <div class="sys-arrow">></div>
           </div>
           <div class="sys-item">
@@ -112,7 +115,11 @@
 import HorizontalScrollList from '@/components/HorizontalScrollList.vue';
 import caidan from '@/components/caidan.vue';
 import footerVue from '@/components/footer.vue';
-import { getFriendApiDetail, getUserList } from '@/api/user.js';
+import {
+  getFriendApiDetail,
+  getUserList,
+  getrequestFriendApi
+} from '@/api/user.js';
 
 export default {
   name: 'MessagePage',
@@ -130,6 +137,10 @@ export default {
       hasMore: true,
       page: 1,
       pageSize: 10,
+
+      // 好友请求相关
+      friendRequests: [],
+      hasFriendRequests: false,
 
       // 样式状态
       caidancss: {
@@ -239,11 +250,30 @@ export default {
       if (id) {
         this.$router.push({ path: '/chatyi', query: { id } });
       }
+    },
+
+    // 5. 获取好友请求列表
+    async fetchFriendRequests() {
+      try {
+        const response = await getrequestFriendApi();
+        if (response && response.data) {
+          this.friendRequests = response.data;
+          this.hasFriendRequests = this.friendRequests.length > 0;
+        }
+      } catch (error) {
+        console.error('Fetch friend requests failed:', error);
+      }
+    },
+
+    // 6. 处理好友请求点击事件
+    handleFriendRequests() {
+      this.$router.push('/friend-requests');
     }
   },
   mounted() {
     this.fetchFriendInfos();
     this.fetchUserInfos();
+    this.fetchFriendRequests();
 
     // 隐藏全局滚动条
     document.body.style.overflow = 'hidden';

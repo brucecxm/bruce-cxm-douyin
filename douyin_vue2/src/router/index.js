@@ -83,6 +83,11 @@ const routes = [
     component: () => import('@/views/video/videodetail.vue')
   },
   {
+    path: '/tongzhi',
+    name: 'Tongzhi',
+    component: () => import('@/views/xiaoxi/note.vue')
+  },
+  {
     path: '/testmap',
     name: 'Testmap',
     component: () => import('../components/leftmap.vue')
@@ -173,6 +178,11 @@ const routes = [
     path: '/xiaoxi',
     name: 'XiaoXiVue',
     component: () => import('../views/xiaoxi/xiaoxi.vue')
+  },
+  {
+    path: '/friend-requests',
+    name: 'FriendRequests',
+    component: () => import('../views/xiaoxi/friend-requests.vue')
   },
   {
     path: '/chat',
