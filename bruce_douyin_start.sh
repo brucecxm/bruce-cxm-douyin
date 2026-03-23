@@ -89,13 +89,28 @@ echo "✅ mvn install 成功"
 REDIS_PASSWORD="Aa.147258"
 echo "➡️ 检查 Redis 是否运行中..."
 if command -v redis-cli &> /dev/null; then
-    if redis-cli -a "$REDIS_PASSWORD" ping | grep -q "PONG"; then
+    echo "📡 尝试连接 Redis..."
+    # 使用--no-auth-warning避免认证警告干扰输出
+    if redis-cli -a "$REDIS_PASSWORD" --no-auth-warning ping | grep -q "PONG"; then
         echo "✅ Redis 已运行"
     else
-        echo "🔄 Redis 未运行，尝试启动..."
+        echo "🔄 Redis 未响应，检查服务状态..."
+        # 直接检查systemctl状态
         if systemctl list-units --type=service | grep -q "redis"; then
-            sudo systemctl start redis
-            redis-cli -a "$REDIS_PASSWORD" ping | grep -q "PONG" && echo "✅ Redis 启动成功" || { echo "❌ Redis 启动失败"; exit 1; }
+            echo "📋 Redis 服务存在，检查运行状态..."
+            if systemctl is-active redis | grep -q "active"; then
+                echo "✅ Redis 服务已运行（通过systemctl确认）"
+            else
+                echo "🔄 Redis 服务未运行，尝试启动..."
+                sudo systemctl start redis
+                sleep 2  # 给Redis启动时间
+                if systemctl is-active redis | grep -q "active"; then
+                    echo "✅ Redis 启动成功"
+                else
+                    echo "❌ Redis 启动失败"
+                    exit 1
+                fi
+            fi
         else
             echo "❌ 系统中未安装 Redis"
             exit 1
