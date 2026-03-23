@@ -61,15 +61,15 @@ cd douyin_vue2 || { echo "❌ 无法进入 Vue 项目目录"; exit 1; }
 
 # 4. 安装依赖
 echo "➡️ 安装 npm 依赖..."
-NODE_OPTIONS="--max-old-space-size=1024" npm install || { echo "❌ npm install 失败"; exit 1; }
+NODE_OPTIONS="--max-old-space-size=2048 " npm install || { echo "❌ npm install 失败"; exit 1; }
 echo "✅ npm install 成功"
 
 # 5. 根据环境变量构建前端
 echo "➡️ 构建 Vue 项目 (环境: $PROFILE)..."
 if [ "$PROFILE" = "prod" ]; then
-    NODE_OPTIONS="--max-old-space-size=1024" npm run build:prod || { echo "❌ 生产环境构建失败"; exit 1; }
+    NODE_OPTIONS="--max-old-space-size=2048 " npm run build:prod || { echo "❌ 生产环境构建失败"; exit 1; }
 else
-    NODE_OPTIONS="--max-old-space-size=1024" npm run build:dev || { echo "❌ 开发环境构建失败"; exit 1; }
+    NODE_OPTIONS="--max-old-space-size=2048 " npm run build:dev || { echo "❌ 开发环境构建失败"; exit 1; }
 fi
 echo "✅ 构建成功"
 
