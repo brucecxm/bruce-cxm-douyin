@@ -28,14 +28,14 @@ function viteLoggerPlugin() {
 
 export default defineConfig(({ mode }) => {
   // 定义httpsOptions，根据模式动态设置
-  const httpsOptions = {
-    key: fs.readFileSync(
-      'C:/Users/Administrator/Desktop/tools/127.0.0.1+4-key.pem'
-    ),
-    cert: fs.readFileSync(
-      'C:/Users/Administrator/Desktop/tools/127.0.0.1+4.pem'
-    )
-  };
+  // const httpsOptions = {
+  //   key: fs.readFileSync(
+  //     'C:/Users/Administrator/Desktop/tools/127.0.0.1+4-key.pem'
+  //   ),
+  //   cert: fs.readFileSync(
+  //     'C:/Users/Administrator/Desktop/tools/127.0.0.1+4.pem'
+  //   )
+  // };
 
   const commonConfig = {
     plugins: [
