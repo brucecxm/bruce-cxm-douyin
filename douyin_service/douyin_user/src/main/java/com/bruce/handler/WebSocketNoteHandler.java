@@ -17,7 +17,7 @@ public class WebSocketNoteHandler extends TextWebSocketHandler {
         // 添加会话到集合
         sessions.add(session);
         // 连接建立后，主动发送消息给前端
-        session.sendMessage(new TextMessage("Connection established!"));
+//        session.sendMessage(new TextMessage("Connection established!"));
         System.out.println("WebSocket连接已建立: " + session.getId());
         System.out.println("当前活跃连接数: " + sessions.size());
     }
@@ -26,7 +26,7 @@ public class WebSocketNoteHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         // 收到消息后响应
         System.out.println("收到来自客户端的消息: " + message.getPayload());
-        session.sendMessage(new TextMessage("New notification!"));
+//        session.sendMessage(new TextMessage("New notification!"));
     }
 
     @Override

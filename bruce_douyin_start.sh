@@ -75,13 +75,13 @@ echo "🔄 自动拉取：$(if [ "$AUTO_RESTART" = "yes" ]; then echo "启用"; 
 # 3. 安装基础模块
 echo "➡️ 安装基础模块 douyin_basic ..."
 cd douyin_basic || { echo "❌ 进入 douyin_basic 失败"; exit 1; }
-mvn install || { echo "❌ douyin_basic 安装失败"; exit 1; }
+MAVEN_OPTS="-Xms128m -Xmx256m" mvn install -DskipTests || { echo "❌ douyin_basic 安装失败"; exit 1; }
 echo "✅ douyin_basic 安装成功"
 cd ..
 
 # 4. 安装整个项目
 echo "➡️ 执行 mvn install ..."
-mvn install || { echo "❌ mvn install 执行失败"; exit 1; }
+MAVEN_OPTS="-Xms128m -Xmx256m" mvn install -DskipTests || { echo "❌ mvn install 执行失败"; exit 1; }
 echo "✅ mvn install 成功"
 
 # 5. 启动 Redis

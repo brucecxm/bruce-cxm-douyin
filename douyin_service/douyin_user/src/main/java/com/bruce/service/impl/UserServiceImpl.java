@@ -365,29 +365,28 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             throw new com.bruce.handlar.MyCustomException(400, com.bruce.dict.Constant.Error.USER_REPEAT);
         }
 
-        // 生成盐值并保存
-        String saltStr = generateSalt(16);
-        com.bruce.entity.Salt salt = new com.bruce.entity.Salt();
-        salt.setUserId(0L); // 临时ID，后续会更新
-        salt.setSalt(saltStr);
-        saltService.save(salt);
-
-        // 加密密码
-        String encryptedPassword = saltedDoubleHashPassword(password, saltStr);
-
         // 设置用户基本信息
         User user = new User();
         user.setUsername(username);
-        user.setPassword(encryptedPassword);
         user.setNickname(com.bruce.dict.Constant.Chinese.NEW_USER + System.currentTimeMillis());
         user.setRoleId(com.bruce.dict.Constant.Role.USER);
 
         // 保存用户
         this.save(user);
 
-        // 更新盐值的用户ID
+        // 生成盐值并保存
+        String saltStr = generateSalt(16);
+        com.bruce.entity.Salt salt = new com.bruce.entity.Salt();
         salt.setUserId(user.getId());
-        saltService.updateById(salt);
+        salt.setSalt(saltStr);
+        saltService.save(salt);
+
+        // 加密密码
+        String encryptedPassword = saltedDoubleHashPassword(password, saltStr);
+
+        // 更新用户密码
+        user.setPassword(encryptedPassword);
+        this.updateById(user);
 
         return user;
     }
@@ -461,11 +460,13 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
         // 更新盐值
         if (success) {
-            com.bruce.entity.Salt salt = saltService.getOne(new LambdaQueryWrapper<com.bruce.entity.Salt>().eq(com.bruce.entity.Salt::getUserId, userId));
-            if (salt != null) {
-                salt.setSalt(newSalt);
-                saltService.updateById(salt);
-            }
+            // 删除旧盐值
+            saltService.remove(new LambdaQueryWrapper<com.bruce.entity.Salt>().eq(com.bruce.entity.Salt::getUserId, userId));
+            // 保存新盐值
+            com.bruce.entity.Salt newSaltEntity = new com.bruce.entity.Salt();
+            newSaltEntity.setUserId(userId);
+            newSaltEntity.setSalt(newSalt);
+            saltService.save(newSaltEntity);
         }
 
         return success;
