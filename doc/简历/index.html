@@ -250,24 +250,35 @@
       transform: translateY(-10px) scale(0.95);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       backdrop-filter: blur(10px);
+      left: 50%;
+      transform-origin: top center;
+    }
+
+    /* 移动端适配 */
+    @media (max-width: 768px) {
+      .experience-tag {
+        font-size: 12px !important;
+        padding: 8px 12px !important;
+        margin-right: 8px !important;
+      }
     }
 
     .experience-links::before {
       content: '';
       position: absolute;
       top: -8px;
-      left: 24px;
+      left: 50%;
       width: 16px;
       height: 16px;
       background: white;
-      transform: rotate(45deg);
+      transform: translateX(-50%) rotate(45deg);
       box-shadow: -2px -2px 5px rgba(0, 0, 0, 0.05);
     }
 
     .experience-links.show {
       opacity: 1;
       visibility: visible;
-      transform: translateY(0) scale(1);
+      transform: translateX(-50%) translateY(0) scale(1);
     }
 
     /* 体验链接样式 */
@@ -337,15 +348,35 @@
 
 <body>
   <!-- PDF导出按钮和下载按钮 -->
-  <div style="text-align: center; margin-bottom: 20px;">
-    <button id="export-pdf-btn" class="tag"
+  <div style="text-align: center; margin-bottom: 20px; position: relative;">
+    <!-- <button id="export-pdf-btn" class="tag"
       style="cursor: pointer; padding: 10px 20px; font-size: 14px; font-weight: 500; margin-right: 12px;">
       📄 导出为PDF
     </button>
     <button id="download-resume-btn" class="tag"
       style="cursor: pointer; padding: 10px 20px; font-size: 14px; font-weight: 500;">
       ⬇️ 下载简历
+    </button> -->
+    <button class="tag experience-tag" onclick="toggleExperienceLinks(this)"
+      style="cursor: pointer; padding: 10px 20px; font-size: 14px; font-weight: 500; margin-right: 12px; background: #f2f2f7; border: none; border-radius: 8px; color: #555; transition: all 0.3s ease;">
+      融信云电子银行体验
     </button>
+    <div class="experience-links">
+      <a href="https://ent.wuhaicb.com/fpaas_bucket/97054965_prod/h5/22000001-1.0.0.14/html/index.html#/login"
+        target="_blank">个人网银</a>
+      <a href="https://mybank.urbank.com.cn/fpaas_bucket/43603805_prod/h5/22000001-1.0.0.5/html/index.html#/login"
+        target="_blank">企业法人</a>
+      <a href="https://www.xinhuibank.com/fpaas_bucket/85687711_prod/h5/41000001-1.0.0.6/html/index.html#/home"
+        target="_blank">门户网站</a>
+      <a href="https://www.wuhaicb.com/app/czdownload.html" target="_blank">个人手机</a>
+    </div>
+    <button class="tag experience-tag" onclick="toggleExperienceLinks(this)"
+      style="cursor: pointer; padding: 10px 20px; font-size: 14px; font-weight: 500; background: #f2f2f7; border: none; border-radius: 8px; color: #555; transition: all 0.3s ease;">
+      仿抖音短视频体验
+    </button>
+    <div class="experience-links">
+      <a href="#" target="_blank">仿抖音体验地址</a>
+    </div>
   </div>
   <div class="container">
 
