@@ -365,7 +365,7 @@
       <a href="https://ent.wuhaicb.com/fpaas_bucket/97054965_prod/h5/22000001-1.0.0.14/html/index.html#/login"
         target="_blank">个人网银</a>
       <a href="https://mybank.urbank.com.cn/fpaas_bucket/43603805_prod/h5/22000001-1.0.0.5/html/index.html#/login"
-        target="_blank">企业法人</a>
+        target="_blank">企业网银</a>
       <a href="https://www.xinhuibank.com/fpaas_bucket/85687711_prod/h5/41000001-1.0.0.6/html/index.html#/home"
         target="_blank">门户网站</a>
       <a href="https://www.wuhaicb.com/app/czdownload.html" target="_blank">个人手机</a>
@@ -375,7 +375,7 @@
       仿抖音短视频体验
     </button>
     <div class="experience-links">
-      <a href="#" target="_blank">仿抖音体验地址</a>
+      <a href="http://www.brucecxm.xyz:8001" target="_blank">仿抖音体验地址</a>
     </div>
   </div>
   <div class="container">
@@ -452,7 +452,7 @@
                 <a href="https://ent.wuhaicb.com/fpaas_bucket/97054965_prod/h5/22000001-1.0.0.14/html/index.html#/login"
                   target="_blank">个人网银</a>
                 <a href="https://mybank.urbank.com.cn/fpaas_bucket/43603805_prod/h5/22000001-1.0.0.5/html/index.html#/login"
-                  target="_blank">企业法人</a>
+                  target="_blank">企业网银</a>
                 <a href="https://www.xinhuibank.com/fpaas_bucket/85687711_prod/h5/41000001-1.0.0.6/html/index.html#/home"
                   target="_blank">门户网站</a>
                 <a href="https://www.wuhaicb.com/app/czdownload.html" target="_blank">个人手机</a>
@@ -560,6 +560,13 @@
   <script>
     // 切换体验链接显示/隐藏
     function toggleExperienceLinks(button) {
+      // 先关闭所有体验链接容器
+      const allLinksContainers = document.querySelectorAll('.experience-links');
+      allLinksContainers.forEach(container => {
+        container.classList.remove('show');
+      });
+
+      // 然后打开当前按钮对应的容器
       const linksContainer = button.nextElementSibling;
       linksContainer.classList.toggle('show');
     }
