@@ -19,12 +19,7 @@ export const homegetVideocontent = (params) => {
   return request.get('/video/comment/getcomment', { params });
 };
 
-// 修改 getauthzzz 函数
-export const getauthzzz = (userid, page = 1, size = 10) => {
-  return request.get('/video/auth', {
-    params: { userid, page, size } // 将 userid 包装在 params 对象中
-  });
-};
+
 
 export const like = (params) => {
   return request.post('/video/like', params);

@@ -263,6 +263,32 @@
       }
     }
 
+    /* 闪光特效 */
+    .shine-effect::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(to right,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.3) 50%,
+          rgba(255, 255, 255, 0) 100%);
+      transform: rotate(30deg);
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      0% {
+        transform: translateX(-100%) rotate(30deg);
+      }
+
+      100% {
+        transform: translateX(100%) rotate(30deg);
+      }
+    }
+
     .experience-links::before {
       content: '';
       position: absolute;
@@ -370,8 +396,8 @@
         target="_blank">门户网站</a>
       <a href="https://www.wuhaicb.com/app/czdownload.html" target="_blank">个人手机</a>
     </div>
-    <button class="tag experience-tag" onclick="toggleExperienceLinks(this)"
-      style="cursor: pointer; padding: 10px 20px; font-size: 14px; font-weight: 500; background: #f2f2f7; border: none; border-radius: 8px; color: #555; transition: all 0.3s ease;">
+    <button class="tag experience-tag shine-effect" onclick="toggleExperienceLinks(this)"
+      style="cursor: pointer; padding: 10px 20px; font-size: 14px; font-weight: 500; background: #f2f2f7; border: none; border-radius: 8px; color: #555; transition: all 0.3s ease; position: relative; overflow: hidden;">
       仿抖音短视频体验
     </button>
     <div class="experience-links">

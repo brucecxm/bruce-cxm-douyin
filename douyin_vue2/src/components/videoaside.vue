@@ -45,7 +45,11 @@
     <!-- 音乐 -->
     <div class="touxiang music" @click="gomusic(videoData.musicId)">
       <img
-        :src="videoData.musicAvatar"
+        :src="
+          videoData.musicAvatar
+            ? videoData.musicAvatar
+            : 'https://copyright.bdstatic.com/vcg/creative/96a0c34e29b4a7ba461a745116c8766a.eps'
+        "
         alt="music"
         style="width: 1.4rem; height: 1.4rem"
       />

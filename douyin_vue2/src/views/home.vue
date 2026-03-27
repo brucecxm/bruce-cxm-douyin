@@ -123,16 +123,6 @@ export default {
           name: '推荐',
           avatar:
             'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '分享到日常',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
-        },
-        {
-          name: '分享到日常',
-          avatar:
-            'http://gips2.baidu.com/it/u=4160611580,2154032802&fm=3028&app=3028&f=JPEG&fmt=auto?w=720&h=1280'
         }
       ],
       isAnyPopupVisible: false, // 是否有弹窗显示的标志

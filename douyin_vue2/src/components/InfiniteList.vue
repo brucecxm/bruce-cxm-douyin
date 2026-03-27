@@ -132,6 +132,7 @@ export default {
 
 .loading-text {
   text-align: center;
+  font-size: 0.5rem;
   padding: 10px;
   color: #888;
 }
