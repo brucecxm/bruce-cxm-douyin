@@ -49,11 +49,21 @@
         {{ userInfo.myIntro || userInfo.jieshao || '暂无个人简介' }}
       </div>
 
-      <!-- 标签行 (年龄、城市、学校) -->
+      <!-- 标签行 (年龄、城市、学校、性别、生日) -->
       <div class="tags-row">
         <span v-if="userInfo.age" class="tag">Age: {{ userInfo.age }}</span>
         <span v-if="userInfo.city" class="tag">{{ userInfo.city }}</span>
         <span v-if="userInfo.school" class="tag">{{ userInfo.school }}</span>
+        <span
+          v-if="userInfo.gender && userInfo.gender !== '不展示'"
+          class="tag"
+        >{{ userInfo.gender }}</span
+        >
+        <span
+          v-if="userInfo.birthday && userInfo.birthday !== '不展示'"
+          class="tag"
+        >{{ userInfo.birthday }}</span
+        >
         <span class="tag add-tag" @click="goEditMeInfo">+ 编辑资料</span>
       </div>
 

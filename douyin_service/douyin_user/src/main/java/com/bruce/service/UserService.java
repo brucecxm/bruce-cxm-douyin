@@ -104,6 +104,15 @@ public interface UserService extends IService<User> {
     boolean updateUserInfo(User user, Long userId);
 
     /**
+     * 更新用户信息（使用指定策略）
+     * @param user 用户信息
+     * @param userId 当前登录用户ID
+     * @param strategyType 策略类型
+     * @return 更新结果
+     */
+    boolean updateUserInfo(User user, Long userId, String strategyType);
+
+    /**
      * 更新用户详细信息
      * @param userId 用户ID
      * @param nickname 昵称

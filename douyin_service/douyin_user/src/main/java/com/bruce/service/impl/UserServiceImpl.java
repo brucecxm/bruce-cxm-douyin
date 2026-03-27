@@ -14,6 +14,7 @@ import com.bruce.service.strategy.login.LoginStrategy;
 import com.bruce.service.strategy.login.LoginStrategyFactory;
 import com.bruce.service.strategy.redis.sanxiongdi.CachingStrategy;
 import com.bruce.service.strategy.redis.sanxiongdi.CachingStrategyFactory;
+import com.bruce.service.strategy.redis.shuangxieyizhi.userupdate.UserUpdateStrategyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -66,7 +67,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return userDao.selectOne(queryWrapper);
     }
 
-
     /**
      * 重写 根据ID更新用户
      */
@@ -74,13 +74,14 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     public boolean updateById(User user) {
         // 你可以在这里写自定义逻辑
         // 示例：自动更新更新时间
-//        if (user != null) {
-//            user.onUpdate(); // 调用实体类里的更新时间方法
-//        }
+        // if (user != null) {
+        // user.onUpdate(); // 调用实体类里的更新时间方法
+        // }
 
         // 调用 MyBatis-Plus 原生的更新方法
         return super.updateById(user);
     }
+
     @Override
     public User getUserByUsername(String username) {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
@@ -174,11 +175,14 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Autowired
     private com.bruce.service.VideoFeignService videoFeignService;
 
+    @Autowired
+    private UserUpdateStrategyFactory userUpdateStrategyFactory;
+
     @Override
     public java.util.Map<String, Object> login(com.bruce.dto.LoginRequestDTO loginRequestDTO) {
         try {
             // 获取登录策略
-           LoginStrategy strategy = loginStrategyFactory.getStrategy(loginRequestDTO.getLoginType());
+            LoginStrategy strategy = loginStrategyFactory.getStrategy(loginRequestDTO.getLoginType());
             // 执行登录
             User user = strategy.login(loginRequestDTO);
 
@@ -210,7 +214,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                     if (userInfo != null) {
                         // 将查询到的用户信息存入 Redis (10分钟)
                         userInfoJson = objectMapper.writeValueAsString(userInfo);
-                        stringRedisTemplate.opsForValue().set(userInfoKey, userInfoJson, 10, java.util.concurrent.TimeUnit.MINUTES);
+                        stringRedisTemplate.opsForValue().set(userInfoKey, userInfoJson, 10,
+                                java.util.concurrent.TimeUnit.MINUTES);
                     }
                 }
             } catch (Exception e) {
@@ -233,16 +238,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     @Override
     public com.bruce.dto.UserInfoResponseDTO getUserInfo(com.bruce.dto.UserInfoRequestDTO requestDTO) {
-                try {
-                    // 获取缓存策略
-                    CachingStrategy strategy = cachingStrategyFactory.getStrategy(requestDTO.getType());
+        try {
+            // 获取缓存策略
+            CachingStrategy strategy = cachingStrategyFactory.getStrategy(requestDTO.getType());
 
             // 使用策略获取用户信息
             com.bruce.entity.UserInfo userInfo = strategy.getUserInfo(
-                requestDTO.getUserId(),
-                requestDTO.getPage(),
-                requestDTO.getPageSize()
-            );
+                    requestDTO.getUserId(),
+                    requestDTO.getPage(),
+                    requestDTO.getPageSize());
 
             if (userInfo == null) {
                 return null;
@@ -310,24 +314,14 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     @Override
     public boolean updateUserInfo(User user, Long userId) {
-            // 确保只能更新自己的信息
-        if (user.getId() == null || !user.getId().equals(userId)) {
-            throw new IllegalArgumentException("无权修改其他用户信息");
-        }
-
-        // 更新用户信息
-        boolean success = this.updateById(user);
-        if (success) {
-            // 清除 Redis 缓存
-            String cacheKey = "user_info:" + userId;
-            try {
-                stringRedisTemplate.delete(cacheKey);
-            } catch (Exception e) {
-                // Redis 操作失败不应影响主流程
-            }
-        }
-        return success;
+        return updateUserInfo(user, userId, null);
     }
+
+    @Override
+    public boolean updateUserInfo(User user, Long userId, String strategyType) {
+        return userUpdateStrategyFactory.getStrategy(strategyType).updateUserInfo(user, userId);
+    }
+
     @Override
     public UserInfoResponseDTO getUserInfoWithLoginCheck(UserInfoRequestDTO requestDTO, Long currentUserId) {
         // 如果未提供userId，使用当前登录用户ID
@@ -342,6 +336,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
         return getUserInfo(requestDTO);
     }
+
     @Override
     public boolean updateInfo(Long userId, String nickname, String avatar, String phone, String gender) {
         // 验证用户是否存在
@@ -376,7 +371,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public com.baomidou.mybatisplus.core.metadata.IPage<User> getUserList(Integer page, Integer pageSize) {
         // 使用MyBatis Plus的分页功能查询所有用户
-        com.baomidou.mybatisplus.extension.plugins.pagination.Page<User> pageQuery = new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(page, pageSize);
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<User> pageQuery = new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(
+                page, pageSize);
         return this.page(pageQuery);
     }
 
@@ -437,7 +433,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return user;
     }
 
-
     @Override
     public boolean changePassword(Long userId, String oldPassword, String newPassword, String verificationCode) {
         User user = this.getById(userId);
@@ -456,7 +451,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             }
 
             // 获取用户盐值并验证密码
-            com.bruce.entity.Salt salt = saltService.getOne(new LambdaQueryWrapper<com.bruce.entity.Salt>().eq(com.bruce.entity.Salt::getUserId, userId));
+            com.bruce.entity.Salt salt = saltService.getOne(
+                    new LambdaQueryWrapper<com.bruce.entity.Salt>().eq(com.bruce.entity.Salt::getUserId, userId));
             if (salt == null) {
                 return false;
             }
@@ -477,7 +473,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         // 更新盐值
         if (success) {
             // 删除旧盐值
-            saltService.remove(new LambdaQueryWrapper<com.bruce.entity.Salt>().eq(com.bruce.entity.Salt::getUserId, userId));
+            saltService.remove(
+                    new LambdaQueryWrapper<com.bruce.entity.Salt>().eq(com.bruce.entity.Salt::getUserId, userId));
             // 保存新盐值
             com.bruce.entity.Salt newSaltEntity = new com.bruce.entity.Salt();
             newSaltEntity.setUserId(userId);
@@ -506,7 +503,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         stringRedisTemplate.opsForValue().set(intervalKey, "1", 60, java.util.concurrent.TimeUnit.SECONDS);
 
         // 存入 Redis，过期时间 3 分钟
-        stringRedisTemplate.opsForValue().set("CAPTCHA_" + uuid + userName, captcha.text(), 3, java.util.concurrent.TimeUnit.MINUTES);
+        stringRedisTemplate.opsForValue().set("CAPTCHA_" + uuid + userName, captcha.text(), 3,
+                java.util.concurrent.TimeUnit.MINUTES);
 
         java.util.Map<String, Object> result = new java.util.HashMap<>();
         result.put("uuid", uuid);
@@ -539,8 +537,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return new com.bruce.dto.UserStatusResponseDTO(1, "");
     }
 
-
-
     @Override
     public boolean updateInfoWithLoginCheck(com.bruce.dto.UpdateInfoRequestDTO request, Long currentUserId) {
         Long userId = request.getUserId();
@@ -560,7 +556,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             userId = currentUserId;
         }
 
-        return changePassword(userId, request.getOldPassword(), request.getNewPassword(), request.getVerificationCode());
+        return changePassword(userId, request.getOldPassword(), request.getNewPassword(),
+                request.getVerificationCode());
     }
 
     // 生成一个随机盐值
