@@ -49,7 +49,7 @@
 import { shoplist, searchForDish, liansearchForDish, getnav } from '@/api/shop';
 import { shopmenulist } from '@/api/menu';
 import { shopnavlist } from '@/api/menu';
-import footerVue from '@/components/footer.vue';
+import footerVue from '@/components/home/footer.vue';
 
 import imgn6 from '@/assets/shop/nav/2.png';
 import imgn7 from '@/assets/shop/nav/3.png';

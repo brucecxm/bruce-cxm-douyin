@@ -24,7 +24,10 @@
     >
       <!-- 视频侧边栏组件 -->
       <div class="videoasideone">
-        <videoaside-vue :video-data="videoboxdata[index]" @show-comment="handleShowComment"></videoaside-vue>
+        <videoaside-vue
+          :video-data="videoboxdata[index]"
+          @show-comment="handleShowComment"
+        ></videoaside-vue>
       </div>
 
       <!-- 视频文章组件 -->
@@ -63,9 +66,9 @@
 </template>
 
 <script>
-import videoasideVue from './videoaside.vue';
-import videoarticleVue from './videoarticle.vue';
-import { homegetVideo } from '../api/video';
+import videoasideVue from '../home/videoaside.vue';
+import videoarticleVue from '../home/videoarticle.vue';
+import { homegetVideo } from '../../api/video';
 
 export default {
   name: 'videobox-vue',

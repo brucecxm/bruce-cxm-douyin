@@ -1,9 +1,9 @@
 <template>
   <div class="videoarticle" @click="testone">
     <div class="username" @click="goauth(videoData.userid)">
-      {{ videoData.userName }}
+      {{ videoData.username }}
     </div>
-    <div div class="article">{{ videoData.content }}</div>
+    <div div class="article">{{ videoData.title }}</div>
   </div>
 </template>
 
@@ -19,7 +19,7 @@ export default {
     }
   },
   mounted() {
-    console.log(this.videoData);
+    console.log('videoarticle中的videoData', this.videoData);
     var onea = {};
     onea = this.videoData;
     console.log(onea);

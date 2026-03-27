@@ -126,7 +126,7 @@
 import nativeUtils from '../../utils/nativeUtils';
 import routerUtils from '../../utils/routerUtils';
 import { get } from '../../utils/apiUtils';
-import footerVue from '../../components/footer.vue';
+import footerVue from '../../components/home/footer.vue';
 
 export default {
   name: 'HomePage',

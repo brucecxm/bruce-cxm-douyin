@@ -87,16 +87,7 @@ const routes = [
     name: 'Tongzhi',
     component: () => import('@/views/xiaoxi/note.vue')
   },
-  {
-    path: '/testmap',
-    name: 'Testmap',
-    component: () => import('../components/leftmap.vue')
-  },
-  {
-    path: '/map',
-    name: 'Map',
-    component: () => import('../views/gaode.vue')
-  },
+
   {
     path: '/homeone',
     name: 'Home',

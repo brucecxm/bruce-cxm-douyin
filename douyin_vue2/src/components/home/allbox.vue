@@ -8,25 +8,25 @@
       v-if="boxtype === '视频详情'"
       @show-comment="handleShowComment"
     ></videobox-vue> -->
-    <!-- <shopbox-vue v-if="boxtype === '商城'"></shopbox-vue>
+    <!-- <shopbox-vue v-if="boxtype === '商城'"></shopbox-vue> -->
     <samecity-vue v-if="boxtype === '同城'"></samecity-vue>
     <followbox-vue v-if="boxtype === '关注'"></followbox-vue>
     <livebox-vue v-if="boxtype === '直播'"></livebox-vue>
-    <experiencebox v-if="boxtype === '经验'"></experiencebox>
-    <experiencebox v-if="boxtype === '团购'"></experiencebox>
-    <experiencebox v-if="boxtype === '精选'"></experiencebox>
-    <experiencebox v-if="boxtype === '热点'"></experiencebox> -->
+    <!-- <experiencebox v-if="boxtype === '经验'"></experiencebox> -->
+    <!-- <experiencebox v-if="boxtype === '团购'"></experiencebox> -->
+    <!-- <experiencebox v-if="boxtype === '精选'"></experiencebox> -->
+    <!-- <experiencebox v-if="boxtype === '热点'"></experiencebox> -->
     <!-- 其实可以通过传入一个type  yongv-if等控制组件的显示和消失  避免创建这么多组件 -->
   </div>
 </template>
 
 <script>
-import followboxVue from './followbox.vue';
-import liveboxVue from './livebox.vue';
-import samecityVue from './samecity.vue';
-import shopboxVue from './shopbox.vue';
-import videoboxVue from './videobox.vue';
-import experiencebox from './experiencebox.vue';
+import followboxVue from '../Allvideobox/followbox.vue';
+import liveboxVue from '../Allvideobox/livebox.vue';
+import samecityVue from '../Allvideobox/samecity.vue';
+import shopboxVue from '../Allvideobox/shopbox.vue';
+import videoboxVue from '../Allvideobox/videobox.vue';
+import experiencebox from '../Allvideobox/experiencebox.vue';
 
 export default {
   props: {

@@ -21,10 +21,10 @@ public class VideoVO {
     private Long commentNum;
     private Long shareNum;
     private Long collectNum;
-    private Long type;
-    private Long status;
-    private Long title;
-    
+    private Integer type;
+    private Integer status;
+    private String title;
+
     private boolean isLiked;
     private boolean isCollected;
 }

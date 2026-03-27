@@ -288,7 +288,7 @@ export default {
         // 处理音乐数据
         if (musicRes.data && Array.isArray(musicRes.data)) {
           this.musicItems = musicRes.data.map((music) => ({
-            text: music.music_name,
+            text: music.musicName,
             bgColor: '#f5f5f5',
             textColor: '#333',
             borderRadius: 16,
@@ -571,13 +571,13 @@ export default {
       if (this.loading) return;
       if (!this.title) {
         // 显示提示信息
-        alert('请输入想法内容');
+        this.$message.warning('请输入想法内容');
         return;
       }
 
       // 检查是否有内容可以发布
       if (!this.videoThumbnail && !this.videoData) {
-        alert('请上传图片或视频');
+        this.$message.warning('请上传图片或视频');
         return;
       }
 
@@ -660,13 +660,12 @@ export default {
         console.log('发布成功！', res.data);
 
         // 显示成功提示
-        alert('发布成功！');
-
+        this.$message.success('发布成功！');
         // 重置表单
         this.resetForm();
       } catch (err) {
         console.error('发布失败', err);
-        alert('发布失败，请稍后重试');
+        this.$message.error('发布失败，请稍后重试');
       } finally {
         this.loading = false;
         // 发布成功后跳转到首页，并清除Vuex中的视频数据

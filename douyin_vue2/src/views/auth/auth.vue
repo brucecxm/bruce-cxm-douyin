@@ -43,16 +43,32 @@
           </div>
           <div class="icon-button" @click="onMoreClick" title="更多">
             <svg viewBox="0 0 24 24" class="icon">
-              <circle cx="5" cy="12" r="2" fill="white" />
-              <circle cx="12" cy="12" r="2" fill="white" />
-              <circle cx="19" cy="12" r="2" fill="white" />
+              <circle
+cx="5"
+cy="12" r="2"
+fill="white" />
+              <circle
+cx="12"
+cy="12" r="2"
+fill="white" />
+              <circle
+cx="19"
+cy="12" r="2"
+fill="white" />
             </svg>
           </div>
         </div>
       </div>
       <!-- 用户头像 -->
       <div class="touxiang">
-        <img :src="userInfo.avatar" alt="用户头像" />
+        <img
+          :src="
+            userInfo.avatar
+              ? userInfo.avatar
+              : 'https://p3-pc.douyinpic.com/img/aweme-avatar/mosaic-legacy_3795_3047680722~c5_300x300.jpeg?from=2956013662'
+          "
+          alt="用户头像"
+        />
       </div>
     </div>
 

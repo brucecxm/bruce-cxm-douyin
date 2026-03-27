@@ -69,7 +69,7 @@ import { shoplist, searchForDish, liansearchForDish, getnav } from '@/api/shop';
 import { shopmenulist } from '@/api/menu';
 import store from '@/stores';
 import { shopnavlist } from '@/api/menu';
-import footerVue from '@/components/footer.vue';
+import footerVue from '@/components/home/footer.vue';
 import img1 from '@/assets/shop/menunav/1.png';
 import img2 from '@/assets/shop/menunav/2.png';
 import img3 from '@/assets/shop/menunav/3.png';

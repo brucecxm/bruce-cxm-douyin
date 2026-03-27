@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { useTokenStore } from '../stores/token';
+import { useTokenStore } from '../../stores/token';
 
 export default {
   name: 'BaseFooter',

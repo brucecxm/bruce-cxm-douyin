@@ -10,7 +10,7 @@
     @touchmove="drag"
     :style="{ width: boxWidth, height: boxHeight * 0.1 + 'vh' }"
   >
-    > >
+    >
     <div
       v-for="(box, index) in boxes"
       :key="index"
@@ -23,13 +23,12 @@
       }"
     >
       <!-- 用div包一下 避免父组件中absolute对子组件flex布局的影响 -->
-
-      <div class="welcomelive">
-        <h1>欢迎进入直播间</h1>
+      <div class="videoasideone">
+        <videoaside-vue :video-data="videoboxdata[index]"></videoaside-vue>
       </div>
 
       <div class="videoarticle">
-        <div class="position">直播中</div>
+        <div class="position" @click="showPosition()">距离你1km</div>
 
         <videoarticle-vue></videoarticle-vue>
       </div>
@@ -59,13 +58,34 @@ import {
   homegetVideo,
   homegetVideomore,
   homegetVideocontent
-} from '../api/video';
+} from '../../api/video';
 export default {
   components: {
     videoasideVue,
     videoarticleVue
   },
   watch: {},
+  mounted() {
+    this.updateVideoPlayback();
+
+    // 自动发送请求给后端
+    homegetVideo()
+      .then((videoArr) => {
+        console.log(videoArr);
+
+        // 校验 videoArr.data 是否存在且为非空数组
+        if (Array.isArray(videoArr.data) && videoArr.data.length > 0) {
+          this.videoboxdata = videoArr.data;
+        } else {
+          console.log('获取到的视频数据为空或格式不正确:', videoArr.data);
+          // 你可以在这里进行其他处理，比如给用户提示
+        }
+      })
+      .catch((error) => {
+        console.error('获取视频出错:', error);
+        console.log('获取视频出错  videobox中的');
+      });
+  },
   data() {
     return {
       // 使用props传递数据 使用props的数据在组件中是单向传输的 但是我可以通过请求异步修改数据库中的数据 就可以了
@@ -139,35 +159,19 @@ export default {
       { color: 'black', top: 3 * this.boxHeight }
     ];
   },
-  mounted() {
-    this.updateVideoPlayback();
 
-    // 自动发送请求给后端
-    homegetVideo()
-      .then((videoArr) => {
-        console.log(videoArr);
-
-        // 校验 videoArr.data 是否存在且为非空数组
-        if (Array.isArray(videoArr.data) && videoArr.data.length > 0) {
-          this.videoboxdata = videoArr.data;
-        } else {
-          console.log('获取到的视频数据为空或格式不正确:', videoArr.data);
-          // 你可以在这里进行其他处理，比如给用户提示
-        }
-      })
-      .catch((error) => {
-        console.error('获取视频出错:', error);
-        console.log('获取视频出错  videobox中的');
-      });
-  },
   methods: {
+    showPosition() {
+      this.$router.push('/map');
+    },
+
     startDrag(event) {
-      event.preventDefault();
+      //event.preventDefault();
       this.isDragging = true;
       this.startY = this.getEventClientY(event) - this.currentY;
     },
     stopDrag(event) {
-      event.preventDefault();
+      // event.preventDefault();
       this.isDragging = false;
       this.updateBoxPositionBasedOnCurrentY();
       this.updateVideoPlayback();
@@ -234,46 +238,32 @@ export default {
 </script>
 
 <style scoped>
-.welcomelive {
-  width: 5rem;
-  height: 1.5rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  position: absolute;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  /* 完整的边框定义 */
-  bottom: 5rem;
-  border-radius: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  color: white;
-  font-size: 0.2rem;
-  text-align: center;
-  line-height: 1rem;
-}
-
 .position {
-  color: rgba(255, 255, 255, 0.7);
-  /* 文字颜色为半透明白色 */
-  font-size: 0.4rem;
-  /* 字体大小 */
+  font-size: 0.5rem;
   width: 5rem;
-  /* 宽度 */
   height: 1rem;
-  /* 高度 */
-  background-color: red;
-  /* 背景颜色 */
-  transform: translateY(-3rem) translateX(0.5rem);
-  /* 位移 */
-
+  background-color: green;
+  color: white;
+  /* 文字颜色设置为白色 */
   display: flex;
-  /* 使用flex布局 */
+  /* 使用flex布局来居中文本 */
   justify-content: center;
   /* 水平居中 */
   align-items: center;
   /* 垂直居中 */
-
   border-radius: 0.5rem;
-  /* 圆角 */
+  /* 为盒子加上圆角 */
+  transform: translateY(-3rem) translateX(0.5rem);
+}
+
+.videoasideone {
+  display: block;
+  z-index: 5;
+  position: absolute;
+  /* 侧边栏的位置 */
+  right: 0;
+  bottom: 6vh;
+  margin-right: 4vw;
 }
 
 .videoarticle {
@@ -287,7 +277,7 @@ export default {
 
 .videoone {
   display: block;
-  z-index: 10;
+  z-index: 1;
   object-fit: cover;
   margin: 0 auto;
   width: 100%;

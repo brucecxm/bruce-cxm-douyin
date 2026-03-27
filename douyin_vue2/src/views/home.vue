@@ -90,13 +90,13 @@
 </template>
 <script>
 import HorizontalScrollList from '@/components/HorizontalScrollList.vue';
-import caidan from '../components/caidan.vue';
-import AllBoxVue from '../components/allbox.vue';
-import footerVue from '../components/footer.vue';
-import headerVue from '../components/header.vue';
-import Pinglunqu from '@/components/Pinglunqu.vue';
+import caidan from '../components/home/caidan.vue';
+import AllBoxVue from '../components/home/allbox.vue';
+import footerVue from '../components/home/footer.vue';
+import headerVue from '../components/home/header.vue';
+import Pinglunqu from '@/components/home/Pinglunqu.vue';
 import SlidePopup from '@/components/SlidePopup.vue';
-import Danmu from '../components/Danmu.vue';
+import Danmu from '../components/home/Danmu.vue';
 import Vue from 'vue';
 export default {
   data() {

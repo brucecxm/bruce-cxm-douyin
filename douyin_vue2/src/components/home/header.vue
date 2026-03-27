@@ -42,17 +42,7 @@ export default {
 
   data() {
     return {
-      navItems: [
-        '推荐'
-        // '同城',
-        // '关注'
-        // '直播',
-        // '经验',
-        // '商城',
-        // '团购',
-        // '精选',
-        // '热点'
-      ],
+      navItems: ['推荐', '同城', '关注', '直播'],
       underlineVisible: true, // 控制下划线的可见性
       isBlack: false, // 控制是否将所有文字变成黑色
       menuStyle: {
