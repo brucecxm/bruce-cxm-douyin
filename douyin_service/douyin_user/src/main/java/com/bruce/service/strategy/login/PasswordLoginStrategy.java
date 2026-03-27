@@ -1,23 +1,21 @@
-package com.bruce.service.strategy.impl;
+package com.bruce.service.strategy.login;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.bruce.dto.LoginRequestDTO;
 import com.bruce.entity.User;
 import com.bruce.service.UserService;
-import com.bruce.service.strategy.LoginStrategy;
+import com.bruce.service.strategy.login.LoginStrategy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static com.bruce.dict.Constant.User.*;
-import static com.bruce.dict.Constant.Error.CAPTCHA_ERROR;
+import static com.bruce.dict.Constant.Error.INVALID_CREDENTIALS;
 
-@Component("email")
-public class EmailLoginStrategy implements LoginStrategy {
+@Component("password")
+public class PasswordLoginStrategy implements LoginStrategy {
 
     @Autowired
     private UserService userService;
@@ -31,16 +29,10 @@ public class EmailLoginStrategy implements LoginStrategy {
     @Override
     public User login(LoginRequestDTO requestDTO) {
         String userName = requestDTO.getUserName();
-        String emailVerificationCode = requestDTO.getEmailVerificationCode();
+        String password = requestDTO.getPassword();
 
-        if (emailVerificationCode == null || emailVerificationCode.isEmpty()) {
-            throw new IllegalArgumentException("邮箱验证码不能为空");
-        }
-
-        // 验证邮箱验证码
-        String code = stringRedisTemplate.opsForValue().get(EMAIL_CODE_PREFIX + userName);
-        if (code == null || !emailVerificationCode.equals(code)) {
-            throw new IllegalArgumentException(CAPTCHA_ERROR);
+        if (password == null || password.isEmpty()) {
+            throw new IllegalArgumentException("密码不能为空");
         }
 
         // 热点数据：先从 Redis 查用户
@@ -51,7 +43,7 @@ public class EmailLoginStrategy implements LoginStrategy {
             if (userJson != null) {
                 user = objectMapper.readValue(userJson, User.class);
             } else {
-                user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, userName));
+                user = userService.getUserByUsername(userName);
                 if (user != null) {
                     // 存入 Redis，10 分钟过期
                     stringRedisTemplate.opsForValue().set(userKey, objectMapper.writeValueAsString(user), 10, TimeUnit.MINUTES);
@@ -59,14 +51,16 @@ public class EmailLoginStrategy implements LoginStrategy {
             }
         } catch (Exception e) {
             // Redis 操作失败，从数据库查询
-            user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, userName));
+            user = userService.getUserByUsername(userName);
         }
 
         if (user == null) {
-            // 用户不存在则自动注册，随机8位密码可用于后续找回
-            String randomPassword = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
-            // 这里需要调用注册方法，暂时抛出异常，后续在 UserService 中实现
-            throw new UnsupportedOperationException("自动注册功能暂未实现");
+            throw new IllegalArgumentException(INVALID_CREDENTIALS);
+        }
+
+        // 验证密码
+        if (!userService.verifyPassword(userName, password)) {
+            throw new IllegalArgumentException(INVALID_CREDENTIALS);
         }
 
         return user;

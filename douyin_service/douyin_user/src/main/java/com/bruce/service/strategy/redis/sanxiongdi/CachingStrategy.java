@@ -1,4 +1,4 @@
-package com.bruce.service.strategy;
+package com.bruce.service.strategy.redis.sanxiongdi;
 
 import com.bruce.entity.User;
 import com.bruce.entity.UserInfo;

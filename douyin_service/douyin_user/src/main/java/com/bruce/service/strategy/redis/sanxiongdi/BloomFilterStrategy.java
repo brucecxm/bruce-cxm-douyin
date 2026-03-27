@@ -1,9 +1,9 @@
-package com.bruce.service.strategy.impl;
+package com.bruce.service.strategy.redis.sanxiongdi;
 
 import com.bruce.entity.User;
 import com.bruce.entity.UserInfo;
 import com.bruce.entity.Video;
-import com.bruce.service.strategy.CachingStrategy;
+import com.bruce.service.strategy.redis.sanxiongdi.CachingStrategy;
 import com.bruce.dao.UserDao;
 import com.bruce.service.VideoFeignService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
-@Component("bloomFilterStrategy")
+@Component("bloom")
 public class BloomFilterStrategy implements CachingStrategy {
     @Autowired
     private UserDao userDao;

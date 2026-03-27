@@ -87,7 +87,7 @@ public interface UserService extends IService<User> {
      * @return 是否更新成功
      */
     boolean updateById(User user);
-    
+
     /**
      * 根据请求DTO获取用户信息
      * @param requestDTO 用户信息请求DTO
@@ -102,6 +102,25 @@ public interface UserService extends IService<User> {
      * @return 更新结果
      */
     boolean updateUserInfo(User user, Long userId);
+
+    /**
+     * 更新用户详细信息
+     * @param userId 用户ID
+     * @param nickname 昵称
+     * @param avatar 头像
+     * @param phone 手机号
+     * @param gender 性别
+     * @return 更新结果
+     */
+    boolean updateInfo(Long userId, String nickname, String avatar, String phone, String gender);
+
+    /**
+     * 根据用户ID获取用户信息（带登录状态处理）
+     * @param requestDTO 用户信息请求DTO
+     * @param currentUserId 当前登录用户ID
+     * @return 用户信息响应DTO
+     */
+    UserInfoResponseDTO getUserInfoWithLoginCheck(UserInfoRequestDTO requestDTO, Long currentUserId);
 
     /**
      * 获取用户列表（分页）
@@ -121,16 +140,6 @@ public interface UserService extends IService<User> {
      */
     User register(String username, String password, boolean isCheck, String verificationCode);
 
-    /**
-     * 更新用户详细信息
-     * @param userId 用户ID
-     * @param nickname 昵称
-     * @param avatar 头像
-     * @param phone 手机号
-     * @param gender 性别
-     * @return 更新结果
-     */
-    boolean updateInfo(Long userId, String nickname, String avatar, String phone, String gender);
 
     /**
      * 修改密码
@@ -164,13 +173,6 @@ public interface UserService extends IService<User> {
      */
     com.bruce.dto.UserStatusResponseDTO getUserStatus(Long userId);
 
-    /**
-     * 根据用户ID获取用户信息（带登录状态处理）
-     * @param requestDTO 用户信息请求DTO
-     * @param currentUserId 当前登录用户ID
-     * @return 用户信息响应DTO
-     */
-    UserInfoResponseDTO getUserInfoWithLoginCheck(UserInfoRequestDTO requestDTO, Long currentUserId);
 
     /**
      * 更新用户信息（带登录状态处理）

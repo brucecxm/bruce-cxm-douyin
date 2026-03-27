@@ -1,9 +1,9 @@
-package com.bruce.service.strategy.impl;
+package com.bruce.service.strategy.redis.sanxiongdi;
 
 import com.bruce.entity.User;
 import com.bruce.entity.UserInfo;
 import com.bruce.entity.Video;
-import com.bruce.service.strategy.CachingStrategy;
+import com.bruce.service.strategy.redis.sanxiongdi.CachingStrategy;
 import com.bruce.dao.UserDao;
 import com.bruce.service.VideoFeignService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -12,13 +12,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
-@Component("emptyCacheStrategy")
+@Component("empty")
 public class EmptyCacheStrategy implements CachingStrategy {
     @Autowired
     private UserDao userDao;

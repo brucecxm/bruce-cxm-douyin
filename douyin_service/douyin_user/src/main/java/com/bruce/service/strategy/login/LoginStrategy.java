@@ -1,4 +1,4 @@
-package com.bruce.service.strategy;
+package com.bruce.service.strategy.login;
 
 import com.bruce.dto.LoginRequestDTO;
 import com.bruce.entity.User;

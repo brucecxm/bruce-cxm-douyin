@@ -10,8 +10,10 @@ import com.bruce.entity.User;
 import com.bruce.entity.Salt;
 import com.bruce.service.UserService;
 import com.bruce.service.SaltService;
-import com.bruce.service.strategy.LoginStrategy;
-import com.bruce.utils.Md5Util;
+import com.bruce.service.strategy.login.LoginStrategy;
+import com.bruce.service.strategy.login.LoginStrategyFactory;
+import com.bruce.service.strategy.redis.sanxiongdi.CachingStrategy;
+import com.bruce.service.strategy.redis.sanxiongdi.CachingStrategyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -155,7 +157,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     @Autowired
-    private com.bruce.service.strategy.LoginStrategyFactory loginStrategyFactory;
+    private LoginStrategyFactory loginStrategyFactory;
 
     @Autowired
     private com.bruce.utils.AuthUtils authUtils;
@@ -167,7 +169,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     private org.springframework.data.redis.core.StringRedisTemplate stringRedisTemplate;
 
     @Autowired
-    private com.bruce.service.strategy.CachingStrategyFactory cachingStrategyFactory;
+    private CachingStrategyFactory cachingStrategyFactory;
 
     @Autowired
     private com.bruce.service.VideoFeignService videoFeignService;
@@ -233,7 +235,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     public com.bruce.dto.UserInfoResponseDTO getUserInfo(com.bruce.dto.UserInfoRequestDTO requestDTO) {
                 try {
                     // 获取缓存策略
-                    com.bruce.service.strategy.CachingStrategy strategy = cachingStrategyFactory.getStrategy(requestDTO.getType());
+                    CachingStrategy strategy = cachingStrategyFactory.getStrategy(requestDTO.getType());
 
             // 使用策略获取用户信息
             com.bruce.entity.UserInfo userInfo = strategy.getUserInfo(
@@ -326,6 +328,50 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         }
         return success;
     }
+    @Override
+    public UserInfoResponseDTO getUserInfoWithLoginCheck(UserInfoRequestDTO requestDTO, Long currentUserId) {
+        // 如果未提供userId，使用当前登录用户ID
+        if (requestDTO.getUserId() == null) {
+            requestDTO.setUserId(currentUserId);
+        }
+
+        // 验证userId格式
+        if (requestDTO.getUserId() <= 0) {
+            throw new IllegalArgumentException("用户ID格式错误，请输入有效的数字ID");
+        }
+
+        return getUserInfo(requestDTO);
+    }
+    @Override
+    public boolean updateInfo(Long userId, String nickname, String avatar, String phone, String gender) {
+        // 验证用户是否存在
+        User user = this.getById(userId);
+        if (user == null) {
+            return false;
+        }
+
+        // 更新用户信息
+        if (nickname != null) {
+            user.setNickname(nickname);
+        }
+        if (avatar != null) {
+            user.setAvatar(avatar);
+        }
+        if (phone != null) {
+            user.setPhone(phone);
+        }
+        if (gender != null) {
+            user.setGender(gender);
+        }
+
+        boolean success = this.updateById(user);
+        if (success) {
+            // 清除Redis缓存
+            String userInfoKey = userId + com.bruce.dict.Constant.User._USER_INFO;
+            stringRedisTemplate.delete(userInfoKey);
+        }
+        return success;
+    }
 
     @Override
     public com.baomidou.mybatisplus.core.metadata.IPage<User> getUserList(Integer page, Integer pageSize) {
@@ -391,36 +437,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return user;
     }
 
-    @Override
-    public boolean updateInfo(Long userId, String nickname, String avatar, String phone, String gender) {
-        // 验证用户是否存在
-        User user = this.getById(userId);
-        if (user == null) {
-            return false;
-        }
-
-        // 更新用户信息
-        if (nickname != null) {
-            user.setNickname(nickname);
-        }
-        if (avatar != null) {
-            user.setAvatar(avatar);
-        }
-        if (phone != null) {
-            user.setPhone(phone);
-        }
-        if (gender != null) {
-            user.setGender(gender);
-        }
-
-        boolean success = this.updateById(user);
-        if (success) {
-            // 清除Redis缓存
-            String userInfoKey = userId + com.bruce.dict.Constant.User._USER_INFO;
-            stringRedisTemplate.delete(userInfoKey);
-        }
-        return success;
-    }
 
     @Override
     public boolean changePassword(Long userId, String oldPassword, String newPassword, String verificationCode) {
@@ -523,20 +539,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return new com.bruce.dto.UserStatusResponseDTO(1, "");
     }
 
-    @Override
-    public UserInfoResponseDTO getUserInfoWithLoginCheck(UserInfoRequestDTO requestDTO, Long currentUserId) {
-        // 如果未提供userId，使用当前登录用户ID
-        if (requestDTO.getUserId() == null) {
-            requestDTO.setUserId(currentUserId);
-        }
 
-        // 验证userId格式
-        if (requestDTO.getUserId() <= 0) {
-            throw new IllegalArgumentException("用户ID格式错误，请输入有效的数字ID");
-        }
-
-        return getUserInfo(requestDTO);
-    }
 
     @Override
     public boolean updateInfoWithLoginCheck(com.bruce.dto.UpdateInfoRequestDTO request, Long currentUserId) {

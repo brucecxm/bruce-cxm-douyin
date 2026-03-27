@@ -36,30 +36,7 @@ import java.util.concurrent.Executors;
 @RequestMapping("/user")
 @Validated
 public class UserController extends ApiController {
-    @Autowired
-    private JwtUtil jwtUtil;
 
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
-    @Autowired
-    private RedissonClient redissonClient;
-    @Autowired
-    private RBloomFilter<Long> userBloomFilter;
-
-    @Autowired
-    private BloomFilterMonitor bloomFilterMonitor;
-
-    // 布隆过滤器配置
-    @Value("${bloom-filter.warmup-enabled:true}")
-    private boolean bloomFilterWarmupEnabled;
-
-    @Value("${bloom-filter.require-warmup:true}")
-    private boolean bloomFilterRequireWarmup;
-    @Autowired
-    private RedisUtil redisUtil;
-
-    @Autowired
-    private SaltService saltService;
 
     @Autowired
     private UserService userService;
@@ -96,33 +73,43 @@ public class UserController extends ApiController {
         }
     }
 
-    // 分页查询所有用户
-    @GetMapping("/list")
-    public Result<Map<String, Object>> getUserList(
-            @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "10") Integer pageSize) {
+    @GetMapping("/userInfo")
+    public Result<UserInfoResponseDTO> userInfo(
+            @RequestParam(value = "userId", required = false) Long userId,
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "pageSize", required = false) Integer pageSize,
+            @RequestParam(value = "type", required = false) String type,
+            @RequestParam(value = "isRedis", required = false) Boolean isRedis) {
         try {
-            // 参数校验
-            if (page <= 0 || pageSize <= 0) {
-                return Result.error("页码和每页大小必须大于0");
+            // 构建请求DTO
+            UserInfoRequestDTO requestDTO = new UserInfoRequestDTO();
+            requestDTO.setUserId(userId);
+            requestDTO.setPage(page);
+            requestDTO.setPageSize(pageSize);
+            requestDTO.setType(type);
+            requestDTO.setRedis(isRedis != null && isRedis);
+
+            // 获取当前登录用户ID
+            Long currentUserId = Long.parseLong(StpUtil.getLoginId().toString());
+
+            // 调用服务获取用户信息（带登录状态处理）
+            UserInfoResponseDTO userInfo = userService.getUserInfoWithLoginCheck(requestDTO, currentUserId);
+
+            if (userInfo == null) {
+                return Result.error("用户不存在");
             }
 
-            // 调用服务获取用户列表
-            IPage<User> userPage = userService.getUserList(page, pageSize);
-
-            // 构建响应数据
-            Map<String, Object> data = new HashMap<>();
-            data.put("records", userPage.getRecords());
-            data.put("total", userPage.getTotal());
-            data.put("size", userPage.getSize());
-            data.put("current", userPage.getCurrent());
-
-            return Result.success(data);
+            return Result.success(userInfo);
+        } catch (NumberFormatException e) {
+            return Result.error("用户ID格式错误");
+        } catch (IllegalArgumentException e) {
+            return Result.error(e.getMessage());
         } catch (Exception e) {
-            log.error("查询用户列表失败", e);
-            return Result.error("查询失败，请稍后重试");
+            log.error("获取用户信息失败", e);
+            return Result.error("获取用户信息失败，请稍后重试");
         }
     }
+
 
     // 根据ID查询用户
     @GetMapping("/getById")
@@ -168,6 +155,33 @@ public class UserController extends ApiController {
         }
     }
 
+    // 分页查询所有用户
+    @GetMapping("/list")
+    public Result<Map<String, Object>> getUserList(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        try {
+            // 参数校验
+            if (page <= 0 || pageSize <= 0) {
+                return Result.error("页码和每页大小必须大于0");
+            }
+
+            // 调用服务获取用户列表
+            IPage<User> userPage = userService.getUserList(page, pageSize);
+
+            // 构建响应数据
+            Map<String, Object> data = new HashMap<>();
+            data.put("records", userPage.getRecords());
+            data.put("total", userPage.getTotal());
+            data.put("size", userPage.getSize());
+            data.put("current", userPage.getCurrent());
+
+            return Result.success(data);
+        } catch (Exception e) {
+            log.error("查询用户列表失败", e);
+            return Result.error("查询失败，请稍后重试");
+        }
+    }
     @Autowired
     private FriendService friendService;
 
@@ -302,43 +316,6 @@ public class UserController extends ApiController {
     }
 
     // ****************************************************************
-
-    @GetMapping("/userInfo")
-    public Result<UserInfoResponseDTO> userInfo(
-            @RequestParam(value = "userId", required = false) Long userId,
-            @RequestParam(value = "page", required = false) Integer page,
-            @RequestParam(value = "pageSize", required = false) Integer pageSize,
-            @RequestParam(value = "type", required = false) String type,
-            @RequestParam(value = "isRedis", required = false) Boolean isRedis) {
-        try {
-            // 构建请求DTO
-            UserInfoRequestDTO requestDTO = new UserInfoRequestDTO();
-            requestDTO.setUserId(userId);
-            requestDTO.setPage(page);
-            requestDTO.setPageSize(pageSize);
-            requestDTO.setType(type);
-            requestDTO.setRedis(isRedis != null && isRedis);
-
-            // 获取当前登录用户ID
-            Long currentUserId = Long.parseLong(StpUtil.getLoginId().toString());
-
-            // 调用服务获取用户信息（带登录状态处理）
-            UserInfoResponseDTO userInfo = userService.getUserInfoWithLoginCheck(requestDTO, currentUserId);
-
-            if (userInfo == null) {
-                return Result.error("用户不存在");
-            }
-
-            return Result.success(userInfo);
-        } catch (NumberFormatException e) {
-            return Result.error("用户ID格式错误");
-        } catch (IllegalArgumentException e) {
-            return Result.error(e.getMessage());
-        } catch (Exception e) {
-            log.error("获取用户信息失败", e);
-            return Result.error("获取用户信息失败，请稍后重试");
-        }
-    }
 
     // 图片验证码接口
     @GetMapping("/getVerificationCode")
