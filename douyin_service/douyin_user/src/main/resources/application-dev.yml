@@ -59,6 +59,14 @@ spring:
     url: jdbc:mysql://1.94.131.16:3306/douyintest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
     # Druid专属配置
     druid:
+      # 开启连接检测（最重要）
+      test-on-borrow: true
+      # 取连接时，用这个SQL检查是否有效
+      validation-query: SELECT 1
+      # 空闲连接多久后被回收（秒）
+      time-between-eviction-runs-millis: 60000
+      # 连接最小空闲时间（分钟）
+      min-evictable-idle-time-millis: 1800000
       initial-size: 5 # 初始连接数
       max-active: 20 # 最大连接数
       min-idle: 5 # 最小空闲连接数
