@@ -166,7 +166,7 @@ v-if="activeTabIndex === 0"
 
 <script>
 // 保留你要求的 footer 组件
-import footerVue from '@/components/footer.vue';
+import footerVue from '@/components/home/footer.vue';
 // 引入 API
 import { getUserInfo } from '@/api/user';
 

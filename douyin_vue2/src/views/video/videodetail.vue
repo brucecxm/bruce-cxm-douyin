@@ -89,11 +89,11 @@
 import { homegetVideo } from '@/api/video';
 import GlassSearch from '@/components/GlassSearch.vue';
 import HorizontalScrollList from '@/components/HorizontalScrollList.vue';
-import caidan from '@/components/caidan.vue';
-import videoboxVue from '@/components/videobox.vue';
-import Pinglunqu from '@/components/Pinglunqu.vue';
+import caidan from '@/components/home/caidan.vue';
+import videoboxVue from '@/components/Allvideobox/videobox.vue';
+import Pinglunqu from '@/components/home/Pinglunqu.vue';
 import SlidePopup from '@/components/SlidePopup.vue';
-import Danmu from '@/components/Danmu.vue';
+import Danmu from '@/components//home/Danmu.vue';
 export default {
   // provide() {
   //   // 提供一个回调函数给后代组件调用

@@ -82,8 +82,8 @@
 </template>
 
 <script>
-import caidan from '@/components/caidan.vue';
-import footerVue from '@/components/footer.vue';
+import caidan from '@/components/home/caidan.vue';
+import footerVue from '@/components/home/footer.vue';
 import { getrequestFriendApi } from '@/api/user.js';
 import request from '@/utils/request.js';
 

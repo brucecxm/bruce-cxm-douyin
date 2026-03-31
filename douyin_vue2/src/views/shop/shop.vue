@@ -189,7 +189,7 @@
 <script>
 import { getButtonInfo } from '@/api/admin';
 import { shoplistPage, getlikeall } from '@/api/shop';
-import footerVue from '@/components/footer.vue';
+import footerVue from '@/components/home/footer.vue';
 import store from '@/stores';
 
 export default {
