@@ -40,7 +40,7 @@ import java.util.concurrent.Executor;
  * @since 2024-06-25 13:03:25
  */
 @Service("videoService")
-public class  VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements VideoService {
+public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements VideoService {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -76,8 +76,8 @@ public class  VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements V
 
     @Override
     public List<VideoVO> getVideoPage(int page,
-            int size,
-            String videoType) {
+                                      int size,
+                                      String videoType) {
         // 根据videoType获取对应的策略
         VideoStrategy strategy = videoStrategyFactory.getStrategy(videoType);
         // 调用策略的getVideos方法获取视频列表
@@ -85,46 +85,88 @@ public class  VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements V
     }
 
 
+    @Override
+    public Result<Map<String, Object>> handleLike(LikeRequestDTo likeRequest) {
+
+        //todo  所谓幂等性 其实就是找一个全局唯一的id 然后在业务代码做校验  比如这里的判断rediskey是否在redis存在  存在的话直接return
+        //todo  可以有多层操作  首先判断redis  然后再判断数据库 如果插入失败根据唯一id  直接return等  业务代码就是if判断是否存在或者处理过
+        //todo  可以在这里根据唯一id判断是否操作过 如果操作过直接return
+//---------------------------------------------------------------------------------------------------------
+        //todo 这里可以看看  接口幂等性如何实现 还有常见的需要实现接口幂等性的业务
+        //todo 这里可以看看  接口幂等性如何实现 还有常见的需要实现接口幂等性的业务
+        //todo 这里可以看看  接口幂等性如何实现 还有常见的需要实现接口幂等性的业务
+        //todo 这里可以看看  接口幂等性如何实现 还有常见的需要实现接口幂等性的业务
+        //todo 示例 1：点赞接口（唯一 ID = userId + videoId）
+        //todo 示例 2：提交订单接口（唯一 ID = orderToken /requestId）
+        //todo 示例 3：支付回调接口（唯一 ID = outTradeNo 商户订单号）
+// 1. 幂等判断：是否已点赞
+//        Boolean isMember = redis.opsForSet().isMember(key, videoId.toString());
+//        if (Boolean.TRUE.equals(isMember)) {
+//            return Result.fail("已点赞");
+//        }
+//
+//        // 2. DB 原子插入（唯一索引兜底）
+//        int rows = likeMapper.insertIgnore(userId, videoId);
+//        if (rows == 0) {
+//            return Result.fail("已点赞");
+//        }
+//---------------------------------------------------------------------------------------------------------
+
+        //todo MQ异步
+        //todo MQ异步
+        //todo MQ异步
+        System.out.println("这里把消息发送到了MQ 让MQ实现异步落库");
+        System.out.println("这里把消息发送到了MQ 让MQ实现异步落库");
+        System.out.println("这里把消息发送到了MQ 让MQ实现异步落库");
+        System.out.println("这里把消息发送到了MQ 让MQ实现异步落库");
+
+//---------------------------------------------------------------------------------------------------------
+        //todo  异步落库设计到两个表  一个是video的技术 like_count  另一个就是点赞记录表 点赞就插入 取消点赞把状态设置成0
+        //todo  其中点赞技术策略有一个点需要注意  并发数太大 不能直接  update video set like_count=like_count+1 容易造成锁冲突 & 性能崩溃。
+        //todo  ✔ 推荐使用 Redis 原子计数器 INCR video_like_count:video_id
+        //todo  然后定时（或通过 MQ）： UPDATE video SET like_count = redis_value
+
+//---------------------------------------------------------------------------------------------------------
+        //todo  如果采用上面的计数方式  又会导致一个新的问题 就是redis的计数  和video表的计数  还有video_like聚合计数不一致
+        //todo  允许 video.like_count ≠ video_like 聚合值   因为两个表的用途完全不同
+        //todo  但是redis里的计数值和video的计数值是需要最终一致的 但可以短暂不一致
+        //todo  最终一致  这里就涉及到如何实现最终一致性
+        //todo  最终一致  这里就涉及到如何实现最终一致性
+        //todo  最终一致  这里就涉及到如何实现最终一致性
+        //todo  最终一致  这里就涉及到如何实现最终一致性
+        //todo 机制 1：Redis 负责实时计数（INCR）
+        //todo 机制 2：用 MQ 传递增量（delta）到 MySQL（异步）
+        //todo 机制 3：定时（每秒/每分钟）同步一次全量值
+        //todo 机制 4：每天凌晨执行“对账任务”
 
 
 
+//---------------------------------------------------------------------------------------------------------
 
-    // 注入 Spring 管理的线程池
-    @Autowired
-    @Qualifier("likeThreadPool")
-    private Executor likeThreadPool;
+
+        //todo 下面的dolike只处理了redis里的操作  还有一个落库的操作 MQ异步
+        //todo 为什么落库要用MQ而不用多线程 |线程数量有限，扛不住高并发 | 多线程无法削峰 | 多线程没有持久化，宕机全丢 | 多线程没有失败重试机制 | 多线程无法保证顺序写入
+        //todo 为什么落库要用MQ而不用多线程 |线程数量有限，扛不住高并发 | 多线程无法削峰 | 多线程没有持久化，宕机全丢 | 多线程没有失败重试机制 | 多线程无法保证顺序写入
+        //todo 为什么落库要用MQ而不用多线程 |线程数量有限，扛不住高并发 | 多线程无法削峰 | 多线程没有持久化，宕机全丢 | 多线程没有失败重试机制 | 多线程无法保证顺序写入
+        return doLike(likeRequest);
+
+    }
+
 
     // === 下面的业务方法不变 ===
-    private  Result<Map<String, Object>> doLike(LikeRequestDTo likeRequest) {
-
-        // 获取当前登录用户ID
+    private Result<Map<String, Object>> doLike(LikeRequestDTo likeRequest) {
+        //todo  所谓幂等性 其实就是找一个全局唯一的id 然后在业务代码做校验  比如这里的判断rediskey是否在redis存在  存在的话直接return
+        //todo  所谓幂等性 其实就是找一个全局唯一的id 然后在业务代码做校验  比如这里的判断rediskey是否在redis存在  存在的话直接return
+        //todo  可以有多层操作  首先判断redis  然后再判断数据库 如果插入失败根据唯一id  直接return等  业务代码就是if判断是否存在或者处理过
+        //todo  可以有多层操作  首先判断redis  然后再判断数据库 如果插入失败根据唯一id  直接return等  业务代码就是if判断是否存在或者处理过
         Long userId = Long.valueOf(StpUtil.getLoginId().toString());
-
-        // 限流逻辑：每个用户每秒最多允许10次点赞操作
-        String rateLimitKey = "rate:limit:like:" + userId;
-        long current = System.currentTimeMillis() / 1000;
-        redisTemplate.opsForHash().put(rateLimitKey, "last", current);
-        redisTemplate.expire(rateLimitKey, 1, java.util.concurrent.TimeUnit.SECONDS);
-        Long count = redisTemplate.opsForHash().increment(rateLimitKey, "count", 1);
-        if (count > 10) {
-            return Result.error("点赞操作过于频繁，请稍后再试");
-        }
-
-        // 从请求对象中获取参数
         Long contentId = likeRequest.getContentId();
         String type = likeRequest.getType();
         String contentType = likeRequest.getContentType();
-
-        // 生成 Redis 键
         String redisKey = "like:content:" + contentType + contentId;
-        String batchKey = "like:batch:" + contentType;
-
-        // 处理点赞和取消点赞逻辑
         boolean isLiked = redisTemplate.opsForSet().isMember(redisKey, userId);
-        String operation;
         String resultMessage;
         boolean success = false;
-
         if ("red".equals(type)) {
             // 点赞操作
             if (!isLiked) {
@@ -132,7 +174,6 @@ public class  VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements V
                 redisTemplate.opsForSet().add(redisKey, userId);
                 // 将点赞数加 1
                 redisTemplate.opsForValue().increment(redisKey + ":count", 1);
-                operation = "add";
                 resultMessage = contentType + "点赞成功";
                 success = true;
             } else {
@@ -145,80 +186,16 @@ public class  VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements V
                 redisTemplate.opsForSet().remove(redisKey, userId);
                 // 将点赞数减 1
                 redisTemplate.opsForValue().decrement(redisKey + ":count", 1);
-                operation = "del";
                 resultMessage = contentType + "取消点赞成功";
                 success = true;
             } else {
                 return Result.error("您尚未点赞");
             }
         }
-
-        // 优化：将点赞消息先存入Redis列表，而非直接发送到MQ
-        if (success) {
-            LikeMessage message = new LikeMessage(contentId, userId, operation, System.currentTimeMillis());
-            redisTemplate.opsForList().rightPush(batchKey, message);
-
-            // 检查是否达到批量发送阈值
-            Long size = redisTemplate.opsForList().size(batchKey);
-            if (size >= 100) { // 每100条消息批量发送一次
-                // 批量发送消息到MQ
-                List<LikeMessage> messages = redisTemplate.opsForList().range(batchKey, 0, 99);
-                if (messages != null && !messages.isEmpty()) {
-                    // 设置消息持久化
-                    rabbitTemplate.convertAndSend("like.exchange", "like.video", messages, msg -> {
-                        msg.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
-                        return msg;
-                    });
-                    // 删除已发送的消息
-                    redisTemplate.opsForList().trim(batchKey, 100, -1);
-                }
-            }
-        }
-
-        // 获取最新的点赞数
-        Integer likeCount = (Integer) redisTemplate.opsForValue().get(redisKey + ":count");
-        if (likeCount == null) {
-            // 如果Redis中没有点赞数，从数据库查询
-            LambdaQueryWrapper<Favor> likeQueryWrapper = new LambdaQueryWrapper<Favor>()
-                    .eq(Favor::getCommentId, contentId);
-            likeCount = favorService.count(likeQueryWrapper);
-            // 将查询结果存入Redis
-            redisTemplate.opsForValue().set(redisKey + ":count", likeCount);
-        }
-
         // 返回统一格式的响应
         Map<String, Object> data = new HashMap<>();
-        data.put("likeCount", likeCount);
         data.put("isLiked", "red".equals(type) ? true : false);
-
         return Result.success(data);
-    }
-
-    private void updateLikeCount(Long videoId) {
-        try { Thread.sleep(1000); } catch (Exception e) {}
-        System.out.println("【异步线程】更新点赞数+1");
-    }
-
-    private void sendNotify(Long userId, Long videoId) {
-        try { Thread.sleep(500); } catch (Exception e) {}
-        System.out.println("【异步线程】发送点赞通知");
-    }
-    @Override
-    public Result<Map<String, Object>> handleLike(LikeRequestDTo likeRequest) {
-        System.out.println("【主线程】用户点赞开始");
-
-
-        // 2. 非核心逻辑：交给线程池异步执行
-        likeThreadPool.execute(() -> {
-            updateLikeCount(1L); // 更新计数
-            sendNotify(1L, 1L); // 发通知
-        });
-
-        // 3. 立刻返回！用户无等待
-        System.out.println("【主线程】点赞成功，直接返回");
-
-        return doLike(likeRequest);
-
     }
 
 }
