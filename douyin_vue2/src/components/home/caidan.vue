@@ -1,5 +1,9 @@
 <template>
   <div class="container">
+    <NotImplementedPopup
+      v-if="showNotImplemented"
+      @close="showNotImplemented = false"
+    />
     <div class="header">
       <div class="settings" @click="gosetting">
         <svg
@@ -185,7 +189,7 @@
           </div>
           <span>优惠券</span>
         </div>
-        <div class="icon-wrapper">
+        <div class="icon-wrapper" @click="openNotImplemented">
           <div class="icon">
             <svg
               width="24"
@@ -207,7 +211,7 @@
         </div>
       </div>
       <div class="item">
-        <div class="icon-wrapper">
+        <div class="icon-wrapper" @click="openNotImplemented">
           <div class="icon">
             <svg
               width="24"
@@ -234,7 +238,7 @@
           </div>
           <span>观看历史</span>
         </div>
-        <div class="icon-wrapper">
+        <div class="icon-wrapper" @click="openNotImplemented">
           <div class="icon">
             <svg
               width="24"
@@ -261,7 +265,7 @@
           </div>
           <span>内容偏好</span>
         </div>
-        <div class="icon-wrapper">
+        <div class="icon-wrapper" @click="openNotImplemented">
           <div class="icon">
             <svg
               width="24"
@@ -304,7 +308,7 @@
         </div>
       </div>
       <div class="item">
-        <div class="icon-wrapper">
+        <div class="icon-wrapper" @click="openNotImplemented">
           <div class="icon">
             <svg
               width="24"
@@ -336,7 +340,7 @@
     <div class="section">
       <div class="section-title">生活动态</div>
       <div class="item">
-        <div class="icon-wrapper">
+        <div class="icon-wrapper" @click="openNotImplemented">
           <div class="icon">
             <svg
               width="24"
@@ -370,7 +374,7 @@
           </div>
           <span>直播广场</span>
         </div>
-        <div class="icon-wrapper">
+        <div class="icon-wrapper" @click="openNotImplemented">
           <div class="icon">
             <svg
               width="24"
@@ -425,7 +429,7 @@
           </div>
           <span>附近团购</span>
         </div>
-        <div class="icon-wrapper">
+        <div class="icon-wrapper" @click="openNotImplemented">
           <div class="icon">
             <svg
               width="24"
@@ -468,7 +472,7 @@
         </div>
       </div>
       <div class="item">
-        <div class="icon-wrapper">
+        <div class="icon-wrapper" @click="openNotImplemented">
           <div class="icon">
             <svg
               width="24"
@@ -516,7 +520,7 @@
           </div>
           <span>玩游戏</span>
         </div>
-        <div class="icon-wrapper">
+        <div class="icon-wrapper" @click="openNotImplemented">
           <div class="icon">
             <svg
               width="24"
@@ -536,7 +540,7 @@
           </div>
           <span>听抖音</span>
         </div>
-        <div class="icon-wrapper">
+        <div class="icon-wrapper" @click="openNotImplemented">
           <div class="icon">
             <svg
               width="24"
@@ -579,7 +583,7 @@
         </div>
       </div>
       <div class="item">
-        <div class="icon-wrapper">
+        <div class="icon-wrapper" @click="openNotImplemented">
           <div class="icon">
             <svg
               width="24"
@@ -634,15 +638,20 @@
 
 <script>
 import { eventBus } from '../../main'; // 导入全局事件总线
+import NotImplementedPopup from '../Common/NotImplementedPopup.vue';
 
 export default {
   name: 'Tanchuang',
+  components: {
+    NotImplementedPopup
+  },
   data() {
     return {
       tanchuang: {
         home: 'home',
         istanchuangshow: false
-      }
+      },
+      showNotImplemented: false
     };
   },
   methods: {
@@ -654,10 +663,13 @@ export default {
       this.$router.push('/setting');
     },
     gocoupon() {
-      this.$router.push('/coupon');
+      this.showNotImplemented = true;
     },
     gowallet() {
       this.$router.push('/wallet');
+    },
+    openNotImplemented() {
+      this.showNotImplemented = true;
     }
   }
 };
