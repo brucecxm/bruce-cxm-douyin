@@ -31,8 +31,7 @@ import java.util.stream.Collectors;
 public class CommentController extends ApiController {
     @Autowired
     private CommentService commentService;
-    @Autowired
-    private RedisTemplate redisTemplate;
+
     @Autowired
     private IdService idService;
     @Autowired
