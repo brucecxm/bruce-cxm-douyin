@@ -19,8 +19,6 @@ export const homegetVideocontent = (params) => {
   return request.get('/video/comment/getcomment', { params });
 };
 
-
-
 export const like = (params) => {
   return request.post('/video/like', params);
 };
@@ -65,6 +63,13 @@ export const uploadFile = (file, additionalParams) => {
 export const getComment = (params) => {
   return request.get('/video/comment/getFatherComment', { params }); // 将参数放入 { params } 中
 };
+export function getChildrenComment(params) {
+  return request({
+    url: '/video/comment/getChildrenComment',
+    method: 'get',
+    params
+  });
+}
 
 export const getmumsic = (musicId, page = 1, size = 10) => {
   return request.get('/video/music/getmusic', {

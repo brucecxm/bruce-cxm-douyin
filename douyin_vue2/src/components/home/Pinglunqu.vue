@@ -1,9 +1,9 @@
 <template>
   <div class="pinglunqu">
-    <!-- 关闭按钮 -->
     <button @click="sendMessage" class="close-button">×</button>
-    <!-- 评论列表 -->
+
     <div class="comments-list">
+      <!-- 父评论 -->
       <div
         class="comment-item"
         v-for="(ping, index) in commentsData"
@@ -15,6 +15,11 @@
         <div class="comment-content">
           <div class="user-name">{{ ping.username }}</div>
           <div class="comment-text">{{ ping.comment }}</div>
+
+          <div v-if="replyTargetIndex === index" class="replying-info">
+            回复 @{{ ping.username }}
+          </div>
+
           <div class="actions">
             <span class="like-btn" @click="likeComment(index)">
               <svg viewBox="0 0 24 24" class="like-icon" fill="currentColor">
@@ -25,16 +30,50 @@
               {{ ping.likes }}
             </span>
             <span class="reply-btn" @click="replyComment(index)">回复</span>
+
+            <!-- 👇 查看子评论按钮（箭头） -->
+            <span
+              v-if="ping.hasChildren === undefined || ping.hasChildren === true"
+              class="children-btn"
+              @click="toggleChildren(ping, index)"
+            >
+              {{ ping.showChildren ? '↑ 收起' : '↓ 查看回复' }}
+            </span>
+          </div>
+
+          <!-- 👇 子评论列表（展开才显示） -->
+          <div
+            v-if="
+              ping.showChildren &&
+                ping.childrenList &&
+                ping.childrenList.length > 0
+            "
+            class="children-list"
+          >
+            <div
+              class="child-item"
+              v-for="child in ping.childrenList"
+              :key="child.commentId"
+            >
+              <div class="child-avatar">
+                <img :src="child.avatar" alt="头像" />
+              </div>
+              <div class="child-content">
+                <div class="child-name">{{ child.username }}</div>
+                <!-- 显示 回复 @父评论作者 -->
+                <div class="child-reply">回复 @{{ ping.username }}</div>
+                <div class="child-text">{{ child.comment }}</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 评论输入框 -->
     <div class="comment-input-container">
       <textarea
         v-model="newComment"
-        placeholder="说点什么..."
+        :placeholder="replyPlaceholder"
         class="comment-input"
         rows="1"
         @keyup.enter="submitComment"
@@ -46,39 +85,58 @@
       >
         发送
       </button>
+      <button v-if="fatherId" class="cancel-reply-btn" @click="cancelReply">
+        取消
+      </button>
     </div>
   </div>
 </template>
+
 <script>
-import { getComment, addcomment } from '@/api/video';
+import { getComment, addcomment, getChildrenComment } from '@/api/video';
 export default {
   name: 'Pinglunqu',
   data() {
     return {
       commentsData: [],
       fatherId: '',
+      replyTargetIndex: -1,
       newComment: '',
       videoData: {},
       pageNum: 1,
       pageSize: 10,
-      finished: false, // 用于表示是否加载完了全部数据
-      loading: false // 防止重复加载
+      finished: false,
+      loading: false
     };
+  },
+  computed: {
+    replyPlaceholder() {
+      return this.fatherId ? '回复中...' : '说点什么...';
+    }
   },
   methods: {
     sendMessage() {
       this.$emit('send-message', false);
+      this.cancelReply();
     },
     likeComment(index) {
       this.commentsData[index].likes++;
     },
     replyComment(index) {
-      console.log(`回复评论 ${index}`);
-      // 回复逻辑你自己扩展
+      const item = this.commentsData[index];
+      this.fatherId = item.commentId;
+      this.replyTargetIndex = index;
+      this.$nextTick(() => {
+        const input = document.querySelector('.comment-input');
+        input?.focus();
+      });
+    },
+    cancelReply() {
+      this.fatherId = '';
+      this.replyTargetIndex = -1;
     },
     goToUserProfile(userId) {
       console.log(`跳转到用户 ${userId} 的主页`);
-      // this.$router.push({ name: 'userProfile', params: { userId } });
     },
     onScroll(e) {
       const el = e.target;
@@ -86,37 +144,73 @@ export default {
         this.getCommentInit();
       }
     },
+
+    // ======================
+    // 加载父评论
+    // ======================
     getCommentInit() {
       if (this.finished || this.loading) return;
-
       this.loading = true;
       const params = {
         videoId: this.videoData.videoId,
         pageNum: this.pageNum,
         pageSize: this.pageSize
       };
-
       getComment(params)
         .then((res) => {
           const list = res.data.records || [];
-          if (list.length < this.pageSize) {
-            this.finished = true;
-          }
-          this.commentsData = [...this.commentsData, ...list];
+          if (list.length < this.pageSize) this.finished = true;
+
+          // 给每条父评论加默认展开状态 + 子评论数组
+          const newList = list.map((item) => ({
+            ...item,
+            showChildren: false,
+            childrenList: []
+          }));
+
+          this.commentsData = [...this.commentsData, ...newList];
           this.pageNum++;
         })
-        .catch((err) => {
-          console.error('获取评论失败', err);
-        })
-        .finally(() => {
-          this.loading = false;
-        });
+        .catch((err) => console.error('获取评论失败', err))
+        .finally(() => (this.loading = false));
     },
+
+    // ======================
+    // 👇 关键：展开/收起子评论
+    // ======================
+    async toggleChildren(ping, index) {
+      // 关闭
+      if (ping.showChildren) {
+        ping.showChildren = false;
+        this.$set(this.commentsData, index, ping);
+        return;
+      }
+
+      // 已经加载过，直接打开
+      if (ping.childrenList.length > 0) {
+        ping.showChildren = true;
+        this.$set(this.commentsData, index, ping);
+        return;
+      }
+
+      // 请求子评论
+      const res = await getChildrenComment({
+        fatherId: ping.commentId,
+        pageNum: 1,
+        pageSize: 20
+      });
+
+      ping.childrenList = res.data.records || [];
+      ping.showChildren = true;
+      this.$set(this.commentsData, index, ping);
+    },
+
+    // ======================
+    // 发布评论
+    // ======================
     submitComment() {
       const userInfoMap = this.$store.state.userInfo.userInfo;
-
-      // 空内容直接返回
-      if (this.newComment.trim() === '') return;
+      if (!this.newComment.trim()) return;
 
       const newCommentObj = {
         commentId: Date.now(),
@@ -124,32 +218,63 @@ export default {
         avatar: userInfoMap.avatar,
         username: userInfoMap.nickname,
         comment: this.newComment,
-        likes: 0
+        likes: 0,
+        fatherId: this.fatherId
       };
 
-      // 本地渲染
-      this.commentsData.unshift(newCommentObj);
+      // 如果是回复父评论，插入到对应子评论列表
+      if (this.fatherId) {
+        const target = this.commentsData.find(
+          (item) => item.commentId === this.fatherId
+        );
+        if (target) {
+          target.childrenList.unshift(newCommentObj);
+        }
+      } else {
+        this.commentsData.unshift({
+          ...newCommentObj,
+          showChildren: false,
+          childrenList: []
+        });
+      }
 
-      // ==============================================
-      // 🔴 修复点 1：把评论内容传给后端！！！
-      // ==============================================
       const params = {
         videoId: parseInt(this.videoData.videoId, 10),
         userId: newCommentObj.userId,
-        fatherId: this.fatherId,
-        comment: this.newComment.trim() // ✅ 必须加这一行
+        fatherId: this.fatherId || null,
+        comment: this.newComment.trim()
       };
 
-      // 发送请求
       addcomment(params)
         .then((res) => {
-          console.log('评论发布成功:', res);
-          this.newComment = ''; // ✅ 成功后再清空
+          console.log('发布成功', res);
+          // 使用后端返回的commentId替换前端临时生成的ID
+          const backendCommentId = res.data.commentId;
+          if (this.fatherId) {
+            const target = this.commentsData.find(
+              (item) => item.commentId === this.fatherId
+            );
+            if (target) {
+              const newCommentItem = target.childrenList[0];
+              newCommentItem.commentId = backendCommentId;
+            }
+          } else {
+            const newCommentItem = this.commentsData[0];
+            newCommentItem.commentId = backendCommentId;
+          }
+          this.newComment = '';
+          this.cancelReply();
         })
         .catch((err) => {
-          console.error('评论发布失败:', err);
-          // 失败了把本地评论删掉
-          this.commentsData.shift();
+          console.error('发布失败', err);
+          if (this.fatherId) {
+            const target = this.commentsData.find(
+              (item) => item.commentId === this.fatherId
+            );
+            target?.childrenList.shift();
+          } else {
+            this.commentsData.shift();
+          }
         });
     }
   },
@@ -158,6 +283,10 @@ export default {
     this.getCommentInit();
     const container = this.$el;
     container.addEventListener('scroll', this.onScroll);
+  },
+  beforeDestroy() {
+    const container = this.$el;
+    container.removeEventListener('scroll', this.onScroll);
   }
 };
 </script>
@@ -178,6 +307,7 @@ export default {
   user-select: none;
   z-index: 10000;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
 .close-button {
@@ -246,6 +376,12 @@ export default {
   margin-bottom: 6px;
 }
 
+.replying-info {
+  font-size: 12px;
+  color: #ff2e54;
+  margin-bottom: 6px;
+}
+
 .actions {
   display: flex;
   gap: 15px;
@@ -254,7 +390,8 @@ export default {
 }
 
 .like-btn,
-.reply-btn {
+.reply-btn,
+.children-btn {
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -263,7 +400,8 @@ export default {
 }
 
 .like-btn:hover,
-.reply-btn:hover {
+.reply-btn:hover,
+.children-btn:hover {
   color: #ff2e54;
 }
 
@@ -274,7 +412,62 @@ export default {
   fill: currentColor;
 }
 
-/* 底部固定评论输入框 */
+/* ====================== */
+/* 子评论样式 */
+/* ====================== */
+.children-list {
+  margin-top: 10px;
+  padding-left: 10px;
+  border-left: 2px solid #eee;
+}
+
+.child-item {
+  display: flex;
+  margin-bottom: 10px;
+  align-items: flex-start;
+}
+
+.child-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 8px;
+  flex-shrink: 0;
+  background: #f0f0f0;
+}
+
+.child-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.child-content {
+  flex: 1;
+}
+
+.child-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #121212;
+}
+
+.child-reply {
+  font-size: 12px;
+  color: #999;
+  margin: 2px 0;
+}
+
+.child-text {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.4;
+}
+
+/* ====================== */
+/* 输入框 */
+/* ====================== */
 .comment-input-container {
   position: absolute;
   bottom: 0;
@@ -329,5 +522,15 @@ export default {
 
 .submit-btn:not(:disabled):hover {
   background: #ff527b;
+}
+
+.cancel-reply-btn {
+  background: transparent;
+  color: #888;
+  border: none;
+  padding: 8px 10px;
+  margin-left: 6px;
+  font-size: 13px;
+  cursor: pointer;
 }
 </style>

@@ -39,6 +39,44 @@ public class CommentController extends ApiController {
     // 使用线程池来异步上传图片
     private static final ExecutorService executorService = Executors.newCachedThreadPool();
 
+    @GetMapping("/getChildrenComment")
+    public Result<Page<CommentVO>> getChildrenComment(@RequestParam Map<String, Object> params) {
+        String fatherId = String.valueOf(params.get("fatherId"));
+        int pageNum = Integer.parseInt(String.valueOf(params.getOrDefault(Constant.ApiParam.PAGE, 1)));
+        int pageSize = Integer.parseInt(String.valueOf(params.getOrDefault(Constant.ApiParam.LIMIT, 10)));
+
+        Page<Comment> page = new Page<>(pageNum, pageSize);
+        LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
+        // 关键：fatherId = 传入的父评论ID
+        queryWrapper.eq(Comment::getFatherId, fatherId);
+
+        // 1. 分页查询子评论
+        Page<Comment> childrenPage = commentService.page(page, queryWrapper);
+
+        // 2. 封装VO
+        Page<CommentVO> voPage = new Page<>();
+        voPage.setCurrent(childrenPage.getCurrent());
+        voPage.setSize(childrenPage.getSize());
+        voPage.setTotal(childrenPage.getTotal());
+        voPage.setPages(childrenPage.getPages());
+
+        List<CommentVO> voList = childrenPage.getRecords().stream().map(comment -> {
+            CommentVO vo = new CommentVO();
+            BeanUtils.copyProperties(comment, vo);
+
+            // 查询用户信息
+            User user = (User) userFeignService.getUserById(comment.getUserId());
+            if (user != null) {
+                vo.setUsername(user.getUsername());
+                vo.setAvatar(user.getAvatar());
+            }
+            return vo;
+        }).collect(Collectors.toList());
+
+        voPage.setRecords(voList);
+        return Result.success(voPage);
+    }
+
     // Controller 层
     @GetMapping("/getFatherComment")
     public Result<Page<CommentVO>> getFatherComment(@RequestParam Map<String, Object> params) {
@@ -81,8 +119,9 @@ public class CommentController extends ApiController {
         voPage.setRecords(voList);
         return Result.success(voPage);
     }
+
     @PostMapping("/addVideoComment")
-    public Result<String> addVideoComment(@RequestBody Map<String, Object> params) {
+    public Result<Map<String, Object>> addVideoComment(@RequestBody Map<String, Object> params) {
         Comment comment = new Comment();
 
         // 1. 评论内容
@@ -90,12 +129,12 @@ public class CommentController extends ApiController {
 
         // 2. 父评论ID
         Object fatherIdObj = params.get(Constant.ApiParam.FATHER_ID);
-        Integer fatherId = null;
+        Long fatherId = null; // 改成 Long！
         if (fatherIdObj != null) {
             String strVal = fatherIdObj.toString().trim();
             if (!strVal.isEmpty()) {
                 try {
-                    fatherId = Integer.valueOf(strVal);
+                    fatherId = Long.valueOf(strVal); // Long.valueOf
                 } catch (NumberFormatException e) {
                     fatherId = null;
                 }
@@ -144,7 +183,11 @@ public class CommentController extends ApiController {
 
         // 保存
         commentService.save(comment);
-        return Result.success("评论成功");
+
+        // 返回包含commentId的map
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("commentId", commentId);
+        return Result.success(resultMap);
     }
     // @GetMapping("/getzi")
     // //获得对应父评论的子评论

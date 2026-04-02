@@ -30,8 +30,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/video/music")
 public class MusicController extends ApiController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
+    // 构造方法
+    public MusicController() {
+        System.out.println("===== MusicController 已被 Spring 实例化 =====");
+    }
 
     @Autowired
     private musiconeDao musiconedao;

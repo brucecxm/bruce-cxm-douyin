@@ -1,6 +1,8 @@
 package com.bruce.entity;
 
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import lombok.Data;
+
 import java.io.Serializable;
 
 /**
@@ -10,6 +12,7 @@ import java.io.Serializable;
  * @since 2025-06-04 15:45:13
  */
 @SuppressWarnings("serial")
+@Data
 public class Comment extends Model<Comment> {
 
     private Long commentId;
@@ -20,7 +23,7 @@ public class Comment extends Model<Comment> {
 
     private Long userId;
 
-    private Integer fatherId;
+    private Long fatherId;
 
     private Long contentId;
 
@@ -57,13 +60,6 @@ public class Comment extends Model<Comment> {
         this.userId = userId;
     }
 
-    public Integer getFatherId() {
-        return fatherId;
-    }
-
-    public void setFatherId(Integer fatherId) {
-        this.fatherId = fatherId;
-    }
 
     public Long getContentId() {
         return contentId;
