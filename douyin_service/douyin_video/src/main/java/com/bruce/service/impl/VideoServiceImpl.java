@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bruce.dao.VideoDao;
 import com.bruce.dict.Constant;
 import com.bruce.dto.LikeMessage;
+import com.bruce.dto.LikeMsg;
 import com.bruce.dto.LikeRequestDTo;
 import com.bruce.entity.*;
 import com.bruce.file.service.FileStorageService;
@@ -43,33 +44,8 @@ import java.util.concurrent.Executor;
 public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements VideoService {
 
     @Autowired
-    private RabbitTemplate rabbitTemplate;
-
-    @Autowired
-    private VideoDao videoDao;
-
-    @Autowired
     private RedisTemplate redisTemplate;
 
-    @Resource
-    private MessageQueueService messageQueueService;
-
-    @Autowired
-    private IdService idService;
-
-    @Autowired
-    private FileStorageService fileStorageService;
-
-    @Resource
-    private MusicService musicService;
-
-    @Resource
-    private LikeService likeService;
-
-    @Resource
-    private FavorService favorService;
-    @Resource
-    private CommentService commentService;
 
     @Resource
     private VideoStrategyFactory videoStrategyFactory;
@@ -83,7 +59,22 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
         // 调用策略的getVideos方法获取视频列表
         return strategy.getVideos(page, size);
     }
+    @Resource
+    private RabbitTemplate rabbitTemplate;
+    /**
+     * 发送视频点赞消息（对象格式）
+     */
+    public void sendLikeMessage(LikeMsg msg) {
+        // 路由 key 使用 videoId，保证同一个视频永远路由到同一个队列
+        String routingKey = msg.getVideoId().toString();
 
+        // 发送对象消息（Spring 会自动序列化成 JSON）
+        rabbitTemplate.convertAndSend(
+                "video.like.exchange",
+                routingKey,
+                msg
+        );
+    }
 
     @Override
     public Result<Map<String, Object>> handleLike(LikeRequestDTo likeRequest) {
@@ -112,13 +103,44 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
 //        }
 //---------------------------------------------------------------------------------------------------------
 
+
+        Long userId = Long.valueOf(StpUtil.getLoginId().toString());
+        Long contentId = likeRequest.getContentId();
+        String type = likeRequest.getType();
+        String contentType = likeRequest.getContentType();
+        String redisKey = "like:content:" + contentType + contentId;
+        boolean isLiked = redisTemplate.opsForSet().isMember(redisKey, userId);
+        LikeMsg msg=new LikeMsg();
+        msg.setVideoId(contentId);
+        msg.setUserId(userId);
+        msg.setDelta(+1);
+        msg.setTimestamp(System.currentTimeMillis() / 1000);
+        if ("red".equals(type)) {
+            // 点赞操作
+            if (!isLiked) {
+                msg.setDelta(+1);
+            } else {
+                return Result.error("您已点赞");
+            }
+        } else {
+            // 取消点赞操作
+            if (isLiked) {
+                msg.setDelta(-1);
+            } else {
+                return Result.error("您尚未点赞");
+            }
+        }
         //todo MQ异步
         //todo MQ异步
         //todo MQ异步
         System.out.println("这里把消息发送到了MQ 让MQ实现异步落库");
         System.out.println("这里把消息发送到了MQ 让MQ实现异步落库");
-        System.out.println("这里把消息发送到了MQ 让MQ实现异步落库");
-        System.out.println("这里把消息发送到了MQ 让MQ实现异步落库");
+
+
+        sendLikeMessage(msg);
+        //todo  这里消费者消费消息  可以开启多线程快速落库 可以涉及到多线程的知识
+        //todo  这里消费者消费消息  可以开启多线程快速落库 可以涉及到多线程的知识
+        //todo  这里消费者消费消息  可以开启多线程快速落库 可以涉及到多线程的知识
 
 //---------------------------------------------------------------------------------------------------------
         //todo  异步落库设计到两个表  一个是video的技术 like_count  另一个就是点赞记录表 点赞就插入 取消点赞把状态设置成0
