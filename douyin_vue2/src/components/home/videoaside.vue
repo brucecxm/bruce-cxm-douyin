@@ -67,6 +67,10 @@ export default {
   data() {
     return {
       userId: '1',
+      likeTimer: null, // 点赞定时器
+      likeRequestQueue: [], // 点赞请求队列
+      isLikeProcessing: false, // 是否正在发送请求
+      lastLikeTime: 0, // 上次点赞请求时间
       isLiked: this.videoData.isLiked || false, // 从videoData初始化点赞状态
       likeNum: this.videoData.likeNum || 0, // 初始点赞数量
       isCollected: this.videoData.isCollected || false, // 从videoData初始化收藏状态
@@ -100,47 +104,82 @@ export default {
       console.log('test');
     },
     toggleLike() {
-      this.isLiked = !this.isLiked; // 切换点赞状态
-      if (this.isLiked) {
-        this.likeNum += 1; // 点赞时，点赞数量增加1
-      } else {
-        this.likeNum -= 1; // 取消点赞时，点赞数量减少1
-      }
+      // ==========================================
+      // 1. 前端动画立即执行（永远不卡顿）
+      // ==========================================
+      this.isLiked = !this.isLiked;
+      // 点赞/取消点赞时，确保 likeNum 永远 ≥ 0
+      this.likeNum = Math.max(0, this.likeNum + (this.isLiked ? 1 : -1));
       this.behaviour('like');
 
-      // 调用 API 或其他逻辑处理
-      console.log('videoDateOne:', this.videoDateOne);
-      console.log('videoId:', this.videoDateOne.videoId);
-      console.log('videoId type:', typeof this.videoDateOne.videoId);
+      // ==========================================
+      // 2. 把当前操作【推入队列】，保证顺序
+      // ==========================================
+      this.likeRequestQueue.push({
+        isLiked: this.isLiked, // 记录这次点击最终要的状态
+        timestamp: Date.now()
+      });
 
-      // 确保contentId是一个数字，而不是对象
-      const contentId =
-        typeof this.videoDateOne.videoId === 'object'
-          ? Number(
-              this.videoDateOne.videoId.id ||
-                this.videoDateOne.videoId.videoId ||
-                0
-            )
-          : Number(this.videoDateOne.videoId);
-
-      var params = {
-        type: this.isLiked ? 'red' : 'nored',
-        contentType: 'video',
-        contentId: contentId
-      };
-
-      console.log('发送的点赞参数:', params);
-      console.log('contentId type:', typeof params.contentId);
-
-      like(params)
-        .then((result) => {
-          console.log('点赞成功:', result);
-        })
-        .catch((error) => {
-          console.error('点赞出错:', error);
-        });
+      // ==========================================
+      // 3. 执行队列（串行：上一个完成 → 下一个才发）
+      // ==========================================
+      this.runLikeQueue();
     },
 
+    // 串行执行点赞请求（核心：保证顺序 + 间隔 + 不并发）
+    async runLikeQueue() {
+      // 如果正在处理，直接退出，等上一个结束自动继续
+      if (this.isLikeProcessing) return;
+
+      // 开始处理
+      this.isLikeProcessing = true;
+
+      // 依次执行队列里所有请求
+      while (this.likeRequestQueue.length > 0) {
+        const task = this.likeRequestQueue.shift(); // 取出第一个
+
+        // ==========================================
+        // 强制间隔：500ms 发一次（可自己改）
+        // ==========================================
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        // 执行真正的请求
+        await this.sendLikeRequest(task.isLiked);
+      }
+
+      // 全部处理完
+      this.isLikeProcessing = false;
+    },
+
+    // 发送点赞/取消点赞请求
+    sendLikeRequest(isLiked) {
+      return new Promise((resolve) => {
+        const contentId =
+          typeof this.videoDateOne.videoId === 'object'
+            ? Number(
+                this.videoDateOne.videoId.id ||
+                  this.videoDateOne.videoId.videoId ||
+                  0
+              )
+            : Number(this.videoDateOne.videoId);
+
+        const params = {
+          type: isLiked ? 'red' : 'nored',
+          contentType: 'video',
+          contentId: contentId
+        };
+
+        like(params)
+          .then((res) => {
+            console.log('✅ 请求成功（顺序执行）:', params.type);
+            resolve();
+          })
+          .catch((err) => {
+            console.error('❌ 请求失败:', err);
+            resolve(); // 失败也继续执行下一个
+          });
+      });
+    },
     toggleCollect() {
       this.isCollected = !this.isCollected; // 切换收藏状态
       if (this.isCollected) {

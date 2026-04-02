@@ -120,14 +120,14 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
             if (!isLiked) {
                 msg.setDelta(+1);
             } else {
-                return Result.error("您已点赞");
+                return Result.success(new HashMap<>());
             }
         } else {
             // 取消点赞操作
             if (isLiked) {
                 msg.setDelta(-1);
             } else {
-                return Result.error("您尚未点赞");
+                return Result.success(new HashMap<>());
             }
         }
         //todo MQ异步
