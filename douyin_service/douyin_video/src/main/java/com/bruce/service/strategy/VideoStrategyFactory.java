@@ -1,8 +1,8 @@
 package com.bruce.service.strategy;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-
 import java.util.Map;
 
 /**
@@ -11,28 +11,38 @@ import java.util.Map;
 @Component
 public class VideoStrategyFactory {
 
-    private final Map<String, VideoStrategy> strategyMap;
+    private final ApplicationContext applicationContext;
+    private Map<String, VideoStrategy> strategyMap;
 
     /**
-     * 构造方法自动注入所有VideoStrategy实现
-     * Spring会自动将所有VideoStrategy类型的bean注入到Map中
-     * key为bean名称，value为对应的策略实现
+     * 构造方法自动注入 ApplicationContext
      */
     @Autowired
-    public VideoStrategyFactory(Map<String, VideoStrategy> strategyMap) {
-        this.strategyMap = strategyMap;
+    public VideoStrategyFactory(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 
     /**
-     * 根据videoType获取对应的策略
-     * 
+     * 根据 videoType 获取对应的策略
+     *
      * @param videoType 视频类型
-     * @return 对应的视频策略
+     * @return 对应的视频策略，不存在则返回默认策略
      */
     public VideoStrategy getStrategy(String videoType) {
-        // 根据videoType构建对应的策略bean名称
+        // 第一次调用时加载所有策略
+        if (strategyMap == null) {
+            strategyMap = applicationContext.getBeansOfType(VideoStrategy.class);
+        }
+
+        // 拼接 bean 名称
         String strategyBeanName = "videoStrategy" + videoType;
-        // 从map中获取策略，如果不存在则使用默认策略
-        return strategyMap.getOrDefault(strategyBeanName, strategyMap.get("defaultVideoStrategy"));
+
+        // 获取策略，没有就返回默认策略（必须保证存在 defaultVideoStrategy）
+        VideoStrategy strategy = strategyMap.get(strategyBeanName);
+        if (strategy == null) {
+            strategy = strategyMap.get("defaultVideoStrategy");
+        }
+
+        return strategy;
     }
 }
