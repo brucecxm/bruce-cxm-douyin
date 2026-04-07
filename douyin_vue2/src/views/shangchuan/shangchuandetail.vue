@@ -135,12 +135,23 @@
         </button>
       </div>
     </div>
+
+    <!-- 上传进度组件 -->
+    <UploadProgress
+      :visible="uploadVisible"
+      :progress="uploadProgress"
+      :title="uploadTitle"
+      :fileName="uploadFileName"
+      :progressText="uploadProgressText"
+      @close="closeUpload"
+    />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 import FlexibleButtonPanel from '@/components/FlexibleButtonPanel.vue';
+import UploadProgress from '@/components/UploadProgress.vue';
 import {
   getTopics,
   getLocations,
@@ -149,7 +160,7 @@ import {
   getMusicList
 } from '@/api/video.js';
 export default {
-  components: { FlexibleButtonPanel },
+  components: { FlexibleButtonPanel, UploadProgress },
   data() {
     return {
       videoId: '',
@@ -165,6 +176,13 @@ export default {
       videoData: '',
       loading: false,
       dataLoading: false,
+
+      // 上传相关
+      uploadVisible: false,
+      uploadProgress: 0,
+      uploadTitle: '上传中',
+      uploadFileName: '',
+      uploadProgressText: '',
 
       // 音乐相关
       musicItems: [],
@@ -584,87 +602,127 @@ export default {
       this.loading = true;
 
       try {
-        // 创建FormData对象
-        const formData = new FormData();
-
-        // 添加其他表单字段
-        formData.append('userId', this.userId);
-        formData.append('title', this.title);
-        formData.append('topic', this.selectedTopic || '');
-        formData.append('location', this.selectedLocation || '');
-        formData.append('privacy', this.selectedPrivacy || '公开');
-        formData.append('musicId', this.selectedMusic?.musicId || '');
-        formData.append('musicName', this.selectedMusic?.text || '');
-        formData.append('createdAt', new Date().toISOString());
-
         // 检查是视频还是图片上传
+        let fileBlob;
+        let fileName;
+        let contentType;
+
         if (this.videoData && this.videoData.blob) {
           // 视频上传
-          // 添加视频文件
-          const fileName =
+          fileBlob = this.videoData.blob;
+          let originalFileName =
             this.videoData.metadata?.name || `video_${Date.now()}.mp4`;
-          formData.append('videoFile', this.videoData.blob, fileName);
-
-          // 添加视频缩略图
-          if (this.videoThumbnail) {
-            if (
-              typeof this.videoThumbnail === 'string' &&
-              this.videoThumbnail.startsWith('data:')
-            ) {
-              // 将Base64字符串转换为Blob对象
-              const thumbnailBlob = this.base64ToBlob(
-                this.videoThumbnail,
-                'image/jpeg'
-              );
-              formData.append('thumbnail', thumbnailBlob, 'thumbnail.jpg');
-            } else {
-              // 如果已经是Blob或File对象，直接添加
-              formData.append('thumbnail', this.videoThumbnail);
-            }
-          }
-
-          // 添加视频元数据
-          if (this.videoData.metadata) {
-            formData.append(
-              'metadata',
-              JSON.stringify(this.videoData.metadata)
-            );
+          // 直接使用原始文件名，MinIO会自动处理特殊字符
+          fileName = originalFileName;
+          contentType = this.videoData.metadata?.type || 'video/mp4';
+        } else if (this.videoThumbnail) {
+          // 图片上传
+          if (
+            typeof this.videoThumbnail === 'string' &&
+            this.videoThumbnail.startsWith('data:')
+          ) {
+            // 将Base64字符串转换为Blob对象
+            const mimeType = this.videoThumbnail.split(';')[0].split(':')[1];
+            fileBlob = this.base64ToBlob(this.videoThumbnail, mimeType);
+            fileName = `image_${Date.now()}.${mimeType.split('/')[1]}`;
+            contentType = mimeType;
+          } else {
+            // 如果已经是Blob或File对象，直接使用
+            fileBlob = this.videoThumbnail;
+            let originalFileName = fileBlob.name || `image_${Date.now()}.jpg`;
+            // 直接使用原始文件名，MinIO会自动处理特殊字符
+            fileName = originalFileName;
+            contentType = fileBlob.type || 'image/jpeg';
           }
         } else {
-          // 图片上传
-          if (this.videoThumbnail) {
-            let imageBlob;
-            let fileName;
-
-            if (
-              typeof this.videoThumbnail === 'string' &&
-              this.videoThumbnail.startsWith('data:')
-            ) {
-              // 将Base64字符串转换为Blob对象
-              const mimeType = this.videoThumbnail.split(';')[0].split(':')[1];
-              imageBlob = this.base64ToBlob(this.videoThumbnail, mimeType);
-              fileName = `image_${Date.now()}.${mimeType.split('/')[1]}`;
-            } else {
-              // 如果已经是Blob或File对象，直接使用
-              imageBlob = this.videoThumbnail;
-              fileName = imageBlob.name || `image_${Date.now()}.jpg`;
-            }
-
-            // 添加图片文件
-            formData.append('videoFile', imageBlob, fileName);
-          }
+          throw new Error('没有可上传的文件');
         }
 
-        // 发送请求，不手动设置Content-Type，让浏览器自动设置
-        const res = await axios.post('/api/video/publish', formData);
-        console.log('发布成功！', res.data);
+        // 显示上传进度组件
+        this.uploadVisible = true;
+        this.uploadProgress = 0;
+        this.uploadFileName = fileName;
+        this.uploadProgressText = '准备上传...';
+
+        // 1. 获取预签名URL
+        this.uploadProgressText = '获取上传权限...';
+        const presignedUrlParams = new URLSearchParams();
+        presignedUrlParams.append('fileName', fileName);
+        presignedUrlParams.append('contentType', contentType);
+
+        const presignedUrlRes = await axios.post(
+          '/api/video/get-presigned-url',
+          presignedUrlParams,
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }
+        );
+
+        if (presignedUrlRes.data.code !== 0) {
+          throw new Error('获取预签名URL失败');
+        }
+
+        const { presignedUrl, objectName } = presignedUrlRes.data.data;
+        console.log('获取预签名URL成功:', presignedUrl);
+
+        // 2. 直接上传文件到MinIO
+        this.uploadProgressText = '上传到服务器...';
+        await axios.put(presignedUrl, fileBlob, {
+          headers: {
+            'Content-Type': contentType
+          },
+          onUploadProgress: (progressEvent) => {
+            const progress = Math.round(
+              (progressEvent.loaded / progressEvent.total) * 100
+            );
+            this.uploadProgress = progress;
+            this.uploadProgressText = `上传中 ${progress}%`;
+            console.log(`上传进度: ${progress}%`);
+          }
+        });
+
+        console.log('文件上传到MinIO成功');
+        this.uploadProgressText = '处理中...';
+
+        // 3. 通知后端上传完成，更新数据库
+        const publishParams = new URLSearchParams();
+        publishParams.append('title', this.title);
+        publishParams.append('objectName', objectName);
+        publishParams.append('contentType', contentType);
+        publishParams.append('topic', this.selectedTopic || '');
+        publishParams.append('location', this.selectedLocation || '');
+        publishParams.append('privacy', this.selectedPrivacy || '公开');
+        if (this.selectedMusic?.musicId) {
+          publishParams.append('musicId', parseInt(this.selectedMusic.musicId));
+        }
+        publishParams.append('createdAt', new Date().toISOString());
+
+        const publishRes = await axios.post(
+          '/api/video/publish',
+          publishParams,
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }
+        );
+
+        console.log('发布成功！', publishRes.data);
 
         // 显示成功提示
-        this.$message.success('发布成功！');
-        // 重置表单
-        this.resetForm();
+        this.uploadProgress = 100;
+        this.uploadProgressText = '上传成功！';
+        setTimeout(() => {
+          this.uploadVisible = false;
+          this.$message.success('发布成功！');
+          // 重置表单
+          this.resetForm();
+        }, 1000);
       } catch (err) {
         console.error('发布失败', err);
+        this.uploadVisible = false;
         this.$message.error('发布失败，请稍后重试');
       } finally {
         this.loading = false;
@@ -673,9 +731,16 @@ export default {
           this.$store.dispatch('videoStore/removeVideo', this.videoId);
           console.log('已清除Vuex中的视频数据');
         }
-        this.$router.push('/');
+        setTimeout(() => {
+          this.$router.push('/');
+        }, 1500);
       }
     },
+    closeUpload() {
+      this.uploadVisible = false;
+      this.loading = false;
+    },
+
     resetForm() {
       this.title = '';
       this.selectedTopic = null;

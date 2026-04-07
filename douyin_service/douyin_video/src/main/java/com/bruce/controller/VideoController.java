@@ -61,15 +61,11 @@ public class VideoController extends ApiController {
     @Autowired
     private RedisTemplate redisTemplate;
 
-
-
     @Autowired
     private IdService idService;
 
     @Autowired
     private FileStorageService fileStorageService;
-
-
 
     @Resource
     private MusicService musicService;
@@ -99,42 +95,21 @@ public class VideoController extends ApiController {
     // 新增：定义签名URL的有效期（单位：秒），这里设置1小时（3600秒）
     private static final int URL_EXPIRE_SECONDS = 3600;
 
-
     @Autowired
     private DcSystemService dcSystemService;
 
     @PostMapping("/publish")
     public Result<?> publishVideo(
-            @RequestParam("videoFile") MultipartFile videoFile,
-            @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,
             @RequestParam("title") String title,
+            @RequestParam("objectName") String objectName,
+            @RequestParam("contentType") String contentType,
             @RequestParam(value = "topic", required = false) String topic,
             @RequestParam(value = "location", required = false) String location,
             @RequestParam(value = "privacy", defaultValue = "公开") String privacy,
-            @RequestParam(value = "metadata", required = false) String metadataJson,
-            @RequestParam("createdAt") String createdAt) throws IOException {
+            @RequestParam(value = "musicId", required = false) Long musicId,
+            @RequestParam("createdAt") String createdAt) {
 
-        String fileName = videoFile.getOriginalFilename();
         Object userIdObj = StpUtil.getLoginId();
-        System.out.println(StpUtil.isLogin());
-
-        String videoId = String.valueOf(idService.SnowflakeGen());
-        String osName = System.getProperty("os.name").toLowerCase();
-        System.out.println("当前操作系统: " + osName);
-        String minio = "/minio";
-        LambdaQueryWrapper<DcSystem> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(DcSystem::getSysName, "ngrok");
-        DcSystem ngrok = dcSystemService.getOne(queryWrapper);
-
-        // 获取文件内容类型，用于判断是视频还是图片
-        String contentType = videoFile.getContentType();
-
-        // 使用try-with-resources语句，确保输入流自动关闭
-        String url;
-        try (InputStream in = videoFile.getInputStream()) {
-            // 使用用户提供的MinIO bucket: douyin
-            url = fileStorageService.uploadVideoFile("douyin", fileName, in);
-        }
 
         // 获取登录用户ID
         Long userId = null;
@@ -149,6 +124,26 @@ public class VideoController extends ApiController {
             return Result.error("未授权");
         }
 
+        // 构建视频URL (MinIO访问地址)，只对文件名部分进行URL编码
+        String encodedObjectName = objectName;
+        try {
+            // 找到最后一个斜杠的位置，分离路径和文件名
+            int lastSlashIndex = objectName.lastIndexOf('/');
+            if (lastSlashIndex != -1) {
+                String path = objectName.substring(0, lastSlashIndex + 1);
+                String fileName = objectName.substring(lastSlashIndex + 1);
+                // 只对文件名部分进行编码，使用UTF-8编码，空格编码为%20
+                String encodedFileName = java.net.URLEncoder.encode(fileName, "UTF-8").replace("+", "%20");
+                encodedObjectName = path + encodedFileName;
+            } else {
+                // 如果没有路径，直接对整个字符串编码
+                encodedObjectName = java.net.URLEncoder.encode(objectName, "UTF-8").replace("+", "%20");
+            }
+        } catch (java.io.UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String url = "http://1.94.131.16:9000/" + BUCKET + "/" + encodedObjectName;
+
         Video video = new Video();
         video.setVideoId(idService.SnowflakeGen());
         video.setUrl(url);
@@ -160,25 +155,22 @@ public class VideoController extends ApiController {
         video.setTitle(title);
         video.setContent("");
         video.setUserId(userId);
+        if (musicId != null) {
+            video.setMusicId(musicId);
+        }
 
-        // 处理缩略图上传
-        if (thumbnail != null && !thumbnail.isEmpty()) {
-            String thumbnailFileName = "thumbnail_" + video.getVideoId() + "_" + System.currentTimeMillis() + ".jpg";
-            try (InputStream thumbnailIn = thumbnail.getInputStream()) {
-                String thumbnailUrl = fileStorageService.uploadVideoFile("douyin", thumbnailFileName, thumbnailIn);
-                video.setCover(thumbnailUrl);
-            }
-        } else if (type == 2) {
-            // 图片类型，封面为图片本身
+        // 对于图片，使用相同的URL作为封面
+        if (type == 2) {
             video.setCover(url);
         }
 
         videoService.save(video);
+
         Map<String, Object> data = new HashMap<>();
         data.put("code", 200);
+        data.put("videoId", video.getVideoId());
         return Result.success(data);
     }
-
 
     @GetMapping("/getVideoPage")
     public Result<List<VideoVO>> getVideoInfo(
@@ -202,21 +194,9 @@ public class VideoController extends ApiController {
             return Result.error("用户未登录");
         }
 
-
-
         return videoService.handleLike(likeRequest);
 
     }
-
-
-
-
-
-
-
-
-
-
 
     @PostMapping("/collect")
     public Result<Map<String, Object>> collect(@RequestBody LikeRequestDTo likeRequest) {
@@ -357,8 +337,6 @@ public class VideoController extends ApiController {
             return Result.error("生成播放链接失败");
         }
     }
-
-
 
     /**
      * 获取话题列表
@@ -506,7 +484,7 @@ public class VideoController extends ApiController {
                 BeanUtils.copyProperties(video, vo);
 
                 // 用户信息
-                User user = (User)userFeignService.getUserById(video.getUserId());
+                User user = (User) userFeignService.getUserById(video.getUserId());
                 if (user != null) {
                     vo.setUsername(user.getNickname());
                     vo.setUserAvatar(user.getAvatar());
@@ -646,272 +624,262 @@ public class VideoController extends ApiController {
         }
     }
 
+    // 下面的都是没用的接口 但是我又不想删 留着当作纪念了
+    // 下面的都是没用的接口 但是我又不想删 留着当作纪念了
+    // 下面的都是没用的接口 但是我又不想删 留着当作纪念了
+    // 下面的都是没用的接口 但是我又不想删 留着当作纪念了
+    // 下面的都是没用的接口 但是我又不想删 留着当作纪念了
+    // 下面的都是没用的接口 但是我又不想删 留着当作纪念了
+    // 下面的都是没用的接口 但是我又不想删 留着当作纪念了
+    // 下面的都是没用的接口 但是我又不想删 留着当作纪念了
 
+    //
+    // @PostMapping("/like")
+    // public Result<Map<String, Object>> like(@RequestBody LikeRequestDTo
+    // likeRequest) {
+    // try {
+    // StpUtil.checkLogin();
+    // } catch (NotLoginException e) {
+    // return Result.error("用户未登录");
+    // }
+    //
+    // // 获取当前登录用户ID
+    // Long userId = Long.valueOf(StpUtil.getLoginId().toString());
+    //
+    // // 限流逻辑：每个用户每秒最多允许10次点赞操作
+    // String rateLimitKey = "rate:limit:like:" + userId;
+    // long current = System.currentTimeMillis() / 1000;
+    // redisTemplate.opsForHash().put(rateLimitKey, "last", current);
+    // redisTemplate.expire(rateLimitKey, 1, java.util.concurrent.TimeUnit.SECONDS);
+    // Long count = redisTemplate.opsForHash().increment(rateLimitKey, "count", 1);
+    // if (count > 10) {
+    // return Result.error("点赞操作过于频繁，请稍后再试");
+    // }
+    //
+    // // 从请求对象中获取参数
+    // Long contentId = likeRequest.getContentId();
+    // String type = likeRequest.getType();
+    // String contentType = likeRequest.getContentType();
+    //
+    // // 生成 Redis 键
+    // String redisKey = "like:content:" + contentType + contentId;
+    // String batchKey = "like:batch:" + contentType;
+    //
+    // // 处理点赞和取消点赞逻辑
+    // boolean isLiked = redisTemplate.opsForSet().isMember(redisKey, userId);
+    // String operation;
+    // String resultMessage;
+    // boolean success = false;
+    //
+    // if ("red".equals(type)) {
+    // // 点赞操作
+    // if (!isLiked) {
+    // // 将用户 ID 存入 Redis，表示该用户已点赞
+    // redisTemplate.opsForSet().add(redisKey, userId);
+    // // 将点赞数加 1
+    // redisTemplate.opsForValue().increment(redisKey + ":count", 1);
+    // operation = "add";
+    // resultMessage = contentType + "点赞成功";
+    // success = true;
+    // } else {
+    // return Result.error("您已点赞");
+    // }
+    // } else {
+    // // 取消点赞操作
+    // if (isLiked) {
+    // // 将用户 ID 从 Redis 中移除，表示取消点赞
+    // redisTemplate.opsForSet().remove(redisKey, userId);
+    // // 将点赞数减 1
+    // redisTemplate.opsForValue().decrement(redisKey + ":count", 1);
+    // operation = "del";
+    // resultMessage = contentType + "取消点赞成功";
+    // success = true;
+    // } else {
+    // return Result.error("您尚未点赞");
+    // }
+    // }
+    //
+    // // 优化：将点赞消息先存入Redis列表，而非直接发送到MQ
+    // if (success) {
+    // LikeMessage message = new LikeMessage(contentId, userId, operation,
+    // System.currentTimeMillis());
+    // redisTemplate.opsForList().rightPush(batchKey, message);
+    //
+    // // 检查是否达到批量发送阈值
+    // Long size = redisTemplate.opsForList().size(batchKey);
+    // if (size >= 100) { // 每100条消息批量发送一次
+    // // 批量发送消息到MQ
+    // List<LikeMessage> messages = redisTemplate.opsForList().range(batchKey, 0,
+    // 99);
+    // if (messages != null && !messages.isEmpty()) {
+    // // 设置消息持久化
+    // rabbitTemplate.convertAndSend("like.exchange", "like.video", messages, msg ->
+    // {
+    // msg.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
+    // return msg;
+    // });
+    // // 删除已发送的消息
+    // redisTemplate.opsForList().trim(batchKey, 100, -1);
+    // }
+    // }
+    // }
+    //
+    // // 获取最新的点赞数
+    // Integer likeCount = (Integer) redisTemplate.opsForValue().get(redisKey +
+    // ":count");
+    // if (likeCount == null) {
+    // // 如果Redis中没有点赞数，从数据库查询
+    // LambdaQueryWrapper<Favor> likeQueryWrapper = new LambdaQueryWrapper<Favor>()
+    // .eq(Favor::getCommentId, contentId);
+    // likeCount = favorService.count(likeQueryWrapper);
+    // // 将查询结果存入Redis
+    // redisTemplate.opsForValue().set(redisKey + ":count", likeCount);
+    // }
+    //
+    // // 返回统一格式的响应
+    // Map<String, Object> data = new HashMap<>();
+    // data.put("likeCount", likeCount);
+    // data.put("isLiked", "red".equals(type) ? true : false);
+    //
+    // return Result.success(data);
+    // }
 
-
-
-
-
-
-
-
-
-
-
-//下面的都是没用的接口  但是我又不想删  留着当作纪念了
-//下面的都是没用的接口  但是我又不想删  留着当作纪念了
-//下面的都是没用的接口  但是我又不想删  留着当作纪念了
-//下面的都是没用的接口  但是我又不想删  留着当作纪念了
-//下面的都是没用的接口  但是我又不想删  留着当作纪念了
-//下面的都是没用的接口  但是我又不想删  留着当作纪念了
-//下面的都是没用的接口  但是我又不想删  留着当作纪念了
-//下面的都是没用的接口  但是我又不想删  留着当作纪念了
-
-
-
-
-
-
-//
-//    @PostMapping("/like")
-//    public Result<Map<String, Object>> like(@RequestBody LikeRequestDTo likeRequest) {
-//        try {
-//            StpUtil.checkLogin();
-//        } catch (NotLoginException e) {
-//            return Result.error("用户未登录");
-//        }
-//
-//        // 获取当前登录用户ID
-//        Long userId = Long.valueOf(StpUtil.getLoginId().toString());
-//
-//        // 限流逻辑：每个用户每秒最多允许10次点赞操作
-//        String rateLimitKey = "rate:limit:like:" + userId;
-//        long current = System.currentTimeMillis() / 1000;
-//        redisTemplate.opsForHash().put(rateLimitKey, "last", current);
-//        redisTemplate.expire(rateLimitKey, 1, java.util.concurrent.TimeUnit.SECONDS);
-//        Long count = redisTemplate.opsForHash().increment(rateLimitKey, "count", 1);
-//        if (count > 10) {
-//            return Result.error("点赞操作过于频繁，请稍后再试");
-//        }
-//
-//        // 从请求对象中获取参数
-//        Long contentId = likeRequest.getContentId();
-//        String type = likeRequest.getType();
-//        String contentType = likeRequest.getContentType();
-//
-//        // 生成 Redis 键
-//        String redisKey = "like:content:" + contentType + contentId;
-//        String batchKey = "like:batch:" + contentType;
-//
-//        // 处理点赞和取消点赞逻辑
-//        boolean isLiked = redisTemplate.opsForSet().isMember(redisKey, userId);
-//        String operation;
-//        String resultMessage;
-//        boolean success = false;
-//
-//        if ("red".equals(type)) {
-//            // 点赞操作
-//            if (!isLiked) {
-//                // 将用户 ID 存入 Redis，表示该用户已点赞
-//                redisTemplate.opsForSet().add(redisKey, userId);
-//                // 将点赞数加 1
-//                redisTemplate.opsForValue().increment(redisKey + ":count", 1);
-//                operation = "add";
-//                resultMessage = contentType + "点赞成功";
-//                success = true;
-//            } else {
-//                return Result.error("您已点赞");
-//            }
-//        } else {
-//            // 取消点赞操作
-//            if (isLiked) {
-//                // 将用户 ID 从 Redis 中移除，表示取消点赞
-//                redisTemplate.opsForSet().remove(redisKey, userId);
-//                // 将点赞数减 1
-//                redisTemplate.opsForValue().decrement(redisKey + ":count", 1);
-//                operation = "del";
-//                resultMessage = contentType + "取消点赞成功";
-//                success = true;
-//            } else {
-//                return Result.error("您尚未点赞");
-//            }
-//        }
-//
-//        // 优化：将点赞消息先存入Redis列表，而非直接发送到MQ
-//        if (success) {
-//            LikeMessage message = new LikeMessage(contentId, userId, operation, System.currentTimeMillis());
-//            redisTemplate.opsForList().rightPush(batchKey, message);
-//
-//            // 检查是否达到批量发送阈值
-//            Long size = redisTemplate.opsForList().size(batchKey);
-//            if (size >= 100) { // 每100条消息批量发送一次
-//                // 批量发送消息到MQ
-//                List<LikeMessage> messages = redisTemplate.opsForList().range(batchKey, 0, 99);
-//                if (messages != null && !messages.isEmpty()) {
-//                    // 设置消息持久化
-//                    rabbitTemplate.convertAndSend("like.exchange", "like.video", messages, msg -> {
-//                        msg.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
-//                        return msg;
-//                    });
-//                    // 删除已发送的消息
-//                    redisTemplate.opsForList().trim(batchKey, 100, -1);
-//                }
-//            }
-//        }
-//
-//        // 获取最新的点赞数
-//        Integer likeCount = (Integer) redisTemplate.opsForValue().get(redisKey + ":count");
-//        if (likeCount == null) {
-//            // 如果Redis中没有点赞数，从数据库查询
-//            LambdaQueryWrapper<Favor> likeQueryWrapper = new LambdaQueryWrapper<Favor>()
-//                    .eq(Favor::getCommentId, contentId);
-//            likeCount = favorService.count(likeQueryWrapper);
-//            // 将查询结果存入Redis
-//            redisTemplate.opsForValue().set(redisKey + ":count", likeCount);
-//        }
-//
-//        // 返回统一格式的响应
-//        Map<String, Object> data = new HashMap<>();
-//        data.put("likeCount", likeCount);
-//        data.put("isLiked", "red".equals(type) ? true : false);
-//
-//        return Result.success(data);
-//    }
-
-
-
-//
-//
-//
-//    @PostMapping("/like")
-//    public Result<Map<String, Object>> like(@RequestBody LikeRequestDTo likeRequest) {
-//        try {
-//            StpUtil.checkLogin();
-//        } catch (NotLoginException e) {
-//            return Result.error("用户未登录");
-//        }
-//
-//        // 获取当前登录用户ID
-//        Long userId = Long.valueOf(StpUtil.getLoginId().toString());
-//
-//        // 限流逻辑：每个用户每秒最多允许10次点赞操作
-//        String rateLimitKey = "rate:limit:like:" + userId;
-//        long current = System.currentTimeMillis() / 1000;
-//        redisTemplate.opsForHash().put(rateLimitKey, "last", current);
-//        redisTemplate.expire(rateLimitKey, 1, java.util.concurrent.TimeUnit.SECONDS);
-//        Long count = redisTemplate.opsForHash().increment(rateLimitKey, "count", 1);
-//        if (count > 10) {
-//            return Result.error("点赞操作过于频繁，请稍后再试");
-//        }
-//
-//        // 从请求对象中获取参数
-//        Long contentId = likeRequest.getContentId();
-//        String type = likeRequest.getType();
-//        String contentType = likeRequest.getContentType();
-//
-//        // 生成 Redis 键
-//        String redisKey = "like:content:" + contentType + contentId;
-//        String batchKey = "like:batch:" + contentType;
-//
-//        // 处理点赞和取消点赞逻辑
-//        boolean isLiked = redisTemplate.opsForSet().isMember(redisKey, userId);
-//        String operation;
-//        String resultMessage;
-//        boolean success = false;
-//
-//        if ("red".equals(type)) {
-//            // 点赞操作
-//            if (!isLiked) {
-//                // 将用户 ID 存入 Redis，表示该用户已点赞
-//                redisTemplate.opsForSet().add(redisKey, userId);
-//                // 将点赞数加 1
-//                redisTemplate.opsForValue().increment(redisKey + ":count", 1);
-//                operation = "add";
-//                resultMessage = contentType + "点赞成功";
-//                success = true;
-//            } else {
-//                return Result.error("您已点赞");
-//            }
-//        } else {
-//            // 取消点赞操作
-//            if (isLiked) {
-//                // 将用户 ID 从 Redis 中移除，表示取消点赞
-//                redisTemplate.opsForSet().remove(redisKey, userId);
-//                // 将点赞数减 1
-//                redisTemplate.opsForValue().decrement(redisKey + ":count", 1);
-//                operation = "del";
-//                resultMessage = contentType + "取消点赞成功";
-//                success = true;
-//            } else {
-//                return Result.error("您尚未点赞");
-//            }
-//        }
-//
-//        // 优化：将点赞消息先存入Redis列表，而非直接发送到MQ
-//        if (success) {
-//            LikeMessage message = new LikeMessage(contentId, userId, operation, System.currentTimeMillis());
-//            redisTemplate.opsForList().rightPush(batchKey, message);
-//
-//            // 检查是否达到批量发送阈值
-//            Long size = redisTemplate.opsForList().size(batchKey);
-//            if (size >= 100) { // 每100条消息批量发送一次
-//                // 批量发送消息到MQ
-//                List<LikeMessage> messages = redisTemplate.opsForList().range(batchKey, 0, 99);
-//                if (messages != null && !messages.isEmpty()) {
-//                    // 设置消息持久化
-//                    rabbitTemplate.convertAndSend("like.exchange", "like.video", messages, msg -> {
-//                        msg.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
-//                        return msg;
-//                    });
-//                    // 删除已发送的消息
-//                    redisTemplate.opsForList().trim(batchKey, 100, -1);
-//                }
-//            }
-//        }
-//
-//        // 获取最新的点赞数
-//        Integer likeCount = (Integer) redisTemplate.opsForValue().get(redisKey + ":count");
-//        if (likeCount == null) {
-//            // 如果Redis中没有点赞数，从数据库查询
-//            LambdaQueryWrapper<Favor> likeQueryWrapper = new LambdaQueryWrapper<Favor>()
-//                    .eq(Favor::getCommentId, contentId);
-//            likeCount = favorService.count(likeQueryWrapper);
-//            // 将查询结果存入Redis
-//            redisTemplate.opsForValue().set(redisKey + ":count", likeCount);
-//        }
-//
-//        // 返回统一格式的响应
-//        Map<String, Object> data = new HashMap<>();
-//        data.put("likeCount", likeCount);
-//        data.put("isLiked", "red".equals(type) ? true : false);
-//
-//        return Result.success(data);
-//    }
-
+    //
+    //
+    //
+    // @PostMapping("/like")
+    // public Result<Map<String, Object>> like(@RequestBody LikeRequestDTo
+    // likeRequest) {
+    // try {
+    // StpUtil.checkLogin();
+    // } catch (NotLoginException e) {
+    // return Result.error("用户未登录");
+    // }
+    //
+    // // 获取当前登录用户ID
+    // Long userId = Long.valueOf(StpUtil.getLoginId().toString());
+    //
+    // // 限流逻辑：每个用户每秒最多允许10次点赞操作
+    // String rateLimitKey = "rate:limit:like:" + userId;
+    // long current = System.currentTimeMillis() / 1000;
+    // redisTemplate.opsForHash().put(rateLimitKey, "last", current);
+    // redisTemplate.expire(rateLimitKey, 1, java.util.concurrent.TimeUnit.SECONDS);
+    // Long count = redisTemplate.opsForHash().increment(rateLimitKey, "count", 1);
+    // if (count > 10) {
+    // return Result.error("点赞操作过于频繁，请稍后再试");
+    // }
+    //
+    // // 从请求对象中获取参数
+    // Long contentId = likeRequest.getContentId();
+    // String type = likeRequest.getType();
+    // String contentType = likeRequest.getContentType();
+    //
+    // // 生成 Redis 键
+    // String redisKey = "like:content:" + contentType + contentId;
+    // String batchKey = "like:batch:" + contentType;
+    //
+    // // 处理点赞和取消点赞逻辑
+    // boolean isLiked = redisTemplate.opsForSet().isMember(redisKey, userId);
+    // String operation;
+    // String resultMessage;
+    // boolean success = false;
+    //
+    // if ("red".equals(type)) {
+    // // 点赞操作
+    // if (!isLiked) {
+    // // 将用户 ID 存入 Redis，表示该用户已点赞
+    // redisTemplate.opsForSet().add(redisKey, userId);
+    // // 将点赞数加 1
+    // redisTemplate.opsForValue().increment(redisKey + ":count", 1);
+    // operation = "add";
+    // resultMessage = contentType + "点赞成功";
+    // success = true;
+    // } else {
+    // return Result.error("您已点赞");
+    // }
+    // } else {
+    // // 取消点赞操作
+    // if (isLiked) {
+    // // 将用户 ID 从 Redis 中移除，表示取消点赞
+    // redisTemplate.opsForSet().remove(redisKey, userId);
+    // // 将点赞数减 1
+    // redisTemplate.opsForValue().decrement(redisKey + ":count", 1);
+    // operation = "del";
+    // resultMessage = contentType + "取消点赞成功";
+    // success = true;
+    // } else {
+    // return Result.error("您尚未点赞");
+    // }
+    // }
+    //
+    // // 优化：将点赞消息先存入Redis列表，而非直接发送到MQ
+    // if (success) {
+    // LikeMessage message = new LikeMessage(contentId, userId, operation,
+    // System.currentTimeMillis());
+    // redisTemplate.opsForList().rightPush(batchKey, message);
+    //
+    // // 检查是否达到批量发送阈值
+    // Long size = redisTemplate.opsForList().size(batchKey);
+    // if (size >= 100) { // 每100条消息批量发送一次
+    // // 批量发送消息到MQ
+    // List<LikeMessage> messages = redisTemplate.opsForList().range(batchKey, 0,
+    // 99);
+    // if (messages != null && !messages.isEmpty()) {
+    // // 设置消息持久化
+    // rabbitTemplate.convertAndSend("like.exchange", "like.video", messages, msg ->
+    // {
+    // msg.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
+    // return msg;
+    // });
+    // // 删除已发送的消息
+    // redisTemplate.opsForList().trim(batchKey, 100, -1);
+    // }
+    // }
+    // }
+    //
+    // // 获取最新的点赞数
+    // Integer likeCount = (Integer) redisTemplate.opsForValue().get(redisKey +
+    // ":count");
+    // if (likeCount == null) {
+    // // 如果Redis中没有点赞数，从数据库查询
+    // LambdaQueryWrapper<Favor> likeQueryWrapper = new LambdaQueryWrapper<Favor>()
+    // .eq(Favor::getCommentId, contentId);
+    // likeCount = favorService.count(likeQueryWrapper);
+    // // 将查询结果存入Redis
+    // redisTemplate.opsForValue().set(redisKey + ":count", likeCount);
+    // }
+    //
+    // // 返回统一格式的响应
+    // Map<String, Object> data = new HashMap<>();
+    // data.put("likeCount", likeCount);
+    // data.put("isLiked", "red".equals(type) ? true : false);
+    //
+    // return Result.success(data);
+    // }
 
     @GetMapping("/auth")
-public Result<Map<String, Object>> getAuth(
-        @RequestParam(required = false) Integer userid,
-        @RequestParam(defaultValue = "1") int page,
-        @RequestParam(defaultValue = "10") int size) {
-    Object UserIdObj = StpUtil.getLoginId();
-    Long loginUserId = UserIdObj != null ? Long.parseLong(UserIdObj.toString()) : 0L;
-    if (userid == null) {
-        userid = loginUserId.intValue(); // 使用当前登录用户ID
-    }
-    Map<String, Object> result = new HashMap<>();
+    public Result<Map<String, Object>> getAuth(
+            @RequestParam(required = false) Integer userid,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Object UserIdObj = StpUtil.getLoginId();
+        Long loginUserId = UserIdObj != null ? Long.parseLong(UserIdObj.toString()) : 0L;
+        if (userid == null) {
+            userid = loginUserId.intValue(); // 使用当前登录用户ID
+        }
+        Map<String, Object> result = new HashMap<>();
 
-    User userInfo = (User) userFeignService.getUserById(loginUserId);
-    result.put(Constant.User.USER_INFO, userInfo);
-    // 查询视频分页数据
-    Page<Video> pageInfo = new Page<>(page, size);
-    LambdaQueryWrapper<Video> videoQuery = new LambdaQueryWrapper<>();
-    videoQuery.eq(Video::getUserId, userid);
-    IPage<Video> videoPage = videoService.page(pageInfo, videoQuery);
-    result.put(Constant.Video.VIDEO_PAGE_LIST, videoPage.getRecords());
-    result.put(Constant.Video.TOTAL, videoPage.getTotal());
-    return Result.success(result);
-}
+        User userInfo = (User) userFeignService.getUserById(loginUserId);
+        result.put(Constant.User.USER_INFO, userInfo);
+        // 查询视频分页数据
+        Page<Video> pageInfo = new Page<>(page, size);
+        LambdaQueryWrapper<Video> videoQuery = new LambdaQueryWrapper<>();
+        videoQuery.eq(Video::getUserId, userid);
+        IPage<Video> videoPage = videoService.page(pageInfo, videoQuery);
+        result.put(Constant.Video.VIDEO_PAGE_LIST, videoPage.getRecords());
+        result.put(Constant.Video.TOTAL, videoPage.getTotal());
+        return Result.success(result);
+    }
 
     @PostMapping("/upvideo")
     public Result<?> upvideo(
@@ -976,6 +944,47 @@ public Result<Map<String, Object>> getAuth(
         Map<String, Object> data = new HashMap<>();
         data.put("code", 200);
         return Result.success(data);
+    }
+
+    /**
+     * 生成预签名上传URL
+     * 前端使用此URL直接上传视频到MinIO
+     */
+    @PostMapping("/get-presigned-url")
+    public Result<Map<String, Object>> getPresignedUrl(
+            @RequestParam("fileName") String fileName,
+            @RequestParam("contentType") String contentType) {
+        try {
+            // 对fileName进行URL解码，因为前端使用application/x-www-form-urlencoded格式时会自动编码
+            String decodedFileName = fileName;
+            try {
+                decodedFileName = java.net.URLDecoder.decode(fileName, "UTF-8");
+            } catch (java.io.UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            // 生成唯一的对象名
+            String objectName = "videos/" + System.currentTimeMillis() + "-" + decodedFileName;
+
+            // 生成预签名URL，有效期30分钟
+            String presignedUrl = minioClient.getPresignedObjectUrl(
+                    GetPresignedObjectUrlArgs.builder()
+                            .bucket(BUCKET)
+                            .object(objectName)
+                            .method(Method.PUT)
+                            .expiry(1800) // 30分钟有效期
+                            .build());
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("presignedUrl", presignedUrl);
+            data.put("objectName", objectName);
+            data.put("bucket", BUCKET);
+
+            return Result.success(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("生成预签名URL失败");
+        }
     }
 
     // @GetMapping("/one")
