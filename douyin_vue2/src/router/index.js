@@ -28,16 +28,6 @@ const routes = [
     }
   },
   {
-    path: '/dashang',
-    name: 'dashang',
-    component: () => import('@/views/shangchuan/upload.vue'),
-    meta: {
-      requiresAuth: true, // 必须加这行，才会触发登录检查
-      roles: ['admin', 'user'], // 需要的角色
-      permissions: ['home:view'] // 需要的权限
-    }
-  },
-  {
     path: '/testone',
     name: 'Test',
     component: () => import('@/views/test/testshop.vue')

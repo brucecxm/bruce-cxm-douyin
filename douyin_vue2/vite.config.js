@@ -48,7 +48,8 @@ export default defineConfig(({ mode }) => {
     ],
     resolve: {
       alias: {
-        '@': fileURLToPath(new URL('./src', import.meta.url))
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+        'global/window': fileURLToPath(new URL('./src/utils/window-shim.js', import.meta.url))
       }
     },
     logLevel: 'info', // 设置日志级别：'info', 'warn', 'error', 'silent'
@@ -97,7 +98,7 @@ export default defineConfig(({ mode }) => {
       },
       optimizeDeps: {
         // 排除不需要预构建的依赖（已是 ESM 格式或体积较大的库）
-        exclude: ['hls.js', '@videojs/http-streaming'],
+        exclude: ['hls.js'],
         // 强制预构建某些依赖（避免重复处理）
         include: [
           'axios/dist/axios.min.js',
@@ -105,7 +106,11 @@ export default defineConfig(({ mode }) => {
           'element-ui',
           'vant',
           'video.js',
-          'vue-infinite-scroll'
+          'vue-infinite-scroll',
+          'url-toolkit',
+          'global',
+          '@xmldom/xmldom',
+          'mux.js'
         ],
         esbuildOptions: {
           // 增加 esbuild 日志
@@ -157,7 +162,11 @@ export default defineConfig(({ mode }) => {
           'element-ui',
           'vant',
           'video.js',
-          'vue-infinite-scroll'
+          'vue-infinite-scroll',
+          'url-toolkit',
+          'global',
+          '@xmldom/xmldom',
+          'mux.js'
         ]
       }
     };

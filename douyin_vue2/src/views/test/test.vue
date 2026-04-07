@@ -1,217 +1,496 @@
 <template>
-  <div class="search-container">
-    <div class="search-bar">
-      <!-- 搜索图标 -->
-      <svg
-        class="icon-search"
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z"
-          stroke="#999"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-        <path
-          d="M21 21L16.65 16.65"
-          stroke="#999"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
+  <div class="file-transfer-page">
+    <!-- 上传模块 -->
+    <el-card shadow="hover" class="transfer-card">
+      <div class="header">
+        <h2>📤 大文件断点续传 - 上传</h2>
+      </div>
 
-      <!-- 搜索输入框 -->
-      <input
-        type="text"
-        v-model="searchText"
-        placeholder="苹果iPhone 13手机壳"
-        class="search-input"
-      />
+      <div class="upload-area">
+        <label class="upload-label">
+          <div class="upload-placeholder" :class="{ 'has-file': uploadFile }">
+            <i class="el-icon-upload"></i>
+            <div v-if="!uploadFile" class="upload-text">
+              点击上传或拖拽文件到此处
+            </div>
+            <div v-else class="file-info">
+              <div class="file-name">{{ uploadFile.name }}</div>
+              <div class="file-size">{{ formatFileSize(uploadFile.size) }}</div>
+            </div>
+            <input
+              type="file"
+              class="hidden-input"
+              @change="handleFileChange"
+            />
+          </div>
+        </label>
+      </div>
 
-      <!-- 相机图标 -->
-      <button class="camera-btn">
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+      <div v-if="uploadFile" class="progress-section">
+        <el-progress
+          :percentage="uploadProgress"
+          :status="uploadProgress === 100 ? 'success' : 'active'"
+        ></el-progress>
+        <div class="progress-text">
+          {{ uploadedChunks.length }}/{{ totalUploadChunks }} 分片已上传
+          <span v-if="uploading">（上传中...）</span>
+          <span
+            v-else-if="
+              uploadedChunks.length > 0 &&
+                uploadedChunks.length < totalUploadChunks
+            "
+          >（已暂停）</span
+          >
+          <span
+            v-else-if="
+              uploadedChunks.length === totalUploadChunks &&
+                uploadProgress === 100
+            "
+          >（上传完成）</span
+          >
+        </div>
+      </div>
+
+      <div class="button-group">
+        <el-button
+          type="primary"
+          icon="el-icon-video-play"
+          @click="startUpload"
+          :disabled="!uploadFile || uploading"
+        >开始上传</el-button
         >
-          <path
-            d="M23 19V5C23 3.89543 22.1046 3 21 3H3C1.89543 3 1 3.89543 1 5V19C1 20.1046 1.89543 21 3 21H21C22.1046 21 23 20.1046 23 19Z"
-            stroke="#999"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-          <path
-            d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17Z"
-            stroke="#999"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-          <path
-            d="M8.5 10.5L15.5 15.5"
-            stroke="#999"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-      </button>
-
-      <!-- 搜索按钮 -->
-      <button class="search-btn">搜索</button>
-
-      <!-- 购物车图标（恢复） -->
-      <button class="cart-btn">
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+        <el-button
+          type="warning"
+          icon="el-icon-video-pause"
+          @click="pauseUpload"
+          :disabled="!uploading"
+        >暂停上传</el-button
         >
-          <path
-            d="M3 3H5L5.4 5M5.4 5H21L17 13H7M5.4 5L7 13M7 13L5.8 18H17.5"
-            stroke="#999"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-          <circle cx="8.5" cy="19.5" r="1.5" fill="#999" />
-          <circle cx="17.5" cy="19.5" r="1.5" fill="#999" />
-        </svg>
-        <span class="badge">临馨</span>
-      </button>
-    </div>
+        <el-button
+          type="success"
+          icon="el-icon-refresh"
+          @click="resumeUpload"
+          :disabled="
+            uploading ||
+              !uploadFile ||
+              uploadedChunks.length === totalUploadChunks
+          "
+        >恢复上传</el-button
+        >
+        <el-button
+          type="danger"
+          icon="el-icon-delete"
+          @click="resetUpload"
+          v-if="uploadFile"
+        >重置上传</el-button
+        >
+      </div>
+    </el-card>
+
+    <!-- 下载模块 -->
+    <el-card shadow="hover" class="transfer-card">
+      <div class="header">
+        <h2>📥 大文件断点续传 - 下载</h2>
+      </div>
+
+      <el-input
+        v-model="downloadFileName"
+        placeholder="请输入下载文件名（与上传一致）"
+        clearable
+        class="input-file"
+      ></el-input>
+
+      <div class="button-group">
+        <el-button
+          type="primary"
+          @click="startDownload"
+          :disabled="isDownloading"
+        >
+          开始下载
+        </el-button>
+        <el-button
+          type="warning"
+          @click="pauseDownload"
+          :disabled="!isDownloading"
+        >
+          暂停下载
+        </el-button>
+        <el-button
+          type="danger"
+          @click="resetDownload"
+          :disabled="isDownloading"
+        >
+          重置下载
+        </el-button>
+      </div>
+
+      <el-progress
+        :percentage="downloadProgress"
+        status="active"
+        :text-inside="true"
+        :stroke-width="18"
+        style="margin-top: 20px"
+      ></el-progress>
+      <div class="status-text">{{ downloadStatus }}</div>
+    </el-card>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
+  name: 'FileTransfer',
   data() {
     return {
-      searchText: '苹果iPhone 13手机壳'
+      // ========== 上传相关 ==========
+      uploadFile: null,
+      uploadChunkSize: 6 * 1024 * 1024,
+      totalUploadChunks: 0,
+      fileHash: '',
+      uploadedChunks: [],
+      uploading: false,
+      uploadCancelToken: null,
+      currentUploadChunk: 0,
+      uploadProgress: 0,
+
+      // ========== 下载相关 ==========
+      downloadFileName: '',
+      downloadChunkSize: 50 * 1024 * 1024,
+      totalFileSize: 0,
+      totalDownloadChunks: 0,
+      downloadedChunks: new Set(),
+      downloadProgress: 0,
+      isDownloading: false,
+      downloadStatus: '等待下载',
+      downloadCancelTokens: new Map(),
+      chunksBuffer: []
     };
+  },
+  mounted() {
+    // 断网自动续传
+    window.addEventListener('online', () => {
+      if (
+        !this.uploading &&
+        this.uploadFile &&
+        this.uploadedChunks.length < this.totalUploadChunks
+      ) {
+        this.resumeUpload();
+      }
+    });
+  },
+  methods: {
+    // ========================== 上传方法 ==========================
+    handleFileChange(e) {
+      this.uploadFile = e.target.files[0];
+      this.totalUploadChunks = Math.ceil(
+        this.uploadFile.size / this.uploadChunkSize
+      );
+      this.fileHash = this.uploadFile.name + '_' + this.uploadFile.size;
+      this.downloadFileName = this.uploadFile.name; // 自动填充下载文件名
+    },
+
+    async startUpload() {
+      if (!this.uploadFile) return;
+      const { data } = await axios.get('/api/video/upload/check', {
+        params: { fileHash: this.fileHash }
+      });
+      this.uploadedChunks = data.uploaded || [];
+      this.uploading = true;
+      this.currentUploadChunk = 0;
+      this.uploadChunks();
+    },
+
+    pauseUpload() {
+      if (this.uploadCancelToken) this.uploadCancelToken.cancel('用户暂停');
+      this.uploading = false;
+    },
+
+    resumeUpload() {
+      this.uploading = true;
+      this.uploadChunks();
+    },
+
+    async uploadChunks() {
+      while (this.currentUploadChunk < this.totalUploadChunks) {
+        if (!this.uploading) break;
+        if (this.uploadedChunks.includes(this.currentUploadChunk)) {
+          this.updateUploadProgress();
+          this.currentUploadChunk++;
+          continue;
+        }
+
+        const start = this.currentUploadChunk * this.uploadChunkSize;
+        const end = Math.min(
+          this.uploadFile.size,
+          start + this.uploadChunkSize
+        );
+        const chunk = this.uploadFile.slice(start, end);
+
+        const form = new FormData();
+        form.append('file', chunk);
+        form.append('index', this.currentUploadChunk);
+        form.append('total', this.totalUploadChunks);
+        form.append('fileName', this.uploadFile.name);
+        form.append('fileHash', this.fileHash);
+
+        this.uploadCancelToken = axios.CancelToken.source();
+
+        try {
+          await axios.post('/api/video/upload/chunk', form, {
+            cancelToken: this.uploadCancelToken.token
+          });
+          this.uploadedChunks.push(this.currentUploadChunk);
+          this.updateUploadProgress();
+          this.currentUploadChunk++;
+        } catch (err) {
+          if (!axios.isCancel(err)) console.error('分片上传失败', err);
+          return;
+        }
+      }
+
+      if (this.uploadedChunks.length === this.totalUploadChunks) {
+        await axios.post('/api/video/upload/merge', {
+          fileName: this.uploadFile.name,
+          fileHash: this.fileHash,
+          total: this.totalUploadChunks
+        });
+        this.$message.success('✅ 上传并合并完成');
+        this.uploading = false;
+      }
+    },
+
+    updateUploadProgress() {
+      this.uploadProgress = Math.min(
+        100,
+        Math.round((this.uploadedChunks.length / this.totalUploadChunks) * 100)
+      );
+    },
+
+    resetUpload() {
+      this.uploadFile = null;
+      this.totalUploadChunks = 0;
+      this.fileHash = '';
+      this.uploadedChunks = [];
+      this.uploading = false;
+      this.uploadCancelToken = null;
+      this.currentUploadChunk = 0;
+      this.uploadProgress = 0;
+    },
+
+    formatFileSize(size) {
+      if (size < 1024) return size + ' B';
+      if (size < 1024 * 1024) return (size / 1024).toFixed(2) + ' KB';
+      if (size < 1024 * 1024 * 1024)
+        return (size / (1024 * 1024)).toFixed(2) + ' MB';
+      return (size / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+    },
+
+    // ========================== 下载方法 ==========================
+    async startDownload() {
+      if (!this.downloadFileName) return this.$message.warning('请输入文件名');
+      this.downloadStatus = '获取文件信息...';
+      try {
+        const { data } = await axios.get(
+          `/api/down/files/${this.downloadFileName}/info`
+        );
+        if (!data.exists) {
+          this.downloadStatus = '文件不存在';
+          return;
+        }
+        this.totalFileSize = data.fileSize;
+        this.totalDownloadChunks = Math.ceil(
+          this.totalFileSize / this.downloadChunkSize
+        );
+        this.restoreDownloadProgress();
+      } catch (e) {
+        this.downloadStatus = '获取信息失败';
+        return;
+      }
+
+      this.isDownloading = true;
+      this.downloadStatus = '下载中...';
+      this.chunksBuffer = [];
+      this.downloadWithConcurrency();
+    },
+
+    restoreDownloadProgress() {
+      const key = `download_${this.downloadFileName}`;
+      const saved = localStorage.getItem(key);
+      if (saved) this.downloadedChunks = new Set(JSON.parse(saved));
+    },
+
+    saveDownloadProgress() {
+      const key = `download_${this.downloadFileName}`;
+      localStorage.setItem(key, JSON.stringify([...this.downloadedChunks]));
+    },
+
+    async downloadWithConcurrency() {
+      const concurrency = 3;
+      let current = 0,
+        active = 0;
+      const next = async () => {
+        if (current >= this.totalDownloadChunks || !this.isDownloading) {
+          if (this.downloadedChunks.size === this.totalDownloadChunks)
+            this.mergeFile();
+          return;
+        }
+        if (this.downloadedChunks.has(current)) {
+          current++;
+          next();
+          return;
+        }
+        const idx = current++;
+        active++;
+        await this.downloadChunk(idx);
+        active--;
+        next();
+      };
+      for (let i = 0; i < concurrency; i++) next();
+    },
+
+    async downloadChunk(index) {
+      const start = index * this.downloadChunkSize;
+      const end = Math.min(
+        start + this.downloadChunkSize - 1,
+        this.totalFileSize - 1
+      );
+      const source = axios.CancelToken.source();
+      this.downloadCancelTokens.set(index, source);
+      try {
+        const res = await axios.get(
+          `/api/down/files/${this.downloadFileName}`,
+          {
+            headers: { Range: `bytes=${start}-${end}` },
+            responseType: 'blob',
+            cancelToken: source.token
+          }
+        );
+        this.downloadedChunks.add(index);
+        this.chunksBuffer[index] = res.data;
+        this.saveDownloadProgress();
+        this.downloadProgress = Math.round(
+          (this.downloadedChunks.size / this.totalDownloadChunks) * 100
+        );
+      } catch (e) {}
+      this.downloadCancelTokens.delete(index);
+    },
+
+    async mergeFile() {
+      this.isDownloading = false;
+      this.downloadStatus = '合并文件...';
+      const blob = new Blob(this.chunksBuffer);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = this.downloadFileName;
+      a.click();
+      URL.revokeObjectURL(url);
+      this.downloadStatus = '✅ 下载完成';
+      this.downloadProgress = 100;
+    },
+
+    pauseDownload() {
+      this.isDownloading = false;
+      this.downloadStatus = '已暂停';
+      this.downloadCancelTokens.forEach((s) => s.cancel());
+      this.downloadCancelTokens.clear();
+    },
+
+    resetDownload() {
+      this.pauseDownload();
+      this.downloadedChunks.clear();
+      localStorage.removeItem(`download_${this.downloadFileName}`);
+      this.downloadProgress = 0;
+      this.downloadStatus = '已重置';
+      this.chunksBuffer = [];
+    }
   }
 };
 </script>
 
 <style scoped>
-.search-container {
+.file-transfer-page {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+.transfer-card {
+  margin-bottom: 30px;
+  padding: 24px;
+  border-radius: 12px;
+}
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.upload-area {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.upload-label {
   width: 100%;
-  box-sizing: border-box;
-  padding: 8px 10px; /* 保留外层间距 */
 }
-
-.search-bar {
-  display: flex;
-  align-items: center;
-  background-color: #f8f8f8;
-  border-radius: 20px;
-  height: 38px;
-  padding: 0 5px;
-  box-sizing: border-box;
-  overflow: hidden; /* 防止内容溢出圆角 */
+.upload-placeholder {
+  border: 2px dashed #d9d9d9;
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
 }
-
-/* 图标统一设置不可收缩 */
-.icon-search,
-.camera-btn,
-.search-btn,
-.cart-btn {
-  flex-shrink: 0;
+.upload-placeholder:hover {
+  border-color: #409eff;
+  background: #f5faff;
 }
-
-.icon-search {
-  margin: 0 6px 0 10px; /* 左侧间距减小 */
+.upload-placeholder i {
+  font-size: 32px;
+  color: #c0c4cc;
+  margin-bottom: 10px;
 }
-
-.search-input {
-  flex: 1; /* 输入框自适应剩余宽度 */
-  min-width: 0; /* 关键：允许输入框在窄屏时收缩到最小 */
-  border: none;
-  outline: none;
-  background: transparent;
+.upload-placeholder.has-file i {
+  color: #67c23a;
+}
+.upload-text,
+.file-info {
   font-size: 14px;
-  padding: 0 5px;
-  box-sizing: border-box;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis; /* 文字过长时显示省略号 */
+  color: #606266;
 }
-
-.camera-btn {
-  width: 34px;
-  height: 100%;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 2px;
+.file-name {
+  font-weight: 500;
+  word-break: break-all;
 }
-
-.search-btn {
-  width: 65px;
-  height: 30px;
-  background-color: #ff2d4b;
-  color: white;
-  border: none;
-  border-radius: 15px;
+.file-size {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 4px;
+}
+.hidden-input {
+  display: none;
+}
+.progress-section {
+  margin-bottom: 20px;
+}
+.progress-text {
   font-size: 13px;
-  cursor: pointer;
-  margin: 0 4px;
+  color: #606266;
+  text-align: center;
+  margin-top: 6px;
 }
-
-.cart-btn {
-  position: relative;
-  width: 36px;
-  height: 100%;
-  border: none;
-  background: transparent;
-  cursor: pointer;
+.button-group {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 2px;
-}
-
-.badge {
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  background-color: #ff2d4b;
-  color: white;
-  font-size: 10px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
   justify-content: center;
 }
-
-/* 小屏幕适配（如手机） */
-@media (max-width: 375px) {
-  .search-btn {
-    width: 55px; /* 进一步缩小搜索按钮 */
-    font-size: 12px;
-  }
-  .cart-btn {
-    width: 32px;
-  }
-  .icon-search {
-    margin-left: 8px;
-  }
+.input-file {
+  margin-bottom: 18px;
+}
+.status-text {
+  text-align: center;
+  color: #555;
+  margin-top: 12px;
+  font-size: 14px;
 }
 </style>

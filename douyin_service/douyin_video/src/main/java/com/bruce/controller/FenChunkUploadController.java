@@ -22,7 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
-@RequestMapping("/upload")
+@RequestMapping("/video/upload")
 public class FenChunkUploadController {
 
     @Autowired
